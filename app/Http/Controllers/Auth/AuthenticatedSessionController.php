@@ -25,6 +25,51 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
+     * Login user with email and password.
+     */
+    public function login(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        // check if user exists
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
+        }
+
+        // check if user is active
+        if (!$user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => 'Your account is inactive. Please contact the administrator.',
+            ]);
+        }
+
+        // check password
+        if (!Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
+        }
+
+        // Login
+        Auth::login($user, $request->boolean('remember'));
+
+        // Update last login
+        $user->update(['last_login_at' => now()]);
+
+        return response()->json([
+            'message' => 'Login successful',
+            'user' => $user->load(['role', 'university']),
+        ]);
+    }
+
+    /**
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): RedirectResponse
@@ -37,7 +82,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Destroy an authenticated session.
+     * Destroy an authenticated session or logout user.
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -47,5 +92,28 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+        return response()->json([
+            'message' => 'Logout successful',
+        ]);
+    }
+
+    /**
+     * Get authenticated user
+     */
+    public function user(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user()->load(['role', 'university']),
+        ]);
+    }
+
+    /**
+     * Get CSRF cookie (for SPA)
+     */
+    public function csrf()
+    {
+        return response()->json([
+            'message' => 'CSRF cookie set',
+        ]);
     }
 }
