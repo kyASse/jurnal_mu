@@ -34,18 +34,32 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'university_id' => 'nullable|exists:universities,id',
+            'position' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|max:20',
         ]);
+
+        // Get role_id for 'user' role
+        $userRoleId = \DB::table('roles')->where('name', 'user')->value('id');
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role_id' => $userRoleId, // Assign 'user' role by default
+            'university_id' => $request->university_id,
+            'position' => $request->position,
+            'phone' => $request->phone,
+            'is_active' => true,
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return response()->json([
+            'message' => 'Registration successful',
+            'user' => $user->load(['role', 'university']),
+        ], 201);
     }
 }
