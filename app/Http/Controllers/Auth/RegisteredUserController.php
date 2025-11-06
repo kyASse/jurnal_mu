@@ -24,11 +24,11 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
+     * Handle an incoming registration request (API).
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -41,6 +41,14 @@ class RegisteredUserController extends Controller
 
         // Get role_id for 'user' role
         $userRoleId = \DB::table('roles')->where('name', 'user')->value('id');
+        
+        // Fallback: if role not found, throw error
+        if (!$userRoleId) {
+            return response()->json([
+                'message' => 'Role configuration error. Please run database seeder first.',
+                'error' => 'User role not found in database',
+            ], 500);
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -51,6 +59,7 @@ class RegisteredUserController extends Controller
             'position' => $request->position,
             'phone' => $request->phone,
             'is_active' => true,
+            'email_verified_at' => now(), // Auto verify for now
         ]);
 
         event(new Registered($user));

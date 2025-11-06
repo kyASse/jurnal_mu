@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,9 +28,9 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Login user with email and password.
+     * Login user with email and password (API).
      */
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -60,6 +63,9 @@ class AuthenticatedSessionController extends Controller
         // Login
         Auth::login($user, $request->boolean('remember'));
 
+        // Regenerate session to prevent fixation
+        $request->session()->regenerate();
+
         // Update last login
         $user->update(['last_login_at' => now()]);
 
@@ -84,14 +90,13 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session or logout user.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
         return response()->json([
             'message' => 'Logout successful',
         ]);
@@ -104,16 +109,6 @@ class AuthenticatedSessionController extends Controller
     {
         return response()->json([
             'user' => $request->user()->load(['role', 'university']),
-        ]);
-    }
-
-    /**
-     * Get CSRF cookie (for SPA)
-     */
-    public function csrf()
-    {
-        return response()->json([
-            'message' => 'CSRF cookie set',
         ]);
     }
 }
