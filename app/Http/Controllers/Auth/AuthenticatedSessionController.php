@@ -76,13 +76,19 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Handle an incoming authentication request (Web/Inertia).
      */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        // Update last login timestamp
+        $user = Auth::user();
+        if ($user) {
+            $user->update(['last_login_at' => now()]);
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
