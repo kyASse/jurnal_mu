@@ -63,20 +63,22 @@ class SocialAuthController extends Controller
 
             // Check if user is active
             if (!$user->is_active) {
-                return redirect(env('FRONTEND_URL') . '/login?error=account_deactivated')->withErrors(['msg' => 'Your account is inactive. Please contact the administrator.']);
+                return redirect()->route('login')->with('error', 'Your account is inactive. Please contact the administrator.');
             }
 
             // Login user
             Auth::login($user);
 
-            //  Redirect to Frontend dashboard with success
-            return redirect(env('FRONTEND_URL') . '/auth/callback?success=true');
+            // Regenerate session for security
+            request()->session()->regenerate();
 
+            // Redirect to dashboard
+            return redirect()->intended(route('dashboard'));
 
         } catch (\Exception $e) {
             \Log::error('Google OAuth Error: ' . $e->getMessage());
             
-            return redirect(env('FRONTEND_URL') . '/login?error=oauth_failed');
+            return redirect()->route('login')->with('error', 'Login with Google failed. Please try again.');
         }
     }
 }
