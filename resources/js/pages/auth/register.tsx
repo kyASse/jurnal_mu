@@ -1,119 +1,174 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
-
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
 
 type RegisterForm = {
     name: string;
     email: string;
     password: string;
     password_confirmation: string;
+    phone: string;
+    position: string;
 };
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
+    const { data, setData, post, processing, errors } = useForm<RegisterForm>({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
+        phone: '',
+        position: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
+        post(route('register'));
     };
 
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
+        <>
             <Head title="Register" />
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            required
-                            autoFocus
-                            tabIndex={1}
-                            autoComplete="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            disabled={processing}
-                            placeholder="Full name"
-                        />
-                        <InputError message={errors.name} className="mt-2" />
+
+            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-yellow-50 flex items-center justify-center p-4">
+                <div className="w-full max-w-md">
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                        <Link href="/">
+                            <h1 className="text-3xl font-bold text-green-600">
+                                Asistensi Jurnal Muhammadiyah
+                            </h1>
+                            <p className="text-gray-600 mt-2">Platform Manajemen Jurnal Ilmiah PTM</p>
+                        </Link>
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            required
-                            tabIndex={2}
-                            autoComplete="email"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            disabled={processing}
-                            placeholder="email@example.com"
-                        />
-                        <InputError message={errors.email} />
-                    </div>
+                    {/* Register Form */}
+                    <div className="bg-white rounded-2xl shadow-xl p-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-gray-900">Daftar Akun</h2>
+                            <p className="text-gray-600 mt-2">Buat akun baru untuk memulai</p>
+                        </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            tabIndex={3}
-                            autoComplete="new-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            disabled={processing}
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
-                    </div>
+                        <form onSubmit={submit} className="space-y-4">
+                            {/* Name */}
+                            <div>
+                                <Label htmlFor="name">Nama Lengkap *</Label>
+                                <Input
+                                    id="name"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    required
+                                    autoFocus
+                                    className="mt-2"
+                                />
+                                {errors.name && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+                                )}
+                            </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            required
-                            tabIndex={4}
-                            autoComplete="new-password"
-                            value={data.password_confirmation}
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            disabled={processing}
-                            placeholder="Confirm password"
-                        />
-                        <InputError message={errors.password_confirmation} />
-                    </div>
+                            {/* Email */}
+                            <div>
+                                <Label htmlFor="email">Email *</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    required
+                                    className="mt-2"
+                                />
+                                {errors.email && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                                )}
+                            </div>
 
-                    <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Create account
-                    </Button>
+                            {/* Phone */}
+                            <div>
+                                <Label htmlFor="phone">No. Telepon</Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    value={data.phone}
+                                    onChange={(e) => setData('phone', e.target.value)}
+                                    className="mt-2"
+                                />
+                                {errors.phone && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+                                )}
+                            </div>
+
+                            {/* Position */}
+                            <div>
+                                <Label htmlFor="position">Jabatan</Label>
+                                <Input
+                                    id="position"
+                                    value={data.position}
+                                    onChange={(e) => setData('position', e.target.value)}
+                                    className="mt-2"
+                                    placeholder="Dosen, Staf, dll"
+                                />
+                                {errors.position && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.position}</p>
+                                )}
+                            </div>
+
+                            {/* Password */}
+                            <div>
+                                <Label htmlFor="password">Password *</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    required
+                                    className="mt-2"
+                                />
+                                {errors.password && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                                )}
+                            </div>
+
+                            {/* Password Confirmation */}
+                            <div>
+                                <Label htmlFor="password_confirmation">Konfirmasi Password *</Label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    value={data.password_confirmation}
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    required
+                                    className="mt-2"
+                                />
+                                {errors.password_confirmation && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.password_confirmation}</p>
+                                )}
+                            </div>
+
+                            {/* Submit Button */}
+                            <Button 
+                                type="submit" 
+                                disabled={processing}
+                                className="w-full mt-6"
+                            >
+                                {processing ? 'Mendaftar...' : 'Daftar'}
+                            </Button>
+                        </form>
+
+                        {/* Login Link */}
+                        <p className="text-center text-sm text-gray-600 mt-6">
+                            Sudah punya akun?{' '}
+                            <Link 
+                                href={route('login')} 
+                                className="text-green-600 hover:text-green-700 font-medium"
+                            >
+                                Login di sini
+                            </Link>
+                        </p>
+                    </div>
                 </div>
-
-                <div className="text-center text-sm text-muted-foreground">
-                    Already have an account?{' '}
-                    <TextLink href={route('login')} tabIndex={6}>
-                        Log in
-                    </TextLink>
-                </div>
-            </form>
-        </AuthLayout>
+            </div>
+        </>
     );
 }
