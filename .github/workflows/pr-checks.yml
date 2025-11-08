@@ -1,0 +1,126 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  php-lint:
+    name: PHP Code Style (Pint)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run Laravel Pint
+        run: ./vendor/bin/pint --test
+
+  js-lint:
+    name: JavaScript/TypeScript Linting (ESLint)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  format-check:
+    name: Code Formatting (Prettier)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Prettier formatting
+        run: npm run format:check
+
+  type-check:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript type check
+        run: npm run types
+
+  tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run tests
+        run: ./vendor/bin/pest
