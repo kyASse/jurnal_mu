@@ -69,10 +69,7 @@ class AuthenticatedSessionController extends Controller
         // Update last login
         $user->update(['last_login_at' => now()]);
 
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => $user->load(['role', 'university']),
-        ]);
+        return redirect()->route('dashboard')->with('success', 'Login successful! Welcome back to Jurnal MU.');
     }
 
     /**
@@ -103,9 +100,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json([
-            'message' => 'Logout successful',
-        ]);
+        return redirect()->route('home')->with('success', 'Logout successful! See you next time.');
     }
 
     /**

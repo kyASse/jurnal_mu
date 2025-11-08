@@ -66,9 +66,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return response()->json([
-            'message' => 'Registration successful',
-            'user' => $user->load(['role', 'university']),
-        ], 201);
+        // Redirect to dashboard after successful registration
+        return redirect()->route('dashboard')->with('success', 'Registration successful! Welcome to Jurnal MU.');
     }
 }
