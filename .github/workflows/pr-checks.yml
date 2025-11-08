@@ -10,6 +10,8 @@ jobs:
   php-lint:
     name: PHP Code Style (Pint)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -30,6 +32,8 @@ jobs:
   js-lint:
     name: JavaScript/TypeScript Linting (ESLint)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -50,6 +54,8 @@ jobs:
   format-check:
     name: Code Formatting (Prettier)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -70,6 +76,8 @@ jobs:
   type-check:
     name: TypeScript Type Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -90,6 +98,8 @@ jobs:
   tests:
     name: Run Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
