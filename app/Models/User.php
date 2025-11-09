@@ -197,7 +197,7 @@ class User extends Authenticatable
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role->name === 'Super Admin';
+        return $this->role && $this->role->name === 'Super Admin';
     }
 
     /**
@@ -205,7 +205,7 @@ class User extends Authenticatable
      */
     public function isAdminKampus(): bool
     {
-        return $this->role->name === 'admin_kampus';
+        return $this->role && $this->role->name === 'Admin Kampus';
     }
 
     /**
@@ -213,7 +213,7 @@ class User extends Authenticatable
      */
     public function isUser(): bool
     {
-        return $this->role->name === 'user';
+        return $this->role && $this->role->name === 'User';
     }
 
     /**
