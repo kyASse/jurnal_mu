@@ -25,6 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'api/*',
         ]);
+        
+        // Register middleware aliases
+        $middleware->alias([
+            'role' => App\Http\Middleware\CheckRole::class,
+            'active' => App\Http\Middleware\EnsureUserIsActive::class,
+            'journal.owner' => App\Http\Middleware\CheckJournalOwnership::class,
+            'university' => App\Http\Middleware\CheckUniversity::class,
+        ]);
 
         // Web middleware stack
         $middleware->web(append: [
