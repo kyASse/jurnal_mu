@@ -3,6 +3,11 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Admin\UniversityController;
+use App\Http\Controllers\Admin\AdminKampusController;
+use App\Http\Controllers\AdminKampus\UserController as AdminKampusUserController;
+use App\Http\Controllers\User\JournalController;
+use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -58,7 +63,117 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
-    // TODO: Add more protected routes
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Super Admin'])->prefix('admin')->name('admin.')->group(function () {
+        
+        // Universities Management
+        Route::resource('universities', UniversityController::class);
+        
+        // Admin Kampus Management (TODO: Create AdminKampusController)
+        // Route::resource('admin-kampus', AdminKampusController::class);
+        
+        // View all journals (read-only for monitoring) - TODO: Create JournalController
+        // Route::get('journals', [JournalController::class, 'adminIndex'])
+        //     ->name('journals.index');
+        // Route::get('journals/{journal}', [JournalController::class, 'adminShow'])
+        //     ->name('journals.show');
+        
+        // View all assessments (read-only for monitoring) - TODO: Create AssessmentController
+        // Route::get('assessments', [AssessmentController::class, 'adminIndex'])
+        //     ->name('assessments.index');
+        // Route::get('assessments/{assessment}', [AssessmentController::class, 'adminShow'])
+        //     ->name('assessments.show');
+
+        // Additional route for toggle active
+        Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
+            ->name('universities.toggle-active');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Kampus Routes - TODO: Create Controllers
+    |--------------------------------------------------------------------------
+    */
+    // Route::middleware(['role:Admin Kampus', 'university'])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
+    //     
+    //     // Users (Pengelola Jurnal) Management
+    //     Route::resource('users', AdminKampusUserController::class);
+    //     
+    //     // View journals from their university
+    //     Route::get('journals', [JournalController::class, 'adminKampusIndex'])
+    //         ->name('journals.index');
+    //     Route::get('journals/{journal}', [JournalController::class, 'adminKampusShow'])
+    //         ->name('journals.show');
+    //     
+    //     // Review assessments from their university
+    //     Route::get('assessments', [AssessmentController::class, 'adminKampusIndex'])
+    //         ->name('assessments.index');
+    //     Route::get('assessments/{assessment}', [AssessmentController::class, 'adminKampusShow'])
+    //         ->name('assessments.show');
+    //     Route::post('assessments/{assessment}/review', [AssessmentController::class, 'review'])
+    //         ->name('assessments.review');
+    // });
+
+    /*
+    |--------------------------------------------------------------------------
+    | User (Pengelola Jurnal) Routes - TODO: Create Controllers
+    |--------------------------------------------------------------------------
+    */
+    // Route::middleware(['role:User'])->group(function () {
+    //     
+    //     // Journals Management
+    //     Route::resource('journals', JournalController::class);
+    //     
+    //     // Assessments Management
+    //     Route::prefix('journals/{journal}')->name('journals.')->group(function () {
+    //         Route::get('assessments/create', [AssessmentController::class, 'create'])
+    //             ->name('assessments.create');
+    //         Route::post('assessments', [AssessmentController::class, 'store'])
+    //             ->name('assessments.store');
+    //     });
+    //     
+    //     Route::prefix('assessments')->name('assessments.')->middleware('journal.owner')->group(function () {
+    //         Route::get('{assessment}', [AssessmentController::class, 'show'])
+    //             ->name('show');
+    //         Route::get('{assessment}/edit', [AssessmentController::class, 'edit'])
+    //             ->name('edit');
+    //         Route::put('{assessment}', [AssessmentController::class, 'update'])
+    //             ->name('update');
+    //         Route::delete('{assessment}', [AssessmentController::class, 'destroy'])
+    //             ->name('destroy');
+    //         Route::post('{assessment}/submit', [AssessmentController::class, 'submit'])
+    //             ->name('submit');
+    //         
+    //         // Assessment responses
+    //         Route::post('{assessment}/responses', [AssessmentController::class, 'storeResponse'])
+    //             ->name('responses.store');
+    //         Route::put('{assessment}/responses/{response}', [AssessmentController::class, 'updateResponse'])
+    //             ->name('responses.update');
+    //         
+    //         // Assessment attachments
+    //         Route::post('{assessment}/attachments', [AssessmentController::class, 'uploadAttachment'])
+    //             ->name('attachments.upload');
+    //         Route::delete('attachments/{attachment}', [AssessmentController::class, 'deleteAttachment'])
+    //             ->name('attachments.delete');
+    //     });
+    // });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Shared Routes (All Roles) - TODO: Create ProfileController
+    |--------------------------------------------------------------------------
+    */
+    
+    // Profile Management
+    // Route::prefix('profile')->name('profile.')->group(function () {
+    //     Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+    //     Route::patch('/', [ProfileController::class, 'update'])->name('update');
+    //     Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    // });
 });
 
 require __DIR__.'/settings.php';
