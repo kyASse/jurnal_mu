@@ -1,5 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -93,11 +94,11 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
     };
 
     return (
-        <>
-        <Head title="Universities" />
+        <AppLayout>
+            <Head title="Universities" />
 
-        <div className='py-6'>
-            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+            <div className='py-6'>
+                <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 {/* Header */}
                 <div className='mb-6'>
                     <div className='flex items-center justify-between'>
@@ -324,6 +325,6 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                 </div>
             </div>
         </div>
-        </>
+        </AppLayout>
     )
 }
