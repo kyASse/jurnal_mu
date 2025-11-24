@@ -123,7 +123,7 @@ interface Props {
     universities: University[];
 }
 
-export default function AdminKampusCreate({ universities }: Props) {
+export default function AdminKampusCreate({ universities }: Props): JSX.Element {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
