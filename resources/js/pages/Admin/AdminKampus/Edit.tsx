@@ -106,6 +106,7 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/AdminKampus/Edit.tsx
  */
+import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -143,7 +144,7 @@ interface Props {
     universities: University[];
 }
 
-export default function AdminKampusEdit({ adminKampus, universities }: Props) {
+export default function AdminKampusEdit({ adminKampus, universities }: Props): React.JSX.Element {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
