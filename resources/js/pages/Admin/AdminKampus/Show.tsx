@@ -264,26 +264,26 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
 
                             {/* University Information */}
                             {adminKampus.university && (
-                                <div className="bg-white rounded-lg shadow-sm p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                                <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-6">
+                                    <h2 className="text-xl font-semibold text-foreground mb-4">
                                         University Assignment
                                     </h2>
                                     <div className="space-y-4">
                                         <div className="flex items-center gap-3">
-                                            <Building2 className="w-5 h-5 text-gray-400" />
+                                            <Building2 className="w-5 h-5 text-muted-foreground" />
                                             <div>
-                                                <p className="text-sm text-gray-500">University</p>
-                                                <p className="text-gray-900 font-semibold">
+                                                <p className="text-sm text-muted-foreground">University</p>
+                                                <p className="text-foreground font-semibold">
                                                     {adminKampus.university.code} - {adminKampus.university.name}
                                                 </p>
                                             </div>
                                         </div>
                                         {(adminKampus.university.city || adminKampus.university.province) && (
                                             <div className="flex items-center gap-3">
-                                                <MapPin className="w-5 h-5 text-gray-400" />
+                                                <MapPin className="w-5 h-5 text-muted-foreground" />
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Location</p>
-                                                    <p className="text-gray-900">
+                                                    <p className="text-sm text-muted-foreground">Location</p>
+                                                    <p className="text-foreground">
                                                         {adminKampus.university.city}, {adminKampus.university.province}
                                                     </p>
                                                 </div>
@@ -294,12 +294,12 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                             )}
 
                             {/* Managed Journals */}
-                            <div className="bg-white rounded-lg shadow-sm p-6">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                            <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-6">
+                                <h2 className="text-xl font-semibold text-foreground mb-4">
                                     Managed Journals ({journals.length})
                                 </h2>
                                 {journals.length === 0 ? (
-                                    <p className="text-gray-500 text-center py-4">
+                                    <p className="text-muted-foreground text-center py-4">
                                         No journals managed yet
                                     </p>
                                 ) : (
