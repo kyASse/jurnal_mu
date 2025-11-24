@@ -32,7 +32,7 @@
  * @param {AdminKampus} props.adminKampus - Admin data to edit
  * @param {University[]} props.universities - List of universities for assignment
  * 
- * @returns {JSX.Element} The rendered admin kampus edit form
+ * @returns {React.JSX.Element} The rendered admin kampus edit form
  * 
  * @example
  * ```tsx
