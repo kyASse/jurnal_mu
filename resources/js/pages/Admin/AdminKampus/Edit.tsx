@@ -143,7 +143,7 @@ interface Props {
     universities: University[];
 }
 
-export default function AdminKampusEdit({ adminKampus, universities }: Props) {
+export default function AdminKampusEdit({ adminKampus, universities }: Props): JSX.Element {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
