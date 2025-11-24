@@ -72,9 +72,13 @@ Route::middleware(['auth'])->group(function () {
         
         // Universities Management
         Route::resource('universities', UniversityController::class);
+        Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
+            ->name('universities.toggle-active');
         
-        // Admin Kampus Management (TODO: Create AdminKampusController)
-        // Route::resource('admin-kampus', AdminKampusController::class);
+        // Admin Kampus Management
+        Route::resource('admin-kampus', AdminKampusController::class);
+        Route::post('admin-kampus/{admin_kampus}/toggle-active', [AdminKampusController::class, 'toggleActive'])
+            ->name('admin-kampus.toggle-active');
         
         // View all journals (read-only for monitoring) - TODO: Create JournalController
         // Route::get('journals', [JournalController::class, 'adminIndex'])
@@ -88,9 +92,7 @@ Route::middleware(['auth'])->group(function () {
         // Route::get('assessments/{assessment}', [AssessmentController::class, 'adminShow'])
         //     ->name('assessments.show');
 
-        // Additional route for toggle active
-        Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
-            ->name('universities.toggle-active');
+        
     });
 
     /*
