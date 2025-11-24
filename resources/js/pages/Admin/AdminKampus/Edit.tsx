@@ -32,7 +32,7 @@
  * @param {AdminKampus} props.adminKampus - Admin data to edit
  * @param {University[]} props.universities - List of universities for assignment
  * 
- * @returns {React.JSX.Element} The rendered admin kampus edit form
+ * @returns {JSX.Element} The rendered admin kampus edit form
  * 
  * @example
  * ```tsx
@@ -106,7 +106,6 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/AdminKampus/Edit.tsx
  */
-import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -144,7 +143,7 @@ interface Props {
     universities: University[];
 }
 
-export default function AdminKampusEdit({ adminKampus, universities }: Props): React.JSX.Element {
+export default function AdminKampusEdit({ adminKampus, universities }: Props): JSX.Element {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
