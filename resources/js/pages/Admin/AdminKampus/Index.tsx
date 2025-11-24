@@ -50,7 +50,7 @@
  * @param {University[]} props.universities - List of universities for filtering
  * @param {Object} props.filters - Current applied filters
  * 
- * @returns {JSX.Element} The rendered admin kampus list page
+ * @returns The rendered admin kampus list page
  * 
  * @example
  * ```tsx

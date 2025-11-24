@@ -32,7 +32,7 @@
  * @param {AdminKampus} props.adminKampus - Admin data to edit
  * @param {University[]} props.universities - List of universities for assignment
  * 
- * @returns {JSX.Element} The rendered admin kampus edit form
+ * @returns The rendered admin kampus edit form
  * 
  * @example
  * ```tsx
@@ -143,7 +143,7 @@ interface Props {
     universities: University[];
 }
 
-export default function AdminKampusEdit({ adminKampus, universities }: Props): JSX.Element {
+export default function AdminKampusEdit({ adminKampus, universities }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',

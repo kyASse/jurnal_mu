@@ -46,7 +46,7 @@
  * @param {AdminKampus} props.adminKampus - Admin kampus details
  * @param {Journal[]} props.journals - List of managed journals
  * 
- * @returns {JSX.Element} The rendered admin kampus detail page
+ * @returns The rendered admin kampus detail page
  * 
  * @example
  * ```tsx

@@ -20,7 +20,7 @@
  * @param {Props} props - Component props
  * @param {University[]} props.universities - List of universities to assign admin to
  * 
- * @returns {JSX.Element} The rendered admin kampus creation form
+ * @returns The rendered admin kampus creation form
  * 
  * @example
  * ```tsx
@@ -123,7 +123,7 @@ interface Props {
     universities: University[];
 }
 
-export default function AdminKampusCreate({ universities }: Props): JSX.Element {
+export default function AdminKampusCreate({ universities }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
