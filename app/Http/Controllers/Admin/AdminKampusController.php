@@ -34,12 +34,12 @@ class AdminKampusController extends Controller
             $query->search($request->search);
         }
 
-        // Fillter by University
+        // Filter by University
         if ($request->has('university_id') && $request->university_id) {
             $query->where('university_id', $request->university_id);
         }
 
-        // Fillter by Active Status
+        // Filter by Active Status
         if ($request->has('is_active') && $request->is_active !== null) {
             $query->where('is_active', $request->boolean('is_active'));
         }
