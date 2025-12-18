@@ -97,28 +97,30 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Admin Kampus Routes - TODO: Create Controllers
+    | Admin Kampus Routes
     |--------------------------------------------------------------------------
     */
-    // Route::middleware(['role:Admin Kampus', 'university'])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
-    //     
-    //     // Users (Pengelola Jurnal) Management
-    //     Route::resource('users', AdminKampusUserController::class);
-    //     
-    //     // View journals from their university
-    //     Route::get('journals', [JournalController::class, 'adminKampusIndex'])
-    //         ->name('journals.index');
-    //     Route::get('journals/{journal}', [JournalController::class, 'adminKampusShow'])
-    //         ->name('journals.show');
-    //     
-    //     // Review assessments from their university
-    //     Route::get('assessments', [AssessmentController::class, 'adminKampusIndex'])
-    //         ->name('assessments.index');
-    //     Route::get('assessments/{assessment}', [AssessmentController::class, 'adminKampusShow'])
-    //         ->name('assessments.show');
-    //     Route::post('assessments/{assessment}/review', [AssessmentController::class, 'review'])
-    //         ->name('assessments.review');
-    // });
+    Route::middleware(['role:Admin Kampus'])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
+        
+        // Users (Pengelola Jurnal) Management
+        Route::resource('users', AdminKampusUserController::class);
+        Route::post('users/{user}/toggle-active', [AdminKampusUserController::class, 'toggleActive'])
+            ->name('users.toggle-active');
+        
+        // View journals from their university - TODO: Create JournalController methods
+        // Route::get('journals', [JournalController::class, 'adminKampusIndex'])
+        //     ->name('journals.index');
+        // Route::get('journals/{journal}', [JournalController::class, 'adminKampusShow'])
+        //     ->name('journals.show');
+        
+        // Review assessments from their university - TODO: Create AssessmentController methods
+        // Route::get('assessments', [AssessmentController::class, 'adminKampusIndex'])
+        //     ->name('assessments.index');
+        // Route::get('assessments/{assessment}', [AssessmentController::class, 'adminKampusShow'])
+        //     ->name('assessments.show');
+        // Route::post('assessments/{assessment}/review', [AssessmentController::class, 'review'])
+        //     ->name('assessments.review');
+    });
 
     /*
     |--------------------------------------------------------------------------
