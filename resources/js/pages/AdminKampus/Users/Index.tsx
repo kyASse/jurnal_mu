@@ -293,12 +293,12 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link href={route('admin-kampus.users.show', user.id)}>
-                                                        <Button variant="ghost" size="sm" title="View Details">
+                                                        <Button variant="ghost" size="sm" title="View Details" aria-label={`View details for ${user.name}`}>
                                                             <Eye className="w-4 h-4" />
                                                         </Button>
                                                     </Link>
                                                     <Link href={route('admin-kampus.users.edit', user.id)}>
-                                                        <Button variant="ghost" size="sm" title="Edit User">
+                                                        <Button variant="ghost" size="sm" title="Edit User" aria-label={`Edit ${user.name}`}>
                                                             <Edit className="w-4 h-4" />
                                                         </Button>
                                                     </Link>
@@ -307,6 +307,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                                         size="sm"
                                                         onClick={() => handleToggleActive(user.id)}
                                                         title={user.is_active ? 'Deactivate' : 'Activate'}
+                                                        aria-label={user.is_active ? `Deactivate ${user.name}` : `Activate ${user.name}`}
                                                     >
                                                         <Power className={`w-4 h-4 ${user.is_active ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`} />
                                                     </Button>
@@ -315,6 +316,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                                         size="sm"
                                                         onClick={() => handleDelete(user.id, user.name)}
                                                         title="Delete User"
+                                                        aria-label={`Delete ${user.name}`}
                                                     >
                                                         <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                                                     </Button>
@@ -359,7 +361,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                                         ) : isLast ? (
                                                             <ChevronRight className="w-4 h-4" />
                                                         ) : (
-                                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                                            <span>{link.label}</span>
                                                         )}
                                                     </Button>
                                                 </Link>
