@@ -3,13 +3,13 @@
  * 
  * @description
  * A detailed view page for displaying comprehensive information about a user (Pengelola Jurnal).
- * Shows user profile, contact information, managed journals, and activity logs.
+ * Shows user profile, contact information, managed journals, and account timestamps/statistics.
  * 
  * @features
  * - Display user profile with avatar
  * - Show contact information
  * - List all managed journals
- * - Display activity information
+ * - Display account timestamps and statistics (e.g., creation date, last login)
  * - Toggle active/inactive status
  * - Navigate to edit page
  * 

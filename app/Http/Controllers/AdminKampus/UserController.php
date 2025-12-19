@@ -125,7 +125,7 @@ class UserController extends Controller
             'position' => $validated['position'] ?? null,
             'university_id' => $authUser->university_id, // Auto-assign from admin's university
             'role_id' => $userRole->id, // Auto-assign 'User' role
-            'is_active' => $validated['is_active'] ?? true,
+            'is_active' => $validated['is_active'],
         ]);
 
         return redirect()->route('admin-kampus.users.index')
@@ -254,22 +254,22 @@ class UserController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        // Update user
-        $user->update([
+        // Prepare data for update
+        $data = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
             'is_active' => $validated['is_active'] ?? $user->is_active,
-        ]);
+        ];
 
-        // Update password if provided
+        // Include password in update if provided
         if (!empty($validated['password'])) {
-            $user->update([
-                'password' => Hash::make($validated['password']),
-            ]);
+            $data['password'] = Hash::make($validated['password']);
         }
 
+        // Update user with all fields in a single query
+        $user->update($data);
         return redirect()->route('admin-kampus.users.index')
             ->with('success', 'User updated successfully.');
     }
@@ -297,7 +297,7 @@ class UserController extends Controller
 
         // Check if user has journals
         if ($user->journals()->count() > 0) {
-            return back()->with('error', 'Cannot delete user with existing journals. Please reassign or delete journals first.');
+            return back()->with('error', 'Cannot delete user because they still have associated journals. Please delete or reassign all of the user\'s journals before trying again.');
         }
 
         // Soft delete user

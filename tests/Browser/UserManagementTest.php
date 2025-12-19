@@ -316,9 +316,14 @@ class UserManagementTest extends DuskTestCase
                 ->press('Search')
                 ->pause(2000)
                 ->assertSee('Delete Me User');
-            
-            // Use script to click the first eye icon button's parent link
-            $browser->script("document.querySelector('button[title=\"View Details\"]').closest('a').click();");
+
+            // Helper to click a button by its title attribute using JavaScript
+            $clickButtonByTitle = function (Browser $browser, string $title): void {
+                $browser->script("document.querySelector('button[title=\"{$title}\"]').closest('a').click();");
+            };
+
+            // Use helper to click the first "View Details" button's parent link
+            $clickButtonByTitle($browser, 'View Details');
             $browser->pause(3000) // Wait for page to fully load
                 ->assertSee('Delete Me User');
             
