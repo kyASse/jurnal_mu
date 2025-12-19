@@ -6,5 +6,8 @@
 *.md diff=markdown
 *.php diff=php
 
+package-lock.json merge=union
+composer.lock merge=union
+
 CHANGELOG.md export-ignore
 README.md export-ignore
