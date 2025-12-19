@@ -55,7 +55,7 @@ class UserController extends Controller
                 'position' => $user->position,
                 'avatar_url' => $user->avatar_url,
                 'is_active' => $user->is_active,
-                'journals_count' => $user->journals_count ?? 0,
+                'journals_count' => $user->journals_count,
                 'last_login_at' => $user->last_login_at?->format('Y-m-d H:i:s'),
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
             ]);
