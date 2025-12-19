@@ -137,21 +137,11 @@ class UserController extends Controller
      */
     public function show(Request $request, User $user): Response
     {
-        // Load role first for isUser() check
         $user->load('role');
-        
         $this->authorize('view', $user);
 
-        // Verify user belongs to admin's university
         $authUser = $request->user();
-        if ($user->university_id !== $authUser->university_id) {
-            abort(404, 'User not found.');
-        }
-
-        // Verify it's a 'User' role
-        if (!$user->isUser()) {
-            abort(404, 'User not found.');
-        }
+        $this->ensureUserBelongsToUniversityAndIsUser($user, $authUser);
 
         // Load remaining relationships
         $user->load(['university', 'journals.scientificField']);
@@ -190,21 +180,11 @@ class UserController extends Controller
      */
     public function edit(Request $request, User $user): Response
     {
-        // Load role first for isUser() check
         $user->load('role');
-        
         $this->authorize('update', $user);
 
-        // Verify user belongs to admin's university
         $authUser = $request->user();
-        if ($user->university_id !== $authUser->university_id) {
-            abort(404, 'User not found.');
-        }
-
-        // Verify it's a 'User' role
-        if (!$user->isUser()) {
-            abort(404, 'User not found.');
-        }
+        $this->ensureUserBelongsToUniversityAndIsUser($user, $authUser);
 
         return Inertia::render('AdminKampus/Users/Edit', [
             'user' => [
@@ -228,21 +208,11 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
-        // Load role first for isUser() check
         $user->load('role');
-        
         $this->authorize('update', $user);
 
-        // Verify user belongs to admin's university
         $authUser = $request->user();
-        if ($user->university_id !== $authUser->university_id) {
-            abort(404, 'User not found.');
-        }
-
-        // Verify it's a 'User' role
-        if (!$user->isUser()) {
-            abort(404, 'User not found.');
-        }
+        $this->ensureUserBelongsToUniversityAndIsUser($user, $authUser);
 
         // Validate request
         $validated = $request->validate([
@@ -279,21 +249,11 @@ class UserController extends Controller
      */
     public function destroy(Request $request, User $user): RedirectResponse
     {
-        // Load role first for isUser() check
         $user->load('role');
-        
         $this->authorize('delete', $user);
 
-        // Verify user belongs to admin's university
         $authUser = $request->user();
-        if ($user->university_id !== $authUser->university_id) {
-            abort(404, 'User not found.');
-        }
-
-        // Verify it's a 'User' role
-        if (!$user->isUser()) {
-            abort(404, 'User not found.');
-        }
+        $this->ensureUserBelongsToUniversityAndIsUser($user, $authUser);
 
         // Check if user has journals
         if ($user->journals()->count() > 0) {
@@ -312,21 +272,11 @@ class UserController extends Controller
      */
     public function toggleActive(Request $request, User $user): RedirectResponse
     {
-        // Load role first for isUser() check
         $user->load('role');
-        
         $this->authorize('toggleActiveStatus', $user);
 
-        // Verify user belongs to admin's university
         $authUser = $request->user();
-        if ($user->university_id !== $authUser->university_id) {
-            abort(404, 'User not found.');
-        }
-
-        // Verify it's a 'User' role
-        if (!$user->isUser()) {
-            abort(404, 'User not found.');
-        }
+        $this->ensureUserBelongsToUniversityAndIsUser($user, $authUser);
 
         // Toggle active status
         $user->update([
@@ -336,5 +286,28 @@ class UserController extends Controller
         $status = $user->is_active ? 'activated' : 'deactivated';
 
         return back()->with('success', "User {$status} successfully.");
+    }
+
+    /**
+     * Ensure the user belongs to the admin's university and has 'User' role.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    private function ensureUserBelongsToUniversityAndIsUser(User $user, User $authUser): void
+    {
+        // Load role for isUser() check if not already loaded
+        if (!$user->relationLoaded('role')) {
+            $user->load('role');
+        }
+
+        // Verify user belongs to admin's university
+        if ($user->university_id !== $authUser->university_id) {
+            abort(404, 'User not found.');
+        }
+
+        // Verify it's a 'User' role
+        if (!$user->isUser()) {
+            abort(404, 'User not found.');
+        }
     }
 }
