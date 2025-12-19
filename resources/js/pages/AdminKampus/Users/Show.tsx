@@ -33,10 +33,12 @@ import {
     Phone,
     Briefcase,
     Building2,
-    Calendar,
     BookOpen,
     Power,
     Trash2,
+    Clock,
+    CalendarPlus,
+    CalendarClock,
 } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -171,12 +173,16 @@ export default function UsersShow({ user, journals, university }: Props) {
                                     variant="outline"
                                     onClick={handleToggleActive}
                                     className="flex items-center gap-2"
+                                    aria-label={user.is_active ? 'Deactivate user' : 'Activate user'}
                                 >
                                     <Power className="w-4 h-4" />
                                     {user.is_active ? 'Deactivate' : 'Activate'}
                                 </Button>
                                 <Link href={route('admin-kampus.users.edit', user.id)}>
-                                    <Button className="flex items-center gap-2">
+                                    <Button 
+                                        className="flex items-center gap-2"
+                                        aria-label={`Edit user ${user.name}`}
+                                    >
                                         <Edit className="w-4 h-4" />
                                         Edit User
                                     </Button>
@@ -187,6 +193,7 @@ export default function UsersShow({ user, journals, university }: Props) {
                                     className="flex items-center gap-2"
                                     disabled={user.journals_count > 0}
                                     title={user.journals_count > 0 ? 'Cannot delete user with journals' : 'Delete user'}
+                                    aria-label={`Delete user ${user.name}`}
                                 >
                                     <Trash2 className="w-4 h-4" />
                                     Delete
@@ -248,21 +255,21 @@ export default function UsersShow({ user, journals, university }: Props) {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                                    <Clock className="w-5 h-5 text-muted-foreground" />
                                     <div>
                                         <p className="text-sm text-muted-foreground">Last Login</p>
                                         <p className="font-medium">{user.last_login_at || 'Never'}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                                    <CalendarPlus className="w-5 h-5 text-muted-foreground" />
                                     <div>
                                         <p className="text-sm text-muted-foreground">Created At</p>
                                         <p className="font-medium">{user.created_at}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                                    <CalendarClock className="w-5 h-5 text-muted-foreground" />
                                     <div>
                                         <p className="text-sm text-muted-foreground">Last Updated</p>
                                         <p className="font-medium">{user.updated_at}</p>
