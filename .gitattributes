@@ -6,5 +6,9 @@
 *.md diff=markdown
 *.php diff=php
 
+*.lock binary
+package-lock.json merge=ours
+composer.lock merge=ours
+
 CHANGELOG.md export-ignore
 README.md export-ignore
