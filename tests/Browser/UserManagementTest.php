@@ -29,6 +29,12 @@ use Tests\DuskTestCase;
  * 11. Admin Kampus cannot access users from other universities
  * 12. Guest cannot access user management
  * 13. Regular User cannot access user management
+ * 
+ * Technical Notes:
+ * - Several tests use JavaScript execution via $browser->script() to click buttons.
+ * - This is necessary because action buttons are nested inside <a> tags in the UI.
+ * - Dusk's standard click() method may fail due to element overlap or event handling issues.
+ * - JavaScript clicks ensure we properly trigger the parent link's navigation.
  */
 class UserManagementTest extends DuskTestCase
 {
@@ -155,7 +161,7 @@ class UserManagementTest extends DuskTestCase
                 ->waitForText('User Management')
                 ->type('input[placeholder*="Search"]', 'Test User UAD')
                 ->press('Search')
-                ->pause(500)
+                ->waitForText('Test User UAD')
                 ->assertSee('Test User UAD')
                 ->assertSee($this->testUser->email);
         });
@@ -202,12 +208,13 @@ class UserManagementTest extends DuskTestCase
             $browser->loginAs($this->adminKampus)
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
-                ->assertSee($this->testUser->name)
-                ->pause(1000);
+                ->assertSee($this->testUser->name);
             
-            // Use script to click the first eye icon button's parent link
+            // Note: Using JavaScript to click because the button is nested inside an <a> tag.
+            // Dusk's standard click() method may fail due to element overlap or event handling.
+            // This ensures we click the parent link that contains the "View Details" button.
             $browser->script("document.querySelector('button[title=\"View Details\"]').closest('a').click();");
-            $browser->pause(3000) // Wait for page to fully load
+            $browser->waitForText($this->testUser->email)
                 ->assertSee($this->testUser->email);
         });
     }
@@ -222,12 +229,13 @@ class UserManagementTest extends DuskTestCase
             $browser->loginAs($this->adminKampus)
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
-                ->assertSee($this->testUser->name)
-                ->pause(1000);
+                ->assertSee($this->testUser->name);
             
-            // Use script to click the first edit icon button's parent link
+            // Note: Using JavaScript to click because the button is nested inside an <a> tag.
+            // Dusk's standard click() method may fail due to element overlap or event handling.
+            // This ensures we click the parent link that contains the "Edit User" button.
             $browser->script("document.querySelector('button[title=\"Edit User\"]').closest('a').click();");
-            $browser->pause(3000) // Wait for page to fully load
+            $browser->waitForText('Personal Information')
                 ->assertSee('Personal Information')
                 ->assertInputValue('input[id="name"]', $this->testUser->name);
         });
@@ -243,17 +251,17 @@ class UserManagementTest extends DuskTestCase
             $browser->loginAs($this->adminKampus)
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
-                ->assertSee($this->testUser->name)
-                ->pause(1000);
+                ->assertSee($this->testUser->name);
             
-            // Use script to click the first edit icon button's parent link
+            // Note: Using JavaScript to click because the button is nested inside an <a> tag.
+            // Dusk's standard click() method may fail due to element overlap or event handling.
+            // This ensures we click the parent link that contains the "Edit User" button.
             $browser->script("document.querySelector('button[title=\"Edit User\"]').closest('a').click();");
-            $browser->pause(3000) // Wait for page to fully load
-                ->waitFor('input[id="name"]', 15)
+            $browser->waitFor('input[id="name"]', 15)
                 ->clear('input[id="name"]')
                 ->type('input[id="name"]', 'Updated User Name')
                 ->press('Update User')
-                ->pause(3000) // Wait for redirect
+                ->waitForText('Updated User Name')
                 ->assertSee('Updated User Name');
         });
     }
@@ -271,17 +279,16 @@ class UserManagementTest extends DuskTestCase
             $browser->loginAs($this->adminKampus)
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
-                ->assertSee($this->testUser->name)
-                ->pause(1000);
+                ->assertSee($this->testUser->name);
             
             // Use script to click the first eye icon button's parent link
             $browser->script("document.querySelector('button[title=\"View Details\"]').closest('a').click();");
-            $browser->pause(3000) // Wait for page to fully load
+            $browser->waitForText($this->testUser->name)
                 ->assertSee($this->testUser->name);
             
             // Click toggle button - user is active, so button says "Deactivate"
             $browser->press('Deactivate')
-                ->pause(3000); // Wait for action to complete
+                ->waitForText('Activate'); // Wait for button text to change
         });
         
         // Verify user is now inactive
@@ -314,25 +321,28 @@ class UserManagementTest extends DuskTestCase
                 ->waitForText('User Management', 15)
                 ->type('input[placeholder*="Search"]', 'Delete Me User')
                 ->press('Search')
-                ->pause(2000)
+                ->waitForText('Delete Me User')
                 ->assertSee('Delete Me User');
 
-            // Helper to click a button by its title attribute using JavaScript
+            // Helper to click a button by its title attribute using JavaScript.
+            // Note: JavaScript execution is necessary because buttons are nested inside <a> tags,
+            // and Dusk's standard click() method may fail due to element overlap or event handling.
+            // This helper ensures we click the parent link that wraps the button.
             $clickButtonByTitle = function (Browser $browser, string $title): void {
                 $browser->script("document.querySelector('button[title=\"{$title}\"]').closest('a').click();");
             };
 
             // Use helper to click the first "View Details" button's parent link
             $clickButtonByTitle($browser, 'View Details');
-            $browser->pause(3000) // Wait for page to fully load
+            $browser->waitForText('Delete Me User')
                 ->assertSee('Delete Me User');
             
             // Click delete button
             $browser->press('Delete')
-                ->pause(1000)
+                ->waitForDialog()
                 // Handle browser confirm dialog
                 ->acceptDialog()
-                ->pause(3000); // Wait for deletion to complete
+                ->waitForLocation('/admin-kampus/users'); // Wait for deletion to complete
         });
         
         // Verify user is deleted
@@ -356,16 +366,31 @@ class UserManagementTest extends DuskTestCase
             'is_active' => true,
         ]);
 
+        // Verify user exists before deletion attempt
+        $this->assertDatabaseHas('users', ['email' => $this->testUser->email]);
+
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->adminKampus)
                 ->visit('/admin-kampus/users')
-                ->waitForText('User Management', 10)
-                ->waitForText('Test User UAD', 10);
+                ->waitForText('User Management', 15)
+                ->type('input[placeholder*="Search"]', 'Test User UAD')
+                ->press('Search')
+                ->waitForText('Test User UAD')
+                ->assertSee('Test User UAD');
+
+            // Navigate to user detail page
+            $browser->script("document.querySelector('button[title=\"View Details\"]').closest('a').click();");
+            $browser->waitForText($this->testUser->email)
+                ->assertSee($this->testUser->email);
             
-            // The test user should have journals_count = 1
-            // We just verify the page shows correctly - the delete button should be there
-            // But clicking it will fail because user has journals
-            $browser->assertSee('Test User UAD');
+            // Attempt to delete user with journals
+            $browser->press('Delete')
+                ->waitForDialog()
+                ->acceptDialog();
+            
+            // Should show error message or stay on same page
+            // Verify user still exists in database
+            $this->assertDatabaseHas('users', ['email' => $this->testUser->email]);
         });
     }
 
@@ -393,8 +418,7 @@ class UserManagementTest extends DuskTestCase
 
             // Try to access user detail directly - should fail (404 or 403)
             // The controller returns 404 for users not in admin's university
-            $browser->visit('/admin-kampus/users/' . $otherUser->id)
-                ->pause(1000);
+            $browser->visit('/admin-kampus/users/' . $otherUser->id);
             
             // Should not be on the show page - should see error or be redirected
             $browser->assertDontSee('Contact Information')
@@ -422,7 +446,7 @@ class UserManagementTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->testUser)
                 ->visit('/admin-kampus/users')
-                ->pause(500)
+                ->waitForText('403')
                 // Should be forbidden or redirected
                 ->assertSee('403');
         });
@@ -443,7 +467,7 @@ class UserManagementTest extends DuskTestCase
                 ->type('input[id="password"]', 'password123')
                 ->type('input[id="password_confirmation"]', 'password123')
                 ->press('Create User')
-                ->pause(2000);
+                ->waitForText('The email has already been taken.');
             
             // Should show validation error - check that we're still on create page
             // (not redirected to index) which means validation failed
