@@ -1,6 +1,6 @@
 # UI Progress Screenshots - Jurnal_mu Project
 
-Dokumentasi ini menunjukkan progress user interface yang sudah dibuat untuk aplikasi Jurnal_mu per tanggal 31 Desember 2025.
+Dokumentasi ini menunjukkan progress user interface yang sudah dibuat untuk aplikasi Jurnal_mu per tanggal 31 Desember 2024.
 
 ## Ringkasan
 
@@ -279,6 +279,6 @@ Aplikasi Jurnal_mu adalah sistem manajemen jurnal akademik yang dibangun menggun
 
 ---
 
-**Generated on:** 2025-12-31  
+**Generated on:** 2024-12-31  
 **Total Pages Documented:** 8 pages with screenshots  
 **Additional Pages Identified:** 3 pages (not photographed)
