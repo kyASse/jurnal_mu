@@ -527,7 +527,7 @@ Akses: Manage journals (fitur belum tersedia di UI)
 
 ---
 
-**Generated on:** 2024-12-31  
+**Generated on:** 2025-12-31  
 **Branch:** development  
 **Total Pages Documented:** 9 pages with screenshots  
 **Total Pages Identified:** 20+ additional pages (forms, details, settings)
