@@ -1,6 +1,6 @@
 # UI Progress Screenshots - Jurnal_mu Project (Development Branch)
 
-Dokumentasi ini menunjukkan progress user interface yang sudah dibuat untuk aplikasi Jurnal_mu dari branch **development** per tanggal 31 Desember 2024.
+Dokumentasi ini menunjukkan progress user interface yang sudah dibuat untuk aplikasi Jurnal_mu dari branch **development** per tanggal 31 Desember 2025.
 
 ## Ringkasan
 
