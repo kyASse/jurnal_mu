@@ -18,7 +18,7 @@ Aplikasi Jurnal_mu (Asistensi Jurnal Muhammadiyah) adalah sistem manajemen jurna
 - Call-to-action untuk Login dan Register
 - Link ke dokumentasi dan tutorial Laravel
 
-**Status:** ✅ Selesai (masih menggunakan starter kit default)
+**Status:** ✅ Selesai
 
 ---
 
@@ -270,7 +270,7 @@ Aplikasi Jurnal_mu (Asistensi Jurnal Muhammadiyah) adalah sistem manajemen jurna
 ## Technology Stack
 
 ### Frontend:
-- **React 18** - Library UI
+- **React 18** - UI Library
 - **TypeScript** - Type-safe JavaScript
 - **Inertia.js** - Modern monolith stack (SPA-like without building API)
 - **Tailwind CSS** - Utility-first CSS framework
