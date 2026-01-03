@@ -1,3 +1,57 @@
+/**
+ * JournalsEdit Component
+ *
+ * @description
+ * The editing interface for existing journals. Pre-populates all form fields
+ * with current journal data and allows users to update information such as
+ * ISSN, titles, and classification details.
+ *
+ * @component
+ *
+ * @interface Journal
+ * @property {number} id - Journal ID
+ * @property {string} title - Journal Title
+ * @property {string} issn - ISSN
+ * @property {string} e_issn - E-ISSN
+ * @property {string} url - URL
+ * @property {number} scientific_field_id - Foreign key for scientific field
+ * @property {number|null} sinta_rank - SINTA Rank
+ * @property {string} frequency - Publication frequency
+ * @property {string} publisher - Publisher name
+ * @property {number|null} first_published_year - Year of first publication
+ *
+ * @interface Props
+ * @property {Journal} journal - The existing journal data to edit
+ * @property {Array} scientificFields - List of available scientific fields
+ *
+ * @param {Props} props - Component props
+ * @param {Journal} props.journal - Current journal data
+ * @param {Array} props.scientificFields - Reference data for dropdowns
+ *
+ * @returns {JSX.Element} The rendered Edit Journal page
+ *
+ * @example
+ * ```tsx
+ * <JournalsEdit journal={journalData} scientificFields={fieldsList} />
+ * ```
+ *
+ * @features
+ * - Data pre-filling
+ * - PUT request handling for updates
+ * - Validation error display
+ * - Navigation back to index
+ *
+ * @route PUT /journals/{id}
+ *
+ * @requires @inertiajs/react
+ * @requires @/layouts/app-layout
+ * @requires @/components/ui/button
+ * @requires @/components/ui/select
+ * @requires lucide-react
+ *
+ * @author JurnalMU Team
+ * @filepath /resources/js/pages/User/Journals/Edit.tsx
+ */
 import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';

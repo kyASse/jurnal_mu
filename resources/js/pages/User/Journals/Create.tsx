@@ -1,3 +1,49 @@
+/**
+ * JournalsCreate Component
+ *
+ * @description
+ * A form page allowing users to register a new journal into the system.
+ * It strictly validates input data including ISSN, classification, and
+ * publisher details to ensure data integrity.
+ *
+ * @component
+ *
+ * @interface Props
+ * @property {Array} scientificFields - List of available scientific fields for classification
+ * @property {number} scientificFields[].id - ID of the field
+ * @property {string} scientificFields[].name - Name of the field
+ *
+ * @param {Props} props - Component props
+ * @param {Array} props.scientificFields - Data for populating the scientific field dropdown
+ *
+ * @returns {JSX.Element} The rendered Create Journal page
+ *
+ * @example
+ * ```tsx
+ * <JournalsCreate scientificFields={fieldsList} />
+ * ```
+ *
+ * @features
+ * - Comprehensive journal registration form
+ * - Input validation with error messaging
+ * - Selection for Scientific Field and SINTA Rank
+ * - Publication Frequency selection
+ * - Automatic year validation
+ * - Cancel and Return navigation
+ *
+ * @route POST /journals
+ *
+ * @requires @inertiajs/react
+ * @requires @/layouts/app-layout
+ * @requires @/components/ui/button
+ * @requires @/components/ui/input
+ * @requires @/components/ui/label
+ * @requires @/components/ui/select
+ * @requires lucide-react
+ *
+ * @author JurnalMU Team
+ * @filepath /resources/js/pages/User/Journals/Create.tsx
+ */
 import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';

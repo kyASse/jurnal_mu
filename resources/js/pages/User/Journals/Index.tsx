@@ -1,3 +1,68 @@
+/**
+ * JournalsIndex Component
+ *
+ * @description
+ * The main journal management dashboard for users. It displays a comprehensive list
+ * of journals that the user is responsible for. This page allows users to view,
+ * search, manage and track the status of their journals. It serves as the
+ * central hub for all journal-related operations.
+ *
+ * @component
+ *
+ * @interface Journal
+ * @property {number} id - Unique identifier for the journal
+ * @property {string} title - The title of the journal
+ * @property {string} issn - International Standard Serial Number (Print)
+ * @property {string} e_issn - Electronic ISSN
+ * @property {string} url - Website URL of the journal
+ * @property {Object} university - Associated university data
+ * @property {string} university.name - University name
+ * @property {Object} scientific_field - Field of science data
+ * @property {string} scientific_field.name - Name of the field
+ * @property {number|null} sinta_rank - SINTA accreditation rank (1-6)
+ * @property {boolean} is_active - Active status of the journal
+ * @property {string} created_at - Creation timestamp
+ *
+ * @interface Props
+ * @property {Object} journals - Paginated response of journals
+ * @property {Journal[]} journals.data - Array of journal records
+ * @property {number} journals.current_page - Current page number
+ * @property {number} journals.last_page - Last page number
+ * @property {number} journals.per_page - Items per page
+ * @property {number} journals.total - Total items
+ * @property {Array} journals.links - Pagination links
+ *
+ * @param {Props} props - Component props
+ * @param {Object} props.journals - The journals data passed from the controller
+ *
+ * @returns {JSX.Element} The rendered Journals Index page
+ *
+ * @example
+ * ```tsx
+ * <JournalsIndex journals={paginatedJournals} />
+ * ```
+ *
+ * @features
+ * - List view of all user's journals
+ * - Pagination support
+ * - Delete functionality with confirmation
+ * - Direct links to Edit and Create pages
+ * - External link to journal website
+ * - Status indicators (SINTA rank)
+ * - Flash message display
+ *
+ * @route GET /journals
+ *
+ * @requires @inertiajs/react
+ * @requires @/layouts/app-layout
+ * @requires @/components/ui/button
+ * @requires @/components/ui/table
+ * @requires @/components/ui/badge
+ * @requires lucide-react
+ *
+ * @author JurnalMU Team
+ * @filepath /resources/js/pages/User/Journals/Index.tsx
+ */
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -123,9 +188,9 @@ export default function JournalsIndex({ journals }: Props) {
                                             <TableCell>
                                                 <div className="flex flex-col">
                                                     <span className="font-semibold text-gray-900">{journal.title}</span>
-                                                    <a 
-                                                        href={journal.url} 
-                                                        target="_blank" 
+                                                    <a
+                                                        href={journal.url}
+                                                        target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
                                                     >
