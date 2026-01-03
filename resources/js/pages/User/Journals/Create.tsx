@@ -252,7 +252,7 @@ export default function JournalsCreate({ scientificFields }: Props) {
                                             id="first_published_year"
                                             type="number"
                                             min="1900"
-                                            max={currentYear + 1}
+                                            max={currentYear}
                                             value={data.first_published_year}
                                             onChange={(e) => setData('first_published_year', e.target.value)}
                                             placeholder="e.g. 2010"
