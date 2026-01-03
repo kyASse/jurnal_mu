@@ -85,7 +85,7 @@ class JournalController extends Controller
 
         $scientificFields = ScientificField::select('id', 'name')->get();
 
-        return Inertia::render('user/journals/edit', [
+        return Inertia::render('User/Journals/Edit', [
             'journal' => $journal,
             'scientificFields' => $scientificFields,
         ]);
