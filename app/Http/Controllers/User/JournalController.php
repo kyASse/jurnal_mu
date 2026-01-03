@@ -58,8 +58,8 @@ class JournalController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'issn' => 'nullable|string|max:20',
-            'e_issn' => 'nullable|string|max:20',
+            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{4}$/',
+            'e_issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{4}$/',
             'url' => 'required|url|max:500',
             'scientific_field_id' => 'required|exists:scientific_fields,id',
             'sinta_rank' => 'nullable|integer|min:1|max:6',
