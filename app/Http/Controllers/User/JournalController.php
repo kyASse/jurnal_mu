@@ -25,7 +25,7 @@ class JournalController extends Controller
             ->latest()
             ->paginate(10);
 
-        return Inertia::render('user/journals/index', [
+        return Inertia::render('User/Journals/Index', [
             'journals' => $journals,
         ]);
     }
