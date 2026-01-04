@@ -127,44 +127,32 @@ Route::middleware(['auth'])->group(function () {
     | User (Pengelola Jurnal) Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:User'])->group(function () {
+    Route::middleware(['role:User'])->prefix('user')->name('user.')->group(function () {
 
         // Journals Management
         Route::resource('journals', JournalController::class);
 
-        // Assessments Management (Coming Soon in Feature #7)
-        // Route::prefix('journals/{journal}')->name('journals.')->group(function () {
-        //     Route::get('assessments/create', [AssessmentController::class, 'create'])
-        //         ->name('assessments.create');
-        //     Route::post('assessments', [AssessmentController::class, 'store'])
-        //         ->name('assessments.store');
-        // });
-        //     
-        //     Route::prefix('assessments')->name('assessments.')->middleware('journal.owner')->group(function () {
-        //         Route::get('{assessment}', [AssessmentController::class, 'show'])
-        //             ->name('show');
-        //         Route::get('{assessment}/edit', [AssessmentController::class, 'edit'])
-        //             ->name('edit');
-        //         Route::put('{assessment}', [AssessmentController::class, 'update'])
-        //             ->name('update');
-        //         Route::delete('{assessment}', [AssessmentController::class, 'destroy'])
-        //             ->name('destroy');
-        //         Route::post('{assessment}/submit', [AssessmentController::class, 'submit'])
-        //             ->name('submit');
-        //         
-        //         // Assessment responses
-        //         Route::post('{assessment}/responses', [AssessmentController::class, 'storeResponse'])
-        //             ->name('responses.store');
-        //         Route::put('{assessment}/responses/{response}', [AssessmentController::class, 'updateResponse'])
-        //             ->name('responses.update');
-        //         
-        //         // Assessment attachments
-        //         Route::post('{assessment}/attachments', [AssessmentController::class, 'uploadAttachment'])
-        //             ->name('attachments.upload');
-        //         Route::delete('attachments/{attachment}', [AssessmentController::class, 'deleteAttachment'])
-        //             ->name('attachments.delete');
-        //     });
-        // });
+        // Assessments Management
+        Route::prefix('assessments')->name('assessments.')->group(function () {
+            Route::get('/', [AssessmentController::class, 'index'])
+                ->name('index');
+            Route::get('create', [AssessmentController::class, 'create'])
+                ->name('create');
+            Route::post('/', [AssessmentController::class, 'store'])
+                ->name('store');
+            Route::get('{assessment}', [AssessmentController::class, 'show'])
+                ->name('show');
+            Route::get('{assessment}/edit', [AssessmentController::class, 'edit'])
+                ->name('edit');
+            Route::put('{assessment}', [AssessmentController::class, 'update'])
+                ->name('update');
+            Route::delete('{assessment}', [AssessmentController::class, 'destroy'])
+                ->name('destroy');
+            Route::post('{assessment}/submit', [AssessmentController::class, 'submit'])
+                ->name('submit');
+            Route::get('{assessment}/attachments/{attachment}', [AssessmentController::class, 'downloadAttachment'])
+                ->name('attachments.download');
+        });
     });
 
     /*
