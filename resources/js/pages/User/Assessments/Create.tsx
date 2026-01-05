@@ -65,6 +65,7 @@ interface AssessmentResponse {
     answer_text?: string;
     notes?: string;
     attachments?: File[];
+    [key: string]: number | boolean | string | File[] | undefined;
 }
 
 interface Assessment {
@@ -73,7 +74,19 @@ interface Assessment {
     assessment_date: string;
     period: string | null;
     notes: string | null;
-    responses: any[];
+    status: 'draft' | 'submitted' | 'reviewed';
+    responses: Array<{
+        evaluation_indicator_id: number;
+        answer_boolean?: boolean;
+        answer_scale?: number;
+        answer_text?: string;
+        notes?: string;
+        attachments?: Array<{
+            id: number;
+            original_filename: string;
+            human_file_size: string;
+        }>;
+    }>;
 }
 
 interface Props {
@@ -82,9 +95,14 @@ interface Props {
     assessment?: Assessment;
 }
 
+interface FlashProps {
+    error?: string;
+    success?: string;
+}
+
 export default function AssessmentForm({ journals, indicators, assessment }: Props) {
     const isEdit = !!assessment;
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props as { flash?: FlashProps };
 
     // File upload constants
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
@@ -92,7 +110,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
 
     // Pre-fill responses from existing assessment data
     const initialResponses: AssessmentResponse[] = isEdit && assessment?.responses
-        ? assessment.responses.map((response: any) => ({
+        ? assessment.responses.map((response) => ({
             evaluation_indicator_id: response.evaluation_indicator_id,
             answer_boolean: response.answer_boolean,
             answer_scale: response.answer_scale,
@@ -130,9 +148,9 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
     const updateResponse = (
         indicatorId: number,
         field: keyof AssessmentResponse,
-        value: any
+        value: boolean | number | string | File[]
     ) => {
-        const responses = [...data.responses];
+        const responses = [...(data.responses as unknown as AssessmentResponse[])];
         const index = responses.findIndex(
             (r) => r.evaluation_indicator_id === indicatorId
         );
@@ -146,11 +164,11 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
             } as AssessmentResponse);
         }
 
-        setData('responses', responses);
+        setData('responses', responses as AssessmentResponse[]);
     };
 
     const getResponse = (indicatorId: number): AssessmentResponse | undefined => {
-        return data.responses.find((r) => r.evaluation_indicator_id === indicatorId);
+        return (data.responses as unknown as AssessmentResponse[]).find((r) => r.evaluation_indicator_id === indicatorId);
     };
 
     const renderAnswerInput = (indicator: EvaluationIndicator) => {
@@ -238,9 +256,8 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
         if (!indicator.requires_attachment) return null;
 
         // Get existing attachments for this indicator in edit mode
-        const response = getResponse(indicator.id);
         const existingAttachments = isEdit && assessment?.responses
-            ? assessment.responses.find((r: any) => r.evaluation_indicator_id === indicator.id)?.attachments || []
+            ? assessment.responses.find((r) => r.evaluation_indicator_id === indicator.id)?.attachments || []
             : [];
 
         const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,7 +310,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                 {/* Show existing attachments in edit mode */}
                 {isEdit && existingAttachments.length > 0 && (
                     <div className="mb-2 space-y-1">
-                        {existingAttachments.map((attachment: any) => (
+                        {existingAttachments.map((attachment) => (
                             <div key={attachment.id} className="text-sm text-muted-foreground flex items-center gap-2">
                                 <FileText className="w-3 h-3" />
                                 <span>{attachment.original_filename}</span>
@@ -321,7 +338,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
     const calculateProgress = () => {
         const totalIndicators = Object.values(indicators).flat().length;
         if (totalIndicators === 0) return 0;
-        const answeredIndicators = data.responses.length;
+        const answeredIndicators = (data.responses as unknown as AssessmentResponse[]).length;
         return Math.round((answeredIndicators / totalIndicators) * 100);
     };
 
@@ -376,7 +393,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                             <div className="space-y-2">
                                 <Label htmlFor="journal_id">Jurnal *</Label>
                                 <Select
-                                    value={data.journal_id.toString()}
+                                    value={data.journal_id as string}
                                     onValueChange={(value) => setData('journal_id', value)}
                                 >
                                     <SelectTrigger>
@@ -410,7 +427,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                 <Input
                                     id="assessment_date"
                                     type="date"
-                                    value={data.assessment_date}
+                                    value={data.assessment_date as string}
                                     onChange={(e) => setData('assessment_date', e.target.value)}
                                 />
                             </div>
@@ -418,7 +435,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                 <Label htmlFor="period">Periode</Label>
                                 <Input
                                     id="period"
-                                    value={data.period}
+                                    value={data.period as string}
                                     onChange={(e) => setData('period', e.target.value)}
                                     placeholder="e.g., 2025-Q1"
                                 />
@@ -429,7 +446,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                             <Label htmlFor="notes">Catatan (Optional)</Label>
                             <Textarea
                                 id="notes"
-                                value={data.notes}
+                                value={data.notes as string}
                                 onChange={(e) => setData('notes', e.target.value)}
                                 rows={3}
                                 placeholder="Catatan tambahan untuk assessment ini..."
@@ -516,7 +533,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                         {isEdit && assessment?.status === 'draft' && (
                             <Button
                                 type="button"
-                                onClick={(e) => {
+                                onClick={() => {
                                     if (confirm('Yakin ingin submit assessment? Assessment yang sudah disubmit tidak dapat diedit lagi.')) {
                                         router.post(route('user.assessments.submit', assessment!.id));
                                     }
