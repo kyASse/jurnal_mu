@@ -112,7 +112,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
     const [currentCategory, setCurrentCategory] = useState(Object.keys(indicators)[0]);
     const categories = Object.keys(indicators);
 
-    const handleSubmit = (e: React.FormEvent, submit = false) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         const url = isEdit
@@ -124,11 +124,6 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
         method(url, {
             preserveScroll: true,
             forceFormData: true,
-            onSuccess: () => {
-                if (submit) {
-                    // Navigate to submit confirmation
-                }
-            },
         });
     };
 
@@ -512,7 +507,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={(e) => handleSubmit(e, false)}
+                            onClick={handleSubmit}
                             disabled={processing}
                         >
                             <Save className="w-4 h-4 mr-2" />
