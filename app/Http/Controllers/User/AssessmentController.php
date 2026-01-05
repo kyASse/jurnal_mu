@@ -26,7 +26,20 @@ class AssessmentController extends Controller
 
         // Get assessments for user's journals
         $assessments = JournalAssessment::query()
-            ->with(['journal', 'user'])
+            ->with(['journal:id,title,issn,user_id', 'user:id,name'])
+            ->select([
+                'id',
+                'journal_id',
+                'user_id',
+                'assessment_date',
+                'period',
+                'status',
+                'total_score',
+                'max_score',
+                'percentage',
+                'created_at',
+                'updated_at',
+            ])
             ->whereHas('journal', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
@@ -40,7 +53,12 @@ class AssessmentController extends Controller
             })
             ->latest('assessment_date')
             ->paginate(10)
-            ->withQueryString();
+            ->withQueryString()
+            ->through(function ($assessment) {
+                // Append accessor attributes for each item
+                $assessment->append(['status_label', 'status_color', 'grade']);
+                return $assessment;
+            });
 
         return Inertia::render('User/Assessments/Index', [
             'assessments' => $assessments,
