@@ -386,8 +386,7 @@ class AssessmentController extends Controller
     public function downloadAttachment(AssessmentAttachment $attachment)
     {
         // Check authorization (user must own the assessment or be admin)
-        $assessment = $attachment->assessmentResponse->journalAssessment;
-        $this->authorize('view', $assessment);
+        $this->authorize('view', $attachment->assessmentResponse->journalAssessment);
 
         if (!Storage::disk('public')->exists($attachment->file_path)) {
             abort(404, 'File tidak ditemukan.');

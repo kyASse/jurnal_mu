@@ -150,7 +150,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('destroy');
             Route::post('{assessment}/submit', [AssessmentController::class, 'submit'])
                 ->name('submit');
-            Route::get('{assessment}/attachments/{attachment}', [AssessmentController::class, 'downloadAttachment'])
+            Route::get('attachments/{attachment}', [AssessmentController::class, 'downloadAttachment'])
                 ->name('attachments.download');
         });
     });
