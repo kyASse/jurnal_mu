@@ -382,7 +382,7 @@ class AssessmentController extends Controller
             // Delete all attachments from storage
             foreach ($assessment->responses as $response) {
                 foreach ($response->attachments as $attachment) {
-                    Storage::disk('public')->delete($attachment->file_path);
+                    Storage::disk('local')->delete($attachment->file_path);
                 }
             }
 
@@ -412,11 +412,11 @@ class AssessmentController extends Controller
         // Check authorization (user must own the assessment or be admin)
         $this->authorize('view', $attachment->assessmentResponse->journalAssessment);
 
-        if (!Storage::disk('public')->exists($attachment->file_path)) {
+        if (!Storage::disk('local')->exists($attachment->file_path)) {
             abort(404, 'File tidak ditemukan.');
         }
 
-        return Storage::disk('public')->download(
+        return Storage::disk('local')->download(
             $attachment->file_path,
             $attachment->original_filename
         );
@@ -458,7 +458,7 @@ class AssessmentController extends Controller
         $path = $file->storeAs(
             'assessments/' . $response->journal_assessment_id,
             $storedFilename,
-            'public'
+            'local'
         );
 
         return AssessmentAttachment::create([
