@@ -85,8 +85,13 @@ interface Props {
     };
 }
 
+interface FlashProps {
+    error?: string;
+    success?: string;
+}
+
 export default function AssessmentsIndex({ assessments, filters }: Props) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props as { flash?: FlashProps };
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || '');
 
