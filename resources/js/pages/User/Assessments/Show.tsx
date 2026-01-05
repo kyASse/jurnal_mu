@@ -91,8 +91,13 @@ interface Props {
     responsesByCategory: Record<string, Response[]>;
 }
 
+interface FlashProps {
+    error?: string;
+    success?: string;
+}
+
 export default function AssessmentShow({ assessment, responsesByCategory }: Props) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props as { flash?: FlashProps };
 
     const handleSubmit = () => {
         if (confirm('Yakin ingin submit assessment? Assessment yang sudah disubmit tidak dapat diedit lagi.')) {
