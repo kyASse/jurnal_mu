@@ -173,7 +173,13 @@ class AssessmentController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Gagal menyimpan assessment: ' . $e->getMessage()]);
+            \Log::error('Failed to store assessment', [
+                'user_id' => $user->id,
+                'journal_id' => $validated['journal_id'] ?? null,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withErrors(['error' => 'Gagal menyimpan assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -316,7 +322,13 @@ class AssessmentController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Gagal memperbarui assessment: ' . $e->getMessage()]);
+            \Log::error('Failed to update assessment', [
+                'assessment_id' => $assessment->id,
+                'user_id' => $request->user()->id,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withErrors(['error' => 'Gagal memperbarui assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -341,7 +353,13 @@ class AssessmentController extends Controller
                 ->with('success', 'Assessment berhasil disubmit!');
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal submit assessment: ' . $e->getMessage()]);
+            \Log::error('Failed to submit assessment', [
+                'assessment_id' => $assessment->id,
+                'user_id' => $request->user()->id,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withErrors(['error' => 'Gagal submit assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -374,7 +392,13 @@ class AssessmentController extends Controller
                 ->with('success', 'Assessment berhasil dihapus.');
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal menghapus assessment: ' . $e->getMessage()]);
+            \Log::error('Failed to delete assessment', [
+                'assessment_id' => $assessment->id,
+                'user_id' => $request->user()->id,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withErrors(['error' => 'Gagal menghapus assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
