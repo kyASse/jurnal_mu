@@ -37,6 +37,7 @@ import {
     FileText,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Journal {
     id: number;
@@ -84,6 +85,10 @@ interface Props {
 export default function AssessmentForm({ journals, indicators, assessment }: Props) {
     const isEdit = !!assessment;
     const { flash } = usePage().props as any;
+
+    // File upload constants
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+    const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
     // Pre-fill responses from existing assessment data
     const initialResponses: AssessmentResponse[] = isEdit && assessment?.responses
@@ -243,6 +248,46 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
             ? assessment.responses.find((r: any) => r.evaluation_indicator_id === indicator.id)?.attachments || []
             : [];
 
+        const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const files = Array.from(e.target.files || []);
+            const validFiles: File[] = [];
+            const errors: string[] = [];
+
+            files.forEach((file) => {
+                // Check file size
+                if (file.size > MAX_FILE_SIZE) {
+                    errors.push(`${file.name}: Ukuran file melebihi 5MB (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+                    return;
+                }
+
+                // Check file type
+                if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+                    errors.push(`${file.name}: Format file tidak didukung. Gunakan PDF, JPG, atau PNG`);
+                    return;
+                }
+
+                validFiles.push(file);
+            });
+
+            // Show error toast if there are invalid files
+            if (errors.length > 0) {
+                toast.error('File tidak valid', {
+                    description: errors.join('\n'),
+                });
+            }
+
+            // Update form with valid files only
+            if (validFiles.length > 0) {
+                updateResponse(indicator.id, 'attachments', validFiles);
+                toast.success('File berhasil ditambahkan', {
+                    description: `${validFiles.length} file siap diupload`,
+                });
+            }
+
+            // Reset input to allow re-selecting the same file
+            e.target.value = '';
+        };
+
         return (
             <div className="mt-4">
                 <Label className="flex items-center gap-2">
@@ -267,10 +312,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                 <Input
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        updateResponse(indicator.id, 'attachments', files);
-                    }}
+                    onChange={handleFileChange}
                     className="mt-2"
                     multiple
                 />
