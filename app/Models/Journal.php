@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Journal extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -145,8 +146,8 @@ class Journal extends Model
 
         return $query->where(function ($q) use ($search) {
             $q->where('title', 'like', "%{$search}%")
-              ->orWhere('issn', 'like', "%{$search}%")
-              ->orWhere('e_issn', 'like', "%{$search}%");
+                ->orWhere('issn', 'like', "%{$search}%")
+                ->orWhere('e_issn', 'like', "%{$search}%");
         });
     }
 
@@ -186,7 +187,7 @@ class Journal extends Model
         if (!$this->accreditation_status) {
             return 'Belum Terakreditasi';
         }
-        return $this->accreditation_grade 
+        return $this->accreditation_grade
             ? "{$this->accreditation_status} ({$this->accreditation_grade})"
             : $this->accreditation_status;
     }
