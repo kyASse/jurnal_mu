@@ -7,15 +7,19 @@ import { ChevronRight } from 'lucide-react';
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
     return (
-        <SidebarGroup>
+        <SidebarGroup className="py-2">
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => (
-                    item.items && item.items.length > 0 ? (
+                {items.map((item) => {
+                    // Compute isActive for parent based on whether any subitem matches current URL
+                    const hasActiveSubitem = item.items?.some(subItem => page.url.startsWith(subItem.href)) ?? false;
+                    const isParentActive = item.isActive ?? hasActiveSubitem;
+                    
+                    return item.items && item.items.length > 0 ? (
                         <Collapsible
                             key={item.title}
                             asChild
-                            defaultOpen={item.isActive}
+                            defaultOpen={isParentActive}
                             className="group/collapsible"
                         >
                             <SidebarMenuItem>
@@ -31,7 +35,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                         {item.items.map((subItem) => (
                                             <SidebarMenuSubItem key={subItem.title}>
                                                 <SidebarMenuSubButton asChild isActive={page.url.startsWith(subItem.href)}>
-                                                    <Link href={subItem.href}>
+                                                    <Link href={subItem.href} prefetch>
                                                         <span>{subItem.title}</span>
                                                     </Link>
                                                 </SidebarMenuSubButton>
@@ -50,8 +54,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
-                    )
-                ))}
+                    );
+                })}
             </SidebarMenu>
         </SidebarGroup>
     );
