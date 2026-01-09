@@ -1,14 +1,15 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminKampusController;
+use App\Http\Controllers\Admin\UniversityController;
+use App\Http\Controllers\AdminKampus\UserController as AdminKampusUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
-use App\Http\Controllers\Admin\UniversityController;
-use App\Http\Controllers\Admin\AdminKampusController;
-use App\Http\Controllers\AdminKampus\UserController as AdminKampusUserController;
-use App\Http\Controllers\User\JournalController;
-use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\User\AssessmentController;
+use App\Http\Controllers\User\JournalController;
+use App\Models\Role;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -68,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
     | Super Admin Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:Super Admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:'.Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
 
         // Universities Management
         Route::resource('universities', UniversityController::class);
@@ -92,7 +93,6 @@ Route::middleware(['auth'])->group(function () {
         // Route::get('assessments/{assessment}', [AssessmentController::class, 'adminShow'])
         //     ->name('assessments.show');
 
-
     });
 
     /*
@@ -100,7 +100,7 @@ Route::middleware(['auth'])->group(function () {
     | Admin Kampus Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:Admin Kampus'])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
+    Route::middleware(['role:'.Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
 
         // Users (Pengelola Jurnal) Management
         Route::resource('users', AdminKampusUserController::class);
@@ -127,7 +127,7 @@ Route::middleware(['auth'])->group(function () {
     | User (Pengelola Jurnal) Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:User'])->prefix('user')->name('user.')->group(function () {
+    Route::middleware(['role:'.Role::USER])->prefix('user')->name('user.')->group(function () {
 
         // Journals Management
         Route::resource('journals', JournalController::class);
@@ -169,5 +169,5 @@ Route::middleware(['auth'])->group(function () {
     // });
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

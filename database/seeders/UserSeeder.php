@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -15,10 +15,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Get IDs from related tables
-        $superAdminRoleId = DB::table('roles')->where('name', 'Super Admin')->value('id');
-        $adminKampusRoleId = DB::table('roles')->where('name', 'Admin Kampus')->value('id');
-        $userRoleId = DB::table('roles')->where('name', 'User')->value('id');
-        
+        $superAdminRoleId = DB::table('roles')->where('name', Role::SUPER_ADMIN)->value('id');
+        $adminKampusRoleId = DB::table('roles')->where('name', Role::ADMIN_KAMPUS)->value('id');
+        $userRoleId = DB::table('roles')->where('name', Role::USER)->value('id');
+
         // Get University IDs
         $uadId = DB::table('universities')->where('code', 'UAD')->value('id');
         $umyId = DB::table('universities')->where('code', 'UMY')->value('id');
@@ -212,11 +212,11 @@ class UserSeeder extends Seeder
 
         DB::table('users')->insert($users);
 
-        $this->command->info(count($users) . ' Users created successfully!');
+        $this->command->info(count($users).' Users created successfully!');
         $this->command->info('');
         $this->command->info('📧 Login Credentials:');
         $this->command->info('Super Admin: superadmin@ajm.ac.id / password123');
         $this->command->info('Admin UAD: admin.uad@ajm.ac.id / password123');
         $this->command->info('User UAD: andi.prasetyo@uad.ac.id / password123');
-    } 
+    }
 }
