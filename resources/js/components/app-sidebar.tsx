@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Award, BookOpen, BookType, Box, ClipboardList, FileText, Folder, LayoutGrid, Library, LifeBuoy, Medal, School, Shield, TrendingUp, UserCheck, Users } from 'lucide-react';
+import { Award, BookOpen, BookType, Box, ClipboardList, FileText, Folder, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
@@ -125,6 +125,11 @@ export function AppSidebar() {
                 title: 'Jurnal',
                 href: '#',
                 icon: BookOpen,
+            },
+            {
+                title: 'Assessments',
+                href: route('user.assessments.index'),
+                icon: FileText,
             },
             {
                 title: 'Pembinaan',
