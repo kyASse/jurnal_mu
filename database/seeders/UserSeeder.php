@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         // Get IDs from related tables
         $superAdminRoleId = DB::table('roles')->where('name', 'Super Admin')->value('id');
         $adminKampusRoleId = DB::table('roles')->where('name', 'Admin Kampus')->value('id');
-        $userRoleId = DB::table('roles')->where('name', 'user')->value('id');
+        $userRoleId = DB::table('roles')->where('name', 'User')->value('id');
         
         // Get University IDs
         $uadId = DB::table('universities')->where('code', 'UAD')->value('id');

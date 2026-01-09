@@ -29,7 +29,7 @@ class RoleSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'name' => 'user',
+                'name' => 'User',
                 'display_name' => 'Pengelola Jurnal',
                 'description' => 'Mengelola jurnal yang ditugaskan. Dapat melakukan self-assessment dan mengajukan pembinaan.',
                 'created_at' => now(),

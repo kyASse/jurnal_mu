@@ -1,6 +1,6 @@
 # UI Progress Screenshots - Jurnal_mu Project (Development Branch)
 
-Dokumentasi ini menunjukkan progress user interface yang sudah dibuat untuk aplikasi Jurnal_mu dari branch **development** per tanggal 31 Desember 2025.
+Dokumentasi ini menunjukkan progress user interface yang sudah dibuat untuk aplikasi Jurnal_mu dari branch **development** per tanggal **6 Januari 2026**.
 
 ## Ringkasan
 
@@ -236,34 +236,332 @@ Aplikasi Jurnal_mu (Asistensi Jurnal Muhammadiyah) adalah sistem manajemen jurna
 
 ---
 
-## Halaman yang Ada di Kode (Belum Difoto)
+---
 
-### Authentication Pages
-- **Confirm Password** - `/confirm-password`
-- **Reset Password** - `/reset-password`
-- **Forgot Password** - `/forgot-password`
-- **Verify Email** - `/verify-email`
-- **Google Callback** - `/auth/google/callback`
+## 10. Authentication Pages
 
-### Settings Pages
-- **Profile Settings** - `/settings/profile`
-- **Password Settings** - `/settings/password`
-- **Appearance Settings** - `/settings/appearance`
+### Forgot Password Page
 
-### Admin Pages (Create/Edit Forms)
-- **Create University** - `/admin/universities/create`
-- **Edit University** - `/admin/universities/{id}/edit`
-- **Create Admin Kampus** - `/admin/admin-kampus/create`
-- **Edit Admin Kampus** - `/admin/admin-kampus/{id}/edit`
-- **View Admin Kampus Detail** - `/admin/admin-kampus/{id}`
+**URL:** `/forgot-password`
 
-### Admin Kampus Pages (Create/Edit Forms)
-- **Create User** - `/admin-kampus/users/create`
-- **Edit User** - `/admin-kampus/users/{id}/edit`
-- **View User Detail** - `/admin-kampus/users/{id}`
+**Screenshot:** ![Forgot Password](screenshots/13-auth-forgot-password.png)
 
-### Error Pages
-- **403 Forbidden** - `/403`
+**Fitur:**
+- Simple form untuk request password reset link
+- Input email dengan validasi
+- Link kembali ke halaman login
+- Desain clean dengan branding yang konsisten
+
+**Status:** ✅ Selesai
+
+---
+
+### Reset Password Page
+
+**URL:** `/reset-password/{token}`
+
+**Screenshot:** ![Reset Password](screenshots/14-auth-reset-password.png)
+
+**Fitur:**
+- Form untuk set password baru
+- Fields: Email, Password, Confirm Password
+- Validasi password strength
+- Token validation di backend
+
+**Status:** ✅ Selesai
+
+---
+
+### Confirm Password Page
+
+**URL:** `/confirm-password`
+
+**Screenshot:** ![Confirm Password](screenshots/15-auth-confirm-password.png)
+
+**Fitur:**
+- Security confirmation untuk sensitive operations
+- Simple password input
+- Digunakan sebelum akses fitur sensitif
+
+**Status:** ✅ Selesai
+
+---
+
+## 11. Settings Pages
+
+### Profile Settings
+
+**URL:** `/settings/profile`
+
+**Screenshot:** ![Profile Settings](screenshots/07-settings-profile.png)
+
+**Fitur:**
+- **Sidebar navigation** dengan 3 tabs: Profile, Password, Appearance
+- **Profile Information Section:**
+  - Edit nama lengkap
+  - Edit email address
+  - Save button untuk update
+- **Delete Account Section:**
+  - Warning message tentang permanent deletion
+  - Delete account button
+- Breadcrumb navigation
+- Consistent layout dengan aplikasi
+
+**Status:** ✅ Selesai
+
+---
+
+### Password Settings
+
+**URL:** `/settings/password`
+
+**Screenshot:** ![Password Settings](screenshots/08-settings-password.png)
+
+**Fitur:**
+- **Sidebar navigation** (shared dengan Profile dan Appearance)
+- **Update Password Form:**
+  - Current password field
+  - New password field
+  - Confirm password field
+  - Password strength validation
+  - Save password button
+- Security best practices messaging
+
+**Status:** ✅ Selesai
+
+---
+
+### Appearance Settings
+
+**URL:** `/settings/appearance`
+
+**Screenshot:** ![Appearance Settings](screenshots/09-settings-appearance.png)
+
+**Fitur:**
+- **Sidebar navigation** (shared dengan Profile dan Password)
+- **Theme Selection:**
+  - Light mode option dengan icon
+  - Dark mode option dengan icon
+  - System mode option (follow OS preference)
+- Modern card-based selection interface
+
+**Status:** ✅ Selesai
+
+---
+
+## 12. Admin - Create University Form
+
+**URL:** `/admin/universities/create` (Super Admin only)
+
+**Screenshot:** ![Create University](screenshots/01-admin-universities-create.png)
+
+**Fitur:**
+- **Back to List** button
+- **Form Sections:**
+  - **Basic Information:** Code, Full Name, Short Name
+  - **Address Information:** Street, City, Province, Postal Code
+  - **Contact Information:** Phone, Email, Website, Logo URL
+  - **Status:** Active/Inactive checkbox
+- Field validation dengan required indicators (*)
+- Cancel dan Create University buttons
+- Professional form layout dengan grouped sections
+
+**Status:** ✅ Selesai
+
+---
+
+## 13. Admin - Edit University Form
+
+**URL:** `/admin/universities/{id}/edit` (Super Admin only)
+
+**Screenshot:** ![Edit University](screenshots/02-admin-universities-edit.png)
+
+**Fitur:**
+- Same form structure as Create University
+- Pre-filled dengan existing data
+- **Example Data (UAD):**
+  - Code: UAD
+  - Name: Universitas Ahmad Dahlan
+  - Address: Jl. Kapas No.9, Semaki
+  - City: Yogyakarta
+  - Contact info: phone, email, website
+  - Logo URL dari Wikipedia
+- Update University button instead of Create
+
+**Status:** ✅ Selesai
+
+---
+
+## 14. Admin - Create Admin Kampus Form
+
+**URL:** `/admin/admin-kampus/create` (Super Admin only)
+
+**Screenshot:** ![Create Admin Kampus](screenshots/03-admin-kampus-create.png)
+
+**Fitur:**
+- **Form Sections:**
+  - **Personal Information:** Name, Email, Phone, Position
+  - **Account Information:** Password, Confirm Password (dengan hint)
+  - **University Assignment:** Dropdown untuk pilih university
+  - **Status:** Active/Inactive checkbox
+- Breadcrumb: Dashboard > Admin Kampus > Create
+- Help text: "This admin will manage journals and users for this university"
+- Password requirements: Minimum 8 characters
+
+**Status:** ✅ Selesai
+
+---
+
+## 15. Admin - Edit Admin Kampus Form
+
+**URL:** `/admin/admin-kampus/{id}/edit` (Super Admin only)
+
+**Screenshot:** ![Edit Admin Kampus](screenshots/04-admin-kampus-edit.png)
+
+**Fitur:**
+- Pre-filled dengan data existing Admin Kampus
+- **Example Data (Dr. Ahmad Fauzi):**
+  - Name: Dr. Ahmad Fauzi, M.Kom
+  - Email: admin.uad@ajm.ac.id
+  - Phone: 081234567891
+  - Position: Kepala LPPM
+  - University: UAD - Universitas Ahmad Dahlan
+- Password fields kosong dengan hint: "Leave empty to keep current password"
+- Update Admin Kampus button
+
+**Status:** ✅ Selesai
+
+---
+
+## 16. Admin - Admin Kampus Detail View
+
+**URL:** `/admin/admin-kampus/{id}` (Super Admin only)
+
+**Screenshot:** ![Admin Kampus Detail](screenshots/05-admin-kampus-show.png)
+
+**Fitur:**
+- **Header Section:**
+  - Avatar placeholder
+  - Name dan role badge
+  - Active status badge
+  - Deactivate dan Edit buttons
+- **Contact Information:**
+  - Email dengan icon
+  - Phone dengan icon
+  - Position dengan icon
+- **University Assignment:**
+  - University name dan code
+  - Location (city, province)
+- **Statistics Sidebar:**
+  - Journals count: 0
+  - Managed Users count: 0
+- **Activity Section:**
+  - Last Login timestamp
+  - Created At
+  - Updated At
+- **Managed Journals Section:** Empty state message
+
+**Status:** ✅ Selesai
+
+---
+
+## 17. Admin Kampus - Create User Form
+
+**URL:** `/admin-kampus/users/create` (Admin Kampus only)
+
+**Screenshot:** ![Create User](screenshots/10-admin-kampus-users-create.png)
+
+**Fitur:**
+- **University Context Banner:**
+  - Shows university name (Universitas Ahmad Dahlan)
+  - Auto-assignment message
+- **Form Sections:**
+  - **Personal Information:** Name, Email, Phone, Position
+  - **Account Information:** Password, Confirm Password
+  - **Status:** Active/Inactive checkbox
+- Help text: "This user will be automatically assigned to your university with 'User' role"
+- Breadcrumb: Dashboard > User Management > Create
+- Scoped to Admin Kampus's university only
+
+**Status:** ✅ Selesai
+
+---
+
+## 18. Admin Kampus - Edit User Form
+
+**URL:** `/admin-kampus/users/{id}/edit` (Admin Kampus only)
+
+**Screenshot:** ![Edit User](screenshots/11-admin-kampus-users-edit.png)
+
+**Fitur:**
+- Pre-filled dengan data existing user
+- **Example Data (Andi Prasetyo):**
+  - Name: Andi Prasetyo, S.Kom, M.T
+  - Email: andi.prasetyo@uad.ac.id
+  - Phone: 081234567894
+  - Position: Dosen Informatika
+  - University: UAD (read-only, shown in banner)
+- **Change Password Section:**
+  - Info icon dengan explanation
+  - New Password field (optional)
+  - Confirm New Password field
+  - Help text: "Leave empty to keep current password"
+- Update User button
+
+**Status:** ✅ Selesai
+
+---
+
+## 19. Admin Kampus - User Detail View
+
+**URL:** `/admin-kampus/users/{id}` (Admin Kampus only)
+
+**Screenshot:** ![User Detail](screenshots/12-admin-kampus-users-show.png)
+
+**Fitur:**
+- **Header Section:**
+  - User avatar
+  - Name
+  - Active status badge
+  - User role badge
+  - Action buttons: Deactivate, Edit User, Delete (disabled)
+- **Contact Information:**
+  - Email, Phone, Position, University
+- **Activity & Statistics:**
+  - Managed Journals count: 1
+  - Last Login timestamp
+  - Created At
+  - Last Updated
+- **Managed Journals Table:**
+  - Columns: Title, ISSN, Scientific Field, Created At
+  - Example: "Jurnal Informatika dan Teknologi" (ISSN: 2088-3714)
+- Professional detail view dengan comprehensive information
+
+**Status:** ✅ Selesai
+
+---
+
+## 20. Error Page - 403 Forbidden
+
+**URL:** `/403` (or any unauthorized access)
+
+**Screenshot:** ![403 Forbidden](screenshots/06-403-forbidden.png)
+
+**Fitur:**
+- Clean error page design
+- Large "403" display
+- Clear message: "You do not have permission to access this page."
+- Triggered when users try to access routes outside their role permissions
+
+**Status:** ✅ Selesai
+
+---
+
+## Halaman yang Sudah Ada (Tidak Difoto Karena Teknis)
+
+### Authentication Pages (Not Screenshotted)
+- **Verify Email** - `/verify-email` - Hanya muncul untuk user dengan email belum verified, redirects to dashboard jika sudah verified
+- **Google Callback** - `/auth/google/callback` - OAuth callback handler, automatic redirect page
 
 ---
 
@@ -527,10 +825,10 @@ Akses: Manage journals (fitur belum tersedia di UI)
 
 ---
 
-**Generated on:** 2025-12-31  
+**Generated on:** 2026-01-06  
 **Branch:** development  
-**Total Pages Documented:** 9 pages with screenshots  
-**Total Pages Identified:** 20+ additional pages (forms, details, settings)
+**Total Pages Documented:** 20 pages with screenshots  
+**Additional Pages:** 2 pages (Verify Email, Google Callback - technical/redirect pages)
 
 ---
 
