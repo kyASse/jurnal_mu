@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Journal;
+use App\Models\ScientificField;
+use App\Models\University;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+/**
+ * JournalController - Super Admin
+ *
+ * Manages journal viewing operations for Super Admin role.
+ * Super Admin can view all journals from all universities.
+ */
+class JournalController extends Controller
+{
+    /**
+     * Display a listing of all journals in the system.
+     *
+     * @route GET /admin/journals
+     *
+     * @features List all journals, search, filter by PTM/status/SINTA/scientific field, pagination
+     */
+    public function index(Request $request): Response
+    {
+        $this->authorize('viewAny', Journal::class);
+
+        $authUser = $request->user();
+
+        // Base query - Super Admin sees all journals
+        $query = Journal::query()
+            ->with(['university', 'user', 'scientificField', 'latestAssessment']);
+
+        // Apply search filter
+        if ($request->filled('search')) {
+            $query->search($request->search);
+        }
+
+        // Apply university filter (Super Admin only)
+        if ($request->filled('university_id')) {
+            $query->where('university_id', $request->university_id);
+        }
+
+        // Apply status filter
+        if ($request->filled('status')) {
+            $query->byAssessmentStatus($request->status);
+        }
+
+        // Apply SINTA rank filter
+        if ($request->filled('sinta_rank')) {
+            $query->bySintaRank($request->sinta_rank);
+        }
+
+        // Apply scientific field filter
+        if ($request->filled('scientific_field_id')) {
+            $query->where('scientific_field_id', $request->scientific_field_id);
+        }
+
+        // Paginate results
+        $journals = $query
+            ->orderBy('title')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(fn ($journal) => [
+                'id' => $journal->id,
+                'title' => $journal->title,
+                'issn' => $journal->issn,
+                'e_issn' => $journal->e_issn,
+                'url' => $journal->url,
+                'university' => [
+                    'id' => $journal->university->id,
+                    'name' => $journal->university->name,
+                ],
+                'user' => [
+                    'id' => $journal->user->id,
+                    'name' => $journal->user->name,
+                    'email' => $journal->user->email,
+                ],
+                'scientific_field' => $journal->scientificField ? [
+                    'id' => $journal->scientificField->id,
+                    'name' => $journal->scientificField->name,
+                ] : null,
+                'sinta_rank' => $journal->sinta_rank,
+                'sinta_rank_label' => $journal->sinta_rank_label,
+                'is_active' => $journal->is_active,
+                'assessment_status' => $journal->latestAssessment?->status ?? null,
+                'assessment_status_label' => $journal->latestAssessment?->status_label ?? 'Belum Ada',
+                'latest_score' => $journal->latestAssessment?->percentage ?? null,
+                'created_at' => $journal->created_at->format('Y-m-d'),
+            ]);
+
+        // Get filter options
+        $universities = University::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $scientificFields = ScientificField::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $sintaRanks = collect([
+            ['value' => 1, 'label' => 'SINTA 1'],
+            ['value' => 2, 'label' => 'SINTA 2'],
+            ['value' => 3, 'label' => 'SINTA 3'],
+            ['value' => 4, 'label' => 'SINTA 4'],
+            ['value' => 5, 'label' => 'SINTA 5'],
+            ['value' => 6, 'label' => 'SINTA 6'],
+        ]);
+
+        $statusOptions = collect([
+            ['value' => 'draft', 'label' => 'Draft'],
+            ['value' => 'submitted', 'label' => 'Submitted'],
+            ['value' => 'reviewed', 'label' => 'Reviewed'],
+        ]);
+
+        return Inertia::render('Admin/Journals/Index', [
+            'journals' => $journals,
+            'filters' => $request->only(['search', 'university_id', 'status', 'sinta_rank', 'scientific_field_id']),
+            'universities' => $universities,
+            'scientificFields' => $scientificFields,
+            'sintaRanks' => $sintaRanks,
+            'statusOptions' => $statusOptions,
+        ]);
+    }
+}
