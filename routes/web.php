@@ -81,11 +81,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin-kampus/{admin_kampus}/toggle-active', [AdminKampusController::class, 'toggleActive'])
             ->name('admin-kampus.toggle-active');
 
-        // View all journals (read-only for monitoring) - TODO: Create JournalController
-        // Route::get('journals', [JournalController::class, 'adminIndex'])
-        //     ->name('journals.index');
-        // Route::get('journals/{journal}', [JournalController::class, 'adminShow'])
-        //     ->name('journals.show');
+        // View all journals (read-only for monitoring)
+        Route::get('journals', [\App\Http\Controllers\Admin\JournalController::class, 'index'])
+            ->name('journals.index');
+        // Route::get('journals/{journal}', [\App\Http\Controllers\Admin\JournalController::class, 'show'])
+        //     ->name('journals.show'); // TODO: Implement detail view in next iteration
 
         // View all assessments (read-only for monitoring) - TODO: Create AssessmentController
         // Route::get('assessments', [AssessmentController::class, 'adminIndex'])
@@ -107,11 +107,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('users/{user}/toggle-active', [AdminKampusUserController::class, 'toggleActive'])
             ->name('users.toggle-active');
 
-        // View journals from their university - TODO: Create JournalController methods
-        // Route::get('journals', [JournalController::class, 'adminKampusIndex'])
-        //     ->name('journals.index');
-        // Route::get('journals/{journal}', [JournalController::class, 'adminKampusShow'])
-        //     ->name('journals.show');
+        // View journals from their university
+        Route::get('journals', [\App\Http\Controllers\AdminKampus\JournalController::class, 'index'])
+            ->name('journals.index');
+        // Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
+        //     ->name('journals.show'); // TODO: Implement detail view in next iteration
 
         // Review assessments from their university - TODO: Create AssessmentController methods
         // Route::get('assessments', [AssessmentController::class, 'adminKampusIndex'])
