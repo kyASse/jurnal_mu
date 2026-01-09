@@ -13,23 +13,23 @@ return new class extends Migration
     {
         Schema::create('journal_assessments', function (Blueprint $table) {
             $table->id();
-            
+
             // Ownership
             $table->foreignId('journal_id')->constrained('journals')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()
                 ->comment('User yang mengisi assessment');
-            
+
             // Assessment Info
             $table->date('assessment_date')->useCurrent();
             $table->string('period', 20)->nullable(); // Periode penilaian, e.g., '2025-Q3'
-            
+
             // Status
             $table->enum('status', ['draft', 'submitted', 'reviewed'])->default('draft');
             $table->timestamp('submitted_at')->nullable();
             $table->timestamp('reviewed_at')->nullable();
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete()
                 ->comment('Admin yang review (untuk v1.1+)');
-            
+
             // Scoring
             $table->decimal('total_score', 5, 2)->default(0.00); // Skor total
             $table->decimal('max_score', 5, 2)->default(0.00); // Skor maksimal
@@ -41,7 +41,7 @@ return new class extends Migration
 
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('journal_id');
             $table->index('user_id');

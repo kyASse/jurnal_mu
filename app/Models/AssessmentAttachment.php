@@ -72,12 +72,12 @@ class AssessmentAttachment extends Model
     {
         $bytes = $this->file_size;
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
@@ -139,6 +139,7 @@ class AssessmentAttachment extends Model
         if ($this->exists()) {
             return Storage::disk('local')->delete($this->file_path);
         }
+
         return false;
     }
 
@@ -150,6 +151,7 @@ class AssessmentAttachment extends Model
         if ($this->exists()) {
             return Storage::disk('local')->get($this->file_path);
         }
+
         return null;
     }
 

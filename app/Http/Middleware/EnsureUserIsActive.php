@@ -19,15 +19,15 @@ class EnsureUserIsActive
         $user = $request->user();
 
         // If user is not authenticated, let auth middleware handle it
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
 
         // Check if user is active
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             // Logout the user
             Auth::guard('web')->logout();
-            
+
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 

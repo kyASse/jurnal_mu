@@ -28,41 +28,41 @@ class DashboardController extends Controller
             // Super Admin sees all data
             $stats['total_journals'] = DB::table('journals')->count();
             $stats['total_assessments'] = DB::table('journal_assessments')->count();
-            
+
             $avgScore = DB::table('journal_assessments')
                 ->whereNotNull('total_score')
                 ->avg('total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
-            
+
         } elseif ($user->role->name === 'Admin Kampus') {
             // Admin Kampus sees only their university data
             $stats['total_journals'] = DB::table('journals')
                 ->where('university_id', $user->university_id)
                 ->count();
-                
+
             $stats['total_assessments'] = DB::table('journal_assessments')
                 ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.university_id', $user->university_id)
                 ->count();
-                
+
             $avgScore = DB::table('journal_assessments')
                 ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.university_id', $user->university_id)
                 ->whereNotNull('journal_assessments.total_score')
                 ->avg('journal_assessments.total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
-            
+
         } else {
             // Regular user (Pengelola Jurnal) sees only their own journals
             $stats['total_journals'] = DB::table('journals')
                 ->where('user_id', $user->id)
                 ->count();
-                
+
             $stats['total_assessments'] = DB::table('journal_assessments')
                 ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.user_id', $user->id)
                 ->count();
-                
+
             $avgScore = DB::table('journal_assessments')
                 ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.user_id', $user->id)

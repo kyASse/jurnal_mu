@@ -55,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
             if ($user->isAdminKampus()) {
                 return $roleName === 'User';
             }
+
             return false;
         });
 
@@ -65,6 +66,7 @@ class AppServiceProvider extends ServiceProvider
             if ($user->isAdminKampus()) {
                 return $user->university_id === $universityId;
             }
+
             return false;
         });
     }

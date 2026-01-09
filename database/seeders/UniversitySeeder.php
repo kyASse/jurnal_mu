@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -98,6 +97,6 @@ class UniversitySeeder extends Seeder
 
         DB::table('universities')->insert($universities);
 
-        $this->command->info(count($universities) . ' Universities seeded successfully.');
+        $this->command->info(count($universities).' Universities seeded successfully.');
     }
 }

@@ -93,7 +93,7 @@ class EvaluationIndicator extends Model
      */
     public function getAnswerTypeLabelAttribute(): string
     {
-        return match($this->answer_type) {
+        return match ($this->answer_type) {
             'boolean' => 'Ya/Tidak',
             'scale' => 'Skala 1-5',
             'text' => 'Text Input',
@@ -112,7 +112,7 @@ class EvaluationIndicator extends Model
      */
     public function calculateScore($answer): float
     {
-        return match($this->answer_type) {
+        return match ($this->answer_type) {
             'boolean' => $answer ? $this->weight : 0,
             'scale' => ($answer / 5) * $this->weight,
             'text' => 0, // Text answers need manual review

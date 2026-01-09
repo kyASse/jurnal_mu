@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -18,7 +18,7 @@ final class LoginRequest extends FormRequest
     {
         return true;
     }
-    
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -43,7 +43,7 @@ final class LoginRequest extends FormRequest
 
         $credentials = $this->only('email', 'password');
 
-        if (!Auth::attempt($credentials, $this->boolean('remember'))) {
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -52,7 +52,7 @@ final class LoginRequest extends FormRequest
         }
 
         // Check if user is active
-        if (!Auth::user()->is_active) {
+        if (! Auth::user()->is_active) {
             Auth::logout();
             RateLimiter::hit($this->throttleKey());
 
@@ -69,7 +69,7 @@ final class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
@@ -90,6 +90,6 @@ final class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
+        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
     }
 }

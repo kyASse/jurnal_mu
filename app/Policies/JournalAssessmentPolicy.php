@@ -40,7 +40,7 @@ class JournalAssessmentPolicy
 
     /**
      * Determine if the user can create assessments.
-     * 
+     *
      * Rules:
      * - Only User (Pengelola Jurnal) can create assessments for their journals
      */
@@ -54,18 +54,19 @@ class JournalAssessmentPolicy
      */
     public function createForJournal(User $user, int $journalId): bool
     {
-        if (!$user->isUser()) {
+        if (! $user->isUser()) {
             return false;
         }
 
         // User can only create assessment for their own journals
         $journal = \App\Models\Journal::find($journalId);
+
         return $journal && $journal->user_id === $user->id;
     }
 
     /**
      * Determine if the user can update the assessment.
-     * 
+     *
      * Rules:
      * - User can update their own assessments
      * - BUT only if status is 'draft'
@@ -84,7 +85,7 @@ class JournalAssessmentPolicy
 
         // User can only update their own draft assessments
         if ($user->isUser()) {
-            return $user->id === $assessment->user_id 
+            return $user->id === $assessment->user_id
                 && $assessment->status === 'draft';
         }
 
@@ -93,7 +94,7 @@ class JournalAssessmentPolicy
 
     /**
      * Determine if the user can delete the assessment.
-     * 
+     *
      * Rules:
      * - User can delete their own assessments
      * - BUT only if status is 'draft'
@@ -112,7 +113,7 @@ class JournalAssessmentPolicy
 
         // User can only delete their own draft assessments
         if ($user->isUser()) {
-            return $user->id === $assessment->user_id 
+            return $user->id === $assessment->user_id
                 && $assessment->status === 'draft';
         }
 
@@ -139,7 +140,7 @@ class JournalAssessmentPolicy
 
     /**
      * Determine if the user can review the assessment.
-     * 
+     *
      * Rules:
      * - Super Admin: Can review all submitted assessments
      * - Admin Kampus: Can review submitted assessments from their university
@@ -215,7 +216,7 @@ class JournalAssessmentPolicy
 
         // User can export their own assessments (if submitted)
         if ($user->isUser()) {
-            return $user->id === $assessment->user_id 
+            return $user->id === $assessment->user_id
                 && $assessment->isSubmitted();
         }
 

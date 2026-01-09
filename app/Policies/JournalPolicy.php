@@ -9,7 +9,7 @@ class JournalPolicy
 {
     /**
      * Determine if the user can view any journals.
-     * 
+     *
      * Rules:
      * - Super Admin: Can view all journals
      * - Admin Kampus: Can view journals from their university
@@ -45,7 +45,7 @@ class JournalPolicy
 
     /**
      * Determine if the user can create journals.
-     * 
+     *
      * Rules:
      * - Super Admin: Can create journals (for testing)
      * - Admin Kampus: Can create journals in their university
@@ -83,7 +83,8 @@ class JournalPolicy
         // Admin Kampus can assign users from their university
         if ($authUser->isAdminKampus()) {
             $targetUser = User::find($targetUserId);
-            return $targetUser 
+
+            return $targetUser
                 && $targetUser->university_id === $authUser->university_id
                 && $targetUser->isUser();
         }
@@ -135,7 +136,8 @@ class JournalPolicy
             if ($user->university_id !== $journal->university_id) {
                 return false;
             }
-            return !$journal->hasSubmittedAssessment();
+
+            return ! $journal->hasSubmittedAssessment();
         }
 
         // User can delete their own journals
@@ -144,7 +146,8 @@ class JournalPolicy
             if ($user->id !== $journal->user_id) {
                 return false;
             }
-            return !$journal->hasSubmittedAssessment();
+
+            return ! $journal->hasSubmittedAssessment();
         }
 
         return false;

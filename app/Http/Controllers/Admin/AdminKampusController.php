@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\University;
 use App\Models\Role;
+use App\Models\University;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -19,7 +19,7 @@ class AdminKampusController extends Controller
      */
     public function index(Request $request): Response
     {
-        //Only Super Admin can access
+        // Only Super Admin can access
         $this->authorize('manage-admin-kampus');
 
         // Base query for Admin Kampus only
@@ -68,10 +68,10 @@ class AdminKampusController extends Controller
                 'created_at' => $admin->created_at->format('Y-m-d H:i:s'),
             ]);
 
-            // Get all universities for filter dropdown
-            $universities = University::query()
-                ->orderBy('name')
-                ->get(['id', 'name', 'short_name', 'code']);
+        // Get all universities for filter dropdown
+        $universities = University::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'short_name', 'code']);
 
         return Inertia::render('Admin/AdminKampus/Index', [
             'adminKampus' => $adminKampus,
@@ -143,7 +143,7 @@ class AdminKampusController extends Controller
         $this->authorize('manage-admin-kampus');
 
         // Verify it's an Admin Kampus
-        if (!$adminKampu->isAdminKampus()) {
+        if (! $adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
@@ -152,7 +152,7 @@ class AdminKampusController extends Controller
 
         // Get managed users count
         $managedUsersCount = User::where('university_id', $adminKampu->university_id)
-            ->whereHas('role', fn($q) => $q->where('name', 'user'))
+            ->whereHas('role', fn ($q) => $q->where('name', 'user'))
             ->count();
 
         return Inertia::render('Admin/AdminKampus/Show', [
@@ -178,7 +178,7 @@ class AdminKampusController extends Controller
                 'journals_count' => $adminKampu->journals->count(),
                 'managed_users_count' => $managedUsersCount,
             ],
-            'journals' => $adminKampu->journals->map(fn($journal) => [
+            'journals' => $adminKampu->journals->map(fn ($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -195,7 +195,7 @@ class AdminKampusController extends Controller
         $this->authorize('manage-admin-kampus');
 
         // Verify it's an Admin Kampus
-        if (!$adminKampu->isAdminKampus()) {
+        if (! $adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
@@ -228,14 +228,14 @@ class AdminKampusController extends Controller
         $this->authorize('manage-admin-kampus');
 
         // Verify it's an Admin Kampus
-        if (!$adminKampu->isAdminKampus()) {
+        if (! $adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
         // Validate request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $adminKampu->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$adminKampu->id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
@@ -254,7 +254,7 @@ class AdminKampusController extends Controller
         ]);
 
         // Update password if provided
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $adminKampu->update([
                 'password' => Hash::make($validated['password']),
             ]);
@@ -275,7 +275,7 @@ class AdminKampusController extends Controller
         $adminKampu->load('role');
 
         // Verify it's an Admin Kampus
-        if (!$adminKampu->isAdminKampus()) {
+        if (! $adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
@@ -286,7 +286,7 @@ class AdminKampusController extends Controller
 
         // Check if Admin Kampus has managed users
         $managedUsersCount = User::where('university_id', $adminKampu->university_id)
-            ->whereHas('role', fn($q) => $q->where('name', 'user'))
+            ->whereHas('role', fn ($q) => $q->where('name', 'user'))
             ->count();
 
         if ($managedUsersCount > 0) {
@@ -311,13 +311,13 @@ class AdminKampusController extends Controller
         $admin_kampus->load('role');
 
         // Verify it's an Admin Kampus
-        if (!$admin_kampus->isAdminKampus()) {
+        if (! $admin_kampus->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
         // Toggle active status
         $admin_kampus->update([
-            'is_active' => !$admin_kampus->is_active,
+            'is_active' => ! $admin_kampus->is_active,
         ]);
 
         $status = $admin_kampus->is_active ? 'activated' : 'deactivated';

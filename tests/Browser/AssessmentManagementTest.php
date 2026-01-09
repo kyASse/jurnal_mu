@@ -2,14 +2,13 @@
 
 namespace Tests\Browser;
 
-use App\Models\User;
-use App\Models\Journal;
 use App\Models\EvaluationIndicator;
+use App\Models\Journal;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
-use Illuminate\Http\UploadedFile;
 
 class AssessmentManagementTest extends DuskTestCase
 {
@@ -25,7 +24,7 @@ class AssessmentManagementTest extends DuskTestCase
         });
     }
 
-    public function testUserCanCreateAssessment()
+    public function test_user_can_create_assessment()
     {
         $role = Role::create(['name' => 'User', 'display_name' => 'User']);
         $user = User::factory()->create(['name' => 'Test User', 'role_id' => $role->id]);
@@ -63,7 +62,7 @@ class AssessmentManagementTest extends DuskTestCase
         });
     }
 
-    public function testUserCanUploadAttachment()
+    public function test_user_can_upload_attachment()
     {
         $role = Role::firstOrCreate(['name' => 'User'], ['display_name' => 'User']);
         $user = User::factory()->create(['role_id' => $role->id]);
@@ -88,7 +87,7 @@ class AssessmentManagementTest extends DuskTestCase
                 ->click("div[role='option']:first-child")
                 ->click("label[for='1-yes']")
                 // File upload input inside renderFileUpload
-                ->attach('input[type="file"]', __DIR__ . '/testfiles/test.pdf')
+                ->attach('input[type="file"]', __DIR__.'/testfiles/test.pdf')
                 ->press('Simpan Draft')
                 ->waitForRoute('user.assessments.show', ['assessment' => 1])
                 ->assertSee('test.pdf');

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -36,7 +35,7 @@ class SocialAuthController extends Controller
 
             if ($user) {
                 // Upadte Google ID if not set
-                if (!$user->google_id) {
+                if (! $user->google_id) {
                     $user->update([
                         'google_id' => $googleUser->id,
                         'avatar_url' => $googleUser->avatar,
@@ -62,7 +61,7 @@ class SocialAuthController extends Controller
             }
 
             // Check if user is active
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 return redirect()->route('login')->with('error', 'Your account is inactive. Please contact the administrator.');
             }
 
@@ -76,8 +75,8 @@ class SocialAuthController extends Controller
             return redirect()->intended(route('dashboard'));
 
         } catch (\Exception $e) {
-            \Log::error('Google OAuth Error: ' . $e->getMessage());
-            
+            \Log::error('Google OAuth Error: '.$e->getMessage());
+
             return redirect()->route('login')->with('error', 'Login with Google failed. Please try again.');
         }
     }

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -193,9 +192,9 @@ class EvaluationIndicatorSeeder extends Seeder
 
         // Calculate and display total weight
         $totalWeight = array_sum(array_column($indicators, 'weight'));
-        
-        $this->command->info(count($indicators) . ' Evaluation Indicators created successfully!');
-        $this->command->info('Total Weight: ' . $totalWeight . ' points');
+
+        $this->command->info(count($indicators).' Evaluation Indicators created successfully!');
+        $this->command->info('Total Weight: '.$totalWeight.' points');
         $this->command->info('');
         $this->command->info('Breakdown by category:');
         $this->command->info('  - Kelengkapan Administrasi: 6.00 points (4 indicators)');

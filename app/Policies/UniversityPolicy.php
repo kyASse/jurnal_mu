@@ -4,13 +4,12 @@ namespace App\Policies;
 
 use App\Models\University;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UniversityPolicy
 {
     /**
      * Determine if the user can view any universities.
-     * 
+     *
      * Rules:
      * - Super Admin: Can view all universities
      * - Admin Kampus: Can view only their university
@@ -37,7 +36,7 @@ class UniversityPolicy
 
     /**
      * Determine if the user can create universities.
-     * 
+     *
      * Rules:
      * - Only Super Admin can create universities
      */
@@ -48,7 +47,7 @@ class UniversityPolicy
 
     /**
      * Determine if the user can update the university
-     * 
+     *
      * Rules:
      * - Only Super Admin can update universities
      */
@@ -59,14 +58,14 @@ class UniversityPolicy
 
     /**
      * Determine if the user can delete the university
-     * 
+     *
      * Rules:
      * - Only Super Admin can delete universities
      * - Cannot delete if university has journals
      */
     public function delete(User $user, University $university): bool
     {
-        if (!$user->isSuperAdmin()) {
+        if (! $user->isSuperAdmin()) {
             return false;
         }
 

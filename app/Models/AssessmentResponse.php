@@ -75,7 +75,7 @@ class AssessmentResponse extends Model
      */
     public function getAnswerAttribute()
     {
-        return match($this->evaluationIndicator->answer_type) {
+        return match ($this->evaluationIndicator->answer_type) {
             'boolean' => $this->answer_boolean,
             'scale' => $this->answer_scale,
             'text' => $this->answer_text,
@@ -88,7 +88,7 @@ class AssessmentResponse extends Model
      */
     public function getFormattedAnswerAttribute(): string
     {
-        return match($this->evaluationIndicator->answer_type) {
+        return match ($this->evaluationIndicator->answer_type) {
             'boolean' => $this->answer_boolean ? 'Ya' : 'Tidak',
             'scale' => "{$this->answer_scale}/5",
             'text' => $this->answer_text ?? '-',
@@ -109,7 +109,7 @@ class AssessmentResponse extends Model
     {
         $indicator = $this->evaluationIndicator;
 
-        match($indicator->answer_type) {
+        match ($indicator->answer_type) {
             'boolean' => $this->answer_boolean = (bool) $value,
             'scale' => $this->answer_scale = (int) $value,
             'text' => $this->answer_text = (string) $value,

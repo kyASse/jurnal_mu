@@ -129,9 +129,10 @@ class Journal extends Model
      */
     public function scopeBySintaRank($query, ?int $rank)
     {
-        if (!$rank) {
+        if (! $rank) {
             return $query;
         }
+
         return $query->where('sinta_rank', $rank);
     }
 
@@ -140,7 +141,7 @@ class Journal extends Model
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
@@ -156,7 +157,7 @@ class Journal extends Model
      */
     public function scopeByAssessmentStatus($query, ?string $status)
     {
-        if (!$status) {
+        if (! $status) {
             return $query;
         }
 
@@ -184,9 +185,10 @@ class Journal extends Model
      */
     public function getAccreditationLabelAttribute(): string
     {
-        if (!$this->accreditation_status) {
+        if (! $this->accreditation_status) {
             return 'Belum Terakreditasi';
         }
+
         return $this->accreditation_grade
             ? "{$this->accreditation_status} ({$this->accreditation_grade})"
             : $this->accreditation_status;

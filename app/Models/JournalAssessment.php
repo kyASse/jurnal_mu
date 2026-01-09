@@ -120,9 +120,10 @@ class JournalAssessment extends Model
      */
     public function scopeByStatus($query, ?string $status)
     {
-        if (!$status) {
+        if (! $status) {
             return $query;
         }
+
         return $query->where('status', $status);
     }
 
@@ -153,7 +154,7 @@ class JournalAssessment extends Model
      */
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'Draft',
             'submitted' => 'Submitted',
             'reviewed' => 'Reviewed',
@@ -166,7 +167,7 @@ class JournalAssessment extends Model
      */
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'gray',
             'submitted' => 'yellow',
             'reviewed' => 'green',
@@ -179,7 +180,7 @@ class JournalAssessment extends Model
      */
     public function getGradeAttribute(): string
     {
-        return match(true) {
+        return match (true) {
             $this->percentage >= 90 => 'A (Excellent)',
             $this->percentage >= 80 => 'B (Very Good)',
             $this->percentage >= 70 => 'C (Good)',
@@ -219,12 +220,12 @@ class JournalAssessment extends Model
         $this->max_score = $this->responses()
             ->with('evaluationIndicator')
             ->get()
-            ->sum(fn($response) => $response->evaluationIndicator->weight);
-        
-        $this->percentage = $this->max_score > 0 
-            ? ($this->total_score / $this->max_score) * 100 
+            ->sum(fn ($response) => $response->evaluationIndicator->weight);
+
+        $this->percentage = $this->max_score > 0
+            ? ($this->total_score / $this->max_score) * 100
             : 0;
-        
+
         $this->save();
     }
 
@@ -258,9 +259,9 @@ class JournalAssessment extends Model
     {
         $totalIndicators = EvaluationIndicator::active()->count();
         $answeredIndicators = $this->responses()->count();
-        
-        return $totalIndicators > 0 
-            ? ($answeredIndicators / $totalIndicators) * 100 
+
+        return $totalIndicators > 0
+            ? ($answeredIndicators / $totalIndicators) * 100
             : 0;
     }
 }

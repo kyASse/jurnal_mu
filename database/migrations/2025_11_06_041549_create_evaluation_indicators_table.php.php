@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('evaluation_indicators', function (Blueprint $table) {
             $table->id();
-            
-            // Hierarchy: Category > Sub-Category > 
+
+            // Hierarchy: Category > Sub-Category >
             $table->string('category', 100); // Kategori utama, e.g., Kelengkapan Administrasi
             $table->string('sub_category', 100)->nullable(); // Sub-kategori (optional)
 
@@ -29,15 +29,15 @@ return new class extends Migration
 
             // Attachment
             $table->boolean('requires_attachment')->default(false); // Wajib upload bukti?
-            
+
             // Ordering
             $table->integer('sort_order')->default(0);
-            
+
             // Status
             $table->boolean('is_active')->default(true);
-            
+
             $table->timestamps();
-            
+
             // Indexes
             $table->index('category');
             $table->index('code');

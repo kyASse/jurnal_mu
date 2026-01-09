@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
 
             // basic info
-            $table->string('code', 20)->unique(); //Kode PTM unik. e.g., 'UAD', 'UMY'
-            $table->string('name', 150); //Nama lengkap universitas
-            $table->string('short_name', 20)->nullable(); //Singkatan nama universitas
+            $table->string('code', 20)->unique(); // Kode PTM unik. e.g., 'UAD', 'UMY'
+            $table->string('name', 150); // Nama lengkap universitas
+            $table->string('short_name', 20)->nullable(); // Singkatan nama universitas
 
             // Contact
             $table->text('address')->nullable();
@@ -29,10 +29,10 @@ return new class extends Migration
             $table->string('website')->nullable();
 
             // Branding
-            $table->string('logo_url', 500)->nullable(); //URL logo PTM
+            $table->string('logo_url', 500)->nullable(); // URL logo PTM
 
             // Status
-            $table->boolean('is_active')->default(true); //Status aktif/inaktif PTM
+            $table->boolean('is_active')->default(true); // Status aktif/inaktif PTM
 
             $table->timestamps();
             $table->softDeletes();
