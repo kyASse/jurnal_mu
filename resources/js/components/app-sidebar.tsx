@@ -21,6 +21,20 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
+// Common navigation items shared across all roles
+const commonNavItems: NavItem[] = [
+    {
+        title: 'Support',
+        href: '#',
+        icon: LifeBuoy,
+    },
+    {
+        title: 'Resources',
+        href: '#',
+        icon: Box,
+    },
+];
+
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
     const { user } = auth;
@@ -66,16 +80,7 @@ export function AppSidebar() {
                     { title: 'Admin Kampus', href: route('admin.admin-kampus.index') },
                 ],
             },
-            {
-                title: 'Support',
-                href: '#',
-                icon: LifeBuoy,
-            },
-            {
-                title: 'Resources',
-                href: '#',
-                icon: Box,
-            },
+            ...commonNavItems,
         ];
     } else if (user.role && user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
         roleNavItems = [
@@ -103,16 +108,7 @@ export function AppSidebar() {
                     { title: 'Indeksasi', href: '#' },
                 ]
             },
-            {
-                title: 'Support',
-                href: '#',
-                icon: LifeBuoy,
-            },
-            {
-                title: 'Resources',
-                href: '#',
-                icon: Box,
-            },
+            ...commonNavItems,
         ];
     } else if (user.role && user.role.name === ROLE_NAMES.USER) {
         roleNavItems = [
@@ -141,16 +137,7 @@ export function AppSidebar() {
                     { title: 'Indeksasi', href: '#' },
                 ]
             },
-            {
-                title: 'Support',
-                href: '#',
-                icon: LifeBuoy,
-            },
-            {
-                title: 'Resources',
-                href: '#',
-                icon: Box,
-            },
+            ...commonNavItems,
         ];
     }
 
