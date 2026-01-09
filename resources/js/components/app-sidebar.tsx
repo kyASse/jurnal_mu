@@ -2,6 +2,7 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { ROLE_NAMES } from '@/constants/roles';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Award, BookOpen, BookType, Box, ClipboardList, FileText, Folder, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
@@ -36,7 +37,7 @@ export function AppSidebar() {
     // Role-specific items
     let roleNavItems: NavItem[] = [];
 
-    if (user.role && user.role.name === 'Super Admin') {
+    if (user.role && user.role.name === ROLE_NAMES.SUPER_ADMIN) {
         roleNavItems = [
             {
                 title: 'Data Master',
@@ -76,7 +77,7 @@ export function AppSidebar() {
                 icon: Box,
             },
         ];
-    } else if (user.role && user.role.name === 'Admin Kampus') {
+    } else if (user.role && user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
         roleNavItems = [
             {
                 title: 'Pengelola Jurnal',
@@ -113,7 +114,7 @@ export function AppSidebar() {
                 icon: Box,
             },
         ];
-    } else if (user.role && user.role.name === 'User') {
+    } else if (user.role && user.role.name === ROLE_NAMES.USER) {
         roleNavItems = [
             // Profil is usually in the user menu, but requested in sidebar
             {

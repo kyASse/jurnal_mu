@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -15,21 +15,21 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             [
-                'name' => 'Super Admin',
+                'name' => Role::SUPER_ADMIN,
                 'display_name' => 'Super Administrator',
                 'description' => 'Memiliki akses penuh ke seluruh sistem. Dapat mengelola semua PTM, Admin Kampus, dan melihat seluruh data jurnal.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Admin Kampus',
+                'name' => Role::ADMIN_KAMPUS,
                 'display_name' => 'Administrator Kampus',
                 'description' => 'Bertanggung jawab mengelola data jurnal di tingkat kampus. Dapat meninjau, menyetujui, atau menolak jurnal yang diajukan oleh PTM di kampusnya.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'User',
+                'name' => Role::USER,
                 'display_name' => 'Pengelola Jurnal',
                 'description' => 'Mengelola jurnal yang ditugaskan. Dapat melakukan self-assessment dan mengajukan pembinaan.',
                 'created_at' => now(),
