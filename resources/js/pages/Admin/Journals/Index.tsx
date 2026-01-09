@@ -40,6 +40,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import {
+    Eye,
     Search,
     BookOpen,
     ChevronLeft,
@@ -426,15 +427,11 @@ export default function JournalsIndex({
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    {/* TODO: Implement detail view in next iteration */}
-                                                    {/* <Link href={route('admin.journals.show', journal.id)}>
+                                                    <Link href={route('admin.journals.show', journal.id)}>
                                                         <Button variant="ghost" size="sm" title="View Details">
                                                             <Eye className="w-4 h-4" />
                                                         </Button>
-                                                    </Link> */}
-                                                    <span className="text-xs text-muted-foreground">
-                                                        Detail view coming soon
-                                                    </span>
+                                                    </Link>
                                                 </div>
                                             </TableCell>
                                         </TableRow>

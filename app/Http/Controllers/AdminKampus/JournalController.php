@@ -117,4 +117,83 @@ class JournalController extends Controller
             'statusOptions' => $statusOptions,
         ]);
     }
+
+    /**
+     * Display the specified journal with its assessments.
+     *
+     * @route GET /admin-kampus/journals/{journal}
+     *
+     * @features View journal details, view all assessments (read-only)
+     */
+    public function show(Journal $journal): Response
+    {
+        $this->authorize('view', $journal);
+
+        // Eager load relationships
+        $journal->load([
+            'university',
+            'user',
+            'scientificField',
+            'assessments' => function ($query) {
+                $query->with(['user'])
+                    ->orderBy('assessment_date', 'desc');
+            },
+        ]);
+
+        return Inertia::render('AdminKampus/Journals/Show', [
+            'journal' => [
+                'id' => $journal->id,
+                'title' => $journal->title,
+                'issn' => $journal->issn,
+                'e_issn' => $journal->e_issn,
+                'url' => $journal->url,
+                'publisher' => $journal->publisher,
+                'frequency' => $journal->frequency,
+                'frequency_label' => $journal->frequency_label,
+                'first_published_year' => $journal->first_published_year,
+                'editor_in_chief' => $journal->editor_in_chief,
+                'email' => $journal->email,
+                'sinta_rank' => $journal->sinta_rank,
+                'sinta_rank_label' => $journal->sinta_rank_label,
+                'accreditation_status' => $journal->accreditation_status,
+                'accreditation_status_label' => $journal->accreditation_status_label,
+                'accreditation_grade' => $journal->accreditation_grade,
+                'is_active' => $journal->is_active,
+                'created_at' => $journal->created_at->format('Y-m-d H:i'),
+                'updated_at' => $journal->updated_at->format('Y-m-d H:i'),
+                'university' => [
+                    'id' => $journal->university->id,
+                    'name' => $journal->university->name,
+                    'code' => $journal->university->code,
+                ],
+                'user' => [
+                    'id' => $journal->user->id,
+                    'name' => $journal->user->name,
+                    'email' => $journal->user->email,
+                ],
+                'scientific_field' => $journal->scientificField ? [
+                    'id' => $journal->scientificField->id,
+                    'name' => $journal->scientificField->name,
+                ] : null,
+                'assessments' => $journal->assessments->map(fn ($assessment) => [
+                    'id' => $assessment->id,
+                    'assessment_date' => $assessment->assessment_date,
+                    'period' => $assessment->period,
+                    'status' => $assessment->status,
+                    'status_label' => $assessment->status_label,
+                    'status_color' => $assessment->status_color,
+                    'total_score' => $assessment->total_score,
+                    'max_score' => $assessment->max_score,
+                    'percentage' => $assessment->percentage,
+                    'grade' => $assessment->grade,
+                    'submitted_at' => $assessment->submitted_at?->format('Y-m-d H:i'),
+                    'reviewed_at' => $assessment->reviewed_at?->format('Y-m-d H:i'),
+                    'user' => [
+                        'id' => $assessment->user->id,
+                        'name' => $assessment->user->name,
+                    ],
+                ]),
+            ],
+        ]);
+    }
 }

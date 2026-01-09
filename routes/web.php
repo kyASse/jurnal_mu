@@ -84,8 +84,8 @@ Route::middleware(['auth'])->group(function () {
         // View all journals (read-only for monitoring)
         Route::get('journals', [\App\Http\Controllers\Admin\JournalController::class, 'index'])
             ->name('journals.index');
-        // Route::get('journals/{journal}', [\App\Http\Controllers\Admin\JournalController::class, 'show'])
-        //     ->name('journals.show'); // TODO: Implement detail view in next iteration
+        Route::get('journals/{journal}', [\App\Http\Controllers\Admin\JournalController::class, 'show'])
+            ->name('journals.show');
 
         // View all assessments (read-only for monitoring) - TODO: Create AssessmentController
         // Route::get('assessments', [AssessmentController::class, 'adminIndex'])
@@ -110,8 +110,8 @@ Route::middleware(['auth'])->group(function () {
         // View journals from their university
         Route::get('journals', [\App\Http\Controllers\AdminKampus\JournalController::class, 'index'])
             ->name('journals.index');
-        // Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
-        //     ->name('journals.show'); // TODO: Implement detail view in next iteration
+        Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
+            ->name('journals.show');
 
         // Review assessments from their university - TODO: Create AssessmentController methods
         // Route::get('assessments', [AssessmentController::class, 'adminKampusIndex'])
