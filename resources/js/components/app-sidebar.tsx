@@ -51,7 +51,10 @@ export function AppSidebar() {
     // Role-specific items
     let roleNavItems: NavItem[] = [];
 
-    if (user.role && user.role.name === ROLE_NAMES.SUPER_ADMIN) {
+    if (!user.role) {
+        // Fallback for users without assigned roles - show only common items
+        roleNavItems = [...commonNavItems];
+    } else if (user.role.name === ROLE_NAMES.SUPER_ADMIN) {
         roleNavItems = [
             {
                 title: 'Data Master',
@@ -82,7 +85,7 @@ export function AppSidebar() {
             },
             ...commonNavItems,
         ];
-    } else if (user.role && user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
+    } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
         roleNavItems = [
             {
                 title: 'Pengelola Jurnal',
@@ -110,7 +113,7 @@ export function AppSidebar() {
             },
             ...commonNavItems,
         ];
-    } else if (user.role && user.role.name === ROLE_NAMES.USER) {
+    } else if (user.role.name === ROLE_NAMES.USER) {
         roleNavItems = [
             // Profil is usually in the user menu, but requested in sidebar
             {
@@ -139,6 +142,9 @@ export function AppSidebar() {
             },
             ...commonNavItems,
         ];
+    } else {
+        // Fallback for unrecognized roles - show only common items
+        roleNavItems = [...commonNavItems];
     }
 
     const mainNavItems = [...baseNavItems, ...roleNavItems];
