@@ -83,11 +83,6 @@ export function AppSidebar() {
                     { title: 'Admin Kampus', href: route('admin.admin-kampus.index') },
                 ],
             },
-            {
-                title: 'Journals',
-                href: route('admin.journals.index'),
-                icon: Library,
-            },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
@@ -98,8 +93,8 @@ export function AppSidebar() {
                 icon: Users,
             },
             {
-                title: 'Journals',
-                href: route('admin-kampus.journals.index'),
+                title: 'List Jurnal',
+                href: '#',
                 icon: Library,
             },
             {
