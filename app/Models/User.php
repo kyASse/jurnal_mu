@@ -151,7 +151,7 @@ class User extends Authenticatable
      */
     public function scopeSuperAdmins($query)
     {
-        return $query->byRole('super_admin');
+        return $query->byRole(Role::SUPER_ADMIN);
     }
 
     /**
@@ -159,7 +159,7 @@ class User extends Authenticatable
      */
     public function scopeAdminKampus($query)
     {
-        return $query->byRole('admin_kampus');
+        return $query->byRole(Role::ADMIN_KAMPUS);
     }
 
     /**
@@ -167,7 +167,7 @@ class User extends Authenticatable
      */
     public function scopePengelolaJurnal($query)
     {
-        return $query->byRole('user');
+        return $query->byRole(Role::USER);
     }
 
     /**
@@ -175,14 +175,14 @@ class User extends Authenticatable
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('position', 'like', "%{$search}%");
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('position', 'like', "%{$search}%");
         });
     }
 
@@ -197,7 +197,7 @@ class User extends Authenticatable
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role && $this->role->name === 'Super Admin';
+        return $this->role && $this->role->name === Role::SUPER_ADMIN;
     }
 
     /**
@@ -205,7 +205,7 @@ class User extends Authenticatable
      */
     public function isAdminKampus(): bool
     {
-        return $this->role && $this->role->name === 'Admin Kampus';
+        return $this->role && $this->role->name === Role::ADMIN_KAMPUS;
     }
 
     /**
@@ -213,7 +213,7 @@ class User extends Authenticatable
      */
     public function isUser(): bool
     {
-        return $this->role && $this->role->name === 'User';
+        return $this->role && $this->role->name === Role::USER;
     }
 
     /**
@@ -259,8 +259,9 @@ class User extends Authenticatable
     {
         $words = explode(' ', $this->name);
         if (count($words) >= 2) {
-            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+            return strtoupper(substr($words[0], 0, 1).substr($words[1], 0, 1));
         }
+
         return strtoupper(substr($this->name, 0, 2));
     }
 }

@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Role extends Model
 {
     /**
+     * Role name constants
+     */
+    public const SUPER_ADMIN = 'Super Admin';
+
+    public const ADMIN_KAMPUS = 'Admin Kampus';
+
+    public const USER = 'User';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -46,15 +55,15 @@ class Role extends Model
     | Scopes
     |--------------------------------------------------------------------------
     */
-    
+
     /**
      * Scope to get specific role by name.
-    */
+     */
     public function scopeByName($query, string $name)
     {
         return $query->where('name', $name);
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Helper Methods
@@ -66,7 +75,7 @@ class Role extends Model
      */
     public function isSuperAdmin(): bool
     {
-        return $this->name === 'super_admin';
+        return $this->name === self::SUPER_ADMIN;
     }
 
     /**
@@ -74,7 +83,7 @@ class Role extends Model
      */
     public function isAdminKampus(): bool
     {
-        return $this->name === 'admin_kampus';
+        return $this->name === self::ADMIN_KAMPUS;
     }
 
     /**
@@ -82,6 +91,6 @@ class Role extends Model
      */
     public function isUser(): bool
     {
-        return $this->name === 'user';
+        return $this->name === self::USER;
     }
 }
