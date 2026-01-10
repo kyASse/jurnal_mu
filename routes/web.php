@@ -26,6 +26,18 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
+| Public Journals Routes
+|--------------------------------------------------------------------------
+*/
+
+// Public access to view journals
+Route::get('/journals', [\App\Http\Controllers\PublicJournalController::class, 'index'])
+    ->name('journals.index');
+Route::get('/journals/{journal}', [\App\Http\Controllers\PublicJournalController::class, 'show'])
+    ->name('journals.show');
+
+/*
+|--------------------------------------------------------------------------
 | Guest Routes (Redirect jika sudah login)
 |--------------------------------------------------------------------------
 */
@@ -69,7 +81,7 @@ Route::middleware(['auth'])->group(function () {
     | Super Admin Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:' . Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
 
         // Universities Management
         Route::resource('universities', UniversityController::class);
@@ -100,7 +112,7 @@ Route::middleware(['auth'])->group(function () {
     | Admin Kampus Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
+    Route::middleware(['role:' . Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
 
         // Users (Pengelola Jurnal) Management
         Route::resource('users', AdminKampusUserController::class);
@@ -127,7 +139,7 @@ Route::middleware(['auth'])->group(function () {
     | User (Pengelola Jurnal) Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::USER])->prefix('user')->name('user.')->group(function () {
+    Route::middleware(['role:' . Role::USER])->prefix('user')->name('user.')->group(function () {
 
         // Journals Management
         Route::resource('journals', JournalController::class);
@@ -169,5 +181,5 @@ Route::middleware(['auth'])->group(function () {
     // });
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
