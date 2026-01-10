@@ -17,15 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Enable stateful API for Sanctum SPA authentication
         $middleware->statefulApi();
-        
+
         // Encrypt cookies except for appearance and sidebar state
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-        
+
         // Add CORS for SPA - exclude API routes from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'api/*',
         ]);
-        
+
         // Register middleware aliases
         $middleware->alias([
             'role' => App\Http\Middleware\CheckRole::class,

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -41,9 +40,9 @@ class RegisteredUserController extends Controller
 
         // Get role_id for 'user' role
         $userRoleId = \DB::table('roles')->where('name', 'user')->value('id');
-        
+
         // Fallback: if role not found, throw error
-        if (!$userRoleId) {
+        if (! $userRoleId) {
             return response()->json([
                 'message' => 'Role configuration error. Please run database seeder first.',
                 'error' => 'User role not found in database',

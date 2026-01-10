@@ -51,9 +51,9 @@ class LoginRequest extends FormRequest
 
         // Check if user account is active
         $user = Auth::user();
-        if ($user && !$user->is_active) {
+        if ($user && ! $user->is_active) {
             Auth::logout();
-            
+
             throw ValidationException::withMessages([
                 'email' => 'Your account has been deactivated. Please contact the administrator.',
             ]);

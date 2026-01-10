@@ -1,20 +1,21 @@
 <?php
+
 // tests/Browser/UserManagementTest.php
 
 namespace Tests\Browser;
 
-use App\Models\User;
-use App\Models\University;
-use App\Models\Role;
 use App\Models\Journal;
+use App\Models\Role;
 use App\Models\ScientificField;
+use App\Models\University;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 /**
  * Browser tests for User Management by Admin Kampus
- * 
+ *
  * Tests the following scenarios:
  * 1. Admin Kampus can view user list (only users from their university)
  * 2. Admin Kampus can access create user page
@@ -29,7 +30,7 @@ use Tests\DuskTestCase;
  * 11. Admin Kampus cannot access users from other universities
  * 12. Guest cannot access user management
  * 13. Regular User cannot access user management
- * 
+ *
  * Technical Notes:
  * - Several tests use JavaScript execution via $browser->script() to click buttons.
  * - This is necessary because action buttons are nested inside <a> tags in the UI.
@@ -41,10 +42,15 @@ class UserManagementTest extends DuskTestCase
     use DatabaseMigrations;
 
     protected $adminKampus;
+
     protected $otherAdminKampus;
+
     protected $university;
+
     protected $otherUniversity;
+
     protected $testUser;
+
     protected $userRole;
 
     protected function setUp(): void
@@ -209,7 +215,7 @@ class UserManagementTest extends DuskTestCase
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
                 ->assertSee($this->testUser->name);
-            
+
             // Note: Using JavaScript to click because the button is nested inside an <a> tag.
             // Dusk's standard click() method may fail due to element overlap or event handling.
             // This ensures we click the parent link that contains the "View Details" button.
@@ -230,7 +236,7 @@ class UserManagementTest extends DuskTestCase
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
                 ->assertSee($this->testUser->name);
-            
+
             // Note: Using JavaScript to click because the button is nested inside an <a> tag.
             // Dusk's standard click() method may fail due to element overlap or event handling.
             // This ensures we click the parent link that contains the "Edit User" button.
@@ -252,7 +258,7 @@ class UserManagementTest extends DuskTestCase
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
                 ->assertSee($this->testUser->name);
-            
+
             // Note: Using JavaScript to click because the button is nested inside an <a> tag.
             // Dusk's standard click() method may fail due to element overlap or event handling.
             // This ensures we click the parent link that contains the "Edit User" button.
@@ -273,24 +279,24 @@ class UserManagementTest extends DuskTestCase
     {
         // Verify user starts as active
         $this->assertTrue($this->testUser->is_active);
-        
+
         $this->browse(function (Browser $browser) {
             // Navigate from index to show page
             $browser->loginAs($this->adminKampus)
                 ->visit('/admin-kampus/users')
                 ->waitForText('User Management', 15)
                 ->assertSee($this->testUser->name);
-            
+
             // Use script to click the first eye icon button's parent link
             $browser->script("document.querySelector('button[title=\"View Details\"]').closest('a').click();");
             $browser->waitForText($this->testUser->name)
                 ->assertSee($this->testUser->name);
-            
+
             // Click toggle button - user is active, so button says "Deactivate"
             $browser->press('Deactivate')
                 ->waitForText('Activate'); // Wait for button text to change
         });
-        
+
         // Verify user is now inactive
         $this->testUser->refresh();
         $this->assertFalse($this->testUser->is_active);
@@ -313,8 +319,8 @@ class UserManagementTest extends DuskTestCase
 
         // Verify user exists
         $this->assertDatabaseHas('users', ['email' => 'delete.me@uad.ac.id']);
-        
-        $this->browse(function (Browser $browser) use ($deleteUser) {
+
+        $this->browse(function (Browser $browser) {
             // Navigate from index - search for the delete user first
             $browser->loginAs($this->adminKampus)
                 ->visit('/admin-kampus/users')
@@ -336,7 +342,7 @@ class UserManagementTest extends DuskTestCase
             $clickButtonByTitle($browser, 'View Details');
             $browser->waitForText('Delete Me User')
                 ->assertSee('Delete Me User');
-            
+
             // Click delete button
             $browser->press('Delete')
                 ->waitForDialog()
@@ -344,7 +350,7 @@ class UserManagementTest extends DuskTestCase
                 ->acceptDialog()
                 ->waitForLocation('/admin-kampus/users'); // Wait for deletion to complete
         });
-        
+
         // Verify user is deleted
         $this->assertDatabaseMissing('users', ['email' => 'delete.me@uad.ac.id']);
     }
@@ -382,12 +388,12 @@ class UserManagementTest extends DuskTestCase
             $browser->script("document.querySelector('button[title=\"View Details\"]').closest('a').click();");
             $browser->waitForText($this->testUser->email)
                 ->assertSee($this->testUser->email);
-            
+
             // Attempt to delete user with journals
             $browser->press('Delete')
                 ->waitForDialog()
                 ->acceptDialog();
-            
+
             // Should show error message or stay on same page
             // Verify user still exists in database
             $this->assertDatabaseHas('users', ['email' => $this->testUser->email]);
@@ -418,8 +424,8 @@ class UserManagementTest extends DuskTestCase
 
             // Try to access user detail directly - should fail (404 or 403)
             // The controller returns 404 for users not in admin's university
-            $browser->visit('/admin-kampus/users/' . $otherUser->id);
-            
+            $browser->visit('/admin-kampus/users/'.$otherUser->id);
+
             // Should not be on the show page - should see error or be redirected
             $browser->assertDontSee('Contact Information')
                 ->assertDontSee('Activity & Statistics');
@@ -468,7 +474,7 @@ class UserManagementTest extends DuskTestCase
                 ->type('input[id="password_confirmation"]', 'password123')
                 ->press('Create User')
                 ->waitForText('The email has already been taken.');
-            
+
             // Should show validation error - check that we're still on create page
             // (not redirected to index) which means validation failed
             $browser->assertPathIs('/admin-kampus/users/create');

@@ -12,19 +12,19 @@ class CheckRole
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$roles
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         // Check if user us authenticated
-        if (!$request->user()) {
+        if (! $request->user()) {
             return redirect()->route('login')
                 ->with('error', 'You must be logged in to access this page.');
         }
 
         // Check if user is active
-        if (!$request->user()->is_active) {
+        if (! $request->user()->is_active) {
             auth()->logout();
+
             return redirect()->route('login')
                 ->with('error', 'Your account has been deactivated. Please contact the administrator.');
         }
@@ -33,7 +33,7 @@ class CheckRole
         $userRole = $request->user()->role->name;
 
         // Check if user has requiered role
-        if (!in_array($userRole, $roles)) {
+        if (! in_array($userRole, $roles)) {
             abort(403, 'You do not have permission to access this page.');
         }
 

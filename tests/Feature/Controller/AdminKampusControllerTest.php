@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Controller;
 
+use App\Models\Journal;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
-use App\Models\Journal;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,12 +14,19 @@ class AdminKampusControllerTest extends TestCase
     use RefreshDatabase;
 
     private User $superAdmin;
+
     private User $adminKampus;
+
     private User $regularUser;
+
     private University $university1;
+
     private University $university2;
+
     private Role $superAdminRole;
+
     private Role $adminKampusRole;
+
     private Role $userRole;
 
     protected function setUp(): void
@@ -116,7 +123,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Page loads successfully with correct component
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->component('Admin/AdminKampus/Index')
                 ->has('adminKampus')
                 ->has('universities')
@@ -173,7 +180,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Displays both Admin Kampus users
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->component('Admin/AdminKampus/Index')
                 ->has('adminKampus.data', 2)
                 ->where('adminKampus.data.0.name', 'Admin Kampus 2')
@@ -202,7 +209,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Only matching result returned
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->has('adminKampus.data', 1)
                 ->where('adminKampus.data.0.name', 'John Doe Admin')
             );
@@ -229,7 +236,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Only university 2 admin returned
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->has('adminKampus.data', 1)
                 ->where('adminKampus.data.0.university.id', $this->university2->id)
             );
@@ -256,7 +263,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Only active admins returned
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->has('adminKampus.data', 1)
                 ->where('adminKampus.data.0.is_active', true)
             );
@@ -275,7 +282,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Form loads with universities list
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->component('Admin/AdminKampus/Create')
                 ->has('universities')
             );
@@ -424,7 +431,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Details page loads with correct data
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->component('Admin/AdminKampus/Show')
                 ->where('adminKampus.id', $this->adminKampus->id)
                 ->where('adminKampus.name', 'Admin Kampus Test')
@@ -461,7 +468,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Form loads with Admin Kampus data
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->component('Admin/AdminKampus/Edit')
                 ->where('adminKampus.id', $this->adminKampus->id)
                 ->where('adminKampus.name', 'Admin Kampus Test')
@@ -539,7 +546,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Password updated
         $response->assertRedirect(route('admin.admin-kampus.index'));
-        
+
         $this->adminKampus->refresh();
         $this->assertTrue(\Hash::check('newpassword123', $this->adminKampus->password));
     }
@@ -551,7 +558,7 @@ class AdminKampusControllerTest extends TestCase
     {
         // Arrange: Get old password hash
         $oldPasswordHash = $this->adminKampus->password;
-        
+
         $data = [
             'name' => 'Updated Name',
             'email' => $this->adminKampus->email,
@@ -565,7 +572,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Password unchanged
         $response->assertRedirect(route('admin.admin-kampus.index'));
-        
+
         $this->adminKampus->refresh();
         $this->assertEquals($oldPasswordHash, $this->adminKampus->password);
     }
@@ -720,7 +727,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Status toggled to inactive
         $response->assertSessionHas('success', 'Admin Kampus deactivated successfully.');
-        
+
         $this->adminKampus->refresh();
         $this->assertFalse($this->adminKampus->is_active);
 
@@ -730,7 +737,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Status toggled to active
         $response->assertSessionHas('success', 'Admin Kampus activated successfully.');
-        
+
         $this->adminKampus->refresh();
         $this->assertTrue($this->adminKampus->is_active);
     }
@@ -788,7 +795,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: First page has 10 items
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->has('adminKampus.data', 10)
                 ->where('adminKampus.per_page', 10)
             );
@@ -799,7 +806,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Second page has remaining 5 items
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->has('adminKampus.data', 5)
             );
     }
@@ -844,7 +851,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Journals count displayed
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->where('adminKampus.data.0.journals_count', 2)
             );
     }
@@ -862,7 +869,7 @@ class AdminKampusControllerTest extends TestCase
 
         // Assert: Managed users count displayed
         $response->assertOk()
-            ->assertInertia(fn($page) => $page
+            ->assertInertia(fn ($page) => $page
                 ->where('adminKampus.managed_users_count', 1)
             );
     }

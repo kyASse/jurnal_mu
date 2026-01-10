@@ -8,7 +8,6 @@ use App\Models\ScientificField;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Validation\Rule;
 
 class JournalController extends Controller
 {
@@ -52,7 +51,7 @@ class JournalController extends Controller
         $user = Auth::user();
 
         // Ensure user has a university assigned
-        if (!$user->university_id) {
+        if (! $user->university_id) {
             return back()->withErrors(['university_id' => 'Anda belum terdaftar di kampus manapun. Hubungi Admin Kampus.']);
         }
 
@@ -65,7 +64,7 @@ class JournalController extends Controller
             'sinta_rank' => 'nullable|integer|min:1|max:6',
             'frequency' => 'required|string|max:50',
             'publisher' => 'nullable|string|max:255',
-            'first_published_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'first_published_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
         ]);
 
         $validated['user_id'] = $user->id;
@@ -107,7 +106,7 @@ class JournalController extends Controller
             'sinta_rank' => 'nullable|integer|min:1|max:6',
             'frequency' => 'required|string|max:50',
             'publisher' => 'nullable|string|max:255',
-            'first_published_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'first_published_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
         ]);
 
         $journal->update($validated);

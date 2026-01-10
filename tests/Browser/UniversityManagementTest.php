@@ -15,6 +15,7 @@ class UniversityManagementTest extends DuskTestCase
     use DatabaseMigrations;
 
     protected User $superAdmin;
+
     protected Role $superAdminRole;
 
     protected function setUp(): void
@@ -150,7 +151,7 @@ class UniversityManagementTest extends DuskTestCase
                 ->type('#code', 'NTU123')
                 ->type('#name', 'New Test University')
                 ->type('#short_name', 'NTU')
-                // Address Information  
+                // Address Information
                 ->type('#address', 'Jl. Sudirman No. 123')
                 ->type('#city', 'Jakarta Pusat')
                 ->type('#province', 'DKI Jakarta')
@@ -165,15 +166,15 @@ class UniversityManagementTest extends DuskTestCase
                 ->click('button[type="submit"]')
                 ->pause(5000)  // Wait longer for form submission
                 ->screenshot('after-submit');
-                
+
             // Check if still on create page (validation error)
             $currentPath = $browser->driver->getCurrentURL();
             if (str_contains($currentPath, '/create')) {
                 // There might be validation errors, let's see them
                 $pageSource = $browser->driver->getPageSource();
-                $this->fail("Form submission failed. Still on create page. Check screenshots.");
+                $this->fail('Form submission failed. Still on create page. Check screenshots.');
             }
-                
+
             $browser->assertPathIs('/admin/universities')
                 ->pause(1000)
                 ->assertSee('New Test University');
@@ -299,14 +300,14 @@ class UniversityManagementTest extends DuskTestCase
                 ->visit('/admin/universities')
                 ->pause(2000)  // Wait for table to load
                 ->assertSee($university->name);
-                
+
             // Find and click the delete button (Trash icon) in the first row
             // The button has onClick handler that triggers confirm dialog
             $browser->with('table tbody tr:first-child', function ($row) {
-                    $row->click('button:has(svg.text-red-600)');
-                })
+                $row->click('button:has(svg.text-red-600)');
+            })
                 ->pause(500);
-                
+
             // Accept the browser confirm dialog
             $browser->acceptDialog()
                 ->pause(3000)  // Wait for deletion to complete
@@ -358,13 +359,13 @@ class UniversityManagementTest extends DuskTestCase
                 ->visit('/admin/universities')
                 ->pause(2000)  // Wait for table to load
                 ->assertSee($university->name);
-                
+
             // Try to delete university with journals
             $browser->with('table tbody tr:first-child', function ($row) {
-                    $row->click('button:has(svg.text-red-600)');
-                })
+                $row->click('button:has(svg.text-red-600)');
+            })
                 ->pause(500);
-                
+
             // Accept the browser confirm dialog
             $browser->acceptDialog()
                 ->pause(3000)  // Wait for response
@@ -389,12 +390,12 @@ class UniversityManagementTest extends DuskTestCase
         for ($i = 1; $i <= 25; $i++) {
             University::create([
                 'name' => "Test University {$i}",
-                'code' => "TU" . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'code' => 'TU'.str_pad($i, 3, '0', STR_PAD_LEFT),
                 'short_name' => "TU{$i}",
                 'province' => 'Jakarta',
                 'city' => 'Jakarta',
                 'address' => "Jl. Test No. {$i}",
-                'phone' => "021-" . str_pad($i, 7, '0', STR_PAD_LEFT),
+                'phone' => '021-'.str_pad($i, 7, '0', STR_PAD_LEFT),
                 'email' => "test{$i}@test.ac.id",
                 'website' => "https://test{$i}.ac.id",
                 'is_active' => true,

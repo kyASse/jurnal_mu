@@ -40,21 +40,21 @@ class AuthenticatedSessionController extends Controller
         $user = User::where('email', $request->email)->first();
 
         // check if user exists
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'email' => 'The provided credentials do not match our records.',
             ]);
         }
 
         // check if user is active
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             throw ValidationException::withMessages([
                 'email' => 'Your account is inactive. Please contact the administrator.',
             ]);
         }
 
         // check password
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => 'The provided credentials do not match our records.',
             ]);

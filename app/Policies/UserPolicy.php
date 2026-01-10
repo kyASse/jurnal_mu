@@ -3,13 +3,12 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
     /**
      * Determine whether the user can view any users.
-     * 
+     *
      * Rules:
      * - Super Andmin: Can view all users.
      * - Admin: Can view all users except Super Admins.
@@ -41,7 +40,7 @@ class UserPolicy
 
     /**
      * Determine whether the user can create users.
-     * 
+     *
      * Rules:
      * - Super Admin: Can create Admin Kampus and User
      * - Admin Kampus: Can create User only within their university.
@@ -105,7 +104,7 @@ class UserPolicy
         // Admin Kampus can update users within their university except Super Admins
         if ($authUser->isAdminKampus()) {
             return $authUser->university_id === $targetUser->university_id
-                && !$targetUser->isSuperAdmin();
+                && ! $targetUser->isSuperAdmin();
         }
 
         return false;
@@ -123,7 +122,7 @@ class UserPolicy
 
         // Super Admin can delete Admin Kampus and User
         if ($authUser->isSuperAdmin()) {
-            return !$targetUser->isSuperAdmin();
+            return ! $targetUser->isSuperAdmin();
         }
 
         // Admin Kampus can delete users within their university except Super Admins
@@ -159,8 +158,8 @@ class UserPolicy
      */
     public function forceDelete(User $authUser, User $targetUser): bool
     {
-        // Only Super Admin can force delete 
-        return $authUser->isSuperAdmin() && !$targetUser->isSuperAdmin();
+        // Only Super Admin can force delete
+        return $authUser->isSuperAdmin() && ! $targetUser->isSuperAdmin();
     }
 
     /**
@@ -175,7 +174,7 @@ class UserPolicy
 
         // Super Admin can toggle any user except Super Admins
         if ($authUser->isSuperAdmin()) {
-            return !$targetUser->isSuperAdmin();
+            return ! $targetUser->isSuperAdmin();
         }
 
         // Admin Kampus can toggle users within their university except Super Admins

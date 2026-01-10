@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -140,6 +139,6 @@ class JournalSeeder extends Seeder
 
         DB::table('journals')->insert($journals);
 
-        $this->command->info(count($journals) . ' Sample Journals created successfully!');
+        $this->command->info(count($journals).' Sample Journals created successfully!');
     }
 }

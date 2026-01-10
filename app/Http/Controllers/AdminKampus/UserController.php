@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Role;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
@@ -112,7 +112,7 @@ class UserController extends Controller
         $userRole = Role::where('name', 'User')->firstOrFail();
 
         // Verify admin can assign this role
-        if (!$authUser->can('canAssignRole', [User::class, 'User'])) {
+        if (! $authUser->can('canAssignRole', [User::class, 'User'])) {
             abort(403, 'You are not authorized to assign this role.');
         }
 
@@ -217,7 +217,7 @@ class UserController extends Controller
         // Validate request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
@@ -234,12 +234,13 @@ class UserController extends Controller
         ];
 
         // Include password in update if provided
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);
         }
 
         // Update user with all fields in a single query
         $user->update($data);
+
         return redirect()->route('admin-kampus.users.index')
             ->with('success', 'User updated successfully.');
     }
@@ -280,7 +281,7 @@ class UserController extends Controller
 
         // Toggle active status
         $user->update([
-            'is_active' => !$user->is_active,
+            'is_active' => ! $user->is_active,
         ]);
 
         $status = $user->is_active ? 'activated' : 'deactivated';
@@ -296,7 +297,7 @@ class UserController extends Controller
     private function ensureUserBelongsToUniversityAndIsUser(User $user, User $authUser): void
     {
         // Load role for isUser() check if not already loaded
-        if (!$user->relationLoaded('role')) {
+        if (! $user->relationLoaded('role')) {
             $user->load('role');
         }
 
@@ -306,7 +307,7 @@ class UserController extends Controller
         }
 
         // Verify it's a 'User' role
-        if (!$user->isUser()) {
+        if (! $user->isUser()) {
             abort(404, 'User not found.');
         }
     }

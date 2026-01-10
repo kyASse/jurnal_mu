@@ -1,11 +1,12 @@
 <?php
+
 // tests/Browser/AdminKampusManagementTest.php
 
 namespace Tests\Browser;
 
-use App\Models\User;
-use App\Models\University;
 use App\Models\Role;
+use App\Models\University;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
@@ -15,6 +16,7 @@ class AdminKampusManagementTest extends DuskTestCase
     use DatabaseMigrations;
 
     protected $superAdmin;
+
     protected $university;
 
     protected function setUp(): void
@@ -135,7 +137,7 @@ class AdminKampusManagementTest extends DuskTestCase
     {
         // Create Admin Kampus with different statuses
         $adminKampusRole = Role::where('name', 'Admin Kampus')->first();
-        
+
         User::create([
             'name' => 'Active Admin',
             'email' => 'active.admin@uad.ac.id',
@@ -191,7 +193,7 @@ class AdminKampusManagementTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($adminKampus) {
             $browser->loginAs($this->superAdmin)
-                ->visit('/admin/admin-kampus/' . $adminKampus->id)
+                ->visit('/admin/admin-kampus/'.$adminKampus->id)
                 ->assertSee('Detail Test Admin')
                 ->assertSee('detail.test@uad.ac.id')
                 ->assertSee('0274-999999')
@@ -219,7 +221,7 @@ class AdminKampusManagementTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($adminKampus) {
             $browser->loginAs($this->superAdmin)
-                ->visit('/admin/admin-kampus/' . $adminKampus->id . '/edit')
+                ->visit('/admin/admin-kampus/'.$adminKampus->id.'/edit')
                 ->assertSee('Edit Admin Kampus')
                 ->assertSee('Update information for Edit Test Admin')
                 ->assertInputValue('input[id="name"]', 'Edit Test Admin')
@@ -229,7 +231,7 @@ class AdminKampusManagementTest extends DuskTestCase
 
     /**
      * Test Super Admin can update Admin Kampus.
-     * 
+     *
      * Note: Tests that the edit form loads correctly with user data.
      * Form submission with React controlled inputs is complex in Dusk,
      * so we verify the form renders with correct data and can be accessed.
@@ -249,7 +251,7 @@ class AdminKampusManagementTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($adminKampus) {
             $browser->loginAs($this->superAdmin)
-                ->visit('/admin/admin-kampus/' . $adminKampus->id . '/edit')
+                ->visit('/admin/admin-kampus/'.$adminKampus->id.'/edit')
                 ->waitForText('Edit Admin Kampus')
                 // Verify form loaded with correct data
                 ->assertInputValue('input[id="name"]', 'Update Test Admin')
@@ -277,21 +279,21 @@ class AdminKampusManagementTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($adminKampus) {
             $browser->loginAs($this->superAdmin)
-                ->visit('/admin/admin-kampus/' . $adminKampus->id)
+                ->visit('/admin/admin-kampus/'.$adminKampus->id)
                 ->waitForText('Toggle Test Admin')
                 ->assertSee('Active');
-            
+
             // Click Deactivate button using JavaScript
             $browser->script([
                 "document.querySelectorAll('button').forEach(function(btn) {
                     if (btn.textContent.trim() === 'Deactivate') {
                         btn.click();
                     }
-                });"
+                });",
             ]);
-            
+
             $browser->pause(2000);
-            
+
             // Verify toggle worked in database
             $adminKampus->refresh();
             $this->assertFalse($adminKampus->is_active);
@@ -300,7 +302,7 @@ class AdminKampusManagementTest extends DuskTestCase
 
     /**
      * Test Super Admin can delete Admin Kampus without dependencies.
-     * 
+     *
      * Note: Tests the delete functionality by verifying the delete button exists
      * and the confirm dialog can be triggered. Full deletion is tested via Feature tests.
      */
@@ -317,7 +319,7 @@ class AdminKampusManagementTest extends DuskTestCase
             'is_active' => true,
         ]);
 
-        $this->browse(function (Browser $browser) use ($adminKampus) {
+        $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdmin)
                 ->visit('/admin/admin-kampus')
                 ->waitForText('Delete Safe Admin XYZ')
@@ -356,25 +358,25 @@ class AdminKampusManagementTest extends DuskTestCase
             'is_active' => true,
         ]);
 
-        $this->browse(function (Browser $browser) use ($adminKampus) {
+        $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdmin)
                 ->visit('/admin/admin-kampus')
                 ->assertSee('Delete Test Admin With Journal');
-            
+
             // Override confirm dialog to auto-accept
             $browser->script([
-                "window.confirm = function() { return true; }"
+                'window.confirm = function() { return true; }',
             ]);
-            
+
             // Click the delete button
             $browser->script([
                 "document.querySelectorAll('table tbody tr').forEach(function(row) {
                     if (row.textContent.includes('Delete Test Admin With Journal')) {
                         row.querySelector('button:last-child').click();
                     }
-                });"
+                });",
             ]);
-            
+
             $browser->pause(1500)
                 // Should still see the admin (not deleted due to journals)
                 ->assertSee('Delete Test Admin With Journal');
@@ -390,7 +392,7 @@ class AdminKampusManagementTest extends DuskTestCase
             $browser->loginAs($this->superAdmin)
                 ->visit('/admin/admin-kampus/create')
                 ->waitForText('Create New Admin Kampus');
-            
+
             // Bypass HTML5 validation and click submit
             $browser->script([
                 "document.querySelector('form').setAttribute('novalidate', 'novalidate');",
@@ -398,9 +400,9 @@ class AdminKampusManagementTest extends DuskTestCase
                     if (btn.textContent.includes('Create Admin Kampus')) {
                         btn.click();
                     }
-                });"
+                });",
             ]);
-            
+
             $browser->pause(2000)
                 // Check for any validation error - Laravel returns "The X field is required."
                 ->assertSee('required');
@@ -409,7 +411,7 @@ class AdminKampusManagementTest extends DuskTestCase
 
     /**
      * Test email uniqueness validation.
-     * 
+     *
      * Note: Tests that the create form with existing email shows validation error.
      * We verify the form can be filled and the email error is shown when a duplicate email is used.
      */
@@ -436,7 +438,7 @@ class AdminKampusManagementTest extends DuskTestCase
                 // Verify the email is typed correctly
                 ->assertInputValue('input[id="email"]', 'existing@uad.ac.id');
         });
-        
+
         // Verify that the existing email is still in database
         $this->assertDatabaseHas('users', ['email' => 'existing@uad.ac.id']);
     }
@@ -462,7 +464,7 @@ class AdminKampusManagementTest extends DuskTestCase
     {
         // Create 15 Admin Kampus (more than 10 per page)
         $adminKampusRole = Role::where('name', 'Admin Kampus')->first();
-        
+
         for ($i = 1; $i <= 15; $i++) {
             User::create([
                 'name' => "Pagination Test Admin {$i}",

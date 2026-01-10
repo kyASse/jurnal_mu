@@ -103,7 +103,7 @@ class University extends Model
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
@@ -121,7 +121,7 @@ class University extends Model
     */
 
     /**
-     * Get full 
+     * Get full
      */
     public function getFullAddressAttribute(): string
     {

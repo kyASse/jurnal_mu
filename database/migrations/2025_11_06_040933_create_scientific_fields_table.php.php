@@ -17,15 +17,15 @@ return new class extends Migration
             $table->string('code', 20)->unique(); // 'Kode bidang ilmu, e.g., COMP, MED'
             $table->string('name'); // 'Nama bidang ilmu, e.g., Computer Science, Medicine'
             $table->text('description')->nullable();
-            
+
             // Hierarchy (optional untuk grouping)
             $table->foreignId('parent_id')->nullable()->constrained('scientific_fields')->nullOnDelete();
-            
+
             // Status
             $table->boolean('is_active')->default(true);
-            
+
             $table->timestamps();
-            
+
             // Indexes
             $table->index('code');
             $table->index('parent_id');

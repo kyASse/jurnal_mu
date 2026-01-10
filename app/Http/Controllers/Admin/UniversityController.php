@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\University;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -62,7 +62,7 @@ class UniversityController extends Controller
                 ->where('id', $request->user()->university_id)
                 ->withCount(['users', 'journals'])
                 ->paginate(10)
-                ->through(fn($university) => [
+                ->through(fn ($university) => [
                     'id' => $university->id,
                     'code' => $university->code,
                     'name' => $university->name,
@@ -88,7 +88,7 @@ class UniversityController extends Controller
      */
     public function create(Request $request): Response
     {
-        //Check authorization
+        // Check authorization
         $this->authorize('create', University::class);
 
         return Inertia::render('Admin/Universities/Create');
@@ -158,13 +158,13 @@ class UniversityController extends Controller
                 'users_count' => $university->users->count(),
                 'journals_count' => $university->journals->count(),
             ],
-            'users' => $university->users->map(fn($user) => [
+            'users' => $university->users->map(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role->display_name,
             ]),
-            'journals' => $university->journals->map(fn($journal) => [
+            'journals' => $university->journals->map(fn ($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -175,7 +175,7 @@ class UniversityController extends Controller
             ],
         ]);
     }
-    
+
     /**
      * Show the form for editing the specified university.
      */
@@ -213,7 +213,7 @@ class UniversityController extends Controller
 
         // Validate request
         $validated = $request->validate([
-            'code' => 'required|string|max:20|unique:universities,code,' . $university->id,
+            'code' => 'required|string|max:20|unique:universities,code,'.$university->id,
             'name' => 'required|string|max:255',
             'short_name' => 'nullable|string|max:100',
             'address' => 'nullable|string',
@@ -266,7 +266,7 @@ class UniversityController extends Controller
 
         // Toggle active status
         $university->update([
-            'is_active' => !$university->is_active,
+            'is_active' => ! $university->is_active,
         ]);
 
         $status = $university->is_active ? 'activated' : 'deactivated';

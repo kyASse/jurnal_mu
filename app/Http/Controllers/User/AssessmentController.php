@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AssessmentAttachment;
+use App\Models\AssessmentResponse;
+use App\Models\EvaluationIndicator;
 use App\Models\Journal;
 use App\Models\JournalAssessment;
-use App\Models\EvaluationIndicator;
-use App\Models\AssessmentResponse;
-use App\Models\AssessmentAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +17,7 @@ class AssessmentController extends Controller
 {
     /**
      * Display a listing of user's assessments
-     * 
+     *
      * @route GET /user/assessments
      */
     public function index(Request $request)
@@ -57,6 +57,7 @@ class AssessmentController extends Controller
             ->through(function ($assessment) {
                 // Append accessor attributes for each item
                 $assessment->append(['status_label', 'status_color', 'grade']);
+
                 return $assessment;
             });
 
@@ -71,7 +72,7 @@ class AssessmentController extends Controller
 
     /**
      * Show the form for creating a new assessment
-     * 
+     *
      * @route GET /user/assessments/create
      */
     public function create(Request $request)
@@ -98,7 +99,7 @@ class AssessmentController extends Controller
 
     /**
      * Store a newly created assessment in storage
-     * 
+     *
      * @route POST /user/assessments
      */
     public function store(Request $request)
@@ -179,13 +180,14 @@ class AssessmentController extends Controller
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return back()->withErrors(['error' => 'Gagal menyimpan assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
     /**
      * Display the specified assessment
-     * 
+     *
      * @route GET /user/assessments/{assessment}
      */
     public function show(Request $request, JournalAssessment $assessment)
@@ -213,7 +215,7 @@ class AssessmentController extends Controller
 
     /**
      * Show the form for editing the specified assessment
-     * 
+     *
      * @route GET /user/assessments/{assessment}/edit
      */
     public function edit(Request $request, JournalAssessment $assessment)
@@ -222,7 +224,7 @@ class AssessmentController extends Controller
         $this->authorize('update', $assessment);
 
         // Only draft assessments can be edited
-        if (!$assessment->isEditable()) {
+        if (! $assessment->isEditable()) {
             return redirect()->route('user.assessments.show', $assessment->id)
                 ->withErrors(['error' => 'Assessment yang sudah disubmit tidak dapat diedit.']);
         }
@@ -247,7 +249,7 @@ class AssessmentController extends Controller
 
     /**
      * Update the specified assessment in storage
-     * 
+     *
      * @route PUT /user/assessments/{assessment}
      */
     public function update(Request $request, JournalAssessment $assessment)
@@ -256,7 +258,7 @@ class AssessmentController extends Controller
         $this->authorize('update', $assessment);
 
         // Only draft assessments can be updated
-        if (!$assessment->isEditable()) {
+        if (! $assessment->isEditable()) {
             return redirect()->route('user.assessments.show', $assessment->id)
                 ->withErrors(['error' => 'Assessment yang sudah disubmit tidak dapat diedit.']);
         }
@@ -328,13 +330,14 @@ class AssessmentController extends Controller
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return back()->withErrors(['error' => 'Gagal memperbarui assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
     /**
      * Submit the assessment (change status from draft to submitted)
-     * 
+     *
      * @route POST /user/assessments/{assessment}/submit
      */
     public function submit(Request $request, JournalAssessment $assessment)
@@ -342,7 +345,7 @@ class AssessmentController extends Controller
         // Authorization
         $this->authorize('update', $assessment);
 
-        if (!$assessment->isEditable()) {
+        if (! $assessment->isEditable()) {
             return back()->withErrors(['error' => 'Assessment sudah disubmit sebelumnya.']);
         }
 
@@ -359,13 +362,14 @@ class AssessmentController extends Controller
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return back()->withErrors(['error' => 'Gagal submit assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
     /**
      * Remove the specified assessment from storage
-     * 
+     *
      * @route DELETE /user/assessments/{assessment}
      */
     public function destroy(Request $request, JournalAssessment $assessment)
@@ -374,7 +378,7 @@ class AssessmentController extends Controller
         $this->authorize('delete', $assessment);
 
         // Only draft assessments can be deleted
-        if (!$assessment->isEditable()) {
+        if (! $assessment->isEditable()) {
             return back()->withErrors(['error' => 'Assessment yang sudah disubmit tidak dapat dihapus.']);
         }
 
@@ -398,13 +402,14 @@ class AssessmentController extends Controller
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return back()->withErrors(['error' => 'Gagal menghapus assessment. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
     /**
      * Download attachment file
-     * 
+     *
      * @route GET /user/assessments/attachments/{attachment}
      */
     public function downloadAttachment(AssessmentAttachment $attachment)
@@ -412,7 +417,7 @@ class AssessmentController extends Controller
         // Check authorization (user must own the assessment or be admin)
         $this->authorize('view', $attachment->assessmentResponse->journalAssessment);
 
-        if (!Storage::disk('local')->exists($attachment->file_path)) {
+        if (! Storage::disk('local')->exists($attachment->file_path)) {
             abort(404, 'File tidak ditemukan.');
         }
 
@@ -424,16 +429,12 @@ class AssessmentController extends Controller
 
     /**
      * Calculate score based on indicator and answer
-     * 
-     * @param EvaluationIndicator $indicator
-     * @param array $responseData
-     * @return float
      */
     private function calculateScore(EvaluationIndicator $indicator, array $responseData): float
     {
         $weight = (float) $indicator->weight;
 
-        return match($indicator->answer_type) {
+        return match ($indicator->answer_type) {
             'boolean' => ($responseData['answer_boolean'] ?? false) ? $weight : 0.00,
             'scale' => $weight * (($responseData['answer_scale'] ?? 0) / 5),
             'text' => $weight, // Full weight for text answers (manual review needed)
@@ -443,20 +444,17 @@ class AssessmentController extends Controller
 
     /**
      * Store attachment file
-     * 
-     * @param AssessmentResponse $response
-     * @param \Illuminate\Http\UploadedFile $file
-     * @param int $userId
-     * @return AssessmentAttachment
+     *
+     * @param  \Illuminate\Http\UploadedFile  $file
      */
     private function storeAttachment(AssessmentResponse $response, $file, int $userId): AssessmentAttachment
     {
         $originalFilename = $file->getClientOriginalName();
         $extension = $file->getClientOriginalExtension();
-        $storedFilename = time() . '_' . uniqid() . '.' . $extension;
-        
+        $storedFilename = time().'_'.uniqid().'.'.$extension;
+
         $path = $file->storeAs(
-            'assessments/' . $response->journal_assessment_id,
+            'assessments/'.$response->journal_assessment_id,
             $storedFilename,
             'local'
         );

@@ -112,6 +112,7 @@ class ScientificField extends Model
         if ($this->parent) {
             return "{$this->parent->name} - {$this->name}";
         }
+
         return $this->name;
     }
 }
