@@ -5,9 +5,9 @@ import { BookOpen, ArrowRight } from 'lucide-react';
 
 interface JournalCardProps {
     title: string;
-    issn?: string;
-    e_issn?: string;
-    sinta_rank?: number;
+    issn?: string | null;
+    e_issn?: string | null;
+    sinta_rank?: number | null;
     university?: string;
     url?: string;
     coverColor?: string; // Optional color for the card header pattern
