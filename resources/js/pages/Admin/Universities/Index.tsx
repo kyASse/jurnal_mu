@@ -1,8 +1,48 @@
+/**
+ * UniversitiesIndex Component
+ * 
+ * @description
+ * A comprehensive list view page for managing universities (PTM) in the system.
+ * This component provides filtering, searching, pagination, and CRUD operations for universities.
+ * It displays university information including code, name, location, stats (users/journals), and status.
+ * 
+ * @component
+ * 
+ * @interface University
+ * @property {number} id - Unique identifier for the university
+ * @property {string} code - University code (e.g., UAD, UMY)
+ * @property {string} name - Full name of the university
+ * @property {string} short_name - Abbreviated name
+ * @property {string} city - City location
+ * @property {string} province - Province location
+ * @property {boolean} is_active - Active status
+ * @property {number} users_count - Number of users in this university
+ * @property {number} journals_count - Number of journals in this university
+ * @property {string} created_at - Creation timestamp
+ * 
+ * @interface Props
+ * @property {Object} universities - Paginated university data
+ * @property {Object} filters - Current filter values
+ * @property {Object} can - Permissions
+ * 
+ * @route GET /admin/universities
+ * 
+ * @requires @inertiajs/react
+ * @requires @/components/ui/button
+ * @requires @/components/ui/input
+ * @requires @/components/ui/table
+ * @requires @/components/ui/badge
+ * @requires @/layouts/app-layout
+ * @requires lucide-react
+ * 
+ * @author JurnalMU Team
+ * @filepath /resources/js/pages/Admin/Universities/Index.tsx
+ */
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import AppLayout from '@/layouts/app-layout';
 import {
     Table,
     TableBody,
@@ -12,6 +52,13 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Search,
     Plus,
@@ -24,6 +71,18 @@ import {
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';
+import { type BreadcrumbItem } from '@/types';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+    {
+        title: 'Universities',
+        href: '/admin/universities',
+    },
+];
 
 interface University {
     id: number;
@@ -74,7 +133,7 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
         e.preventDefault();
         router.get(
             route('admin.universities.index'),
-            { search, is_active: isActiveFilter },
+            { search, is_active: isActiveFilter === 'all' ? '' : isActiveFilter },
             { preserveState: true }
         );
     };
@@ -94,237 +153,250 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
     };
 
     return (
-        <AppLayout>
-            <Head title="Universities" />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Universities Management" />
 
-            <div className='py-6'>
-                <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-                {/* Header */}
-                <div className='mb-6'>
-                    <div className='flex items-center justify-between'>
-                        <div>
-                            <h1 className='text-3xl font-bold text-gray-900 flex items-center gap-2'>
-                                <Building2 className='w-8 h-8 text-green-600' />
-                                Universities Management
-                            </h1>
-                            <p className="text-gray-600 mt-1">
-                                Manage Perguruan Tinggi Muhammadiyah
-                            </p>
-                        </div>
-                        {can.create && (
-                            <Link href={route('admin.universities.create')}>
-                                <Button className='flex items-center gap-2'>
-                                    <Plus className='w-4 h-4' />
-                                    Add University
-                                </Button>
-                            </Link>
-                        )}
-                    </div>
-                </div>
-
-                {/* Flash Messages */}
-                {flash.success && (
-                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                        {flash.success}
-                    </div>
-                )}
-                {flash.error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
-                        {flash.error}
-                    </div>
-                )}
-
-                {/* Filters */}
-                <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-                    <form onSubmit={handleSearch} className="flex gap-4">
-                        <div className="flex-1">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <Input
-                                    type="text"
-                                    placeholder="Search by name, code, or city..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="pl-10"
-                                />
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-neutral-950 p-6">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+                                    <Building2 className="w-8 h-8 text-green-600 dark:text-green-400" />
+                                    Universities Management
+                                </h1>
+                                <p className="text-muted-foreground mt-1">
+                                    Manage Perguruan Tinggi Muhammadiyah (PTM) and their details
+                                </p>
                             </div>
-                        </div>
-                        <select
-                            value={isActiveFilter}
-                            onChange={(e) => setIsActiveFilter(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg"
-                        >
-                            <option value="">All Status</option>
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
-                        <Button type="submit">Search</Button>
-                        {(search || isActiveFilter) && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                    setSearch('');
-                                    setIsActiveFilter('');
-                                    router.get(route('admin.universities.index'));
-                                }}
-                            >
-                                Clear
-                            </Button>
-                        )}
-                    </form>
-                </div>
-
-                {/* Table */}
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Code</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Location</TableHead>
-                                <TableHead className="text-center">Status</TableHead>
-                                <TableHead className="text-center">
-                                    <Users className="w-4 h-4 inline mr-1" />
-                                    Users
-                                </TableHead>
-                                <TableHead className="text-center">
-                                    <BookOpen className="w-4 h-4 inline mr-1" />
-                                    Journals
-                                </TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {universities.data.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                                        No universities found.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                universities.data.map((university) => (
-                                    <TableRow key={university.id}>
-                                        <TableCell className="font-medium">
-                                            {university.code}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div>
-                                                <div className="font-semibold text-gray-900">
-                                                    {university.name}
-                                                </div>
-                                                {university.short_name && (
-                                                    <div className="text-sm text-gray-500">
-                                                        {university.short_name}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="text-sm">
-                                                {university.city && university.province ? (
-                                                    <>
-                                                        {university.city}, {university.province}
-                                                    </>
-                                                ) : (
-                                                    <span className="text-gray-400">-</span>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            {university.is_active ? (
-                                                <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                                                    Active
-                                                </Badge>
-                                            ) : (
-                                                <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">
-                                                    Inactive
-                                                </Badge>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            {university.users_count}
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            {university.journals_count}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Link href={route('admin.universities.show', university.id)}>
-                                                    <Button variant="ghost" size="sm">
-                                                        <Eye className="w-4 h-4" />
-                                                    </Button>
-                                                </Link>
-                                                {can.create && (
-                                                    <>
-                                                        <Link href={route('admin.universities.edit', university.id)}>
-                                                            <Button variant="ghost" size="sm">
-                                                                <Edit className="w-4 h-4" />
-                                                            </Button>
-                                                        </Link>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleDelete(university.id, university.name)}
-                                                        >
-                                                            <Trash2 className="w-4 h-4 text-red-600" />
-                                                        </Button>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
+                            {can.create && (
+                                <Link href={route('admin.universities.create')}>
+                                    <Button className="flex items-center gap-2">
+                                        <Plus className="w-4 h-4" />
+                                        Add University
+                                    </Button>
+                                </Link>
                             )}
-                        </TableBody>
-                    </Table>
+                        </div>
+                    </div>
 
-                    {/* Pagination */}
-                    {universities.last_page > 1 && (
-                        <div className="px-6 py-4 border-t border-gray-200">
-                            <div className="flex items-center justify-between">
-                                <div className="text-sm text-gray-600">
-                                    Showing {((universities.current_page - 1) * universities.per_page) + 1} to{' '}
-                                    {Math.min(universities.current_page * universities.per_page, universities.total)} of{' '}
-                                    {universities.total} results
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {universities.links.map((link, index) => {
-                                        if (link.url === null) return null;
-                                        
-                                        const isFirst = index === 0;
-                                        const isLast = index === universities.links.length - 1;
-                                        
-                                        return (
-                                            <Link
-                                                key={index}
-                                                href={link.url}
-                                                preserveState
-                                                preserveScroll
-                                            >
-                                                <Button
-                                                    variant={link.active ? 'default' : 'outline'}
-                                                    size="sm"
-                                                    disabled={!link.url}
-                                                >
-                                                    {isFirst ? (
-                                                        <ChevronLeft className="w-4 h-4" />
-                                                    ) : isLast ? (
-                                                        <ChevronRight className="w-4 h-4" />
-                                                    ) : (
-                                                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                                    )}
-                                                </Button>
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
-                            </div>
+                    {/* Flash Messages */}
+                    {flash.success && (
+                        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 rounded-lg text-green-800 dark:text-green-300">
+                            {flash.success}
                         </div>
                     )}
+                    {flash.error && (
+                        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg text-red-800 dark:text-red-300">
+                            {flash.error}
+                        </div>
+                    )}
+
+                    {/* Filters */}
+                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-4 mb-6">
+                        <form onSubmit={handleSearch} className="flex gap-4">
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Search by name, code, or city..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="pl-10"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <Select 
+                                value={isActiveFilter} 
+                                onValueChange={(value) => setIsActiveFilter(value)}
+                            >
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="All Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    <SelectItem value="1">Active</SelectItem>
+                                    <SelectItem value="0">Inactive</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Button type="submit">Search</Button>
+                            {(search || (isActiveFilter && isActiveFilter !== 'all')) && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSearch('');
+                                        setIsActiveFilter('all');
+                                        router.get(route('admin.universities.index'));
+                                    }}
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </form>
+                    </div>
+
+                    {/* Table */}
+                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Code</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Location</TableHead>
+                                    <TableHead className="text-center">Status</TableHead>
+                                    <TableHead className="text-center">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <Users className="w-4 h-4" />
+                                            Users
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <BookOpen className="w-4 h-4" />
+                                            Journals
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {universities.data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                            No universities found.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    universities.data.map((university) => (
+                                        <TableRow key={university.id}>
+                                            <TableCell className="font-medium">
+                                                {university.code}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <div className="font-semibold text-foreground">
+                                                        {university.name}
+                                                    </div>
+                                                    {university.short_name && (
+                                                        <div className="text-sm text-muted-foreground">
+                                                            {university.short_name}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="text-sm">
+                                                    {university.city && university.province ? (
+                                                        <>
+                                                            {university.city}, {university.province}
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {university.is_active ? (
+                                                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-0 dark:bg-green-900 dark:text-green-300">
+                                                        Active
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="secondary">
+                                                        Inactive
+                                                    </Badge>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {university.users_count}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {university.journals_count}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Link href={route('admin.universities.show', university.id)}>
+                                                        <Button variant="ghost" size="icon" title="View Details">
+                                                            <Eye className="w-4 h-4" />
+                                                        </Button>
+                                                    </Link>
+                                                    {can.create && (
+                                                        <>
+                                                            <Link href={route('admin.universities.edit', university.id)}>
+                                                                <Button variant="ghost" size="icon" title="Edit">
+                                                                    <Edit className="w-4 h-4" />
+                                                                </Button>
+                                                            </Link>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                onClick={() => handleDelete(university.id, university.name)}
+                                                                title="Delete"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+
+                        {/* Pagination */}
+                        {universities.last_page > 1 && (
+                            <div className="px-6 py-4 border-t border-sidebar-border/70 dark:border-sidebar-border">
+                                <div className="flex items-center justify-between">
+                                    <div className="text-sm text-muted-foreground">
+                                        Showing {((universities.current_page - 1) * universities.per_page) + 1} to{' '}
+                                        {Math.min(universities.current_page * universities.per_page, universities.total)} of{' '}
+                                        {universities.total} results
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {universities.links.map((link, index) => {
+                                            if (link.url === null) return null;
+                                            
+                                            const isFirst = index === 0;
+                                            const isLast = index === universities.links.length - 1;
+                                            
+                                            return (
+                                                <Link
+                                                    key={index}
+                                                    href={link.url}
+                                                    preserveState
+                                                    preserveScroll
+                                                >
+                                                    <Button
+                                                        variant={link.active ? 'default' : 'outline'}
+                                                        size="sm"
+                                                        disabled={!link.url}
+                                                        className={link.active ? '' : 'text-muted-foreground'}
+                                                    >
+                                                        {isFirst ? (
+                                                            <ChevronLeft className="w-4 h-4" />
+                                                        ) : isLast ? (
+                                                            <ChevronRight className="w-4 h-4" />
+                                                        ) : (
+                                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                                        )}
+                                                    </Button>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
         </AppLayout>
     )
 }
