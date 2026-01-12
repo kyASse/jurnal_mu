@@ -1,36 +1,22 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { ROLE_NAMES } from '@/constants/roles';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Award, BookOpen, BookType, Box, ClipboardList, FileText, Folder, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
+import { Award, BookOpen, BookType, Box, ClipboardList, FileText, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
 import AppLogo from './app-logo';
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
 
 // Common navigation items shared across all roles
 const commonNavItems: NavItem[] = [
     {
         title: 'Support',
-        href: '#',
+        href: route('support'),
         icon: LifeBuoy,
     },
     {
         title: 'Resources',
-        href: '#',
+        href: route('resources'),
         icon: Box,
     },
 ];
@@ -58,21 +44,13 @@ export function AppSidebar() {
         roleNavItems = [
             {
                 title: 'Data Master',
-                href: '#',
+                href: route('admin.data-master.index'),
                 icon: BookType,
-                items: [
-                    { title: 'Bidang Ilmu', href: '#' },
-                ]
             },
             {
                 title: 'Borang Indikator',
-                href: '#',
+                href: route('admin.borang-indikator.index'),
                 icon: ClipboardList,
-                items: [
-                    { title: 'Unsur', href: '#' },
-                    { title: 'Sub Unsur', href: '#' },
-                    { title: 'Indikator', href: '#' },
-                ]
             },
             {
                 title: 'User Management',
@@ -104,31 +82,26 @@ export function AppSidebar() {
             },
             {
                 title: 'Reviewer',
-                href: '#',
+                href: route('admin-kampus.reviewer.index'),
                 icon: UserCheck,
             },
             {
                 title: 'Pembinaan',
-                href: '#',
+                href: route('admin-kampus.pembinaan.index'),
                 icon: Award,
-                items: [
-                    { title: 'Akreditasi', href: '#' },
-                    { title: 'Indeksasi', href: '#' },
-                ]
             },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.USER) {
         roleNavItems = [
-            // Profil is usually in the user menu, but requested in sidebar
             {
                 title: 'Profil',
-                href: '#',
-                icon: UserCheck, // Placeholder icon
+                href: route('user.profil.index'),
+                icon: UserCheck,
             },
             {
                 title: 'Jurnal',
-                href: '#',
+                href: route('user.jurnal.index'),
                 icon: BookOpen,
             },
             {
@@ -138,12 +111,8 @@ export function AppSidebar() {
             },
             {
                 title: 'Pembinaan',
-                href: '#',
+                href: route('user.pembinaan.index'),
                 icon: Award,
-                items: [
-                    { title: 'Akreditasi', href: '#' },
-                    { title: 'Indeksasi', href: '#' },
-                ]
             },
             ...commonNavItems,
         ];
@@ -173,7 +142,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

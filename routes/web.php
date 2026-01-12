@@ -1,14 +1,25 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminKampusController;
+use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
+use App\Http\Controllers\Admin\BorangIndikatorController;
+use App\Http\Controllers\Admin\DataMasterController;
 use App\Http\Controllers\Admin\UniversityController;
+use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
+use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
+use App\Http\Controllers\AdminKampus\ReviewerController;
 use App\Http\Controllers\AdminKampus\UserController as AdminKampusUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ResourcesController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\User\AssessmentController;
-use App\Http\Controllers\User\JournalController;
+use App\Http\Controllers\User\JournalController as UserJournalController;
+use App\Http\Controllers\User\JurnalController;
+use App\Http\Controllers\User\PembinaanController as UserPembinaanController;
+use App\Http\Controllers\User\ProfilController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -83,6 +94,14 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::middleware(['role:' . Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
 
+        // Data Master (Placeholder)
+        Route::get('data-master', [DataMasterController::class, 'index'])
+            ->name('data-master.index');
+
+        // Borang Indikator (Placeholder)
+        Route::get('borang-indikator', [BorangIndikatorController::class, 'index'])
+            ->name('borang-indikator.index');
+
         // Universities Management
         Route::resource('universities', UniversityController::class);
         Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
@@ -99,11 +118,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('journals/{journal}', [\App\Http\Controllers\Admin\JournalController::class, 'show'])
             ->name('journals.show');
 
-        // View all assessments (read-only for monitoring) - TODO: Create AssessmentController
-        // Route::get('assessments', [AssessmentController::class, 'adminIndex'])
-        //     ->name('assessments.index');
-        // Route::get('assessments/{assessment}', [AssessmentController::class, 'adminShow'])
-        //     ->name('assessments.show');
+        // View all assessments (read-only for monitoring)
+        Route::get('assessments', [AdminAssessmentController::class, 'index'])
+            ->name('assessments.index');
 
     });
 
@@ -125,13 +142,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
             ->name('journals.show');
 
-        // Review assessments from their university - TODO: Create AssessmentController methods
-        // Route::get('assessments', [AssessmentController::class, 'adminKampusIndex'])
-        //     ->name('assessments.index');
-        // Route::get('assessments/{assessment}', [AssessmentController::class, 'adminKampusShow'])
-        //     ->name('assessments.show');
-        // Route::post('assessments/{assessment}/review', [AssessmentController::class, 'review'])
-        //     ->name('assessments.review');
+        // Reviewer Management (Placeholder)
+        Route::get('reviewer', [ReviewerController::class, 'index'])
+            ->name('reviewer.index');
+
+        // Pembinaan (Placeholder)
+        Route::get('pembinaan', [AdminKampusPembinaanController::class, 'index'])
+            ->name('pembinaan.index');
+
+        // Review assessments from their university
+        Route::get('assessments', [AdminKampusAssessmentController::class, 'index'])
+            ->name('assessments.index');
+
     });
 
     /*
@@ -141,8 +163,16 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::middleware(['role:' . Role::USER])->prefix('user')->name('user.')->group(function () {
 
-        // Journals Management
-        Route::resource('journals', JournalController::class);
+        // Profil (Placeholder)
+        Route::get('profil', [ProfilController::class, 'index'])
+            ->name('profil.index');
+
+        // Jurnal (Placeholder)
+        Route::get('jurnal', [JurnalController::class, 'index'])
+            ->name('jurnal.index');
+
+        // Journals Management (existing feature - keep for backward compatibility)
+        Route::resource('journals', UserJournalController::class);
 
         // Assessments Management
         Route::prefix('assessments')->name('assessments.')->group(function () {
@@ -165,13 +195,25 @@ Route::middleware(['auth'])->group(function () {
             Route::get('attachments/{attachment}', [AssessmentController::class, 'downloadAttachment'])
                 ->name('attachments.download');
         });
+
+        // Pembinaan (Placeholder)
+        Route::get('pembinaan', [UserPembinaanController::class, 'index'])
+            ->name('pembinaan.index');
     });
 
     /*
     |--------------------------------------------------------------------------
-    | Shared Routes (All Roles) - TODO: Create ProfileController
+    | Shared Routes (All Roles)
     |--------------------------------------------------------------------------
     */
+
+    // Support (Placeholder)
+    Route::get('/support', [SupportController::class, 'index'])
+        ->name('support');
+
+    // Resources (Placeholder)
+    Route::get('/resources', [ResourcesController::class, 'index'])
+        ->name('resources');
 
     // Profile Management
     // Route::prefix('profile')->name('profile.')->group(function () {

@@ -46,6 +46,7 @@ export interface User {
     role: Role;
     university_id?: number;
     avatar_url?: string;
+    avatar?: string;
 }
 
 export type PageProps<

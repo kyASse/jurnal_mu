@@ -18,6 +18,7 @@
  * @route GET /admin-kampus/journals
  */
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Eye } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
