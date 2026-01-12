@@ -16,11 +16,11 @@
 
 ---
 
-## 📖 Tentang JurnalMu
+## Tentang JurnalMu
 
 **JurnalMu** (Asistensi Jurnal Muhammadiyah) adalah platform manajemen jurnal akademik yang dirancang khusus untuk Perguruan Tinggi Muhammadiyah di seluruh Indonesia. Aplikasi ini membantu mengelola, memonitor, dan meningkatkan kualitas jurnal ilmiah melalui sistem self-assessment terintegrasi.
 
-### 🎯 Tujuan Utama
+### Tujuan Utama
 
 - Mempermudah pengelolaan jurnal ilmiah di lingkungan PTM
 - Menyediakan sistem self-assessment untuk evaluasi kualitas jurnal
@@ -29,9 +29,9 @@
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
-### 🔐 Authentication & Authorization
+### Authentication & Authorization
 - Login dengan email/password
 - **Google OAuth Integration** untuk kemudahan akses
 - Role-based access control (RBAC) dengan 3 level:
@@ -39,32 +39,32 @@
   - **Admin Kampus**: Mengelola jurnal dan user di kampusnya
   - **User (Pengelola Jurnal)**: Mengelola jurnal yang ditugaskan
 
-### 📊 Dashboard Role-Based
+### Dashboard Role-Based
 - Statistik yang disesuaikan berdasarkan role pengguna
 - Ringkasan data jurnal, asesmen, dan skor rata-rata
 - Monitoring status self-assessment
 
-### 🏫 Manajemen Universitas (Super Admin)
+### Manajemen Universitas (Super Admin)
 - CRUD Perguruan Tinggi Muhammadiyah
 - Data lengkap: nama, kode, alamat, kontak, logo
 - Search dan filter berdasarkan status
 
-### 👥 Manajemen Admin Kampus (Super Admin)
+### Manajemen Admin Kampus (Super Admin)
 - CRUD Administrator untuk setiap PTM
 - Assignment admin ke universitas tertentu
 - Tracking aktivitas dan last login
 
-### 👤 Manajemen User/Pengelola Jurnal (Admin Kampus)
+### Manajemen User/Pengelola Jurnal (Admin Kampus)
 - CRUD User yang di-scope ke universitas sendiri
 - Assign pengelola ke jurnal tertentu
 - Monitoring aktivitas pengelola
 
-### 📚 Manajemen Jurnal (User)
+### Manajemen Jurnal (User)
 - Input data jurnal lengkap (ISSN, E-ISSN, URL, dll)
 - Klasifikasi berdasarkan bidang ilmu
 - Status akreditasi dan peringkat SINTA
 
-### 📝 Self-Assessment (User)
+### Self-Assessment (User)
 - Borang evaluasi dengan 12 indikator penilaian
 - 3 kategori utama:
   - Kelengkapan Administrasi
@@ -73,14 +73,14 @@
 - Auto-calculate skor total
 - Status draft/submitted untuk tracking progress
 
-### ⚙️ Settings & Profile
+### Settings & Profile
 - Update profil pengguna
 - Ubah password
 - Pengaturan tema (Light/Dark/System)
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 | Technology | Version | Description |
@@ -113,7 +113,7 @@
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -200,7 +200,7 @@ composer dev
 
 ---
 
-## 🔑 Default Credentials
+## Default Credentials
 
 Setelah menjalankan seeder, gunakan kredensial berikut untuk testing:
 
@@ -212,7 +212,7 @@ Setelah menjalankan seeder, gunakan kredensial berikut untuk testing:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 jurnal_mu/
@@ -247,7 +247,7 @@ jurnal_mu/
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### PHP Tests (Pest)
 ```bash
@@ -272,7 +272,7 @@ php artisan dusk
 
 ---
 
-## 🔧 Code Quality
+## Code Quality
 
 ### PHP Linting
 ```bash
@@ -300,7 +300,7 @@ npm run types
 
 ---
 
-## 📊 Database Schema
+## Database Schema
 
 Aplikasi menggunakan schema database berikut:
 
@@ -320,32 +320,7 @@ Lihat dokumentasi lengkap di [docs/ERD Database.md](docs/ERD%20Database.md).
 
 ---
 
-## 🗺️ Roadmap
-
-### ✅ Completed (MVP v1.0)
-- [x] Authentication & Google OAuth
-- [x] Role-based Dashboard
-- [x] Manajemen Universitas (Super Admin)
-- [x] Manajemen Admin Kampus (Super Admin)
-- [x] Manajemen User (Admin Kampus)
-- [x] Landing Page Public
-- [x] Settings (Profile, Password, Appearance)
-
-### 🚧 In Progress
-- [ ] Journal Management UI
-- [ ] Self-Assessment Form
-- [ ] Assessment Review (Admin Kampus)
-
-### 📋 Planned (v1.1+)
-- [ ] Modul Pembinaan
-- [ ] Email Notifications
-- [ ] Export PDF/Excel Reports
-- [ ] Advanced Analytics Dashboard
-- [ ] Resources Management
-
----
-
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read our contributing guidelines before submitting a PR.
 
@@ -357,13 +332,13 @@ Contributions are welcome! Please read our contributing guidelines before submit
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📞 Contact & Support
+## Contact & Support
 
 - **Repository**: [github.com/kyASse/jurnal_mu](https://github.com/kyASse/jurnal_mu)
 - **Issues**: [github.com/kyASse/jurnal_mu/issues](https://github.com/kyASse/jurnal_mu/issues)
