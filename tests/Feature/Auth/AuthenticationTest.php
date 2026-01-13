@@ -9,7 +9,8 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+    $this->seedRoles();
+    $user = User::factory()->user()->create();
 
     $response = $this->post('/login', [
         'email' => $user->email,
@@ -21,7 +22,8 @@ test('users can authenticate using the login screen', function () {
 });
 
 test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+    $this->seedRoles();
+    $user = User::factory()->user()->create();
 
     $this->post('/login', [
         'email' => $user->email,
@@ -32,7 +34,8 @@ test('users can not authenticate with invalid password', function () {
 });
 
 test('users can logout', function () {
-    $user = User::factory()->create();
+    $this->seedRoles();
+    $user = User::factory()->user()->create();
 
     $response = $this->actingAs($user)->post('/logout');
 
