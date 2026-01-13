@@ -10,7 +10,7 @@ class ProfilController extends Controller
 {
     /**
      * Display the user profile page.
-     * 
+     *
      * This is a placeholder page for the Profil feature
      * which is currently under development.
      */

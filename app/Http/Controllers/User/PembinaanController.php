@@ -10,7 +10,7 @@ class PembinaanController extends Controller
 {
     /**
      * Display the Pembinaan page for journal managers.
-     * 
+     *
      * This is a placeholder page for the Pembinaan feature
      * which is currently under development.
      */
