@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('journals', function (Blueprint $table) {
             $table->id();
-            
+
             // Ownership
             $table->foreignId('university_id')->constrained('universities')->cascadeOnDelete();
             // Pengelola jurnal (User)
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            
+
             // Basic Info
             $table->string('title'); // Nama jurnal
             $table->string('issn', 20)->nullable(); // ISSN cetak
             $table->string('e_issn', 20)->nullable(); // ISSN elektronik
-            
+
             // Publication Details
             $table->string('url', 500)->nullable(); // URL jurnal
             $table->string('publisher')->nullable(); // Penerbit
@@ -32,22 +32,22 @@ return new class extends Migration
 
             // Classification
             $table->foreignId('scientific_field_id')->nullable()->constrained('scientific_fields')->nullOnDelete();
-            
+
             // Indexing & Accreditation
             $table->tinyInteger('sinta_rank')->nullable(); // 1-6, atau NULL jika belum terindeks
             $table->string('accreditation_status', 50)->nullable(); // Terakreditasi/Belum
             $table->string('accreditation_grade', 10)->nullable(); // S1, S2, S3, S4
-            
+
             // Contact
             $table->string('editor_in_chief')->nullable();
             $table->string('email')->nullable();
-            
+
             // Status
             $table->boolean('is_active')->default(true);
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('university_id');
             $table->index('user_id');

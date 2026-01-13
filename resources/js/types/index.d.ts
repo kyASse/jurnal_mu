@@ -20,6 +20,7 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    items?: NavItem[];
 }
 
 export interface SharedData {
@@ -28,16 +29,32 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    flash?: {
+        success?: string;
+        error?: string;
+    };
     [key: string]: unknown;
+}
+
+export interface Role {
+    id: number;
+    name: string;
+    description: string;
 }
 
 export interface User {
     id: number;
     name: string;
     email: string;
+    email_verified_at?: string;
+    role: Role;
+    university_id?: number;
+    avatar_url?: string;
     avatar?: string;
-    email_verified_at: string | null;
-    created_at: string;
-    updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
 }
+
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+    auth: {
+        user: User;
+    };
+};

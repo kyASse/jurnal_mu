@@ -1,0 +1,344 @@
+/**
+ * UniversitiesIndex Component
+ *
+ * @description
+ * A comprehensive list view page for managing universities (PTM) in the system.
+ * This component provides filtering, searching, pagination, and CRUD operations for universities.
+ * It displays university information including code, name, location, stats (users/journals), and status.
+ *
+ * @component
+ *
+ * @interface University
+ * @property {number} id - Unique identifier for the university
+ * @property {string} code - University code (e.g., UAD, UMY)
+ * @property {string} name - Full name of the university
+ * @property {string} short_name - Abbreviated name
+ * @property {string} city - City location
+ * @property {string} province - Province location
+ * @property {boolean} is_active - Active status
+ * @property {number} users_count - Number of users in this university
+ * @property {number} journals_count - Number of journals in this university
+ * @property {string} created_at - Creation timestamp
+ *
+ * @interface Props
+ * @property {Object} universities - Paginated university data
+ * @property {Object} filters - Current filter values
+ * @property {Object} can - Permissions
+ *
+ * @route GET /admin/universities
+ *
+ * @requires @inertiajs/react
+ * @requires @/components/ui/button
+ * @requires @/components/ui/input
+ * @requires @/components/ui/table
+ * @requires @/components/ui/badge
+ * @requires @/layouts/app-layout
+ * @requires lucide-react
+ *
+ * @author JurnalMU Team
+ * @filepath /resources/js/pages/Admin/Universities/Index.tsx
+ */
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { BookOpen, Building2, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, Users } from 'lucide-react';
+import { useState } from 'react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+    {
+        title: 'Universities',
+        href: '/admin/universities',
+    },
+];
+
+interface University {
+    id: number;
+    code: string;
+    name: string;
+    short_name: string;
+    city: string;
+    province: string;
+    phone: string;
+    email: string;
+    website: string;
+    logo_url: string;
+    is_active: boolean;
+    users_count: number;
+    journals_count: number;
+    full_address: string;
+    created_at: string;
+}
+
+interface Props {
+    universities: {
+        data: University[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links: Array<{
+            url: string | null;
+            label: string;
+            active: boolean;
+        }>;
+    };
+    filters: {
+        search: string;
+        is_active: string;
+    };
+    can: {
+        create: boolean;
+    };
+}
+
+export default function UniversitiesIndex({ universities, filters, can }: Props) {
+    const { flash } = usePage<SharedData>().props;
+    const [search, setSearch] = useState(filters.search || '');
+    const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(route('admin.universities.index'), { search, is_active: isActiveFilter === 'all' ? '' : isActiveFilter }, { preserveState: true });
+    };
+
+    const handleDelete = (id: number, name: string) => {
+        if (confirm(`Are you sure you want to delete ${name}?`)) {
+            router.delete(route('admin.universities.destroy', id));
+        }
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Universities Management" />
+
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
+                                    <Building2 className="h-8 w-8 text-green-600 dark:text-green-400" />
+                                    Universities Management
+                                </h1>
+                                <p className="mt-1 text-muted-foreground">Manage Perguruan Tinggi Muhammadiyah (PTM) and their details</p>
+                            </div>
+                            {can.create && (
+                                <Link href={route('admin.universities.create')}>
+                                    <Button className="flex items-center gap-2">
+                                        <Plus className="h-4 w-4" />
+                                        Add University
+                                    </Button>
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Flash Messages */}
+                    {flash?.success && (
+                        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-300">
+                            {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300">
+                            {flash.error}
+                        </div>
+                    )}
+
+                    {/* Filters */}
+                    <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
+                        <form onSubmit={handleSearch} className="flex gap-4">
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Search by name, code, or city..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="pl-10"
+                                    />
+                                </div>
+                            </div>
+
+                            <Select value={isActiveFilter} onValueChange={(value) => setIsActiveFilter(value)}>
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="All Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    <SelectItem value="1">Active</SelectItem>
+                                    <SelectItem value="0">Inactive</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Button type="submit">Search</Button>
+                            {(search || (isActiveFilter && isActiveFilter !== 'all')) && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSearch('');
+                                        setIsActiveFilter('all');
+                                        router.get(route('admin.universities.index'));
+                                    }}
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </form>
+                    </div>
+
+                    {/* Table */}
+                    <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Code</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Location</TableHead>
+                                    <TableHead className="text-center">Status</TableHead>
+                                    <TableHead className="text-center">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <Users className="h-4 w-4" />
+                                            Users
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <BookOpen className="h-4 w-4" />
+                                            Journals
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {universities.data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                                            No universities found.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    universities.data.map((university) => (
+                                        <TableRow key={university.id}>
+                                            <TableCell className="font-medium">{university.code}</TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <div className="font-semibold text-foreground">{university.name}</div>
+                                                    {university.short_name && (
+                                                        <div className="text-sm text-muted-foreground">{university.short_name}</div>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="text-sm">
+                                                    {university.city && university.province ? (
+                                                        <>
+                                                            {university.city}, {university.province}
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {university.is_active ? (
+                                                    <Badge className="border-0 bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300">
+                                                        Active
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="secondary">Inactive</Badge>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-center">{university.users_count}</TableCell>
+                                            <TableCell className="text-center">{university.journals_count}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Link href={route('admin.universities.show', university.id)}>
+                                                        <Button variant="ghost" size="icon" title="View Details">
+                                                            <Eye className="h-4 w-4" />
+                                                        </Button>
+                                                    </Link>
+                                                    {can.create && (
+                                                        <>
+                                                            <Link href={route('admin.universities.edit', university.id)}>
+                                                                <Button variant="ghost" size="icon" title="Edit">
+                                                                    <Edit className="h-4 w-4" />
+                                                                </Button>
+                                                            </Link>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                                onClick={() => handleDelete(university.id, university.name)}
+                                                                title="Delete"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+
+                        {/* Pagination */}
+                        {universities.last_page > 1 && (
+                            <div className="border-t border-sidebar-border/70 px-6 py-4 dark:border-sidebar-border">
+                                <div className="flex items-center justify-between">
+                                    <div className="text-sm text-muted-foreground">
+                                        Showing {(universities.current_page - 1) * universities.per_page + 1} to{' '}
+                                        {Math.min(universities.current_page * universities.per_page, universities.total)} of {universities.total}{' '}
+                                        results
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {universities.links.map((link, index) => {
+                                            if (link.url === null) return null;
+
+                                            const isFirst = index === 0;
+                                            const isLast = index === universities.links.length - 1;
+
+                                            return (
+                                                <Link key={index} href={link.url} preserveState preserveScroll>
+                                                    <Button
+                                                        variant={link.active ? 'default' : 'outline'}
+                                                        size="sm"
+                                                        disabled={!link.url}
+                                                        className={link.active ? '' : 'text-muted-foreground'}
+                                                    >
+                                                        {isFirst ? (
+                                                            <ChevronLeft className="h-4 w-4" />
+                                                        ) : isLast ? (
+                                                            <ChevronRight className="h-4 w-4" />
+                                                        ) : (
+                                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                                        )}
+                                                    </Button>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </AppLayout>
+    );
+}

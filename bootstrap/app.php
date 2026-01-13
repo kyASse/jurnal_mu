@@ -15,8 +15,26 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Enable stateful API for Sanctum SPA authentication
+        $middleware->statefulApi();
+
+        // Encrypt cookies except for appearance and sidebar state
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        // Add CORS for SPA - exclude API routes from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'api/*',
+        ]);
+
+        // Register middleware aliases
+        $middleware->alias([
+            'role' => App\Http\Middleware\CheckRole::class,
+            'active' => App\Http\Middleware\EnsureUserIsActive::class,
+            'journal.owner' => App\Http\Middleware\CheckJournalOwnership::class,
+            'university' => App\Http\Middleware\CheckUniversity::class,
+        ]);
+
+        // Web middleware stack
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,

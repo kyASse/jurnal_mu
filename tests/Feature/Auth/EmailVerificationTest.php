@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 
 test('email verification screen can be rendered', function () {
-    $user = User::factory()->unverified()->create();
+    $this->seedRoles();
+    $user = User::factory()->user()->unverified()->create();
 
     $response = $this->actingAs($user)->get('/verify-email');
 
@@ -14,7 +15,8 @@ test('email verification screen can be rendered', function () {
 });
 
 test('email can be verified', function () {
-    $user = User::factory()->unverified()->create();
+    $this->seedRoles();
+    $user = User::factory()->user()->unverified()->create();
 
     Event::fake();
 
@@ -32,7 +34,8 @@ test('email can be verified', function () {
 });
 
 test('email is not verified with invalid hash', function () {
-    $user = User::factory()->unverified()->create();
+    $this->seedRoles();
+    $user = User::factory()->user()->unverified()->create();
 
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',

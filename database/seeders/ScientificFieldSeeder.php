@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -108,6 +107,6 @@ class ScientificFieldSeeder extends Seeder
 
         DB::table('scientific_fields')->insert($fields);
 
-        $this->command->info(count($fields) . ' Scientific fields seeded successfully.');
+        $this->command->info(count($fields).' Scientific fields seeded successfully.');
     }
 }
