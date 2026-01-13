@@ -1,40 +1,19 @@
 /**
  * Assessments Index Page
- * 
+ *
  * @description User's assessment listing page - displays all self-assessments
  * @features List view, filter by status, search, pagination, create new
  * @route GET /user/assessments
  */
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Plus,
-    Eye,
-    Edit,
-    Trash2,
-    FileText,
-    Calendar,
-    TrendingUp,
-} from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Calendar, Edit, Eye, FileText, Plus, Trash2, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Journal {
     id: number;
@@ -104,7 +83,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                 {
                     preserveState: true,
                     preserveScroll: true,
-                }
+                },
             );
         }, 300);
 
@@ -126,11 +105,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
             green: 'outline',
         };
 
-        return (
-            <Badge variant={variants[assessment.status_color] || 'default'}>
-                {assessment.status_label}
-            </Badge>
-        );
+        return <Badge variant={variants[assessment.status_color] || 'default'}>{assessment.status_label}</Badge>;
     };
 
     const getGradeBadge = (percentage: number) => {
@@ -145,18 +120,16 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
         <AppLayout>
             <Head title="Self-Assessment" />
 
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
+            <div className="container mx-auto max-w-7xl px-4 py-8">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Self-Assessment</h1>
-                        <p className="text-muted-foreground mt-2">
-                            Kelola penilaian mandiri untuk jurnal Anda
-                        </p>
+                        <p className="mt-2 text-muted-foreground">Kelola penilaian mandiri untuk jurnal Anda</p>
                     </div>
                     <Link href={route('user.assessments.create')}>
                         <Button size="lg" className="shadow-sm">
-                            <Plus className="w-4 h-4 mr-2" />
+                            <Plus className="mr-2 h-4 w-4" />
                             Buat Assessment Baru
                         </Button>
                     </Link>
@@ -164,20 +137,13 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
 
                 {/* Flash Message */}
                 {flash?.success && (
-                    <div className="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-lg mb-6 shadow-sm">
-                        {flash.success}
-                    </div>
+                    <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-6 py-4 text-green-800 shadow-sm">{flash.success}</div>
                 )}
 
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-card p-4 rounded-lg border shadow-sm">
+                <div className="mb-6 flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm sm:flex-row">
                     <div className="flex-1">
-                        <Input
-                            placeholder="Cari jurnal..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full"
-                        />
+                        <Input placeholder="Cari jurnal..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full" />
                     </div>
                     <Select value={status || 'all'} onValueChange={(value) => setStatus(value === 'all' ? '' : value)}>
                         <SelectTrigger className="w-full sm:w-[200px]">
@@ -193,7 +159,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                 </div>
 
                 {/* Table */}
-                <div className="bg-card border rounded-lg shadow-sm overflow-hidden mb-6">
+                <div className="mb-6 overflow-hidden rounded-lg border bg-card shadow-sm">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -209,14 +175,10 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                         <TableBody>
                             {assessments.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-16">
-                                        <FileText className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                                        <p className="text-muted-foreground text-lg font-medium mb-2">
-                                            Belum ada assessment
-                                        </p>
-                                        <p className="text-muted-foreground text-sm">
-                                            Buat assessment pertama Anda untuk memulai!
-                                        </p>
+                                    <TableCell colSpan={7} className="py-16 text-center">
+                                        <FileText className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+                                        <p className="mb-2 text-lg font-medium text-muted-foreground">Belum ada assessment</p>
+                                        <p className="text-sm text-muted-foreground">Buat assessment pertama Anda untuk memulai!</p>
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -224,39 +186,25 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                                     <TableRow key={assessment.id}>
                                         <TableCell className="font-medium">
                                             <div>
-                                                <div className="font-semibold">
-                                                    {assessment.journal.title}
-                                                </div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    ISSN: {assessment.journal.issn}
-                                                </div>
+                                                <div className="font-semibold">{assessment.journal.title}</div>
+                                                <div className="text-sm text-muted-foreground">ISSN: {assessment.journal.issn}</div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-muted-foreground" />
+                                                <Calendar className="h-4 w-4 text-muted-foreground" />
                                                 {new Date(assessment.assessment_date).toLocaleDateString('id-ID')}
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            {assessment.period || '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {getStatusBadge(assessment)}
-                                        </TableCell>
+                                        <TableCell>{assessment.period || '-'}</TableCell>
+                                        <TableCell>{getStatusBadge(assessment)}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-1">
-                                                <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                                                <span className="font-semibold">
-                                                    {Number(assessment.total_score).toFixed(2)}
-                                                </span>
-                                                <span className="text-muted-foreground">
-                                                    / {Number(assessment.max_score).toFixed(2)}
-                                                </span>
+                                                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                                                <span className="font-semibold">{Number(assessment.total_score).toFixed(2)}</span>
+                                                <span className="text-muted-foreground">/ {Number(assessment.max_score).toFixed(2)}</span>
                                             </div>
-                                            <div className="text-sm text-muted-foreground">
-                                                ({Number(assessment.percentage).toFixed(1)}%)
-                                            </div>
+                                            <div className="text-sm text-muted-foreground">({Number(assessment.percentage).toFixed(1)}%)</div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {assessment.status !== 'draft' && getGradeBadge(assessment.percentage)}
@@ -265,22 +213,18 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                                             <div className="flex justify-end gap-2">
                                                 <Link href={route('user.assessments.show', assessment.id)}>
                                                     <Button variant="ghost" size="sm">
-                                                        <Eye className="w-4 h-4" />
+                                                        <Eye className="h-4 w-4" />
                                                     </Button>
                                                 </Link>
                                                 {assessment.status === 'draft' && (
                                                     <>
                                                         <Link href={route('user.assessments.edit', assessment.id)}>
                                                             <Button variant="ghost" size="sm">
-                                                                <Edit className="w-4 h-4" />
+                                                                <Edit className="h-4 w-4" />
                                                             </Button>
                                                         </Link>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleDelete(assessment.id)}
-                                                        >
-                                                            <Trash2 className="w-4 h-4 text-destructive" />
+                                                        <Button variant="ghost" size="sm" onClick={() => handleDelete(assessment.id)}>
+                                                            <Trash2 className="h-4 w-4 text-destructive" />
                                                         </Button>
                                                     </>
                                                 )}
@@ -295,7 +239,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
 
                 {/* Pagination */}
                 {assessments.last_page > 1 && (
-                    <div className="flex justify-center gap-2 mb-6">
+                    <div className="mb-6 flex justify-center gap-2">
                         {assessments.links.map((link, index) => (
                             <Button
                                 key={index}
@@ -310,22 +254,20 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                 )}
 
                 {/* Stats Summary */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-card p-6 rounded-lg border shadow-sm">
-                    <div className="text-center p-4">
-                        <div className="text-3xl font-bold text-primary mb-1">{assessments.total}</div>
-                        <div className="text-sm text-muted-foreground font-medium">Total Assessment</div>
+                <div className="grid grid-cols-1 gap-6 rounded-lg border bg-card p-6 shadow-sm md:grid-cols-3">
+                    <div className="p-4 text-center">
+                        <div className="mb-1 text-3xl font-bold text-primary">{assessments.total}</div>
+                        <div className="text-sm font-medium text-muted-foreground">Total Assessment</div>
                     </div>
-                    <div className="text-center p-4 border-l border-r">
-                        <div className="text-3xl font-bold text-yellow-600 mb-1">
-                            {assessments.data.filter(a => a.status === 'draft').length}
-                        </div>
-                        <div className="text-sm text-muted-foreground font-medium">Draft</div>
+                    <div className="border-r border-l p-4 text-center">
+                        <div className="mb-1 text-3xl font-bold text-yellow-600">{assessments.data.filter((a) => a.status === 'draft').length}</div>
+                        <div className="text-sm font-medium text-muted-foreground">Draft</div>
                     </div>
-                    <div className="text-center p-4">
-                        <div className="text-3xl font-bold text-green-600 mb-1">
-                            {assessments.data.filter(a => a.status === 'submitted').length}
+                    <div className="p-4 text-center">
+                        <div className="mb-1 text-3xl font-bold text-green-600">
+                            {assessments.data.filter((a) => a.status === 'submitted').length}
                         </div>
-                        <div className="text-sm text-muted-foreground font-medium">Submitted</div>
+                        <div className="text-sm font-medium text-muted-foreground">Submitted</div>
                     </div>
                 </div>
             </div>

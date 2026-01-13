@@ -1,16 +1,16 @@
 /**
  * UniversitiesCreate Component
- * 
+ *
  * @description
  * A form page for creating new university (PTM) records in the system.
  * This component provides input fields for university details including
  * basic information, address, contact details, and initial status.
- * 
+ *
  * @component
- * 
+ *
  * @route GET /admin/universities/create
  * @route POST /admin/universities
- * 
+ *
  * @requires @inertiajs/react
  * @requires @/components/ui/button
  * @requires @/components/ui/input
@@ -18,18 +18,18 @@
  * @requires @/components/ui/textarea
  * @requires @/layouts/app-layout
  * @requires lucide-react
- * 
+ *
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/Universities/Create.tsx
  */
-import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -71,29 +71,25 @@ export default function UniversitiesCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create University" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-neutral-950 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
                         <Link href={route('admin.universities.index')}>
                             <Button variant="ghost" className="mb-4">
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to List
                             </Button>
                         </Link>
-                        <h1 className="text-3xl font-bold text-foreground">
-                            Create New University
-                        </h1>
-                        <p className="text-muted-foreground mt-1">
-                            Add a new Perguruan Tinggi Muhammadiyah
-                        </p>
+                        <h1 className="text-3xl font-bold text-foreground">Create New University</h1>
+                        <p className="mt-1 text-muted-foreground">Add a new Perguruan Tinggi Muhammadiyah</p>
                     </div>
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Basic Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground border-b border-sidebar-border/70 dark:border-sidebar-border pb-2">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
                                 Basic Information
                             </h3>
 
@@ -110,9 +106,7 @@ export default function UniversitiesCreate() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.code && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.code}</p>
-                                )}
+                                {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code}</p>}
                             </div>
 
                             {/* Name */}
@@ -128,9 +122,7 @@ export default function UniversitiesCreate() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.name && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
-                                )}
+                                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
                             </div>
 
                             {/* Short Name */}
@@ -143,15 +135,13 @@ export default function UniversitiesCreate() {
                                     placeholder="e.g., UAD"
                                     className="mt-2"
                                 />
-                                {errors.short_name && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.short_name}</p>
-                                )}
+                                {errors.short_name && <p className="mt-1 text-sm text-red-600">{errors.short_name}</p>}
                             </div>
                         </div>
 
                         {/* Address */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground border-b border-sidebar-border/70 dark:border-sidebar-border pb-2">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
                                 Address Information
                             </h3>
 
@@ -164,23 +154,14 @@ export default function UniversitiesCreate() {
                                     rows={3}
                                     className="mt-2"
                                 />
-                                {errors.address && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.address}</p>
-                                )}
+                                {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div>
                                     <Label htmlFor="city">City</Label>
-                                    <Input
-                                        id="city"
-                                        value={data.city}
-                                        onChange={(e) => setData('city', e.target.value)}
-                                        className="mt-2"
-                                    />
-                                    {errors.city && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.city}</p>
-                                    )}
+                                    <Input id="city" value={data.city} onChange={(e) => setData('city', e.target.value)} className="mt-2" />
+                                    {errors.city && <p className="mt-1 text-sm text-red-600">{errors.city}</p>}
                                 </div>
 
                                 <div>
@@ -191,9 +172,7 @@ export default function UniversitiesCreate() {
                                         onChange={(e) => setData('province', e.target.value)}
                                         className="mt-2"
                                     />
-                                    {errors.province && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.province}</p>
-                                    )}
+                                    {errors.province && <p className="mt-1 text-sm text-red-600">{errors.province}</p>}
                                 </div>
 
                                 <div>
@@ -204,20 +183,18 @@ export default function UniversitiesCreate() {
                                         onChange={(e) => setData('postal_code', e.target.value)}
                                         className="mt-2"
                                     />
-                                    {errors.postal_code && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.postal_code}</p>
-                                    )}
+                                    {errors.postal_code && <p className="mt-1 text-sm text-red-600">{errors.postal_code}</p>}
                                 </div>
                             </div>
                         </div>
 
                         {/* Contact Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground border-b border-sidebar-border/70 dark:border-sidebar-border pb-2">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
                                 Contact Information
                             </h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label htmlFor="phone">Phone</Label>
                                     <Input
@@ -228,9 +205,7 @@ export default function UniversitiesCreate() {
                                         placeholder="e.g., 0274-563515"
                                         className="mt-2"
                                     />
-                                    {errors.phone && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
-                                    )}
+                                    {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
                                 </div>
 
                                 <div>
@@ -243,9 +218,7 @@ export default function UniversitiesCreate() {
                                         placeholder="e.g., info@uad.ac.id"
                                         className="mt-2"
                                     />
-                                    {errors.email && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.email}</p>
-                                    )}
+                                    {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                                 </div>
                             </div>
 
@@ -259,9 +232,7 @@ export default function UniversitiesCreate() {
                                     placeholder="e.g., https://uad.ac.id"
                                     className="mt-2"
                                 />
-                                {errors.website && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.website}</p>
-                                )}
+                                {errors.website && <p className="mt-1 text-sm text-red-600">{errors.website}</p>}
                             </div>
 
                             <div>
@@ -274,15 +245,13 @@ export default function UniversitiesCreate() {
                                     placeholder="https://example.com/logo.png"
                                     className="mt-2"
                                 />
-                                {errors.logo_url && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.logo_url}</p>
-                                )}
+                                {errors.logo_url && <p className="mt-1 text-sm text-red-600">{errors.logo_url}</p>}
                             </div>
                         </div>
 
                         {/* Status */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground border-b border-sidebar-border/70 dark:border-sidebar-border pb-2">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
                                 Status
                             </h3>
 
@@ -292,7 +261,7 @@ export default function UniversitiesCreate() {
                                     type="checkbox"
                                     checked={data.is_active}
                                     onChange={(e) => setData('is_active', e.target.checked)}
-                                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                    className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                                 />
                                 <Label htmlFor="is_active" className="cursor-pointer">
                                     Active (University is operational and can be assigned to users)
@@ -301,7 +270,7 @@ export default function UniversitiesCreate() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 pt-6 border-t border-sidebar-border/70 dark:border-sidebar-border">
+                        <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
                             <Link href={route('admin.universities.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel

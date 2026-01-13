@@ -1,8 +1,8 @@
-import { FormEventHandler } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
 
 type RegisterForm = {
     name: string;
@@ -32,23 +32,21 @@ export default function Register() {
         <>
             <Head title="Register" />
 
-            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-yellow-50 flex items-center justify-center p-4">
+            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-yellow-50 p-4">
                 <div className="w-full max-w-md">
                     {/* Header */}
-                    <div className="text-center mb-8">
+                    <div className="mb-8 text-center">
                         <Link href="/">
-                            <h1 className="text-3xl font-bold text-green-600">
-                                Asistensi Jurnal Muhammadiyah
-                            </h1>
-                            <p className="text-gray-600 mt-2">Platform Manajemen Jurnal Ilmiah PTM</p>
+                            <h1 className="text-3xl font-bold text-green-600">Asistensi Jurnal Muhammadiyah</h1>
+                            <p className="mt-2 text-gray-600">Platform Manajemen Jurnal Ilmiah PTM</p>
                         </Link>
                     </div>
 
                     {/* Register Form */}
-                    <div className="bg-white rounded-2xl shadow-xl p-8">
-                        <div className="text-center mb-8">
+                    <div className="rounded-2xl bg-white p-8 shadow-xl">
+                        <div className="mb-8 text-center">
                             <h2 className="text-3xl font-bold text-gray-900">Daftar Akun</h2>
-                            <p className="text-gray-600 mt-2">Buat akun baru untuk memulai</p>
+                            <p className="mt-2 text-gray-600">Buat akun baru untuk memulai</p>
                         </div>
 
                         <form onSubmit={submit} className="space-y-4">
@@ -63,9 +61,7 @@ export default function Register() {
                                     autoFocus
                                     className="mt-2"
                                 />
-                                {errors.name && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
-                                )}
+                                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
                             </div>
 
                             {/* Email */}
@@ -79,24 +75,14 @@ export default function Register() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.email && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.email}</p>
-                                )}
+                                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                             </div>
 
                             {/* Phone */}
                             <div>
                                 <Label htmlFor="phone">No. Telepon</Label>
-                                <Input
-                                    id="phone"
-                                    type="tel"
-                                    value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
-                                    className="mt-2"
-                                />
-                                {errors.phone && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
-                                )}
+                                <Input id="phone" type="tel" value={data.phone} onChange={(e) => setData('phone', e.target.value)} className="mt-2" />
+                                {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
                             </div>
 
                             {/* Position */}
@@ -109,9 +95,7 @@ export default function Register() {
                                     className="mt-2"
                                     placeholder="Dosen, Staf, dll"
                                 />
-                                {errors.position && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.position}</p>
-                                )}
+                                {errors.position && <p className="mt-1 text-sm text-red-600">{errors.position}</p>}
                             </div>
 
                             {/* Password */}
@@ -125,9 +109,7 @@ export default function Register() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.password && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-                                )}
+                                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
                             </div>
 
                             {/* Password Confirmation */}
@@ -141,28 +123,19 @@ export default function Register() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.password_confirmation && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.password_confirmation}</p>
-                                )}
+                                {errors.password_confirmation && <p className="mt-1 text-sm text-red-600">{errors.password_confirmation}</p>}
                             </div>
 
                             {/* Submit Button */}
-                            <Button 
-                                type="submit" 
-                                disabled={processing}
-                                className="w-full mt-6"
-                            >
+                            <Button type="submit" disabled={processing} className="mt-6 w-full">
                                 {processing ? 'Mendaftar...' : 'Daftar'}
                             </Button>
                         </form>
 
                         {/* Login Link */}
-                        <p className="text-center text-sm text-gray-600 mt-6">
+                        <p className="mt-6 text-center text-sm text-gray-600">
                             Sudah punya akun?{' '}
-                            <Link 
-                                href={route('login')} 
-                                className="text-green-600 hover:text-green-700 font-medium"
-                            >
+                            <Link href={route('login')} className="font-medium text-green-600 hover:text-green-700">
                                 Login di sini
                             </Link>
                         </p>

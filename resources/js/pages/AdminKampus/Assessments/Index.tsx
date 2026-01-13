@@ -1,12 +1,12 @@
-import AppLayout from '@/layouts/app-layout';
 import { UnderConstruction } from '@/components/under-construction';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ClipboardCheck } from 'lucide-react';
-import type { BreadcrumbItem } from '@/types';
 
 /**
  * Assessments Monitoring Index Page (Admin Kampus)
- * 
+ *
  * @description Monitor journal assessments within university
  * @route GET /admin-kampus/assessments
  * @features View and monitor assessments in own university - Currently under development
@@ -20,7 +20,7 @@ export default function AssessmentsIndex() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Assessment Monitoring" />
-            
+
             <UnderConstruction
                 title="Assessment Monitoring"
                 description="Monitor dan kelola penilaian jurnal di universitas Anda."

@@ -1,10 +1,10 @@
 /**
  * UsersIndex Component for Admin Kampus
- * 
+ *
  * @description
  * A comprehensive list view page for managing users (Pengelola Jurnal) within the admin's university.
  * This component provides filtering, searching, pagination, and CRUD operations for user accounts.
- * 
+ *
  * @features
  * - Search by name or email
  * - Filter by active/inactive status
@@ -13,43 +13,19 @@
  * - Toggle active status
  * - Add new user button
  * - Flash messages for success/error feedback
- * 
+ *
  * @route GET /admin-kampus/users
  */
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Search,
-    Plus,
-    Edit,
-    Trash2,
-    Eye,
-    BookOpen,
-    ChevronLeft,
-    ChevronRight,
-    Users as UsersIcon,
-    Power,
-} from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, Users as UsersIcon } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -108,11 +84,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(
-            route('admin-kampus.users.index'),
-            { search, is_active: isActiveFilter },
-            { preserveState: true }
-        );
+        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter }, { preserveState: true });
     };
 
     const handleDelete = (id: number, name: string) => {
@@ -129,23 +101,21 @@ export default function UsersIndex({ users, university, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="User Management" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-neutral-950 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                                    <UsersIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                                <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
+                                    <UsersIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                                     User Management
                                 </h1>
-                                <p className="text-muted-foreground mt-1">
-                                    Manage users (Pengelola Jurnal) for {university.name}
-                                </p>
+                                <p className="mt-1 text-muted-foreground">Manage users (Pengelola Jurnal) for {university.name}</p>
                             </div>
                             <Link href={route('admin-kampus.users.create')}>
                                 <Button className="flex items-center gap-2">
-                                    <Plus className="w-4 h-4" />
+                                    <Plus className="h-4 w-4" />
                                     Add User
                                 </Button>
                             </Link>
@@ -154,23 +124,23 @@ export default function UsersIndex({ users, university, filters }: Props) {
 
                     {/* Flash Messages */}
                     {flash?.success && (
-                        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200">
+                        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
                             {flash.success}
                         </div>
                     )}
                     {flash?.error && (
-                        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+                        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
                             {flash.error}
                         </div>
                     )}
 
                     {/* Filters */}
-                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-4 mb-6">
+                    <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <form onSubmit={handleSearch} className="flex gap-4">
                             {/* Search */}
                             <div className="flex-1">
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
                                     <Input
                                         type="text"
                                         placeholder="Search by name or email..."
@@ -211,7 +181,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                     </div>
 
                     {/* Table */}
-                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+                    <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -219,7 +189,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                     <TableHead>Contact</TableHead>
                                     <TableHead className="text-center">Status</TableHead>
                                     <TableHead className="text-center">
-                                        <BookOpen className="w-4 h-4 inline mr-1" />
+                                        <BookOpen className="mr-1 inline h-4 w-4" />
                                         Journals
                                     </TableHead>
                                     <TableHead>Last Login</TableHead>
@@ -229,7 +199,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                             <TableBody>
                                 {users.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                        <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                                             No users found.
                                         </TableCell>
                                     </TableRow>
@@ -239,67 +209,56 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     {user.avatar_url ? (
-                                                        <img
-                                                            src={user.avatar_url}
-                                                            alt={user.name}
-                                                            className="w-10 h-10 rounded-full"
-                                                        />
+                                                        <img src={user.avatar_url} alt={user.name} className="h-10 w-10 rounded-full" />
                                                     ) : (
-                                                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-                                                            <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
+                                                            <span className="font-semibold text-blue-600 dark:text-blue-400">
                                                                 {user.name.charAt(0).toUpperCase()}
                                                             </span>
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <div className="font-semibold text-foreground">
-                                                            {user.name}
-                                                        </div>
-                                                        {user.position && (
-                                                            <div className="text-sm text-muted-foreground">
-                                                                {user.position}
-                                                            </div>
-                                                        )}
+                                                        <div className="font-semibold text-foreground">{user.name}</div>
+                                                        {user.position && <div className="text-sm text-muted-foreground">{user.position}</div>}
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-sm">
                                                     <div>{user.email}</div>
-                                                    {user.phone && (
-                                                        <div className="text-muted-foreground">{user.phone}</div>
-                                                    )}
+                                                    {user.phone && <div className="text-muted-foreground">{user.phone}</div>}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {user.is_active ? (
-                                                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20">
+                                                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/20">
                                                         Active
                                                     </Badge>
                                                 ) : (
-                                                    <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+                                                    <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-800">
                                                         Inactive
                                                     </Badge>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                {user.journals_count}
-                                            </TableCell>
+                                            <TableCell className="text-center">{user.journals_count}</TableCell>
                                             <TableCell>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {user.last_login_at || '-'}
-                                                </div>
+                                                <div className="text-sm text-muted-foreground">{user.last_login_at || '-'}</div>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link href={route('admin-kampus.users.show', user.id)}>
-                                                        <Button variant="ghost" size="sm" title="View Details" aria-label={`View details for ${user.name}`}>
-                                                            <Eye className="w-4 h-4" />
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            title="View Details"
+                                                            aria-label={`View details for ${user.name}`}
+                                                        >
+                                                            <Eye className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
                                                     <Link href={route('admin-kampus.users.edit', user.id)}>
                                                         <Button variant="ghost" size="sm" title="Edit User" aria-label={`Edit ${user.name}`}>
-                                                            <Edit className="w-4 h-4" />
+                                                            <Edit className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
                                                     <Button
@@ -309,7 +268,9 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                                         title={user.is_active ? 'Deactivate' : 'Activate'}
                                                         aria-label={user.is_active ? `Deactivate ${user.name}` : `Activate ${user.name}`}
                                                     >
-                                                        <Power className={`w-4 h-4 ${user.is_active ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`} />
+                                                        <Power
+                                                            className={`h-4 w-4 ${user.is_active ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`}
+                                                        />
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
@@ -318,7 +279,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                                         title="Delete User"
                                                         aria-label={`Delete ${user.name}`}
                                                     >
-                                                        <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                                        <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                                                     </Button>
                                                 </div>
                                             </TableCell>
@@ -330,12 +291,11 @@ export default function UsersIndex({ users, university, filters }: Props) {
 
                         {/* Pagination */}
                         {users.last_page > 1 && (
-                            <div className="px-6 py-4 border-t border-sidebar-border/70 dark:border-sidebar-border">
+                            <div className="border-t border-sidebar-border/70 px-6 py-4 dark:border-sidebar-border">
                                 <div className="flex items-center justify-between">
                                     <div className="text-sm text-muted-foreground">
-                                        Showing {((users.current_page - 1) * users.per_page) + 1} to{' '}
-                                        {Math.min(users.current_page * users.per_page, users.total)} of{' '}
-                                        {users.total} results
+                                        Showing {(users.current_page - 1) * users.per_page + 1} to{' '}
+                                        {Math.min(users.current_page * users.per_page, users.total)} of {users.total} results
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {users.links.map((link, index) => {
@@ -345,21 +305,12 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                             const isLast = index === users.links.length - 1;
 
                                             return (
-                                                <Link
-                                                    key={index}
-                                                    href={link.url}
-                                                    preserveState
-                                                    preserveScroll
-                                                >
-                                                    <Button
-                                                        variant={link.active ? 'default' : 'outline'}
-                                                        size="sm"
-                                                        disabled={!link.url}
-                                                    >
+                                                <Link key={index} href={link.url} preserveState preserveScroll>
+                                                    <Button variant={link.active ? 'default' : 'outline'} size="sm" disabled={!link.url}>
                                                         {isFirst ? (
-                                                            <ChevronLeft className="w-4 h-4" />
+                                                            <ChevronLeft className="h-4 w-4" />
                                                         ) : isLast ? (
-                                                            <ChevronRight className="w-4 h-4" />
+                                                            <ChevronRight className="h-4 w-4" />
                                                         ) : (
                                                             <span>{link.label}</span>
                                                         )}

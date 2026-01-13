@@ -1,16 +1,14 @@
-
-
 /**
  * AdminKampusShow Component
- * 
+ *
  * @description
  * A detailed view page for displaying comprehensive information about a campus administrator (Admin Kampus).
  * This component shows the admin's profile, contact information, assigned university, managed journals,
  * statistics, and activity logs. It provides functionality to view, edit, and toggle the active status
  * of the admin kampus.
- * 
+ *
  * @component
- * 
+ *
  * @interface AdminKampus
  * @property {number} id - Unique identifier for the admin kampus
  * @property {string} name - Full name of the admin kampus
@@ -31,31 +29,31 @@
  * @property {string} updated_at - Last update timestamp
  * @property {number} journals_count - Number of journals managed by this admin
  * @property {number} managed_users_count - Number of users under this admin's management
- * 
+ *
  * @interface Journal
  * @property {number} id - Unique identifier for the journal
  * @property {string} title - Journal title
  * @property {string} issn - International Standard Serial Number
  * @property {string} scientific_field - Scientific field/discipline of the journal
- * 
+ *
  * @interface Props
  * @property {AdminKampus} adminKampus - The admin kampus data to display
  * @property {Journal[]} journals - Array of journals managed by this admin
- * 
+ *
  * @param {Props} props - Component props
  * @param {AdminKampus} props.adminKampus - Admin kampus details
  * @param {Journal[]} props.journals - List of managed journals
- * 
+ *
  * @returns The rendered admin kampus detail page
- * 
+ *
  * @example
  * ```tsx
- * <AdminKampusShow 
- *   adminKampus={adminKampusData} 
- *   journals={journalsList} 
+ * <AdminKampusShow
+ *   adminKampus={adminKampusData}
+ *   journals={journalsList}
  * />
  * ```
- * 
+ *
  * @features
  * - Display admin kampus profile with avatar
  * - Show contact information (email, phone, position)
@@ -67,45 +65,26 @@
  * - Navigate to edit page
  * - Breadcrumb navigation
  * - Dark mode support
- * 
+ *
  * @route GET /admin/admin-kampus/{id}
- * 
+ *
  * @requires @inertiajs/react
  * @requires @/components/ui/button
  * @requires @/components/ui/badge
  * @requires @/components/ui/table
  * @requires @/layouts/app-layout
  * @requires lucide-react
- * 
+ *
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/AdminKampus/Show.tsx
  */
-import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
-    ArrowLeft,
-    Edit,
-    Mail,
-    Phone,
-    Briefcase,
-    Building2,
-    MapPin,
-    Calendar,
-    BookOpen,
-    Users,
-    Shield,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { ArrowLeft, BookOpen, Briefcase, Building2, Calendar, Edit, Mail, MapPin, Phone, Shield, Users } from 'lucide-react';
 
 interface AdminKampus {
     id: number;
@@ -166,38 +145,32 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={adminKampus.name} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-neutral-950 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
                         <Link href={route('admin.admin-kampus.index')}>
                             <Button variant="ghost" className="mb-4">
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to List
                             </Button>
                         </Link>
                         <div className="flex items-start justify-between">
                             <div className="flex items-start gap-4">
                                 {adminKampus.avatar_url ? (
-                                    <img
-                                        src={adminKampus.avatar_url}
-                                        alt={adminKampus.name}
-                                        className="w-20 h-20 rounded-full"
-                                    />
+                                    <img src={adminKampus.avatar_url} alt={adminKampus.name} className="h-20 w-20 rounded-full" />
                                 ) : (
-                                    <div className="w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-                                        <span className="text-green-600 dark:text-green-400 font-bold text-2xl">
+                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+                                        <span className="text-2xl font-bold text-green-600 dark:text-green-400">
                                             {adminKampus.name.charAt(0).toUpperCase()}
                                         </span>
                                     </div>
                                 )}
                                 <div>
-                                    <h1 className="text-3xl font-bold text-foreground">
-                                        {adminKampus.name}
-                                    </h1>
-                                    <div className="flex items-center gap-2 mt-2">
+                                    <h1 className="text-3xl font-bold text-foreground">{adminKampus.name}</h1>
+                                    <div className="mt-2 flex items-center gap-2">
                                         <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
-                                            <Shield className="w-3 h-3 mr-1" />
+                                            <Shield className="mr-1 h-3 w-3" />
                                             Admin Kampus
                                         </Badge>
                                         {adminKampus.is_active ? (
@@ -209,15 +182,12 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Button
-                                    variant={adminKampus.is_active ? 'outline' : 'default'}
-                                    onClick={handleToggleActive}
-                                >
+                                <Button variant={adminKampus.is_active ? 'outline' : 'default'} onClick={handleToggleActive}>
                                     {adminKampus.is_active ? 'Deactivate' : 'Activate'}
                                 </Button>
                                 <Link href={route('admin.admin-kampus.edit', adminKampus.id)}>
                                     <Button>
-                                        <Edit className="w-4 h-4 mr-2" />
+                                        <Edit className="mr-2 h-4 w-4" />
                                         Edit
                                     </Button>
                                 </Link>
@@ -225,17 +195,15 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {/* Left Column - Details */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="space-y-6 lg:col-span-2">
                             {/* Contact Information */}
-                            <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                                <h2 className="text-xl font-semibold text-foreground mb-4">
-                                    Contact Information
-                                </h2>
+                            <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
+                                <h2 className="mb-4 text-xl font-semibold text-foreground">Contact Information</h2>
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3">
-                                        <Mail className="w-5 h-5 text-muted-foreground" />
+                                        <Mail className="h-5 w-5 text-muted-foreground" />
                                         <div>
                                             <p className="text-sm text-muted-foreground">Email</p>
                                             <p className="text-foreground">{adminKampus.email}</p>
@@ -243,7 +211,7 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                                     </div>
                                     {adminKampus.phone && (
                                         <div className="flex items-center gap-3">
-                                            <Phone className="w-5 h-5 text-muted-foreground" />
+                                            <Phone className="h-5 w-5 text-muted-foreground" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Phone</p>
                                                 <p className="text-foreground">{adminKampus.phone}</p>
@@ -252,7 +220,7 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                                     )}
                                     {adminKampus.position && (
                                         <div className="flex items-center gap-3">
-                                            <Briefcase className="w-5 h-5 text-muted-foreground" />
+                                            <Briefcase className="h-5 w-5 text-muted-foreground" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Position</p>
                                                 <p className="text-foreground">{adminKampus.position}</p>
@@ -264,23 +232,21 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
 
                             {/* University Information */}
                             {adminKampus.university && (
-                                <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                                    <h2 className="text-xl font-semibold text-foreground mb-4">
-                                        University Assignment
-                                    </h2>
+                                <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
+                                    <h2 className="mb-4 text-xl font-semibold text-foreground">University Assignment</h2>
                                     <div className="space-y-4">
                                         <div className="flex items-center gap-3">
-                                            <Building2 className="w-5 h-5 text-muted-foreground" />
+                                            <Building2 className="h-5 w-5 text-muted-foreground" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">University</p>
-                                                <p className="text-foreground font-semibold">
+                                                <p className="font-semibold text-foreground">
                                                     {adminKampus.university.code} - {adminKampus.university.name}
                                                 </p>
                                             </div>
                                         </div>
                                         {(adminKampus.university.city || adminKampus.university.province) && (
                                             <div className="flex items-center gap-3">
-                                                <MapPin className="w-5 h-5 text-muted-foreground" />
+                                                <MapPin className="h-5 w-5 text-muted-foreground" />
                                                 <div>
                                                     <p className="text-sm text-muted-foreground">Location</p>
                                                     <p className="text-foreground">
@@ -294,14 +260,10 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                             )}
 
                             {/* Managed Journals */}
-                            <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                                <h2 className="text-xl font-semibold text-foreground mb-4">
-                                    Managed Journals ({journals.length})
-                                </h2>
+                            <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
+                                <h2 className="mb-4 text-xl font-semibold text-foreground">Managed Journals ({journals.length})</h2>
                                 {journals.length === 0 ? (
-                                    <p className="text-muted-foreground text-center py-4">
-                                        No journals managed yet
-                                    </p>
+                                    <p className="py-4 text-center text-muted-foreground">No journals managed yet</p>
                                 ) : (
                                     <Table>
                                         <TableHeader>
@@ -314,9 +276,7 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                                         <TableBody>
                                             {journals.map((journal) => (
                                                 <TableRow key={journal.id}>
-                                                    <TableCell className="font-medium">
-                                                        {journal.title}
-                                                    </TableCell>
+                                                    <TableCell className="font-medium">{journal.title}</TableCell>
                                                     <TableCell>{journal.issn}</TableCell>
                                                     <TableCell>{journal.scientific_field || '-'}</TableCell>
                                                 </TableRow>
@@ -330,30 +290,24 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                         {/* Right Column - Stats & Activity */}
                         <div className="space-y-6">
                             {/* Statistics */}
-                            <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                                <h2 className="text-xl font-semibold text-foreground mb-4">
-                                    Statistics
-                                </h2>
+                            <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
+                                <h2 className="mb-4 text-xl font-semibold text-foreground">Statistics</h2>
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                    <div className="flex items-center justify-between rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
                                         <div className="flex items-center gap-3">
-                                            <BookOpen className="w-8 h-8 text-green-600 dark:text-green-400" />
+                                            <BookOpen className="h-8 w-8 text-green-600 dark:text-green-400" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Journals</p>
-                                                <p className="text-2xl font-bold text-foreground">
-                                                    {adminKampus.journals_count}
-                                                </p>
+                                                <p className="text-2xl font-bold text-foreground">{adminKampus.journals_count}</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                    <div className="flex items-center justify-between rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
                                         <div className="flex items-center gap-3">
-                                            <Users className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                                            <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Managed Users</p>
-                                                <p className="text-2xl font-bold text-foreground">
-                                                    {adminKampus.managed_users_count}
-                                                </p>
+                                                <p className="text-2xl font-bold text-foreground">{adminKampus.managed_users_count}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -361,29 +315,25 @@ export default function AdminKampusShow({ adminKampus, journals }: Props) {
                             </div>
 
                             {/* Activity */}
-                            <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                                <h2 className="text-xl font-semibold text-foreground mb-4">
-                                    Activity
-                                </h2>
+                            <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
+                                <h2 className="mb-4 text-xl font-semibold text-foreground">Activity</h2>
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3">
-                                        <Calendar className="w-5 h-5 text-muted-foreground" />
+                                        <Calendar className="h-5 w-5 text-muted-foreground" />
                                         <div>
                                             <p className="text-sm text-muted-foreground">Last Login</p>
-                                            <p className="text-foreground">
-                                                {adminKampus.last_login_at || 'Never'}
-                                            </p>
+                                            <p className="text-foreground">{adminKampus.last_login_at || 'Never'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Calendar className="w-5 h-5 text-muted-foreground" />
+                                        <Calendar className="h-5 w-5 text-muted-foreground" />
                                         <div>
                                             <p className="text-sm text-muted-foreground">Created At</p>
                                             <p className="text-foreground">{adminKampus.created_at}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Calendar className="w-5 h-5 text-muted-foreground" />
+                                        <Calendar className="h-5 w-5 text-muted-foreground" />
                                         <div>
                                             <p className="text-sm text-muted-foreground">Updated At</p>
                                             <p className="text-foreground">{adminKampus.updated_at}</p>

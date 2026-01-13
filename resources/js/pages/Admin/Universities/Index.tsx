@@ -1,13 +1,13 @@
 /**
  * UniversitiesIndex Component
- * 
+ *
  * @description
  * A comprehensive list view page for managing universities (PTM) in the system.
  * This component provides filtering, searching, pagination, and CRUD operations for universities.
  * It displays university information including code, name, location, stats (users/journals), and status.
- * 
+ *
  * @component
- * 
+ *
  * @interface University
  * @property {number} id - Unique identifier for the university
  * @property {string} code - University code (e.g., UAD, UMY)
@@ -19,14 +19,14 @@
  * @property {number} users_count - Number of users in this university
  * @property {number} journals_count - Number of journals in this university
  * @property {string} created_at - Creation timestamp
- * 
+ *
  * @interface Props
  * @property {Object} universities - Paginated university data
  * @property {Object} filters - Current filter values
  * @property {Object} can - Permissions
- * 
+ *
  * @route GET /admin/universities
- * 
+ *
  * @requires @inertiajs/react
  * @requires @/components/ui/button
  * @requires @/components/ui/input
@@ -34,44 +34,20 @@
  * @requires @/components/ui/badge
  * @requires @/layouts/app-layout
  * @requires lucide-react
- * 
+ *
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/Universities/Index.tsx
  */
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Search,
-    Plus,
-    Edit,
-    Trash2,
-    Eye,
-    Building2,
-    Users,
-    BookOpen,
-    ChevronLeft,
-    ChevronRight,
-} from 'lucide-react';
 import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { BookOpen, Building2, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, Users } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -113,7 +89,7 @@ interface Props {
             url: string | null;
             label: string;
             active: boolean;
-        }>
+        }>;
     };
     filters: {
         search: string;
@@ -124,25 +100,19 @@ interface Props {
     };
 }
 
-export default function UniversitiesIndex({ universities, filters, can}: Props) {
+export default function UniversitiesIndex({ universities, filters, can }: Props) {
     const { flash } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(
-            route('admin.universities.index'),
-            { search, is_active: isActiveFilter === 'all' ? '' : isActiveFilter },
-            { preserveState: true }
-        );
+        router.get(route('admin.universities.index'), { search, is_active: isActiveFilter === 'all' ? '' : isActiveFilter }, { preserveState: true });
     };
 
     const handleDelete = (id: number, name: string) => {
         if (confirm(`Are you sure you want to delete ${name}?`)) {
-            router.delete(
-                route('admin.universities.destroy', id)
-            )
+            router.delete(route('admin.universities.destroy', id));
         }
     };
 
@@ -150,24 +120,22 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Universities Management" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-neutral-950 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                                    <Building2 className="w-8 h-8 text-green-600 dark:text-green-400" />
+                                <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
+                                    <Building2 className="h-8 w-8 text-green-600 dark:text-green-400" />
                                     Universities Management
                                 </h1>
-                                <p className="text-muted-foreground mt-1">
-                                    Manage Perguruan Tinggi Muhammadiyah (PTM) and their details
-                                </p>
+                                <p className="mt-1 text-muted-foreground">Manage Perguruan Tinggi Muhammadiyah (PTM) and their details</p>
                             </div>
                             {can.create && (
                                 <Link href={route('admin.universities.create')}>
                                     <Button className="flex items-center gap-2">
-                                        <Plus className="w-4 h-4" />
+                                        <Plus className="h-4 w-4" />
                                         Add University
                                     </Button>
                                 </Link>
@@ -177,22 +145,22 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
 
                     {/* Flash Messages */}
                     {flash.success && (
-                        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 rounded-lg text-green-800 dark:text-green-300">
+                        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-300">
                             {flash.success}
                         </div>
                     )}
                     {flash.error && (
-                        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg text-red-800 dark:text-red-300">
+                        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300">
                             {flash.error}
                         </div>
                     )}
 
                     {/* Filters */}
-                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-4 mb-6">
+                    <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <form onSubmit={handleSearch} className="flex gap-4">
                             <div className="flex-1">
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
                                     <Input
                                         type="text"
                                         placeholder="Search by name, code, or city..."
@@ -202,11 +170,8 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                                     />
                                 </div>
                             </div>
-                            
-                            <Select 
-                                value={isActiveFilter} 
-                                onValueChange={(value) => setIsActiveFilter(value)}
-                            >
+
+                            <Select value={isActiveFilter} onValueChange={(value) => setIsActiveFilter(value)}>
                                 <SelectTrigger className="w-48">
                                     <SelectValue placeholder="All Status" />
                                 </SelectTrigger>
@@ -235,7 +200,7 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                     </div>
 
                     {/* Table */}
-                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+                    <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -245,13 +210,13 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                                     <TableHead className="text-center">Status</TableHead>
                                     <TableHead className="text-center">
                                         <div className="flex items-center justify-center gap-1">
-                                            <Users className="w-4 h-4" />
+                                            <Users className="h-4 w-4" />
                                             Users
                                         </div>
                                     </TableHead>
                                     <TableHead className="text-center">
                                         <div className="flex items-center justify-center gap-1">
-                                            <BookOpen className="w-4 h-4" />
+                                            <BookOpen className="h-4 w-4" />
                                             Journals
                                         </div>
                                     </TableHead>
@@ -261,25 +226,19 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                             <TableBody>
                                 {universities.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                        <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                                             No universities found.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     universities.data.map((university) => (
                                         <TableRow key={university.id}>
-                                            <TableCell className="font-medium">
-                                                {university.code}
-                                            </TableCell>
+                                            <TableCell className="font-medium">{university.code}</TableCell>
                                             <TableCell>
                                                 <div>
-                                                    <div className="font-semibold text-foreground">
-                                                        {university.name}
-                                                    </div>
+                                                    <div className="font-semibold text-foreground">{university.name}</div>
                                                     {university.short_name && (
-                                                        <div className="text-sm text-muted-foreground">
-                                                            {university.short_name}
-                                                        </div>
+                                                        <div className="text-sm text-muted-foreground">{university.short_name}</div>
                                                     )}
                                                 </div>
                                             </TableCell>
@@ -296,43 +255,37 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {university.is_active ? (
-                                                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-0 dark:bg-green-900 dark:text-green-300">
+                                                    <Badge className="border-0 bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300">
                                                         Active
                                                     </Badge>
                                                 ) : (
-                                                    <Badge variant="secondary">
-                                                        Inactive
-                                                    </Badge>
+                                                    <Badge variant="secondary">Inactive</Badge>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                {university.users_count}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {university.journals_count}
-                                            </TableCell>
+                                            <TableCell className="text-center">{university.users_count}</TableCell>
+                                            <TableCell className="text-center">{university.journals_count}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link href={route('admin.universities.show', university.id)}>
                                                         <Button variant="ghost" size="icon" title="View Details">
-                                                            <Eye className="w-4 h-4" />
+                                                            <Eye className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
                                                     {can.create && (
                                                         <>
                                                             <Link href={route('admin.universities.edit', university.id)}>
                                                                 <Button variant="ghost" size="icon" title="Edit">
-                                                                    <Edit className="w-4 h-4" />
+                                                                    <Edit className="h-4 w-4" />
                                                                 </Button>
                                                             </Link>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                                 onClick={() => handleDelete(university.id, university.name)}
                                                                 title="Delete"
                                                             >
-                                                                <Trash2 className="w-4 h-4" />
+                                                                <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </>
                                                     )}
@@ -346,27 +299,22 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
 
                         {/* Pagination */}
                         {universities.last_page > 1 && (
-                            <div className="px-6 py-4 border-t border-sidebar-border/70 dark:border-sidebar-border">
+                            <div className="border-t border-sidebar-border/70 px-6 py-4 dark:border-sidebar-border">
                                 <div className="flex items-center justify-between">
                                     <div className="text-sm text-muted-foreground">
-                                        Showing {((universities.current_page - 1) * universities.per_page) + 1} to{' '}
-                                        {Math.min(universities.current_page * universities.per_page, universities.total)} of{' '}
-                                        {universities.total} results
+                                        Showing {(universities.current_page - 1) * universities.per_page + 1} to{' '}
+                                        {Math.min(universities.current_page * universities.per_page, universities.total)} of {universities.total}{' '}
+                                        results
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {universities.links.map((link, index) => {
                                             if (link.url === null) return null;
-                                            
+
                                             const isFirst = index === 0;
                                             const isLast = index === universities.links.length - 1;
-                                            
+
                                             return (
-                                                <Link
-                                                    key={index}
-                                                    href={link.url}
-                                                    preserveState
-                                                    preserveScroll
-                                                >
+                                                <Link key={index} href={link.url} preserveState preserveScroll>
                                                     <Button
                                                         variant={link.active ? 'default' : 'outline'}
                                                         size="sm"
@@ -374,9 +322,9 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                                                         className={link.active ? '' : 'text-muted-foreground'}
                                                     >
                                                         {isFirst ? (
-                                                            <ChevronLeft className="w-4 h-4" />
+                                                            <ChevronLeft className="h-4 w-4" />
                                                         ) : isLast ? (
-                                                            <ChevronRight className="w-4 h-4" />
+                                                            <ChevronRight className="h-4 w-4" />
                                                         ) : (
                                                             <span dangerouslySetInnerHTML={{ __html: link.label }} />
                                                         )}
@@ -392,5 +340,5 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                 </div>
             </div>
         </AppLayout>
-    )
+    );
 }

@@ -1,32 +1,16 @@
 /**
  * Assessment Show/Detail Page
- * 
+ *
  * @description Display assessment details with all responses and scoring
  * @features View only, download attachments, submit button for drafts
  * @route GET /user/assessments/{id}
  */
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-    Edit,
-    Send,
-    Download,
-    Calendar,
-    FileText,
-    TrendingUp,
-    CheckCircle,
-    XCircle,
-    ArrowLeft,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeft, Calendar, CheckCircle, Download, Edit, FileText, Send, TrendingUp, XCircle } from 'lucide-react';
 
 interface Journal {
     id: number;
@@ -117,7 +101,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
         };
 
         return (
-            <Badge variant={variants[assessment.status_color] || 'default'} className="text-lg px-4 py-1">
+            <Badge variant={variants[assessment.status_color] || 'default'} className="px-4 py-1 text-lg">
                 {assessment.status_label}
             </Badge>
         );
@@ -125,11 +109,15 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
 
     const getGradeBadge = () => {
         const percentage = assessment.percentage;
-        if (percentage >= 90) return <Badge className="bg-green-500 text-white text-2xl px-6 py-2">A</Badge>;
-        if (percentage >= 80) return <Badge className="bg-blue-500 text-white text-2xl px-6 py-2">B</Badge>;
-        if (percentage >= 70) return <Badge className="bg-yellow-500 text-white text-2xl px-6 py-2">C</Badge>;
-        if (percentage >= 60) return <Badge className="bg-orange-500 text-white text-2xl px-6 py-2">D</Badge>;
-        return <Badge variant="destructive" className="text-2xl px-6 py-2">E</Badge>;
+        if (percentage >= 90) return <Badge className="bg-green-500 px-6 py-2 text-2xl text-white">A</Badge>;
+        if (percentage >= 80) return <Badge className="bg-blue-500 px-6 py-2 text-2xl text-white">B</Badge>;
+        if (percentage >= 70) return <Badge className="bg-yellow-500 px-6 py-2 text-2xl text-white">C</Badge>;
+        if (percentage >= 60) return <Badge className="bg-orange-500 px-6 py-2 text-2xl text-white">D</Badge>;
+        return (
+            <Badge variant="destructive" className="px-6 py-2 text-2xl">
+                E
+            </Badge>
+        );
     };
 
     const renderAnswer = (response: Response) => {
@@ -137,13 +125,13 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
 
         if (indicator.answer_type === 'boolean') {
             return response.answer_boolean ? (
-                <div className="flex items-center gap-2 text-green-600 font-semibold">
-                    <CheckCircle className="w-5 h-5" />
+                <div className="flex items-center gap-2 font-semibold text-green-600">
+                    <CheckCircle className="h-5 w-5" />
                     Ya
                 </div>
             ) : (
-                <div className="flex items-center gap-2 text-red-600 font-semibold">
-                    <XCircle className="w-5 h-5" />
+                <div className="flex items-center gap-2 font-semibold text-red-600">
+                    <XCircle className="h-5 w-5" />
                     Tidak
                 </div>
             );
@@ -152,17 +140,10 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
         if (indicator.answer_type === 'scale') {
             return (
                 <div className="flex items-center gap-2">
-                    <span className="font-semibold text-lg">{response.answer_scale}/5</span>
+                    <span className="text-lg font-semibold">{response.answer_scale}/5</span>
                     <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((num) => (
-                            <div
-                                key={num}
-                                className={`w-3 h-3 rounded-full ${
-                                    num <= (response.answer_scale || 0)
-                                        ? 'bg-primary'
-                                        : 'bg-gray-300'
-                                }`}
-                            />
+                            <div key={num} className={`h-3 w-3 rounded-full ${num <= (response.answer_scale || 0) ? 'bg-primary' : 'bg-gray-300'}`} />
                         ))}
                     </div>
                 </div>
@@ -176,32 +157,30 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
         <AppLayout>
             <Head title="Detail Assessment" />
 
-            <div className="max-w-6xl mx-auto space-y-6">
+            <div className="mx-auto max-w-6xl space-y-6">
                 {/* Header */}
-                <div className="flex justify-between items-start">
+                <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <Link href={route('user.assessments.index')}>
                             <Button variant="ghost" size="sm" className="mb-2">
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="mr-2 h-4 w-4" />
                                 Kembali
                             </Button>
                         </Link>
                         <h1 className="text-3xl font-bold">Detail Self-Assessment</h1>
-                        <p className="text-muted-foreground mt-1">
-                            Hasil penilaian mandiri untuk jurnal {assessment.journal.title}
-                        </p>
+                        <p className="mt-1 text-muted-foreground">Hasil penilaian mandiri untuk jurnal {assessment.journal.title}</p>
                     </div>
                     <div className="flex gap-2">
                         {assessment.status === 'draft' && (
                             <>
                                 <Link href={route('user.assessments.edit', assessment.id)}>
                                     <Button variant="outline">
-                                        <Edit className="w-4 h-4 mr-2" />
+                                        <Edit className="mr-2 h-4 w-4" />
                                         Edit
                                     </Button>
                                 </Link>
                                 <Button onClick={handleSubmit}>
-                                    <Send className="w-4 h-4 mr-2" />
+                                    <Send className="mr-2 h-4 w-4" />
                                     Submit Assessment
                                 </Button>
                             </>
@@ -210,30 +189,24 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                 </div>
 
                 {/* Flash Message */}
-                {flash?.success && (
-                    <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-                        {flash.success}
-                    </div>
-                )}
+                {flash?.success && <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-800">{flash.success}</div>}
 
                 {/* Summary Card */}
                 <Card>
                     <CardHeader>
-                        <div className="flex justify-between items-start">
+                        <div className="flex items-start justify-between">
                             <div>
                                 <CardTitle className="text-2xl">{assessment.journal.title}</CardTitle>
-                                <CardDescription className="mt-2">
-                                    ISSN: {assessment.journal.issn}
-                                </CardDescription>
+                                <CardDescription className="mt-2">ISSN: {assessment.journal.issn}</CardDescription>
                             </div>
                             {getStatusBadge()}
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div className="space-y-3">
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                                    <Calendar className="h-4 w-4 text-muted-foreground" />
                                     <span className="text-sm">Tanggal Assessment:</span>
                                     <span className="font-semibold">
                                         {new Date(assessment.assessment_date).toLocaleDateString('id-ID', {
@@ -245,7 +218,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                                 </div>
                                 {assessment.period && (
                                     <div className="flex items-center gap-2">
-                                        <FileText className="w-4 h-4 text-muted-foreground" />
+                                        <FileText className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm">Periode:</span>
                                         <span className="font-semibold">{assessment.period}</span>
                                     </div>
@@ -254,12 +227,10 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
 
                             {assessment.status !== 'draft' && (
                                 <div className="border-l pl-6">
-                                    <div className="text-center space-y-2">
+                                    <div className="space-y-2 text-center">
                                         <div className="text-sm text-muted-foreground">Nilai Akhir</div>
                                         {getGradeBadge()}
-                                        <div className="text-sm font-semibold">
-                                            {assessment.percentage.toFixed(1)}%
-                                        </div>
+                                        <div className="text-sm font-semibold">{assessment.percentage.toFixed(1)}%</div>
                                         <div className="text-xs text-muted-foreground">
                                             {assessment.total_score.toFixed(2)} / {assessment.max_score.toFixed(2)} poin
                                         </div>
@@ -269,11 +240,9 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                         </div>
 
                         {assessment.notes && (
-                            <div className="mt-4 pt-4 border-t">
-                                <p className="text-sm font-semibold mb-1">Catatan:</p>
-                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                                    {assessment.notes}
-                                </p>
+                            <div className="mt-4 border-t pt-4">
+                                <p className="mb-1 text-sm font-semibold">Catatan:</p>
+                                <p className="text-sm whitespace-pre-wrap text-muted-foreground">{assessment.notes}</p>
                             </div>
                         )}
                     </CardContent>
@@ -286,26 +255,21 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                             <CardTitle>Ringkasan Skor per Kategori</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 {Object.keys(responsesByCategory).map((category) => {
                                     const responses = responsesByCategory[category];
                                     const totalScore = responses.reduce((sum, r) => sum + r.score, 0);
-                                    const maxScore = responses.reduce(
-                                        (sum, r) => sum + r.evaluation_indicator.weight,
-                                        0
-                                    );
+                                    const maxScore = responses.reduce((sum, r) => sum + r.evaluation_indicator.weight, 0);
                                     const percentage = (totalScore / maxScore) * 100;
 
                                     return (
-                                        <div key={category} className="border rounded-lg p-4">
-                                            <h3 className="font-semibold mb-2">{category}</h3>
+                                        <div key={category} className="rounded-lg border p-4">
+                                            <h3 className="mb-2 font-semibold">{category}</h3>
                                             <div className="flex items-center gap-2">
-                                                <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                                                <span className="text-2xl font-bold">
-                                                    {percentage.toFixed(1)}%
-                                                </span>
+                                                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                                                <span className="text-2xl font-bold">{percentage.toFixed(1)}%</span>
                                             </div>
-                                            <div className="text-sm text-muted-foreground mt-1">
+                                            <div className="mt-1 text-sm text-muted-foreground">
                                                 {totalScore.toFixed(2)} / {maxScore.toFixed(2)} poin
                                             </div>
                                         </div>
@@ -326,33 +290,25 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                             <div className="space-y-6">
                                 {responsesByCategory[category].map((response, index) => (
                                     <div key={response.id} className="border-b pb-6 last:border-b-0 last:pb-0">
-                                        <div className="flex justify-between items-start mb-3">
+                                        <div className="mb-3 flex items-start justify-between">
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <Badge variant="outline">
-                                                        {response.evaluation_indicator.code}
-                                                    </Badge>
-                                                    <Badge>
-                                                        {response.evaluation_indicator.weight} poin
-                                                    </Badge>
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <Badge variant="outline">{response.evaluation_indicator.code}</Badge>
+                                                    <Badge>{response.evaluation_indicator.weight} poin</Badge>
                                                     {assessment.status !== 'draft' && (
-                                                        <Badge variant="secondary">
-                                                            Skor: {response.score.toFixed(2)}
-                                                        </Badge>
+                                                        <Badge variant="secondary">Skor: {response.score.toFixed(2)}</Badge>
                                                     )}
                                                 </div>
                                                 <h4 className="font-semibold">
                                                     {index + 1}. {response.evaluation_indicator.question}
                                                 </h4>
                                                 {response.evaluation_indicator.description && (
-                                                    <p className="text-sm text-muted-foreground mt-1">
-                                                        {response.evaluation_indicator.description}
-                                                    </p>
+                                                    <p className="mt-1 text-sm text-muted-foreground">{response.evaluation_indicator.description}</p>
                                                 )}
                                             </div>
                                         </div>
 
-                                        <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                                        <div className="space-y-3 rounded-lg bg-muted/50 p-4">
                                             <div>
                                                 <span className="text-sm font-semibold">Jawaban:</span>
                                                 <div className="mt-2">{renderAnswer(response)}</div>
@@ -361,9 +317,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                                             {response.notes && (
                                                 <div>
                                                     <span className="text-sm font-semibold">Catatan:</span>
-                                                    <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
-                                                        {response.notes}
-                                                    </p>
+                                                    <p className="mt-1 text-sm whitespace-pre-wrap text-muted-foreground">{response.notes}</p>
                                                 </div>
                                             )}
 
@@ -374,25 +328,19 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                                                         {response.attachments.map((attachment) => (
                                                             <div
                                                                 key={attachment.id}
-                                                                className="flex items-center justify-between bg-background border rounded-lg p-3"
+                                                                className="flex items-center justify-between rounded-lg border bg-background p-3"
                                                             >
                                                                 <div className="flex items-center gap-2">
-                                                                    <FileText className="w-4 h-4 text-muted-foreground" />
+                                                                    <FileText className="h-4 w-4 text-muted-foreground" />
                                                                     <div>
-                                                                        <div className="text-sm font-medium">
-                                                                            {attachment.original_filename}
-                                                                        </div>
+                                                                        <div className="text-sm font-medium">{attachment.original_filename}</div>
                                                                         <div className="text-xs text-muted-foreground">
                                                                             {attachment.human_file_size}
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() => handleDownload(attachment.id)}
-                                                                >
-                                                                    <Download className="w-4 h-4" />
+                                                                <Button variant="ghost" size="sm" onClick={() => handleDownload(attachment.id)}>
+                                                                    <Download className="h-4 w-4" />
                                                                 </Button>
                                                             </div>
                                                         ))}

@@ -1,41 +1,21 @@
 /**
  * Assessment Create/Edit Form Page
- * 
+ *
  * @description Form untuk membuat atau mengedit self-assessment jurnal
  * @features Multi-step form, file upload, auto-save draft, score calculation
  * @route GET /user/assessments/create | GET /user/assessments/{id}/edit
  */
-import { Head, useForm, router, usePage } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-    AlertCircle,
-    Save,
-    Send,
-    Upload,
-    CheckCircle,
-    XCircle,
-    FileText,
-} from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { AlertCircle, CheckCircle, FileText, Save, Send, Upload, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -109,15 +89,16 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
     const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
     // Pre-fill responses from existing assessment data
-    const initialResponses: AssessmentResponse[] = isEdit && assessment?.responses
-        ? assessment.responses.map((response) => ({
-            evaluation_indicator_id: response.evaluation_indicator_id,
-            answer_boolean: response.answer_boolean,
-            answer_scale: response.answer_scale,
-            answer_text: response.answer_text,
-            notes: response.notes,
-        }))
-        : [];
+    const initialResponses: AssessmentResponse[] =
+        isEdit && assessment?.responses
+            ? assessment.responses.map((response) => ({
+                  evaluation_indicator_id: response.evaluation_indicator_id,
+                  answer_boolean: response.answer_boolean,
+                  answer_scale: response.answer_scale,
+                  answer_text: response.answer_text,
+                  notes: response.notes,
+              }))
+            : [];
 
     const { data, setData, post, put, processing, errors } = useForm({
         journal_id: assessment?.journal.id.toString() || '',
@@ -133,9 +114,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const url = isEdit
-            ? route('user.assessments.update', assessment!.id)
-            : route('user.assessments.store');
+        const url = isEdit ? route('user.assessments.update', assessment!.id) : route('user.assessments.store');
 
         const method = isEdit ? put : post;
 
@@ -145,15 +124,9 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
         });
     };
 
-    const updateResponse = (
-        indicatorId: number,
-        field: keyof AssessmentResponse,
-        value: boolean | number | string | File[]
-    ) => {
+    const updateResponse = (indicatorId: number, field: keyof AssessmentResponse, value: boolean | number | string | File[]) => {
         const responses = [...(data.responses as unknown as AssessmentResponse[])];
-        const index = responses.findIndex(
-            (r) => r.evaluation_indicator_id === indicatorId
-        );
+        const index = responses.findIndex((r) => r.evaluation_indicator_id === indicatorId);
 
         if (index >= 0) {
             responses[index] = { ...responses[index], [field]: value };
@@ -179,26 +152,20 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                 return (
                     <RadioGroup
                         value={response?.answer_boolean?.toString() || ''}
-                        onValueChange={(value) =>
-                            updateResponse(
-                                indicator.id,
-                                'answer_boolean',
-                                value === 'true'
-                            )
-                        }
+                        onValueChange={(value) => updateResponse(indicator.id, 'answer_boolean', value === 'true')}
                     >
                         <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="true" id={`${indicator.id}-yes`} />
                                 <Label htmlFor={`${indicator.id}-yes`} className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-green-600" />
+                                    <CheckCircle className="h-4 w-4 text-green-600" />
                                     Ya
                                 </Label>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="false" id={`${indicator.id}-no`} />
                                 <Label htmlFor={`${indicator.id}-no`} className="flex items-center gap-2">
-                                    <XCircle className="w-4 h-4 text-red-600" />
+                                    <XCircle className="h-4 w-4 text-red-600" />
                                     Tidak
                                 </Label>
                             </div>
@@ -210,28 +177,17 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                 return (
                     <RadioGroup
                         value={response?.answer_scale?.toString() || ''}
-                        onValueChange={(value) =>
-                            updateResponse(
-                                indicator.id,
-                                'answer_scale',
-                                parseInt(value)
-                            )
-                        }
+                        onValueChange={(value) => updateResponse(indicator.id, 'answer_scale', parseInt(value))}
                     >
                         <div className="flex items-center space-x-4">
                             {[1, 2, 3, 4, 5].map((num) => (
                                 <div key={num} className="flex items-center space-x-2">
-                                    <RadioGroupItem
-                                        value={num.toString()}
-                                        id={`${indicator.id}-${num}`}
-                                    />
+                                    <RadioGroupItem value={num.toString()} id={`${indicator.id}-${num}`} />
                                     <Label htmlFor={`${indicator.id}-${num}`}>{num}</Label>
                                 </div>
                             ))}
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            1 = Sangat Kurang, 5 = Sangat Baik
-                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">1 = Sangat Kurang, 5 = Sangat Baik</p>
                     </RadioGroup>
                 );
 
@@ -239,9 +195,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                 return (
                     <Textarea
                         value={response?.answer_text || ''}
-                        onChange={(e) =>
-                            updateResponse(indicator.id, 'answer_text', e.target.value)
-                        }
+                        onChange={(e) => updateResponse(indicator.id, 'answer_text', e.target.value)}
                         placeholder="Masukkan jawaban Anda..."
                         rows={4}
                     />
@@ -256,9 +210,8 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
         if (!indicator.requires_attachment) return null;
 
         // Get existing attachments for this indicator in edit mode
-        const existingAttachments = isEdit && assessment?.responses
-            ? assessment.responses.find((r) => r.evaluation_indicator_id === indicator.id)?.attachments || []
-            : [];
+        const existingAttachments =
+            isEdit && assessment?.responses ? assessment.responses.find((r) => r.evaluation_indicator_id === indicator.id)?.attachments || [] : [];
 
         const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const files = Array.from(e.target.files || []);
@@ -303,16 +256,16 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
         return (
             <div className="mt-4">
                 <Label className="flex items-center gap-2">
-                    <Upload className="w-4 h-4" />
+                    <Upload className="h-4 w-4" />
                     Upload Bukti {indicator.requires_attachment && <span className="text-red-500">*</span>}
                 </Label>
-                
+
                 {/* Show existing attachments in edit mode */}
                 {isEdit && existingAttachments.length > 0 && (
                     <div className="mb-2 space-y-1">
                         {existingAttachments.map((attachment) => (
-                            <div key={attachment.id} className="text-sm text-muted-foreground flex items-center gap-2">
-                                <FileText className="w-3 h-3" />
+                            <div key={attachment.id} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <FileText className="h-3 w-3" />
                                 <span>{attachment.original_filename}</span>
                                 <span className="text-xs">({attachment.human_file_size})</span>
                             </div>
@@ -320,17 +273,9 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                         <p className="text-xs text-muted-foreground">Upload file baru untuk mengganti</p>
                     </div>
                 )}
-                
-                <Input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={handleFileChange}
-                    className="mt-2"
-                    multiple
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                    Format: PDF, JPG, PNG (Max 5MB per file)
-                </p>
+
+                <Input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFileChange} className="mt-2" multiple />
+                <p className="mt-1 text-xs text-muted-foreground">Format: PDF, JPG, PNG (Max 5MB per file)</p>
             </div>
         );
     };
@@ -346,21 +291,17 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
         <AppLayout>
             <Head title={isEdit ? 'Edit Assessment' : 'Buat Assessment Baru'} />
 
-            <div className="max-w-5xl mx-auto space-y-6">
+            <div className="mx-auto max-w-5xl space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl font-bold">
-                        {isEdit ? 'Edit Assessment' : 'Buat Assessment Baru'}
-                    </h1>
-                    <p className="text-muted-foreground mt-1">
-                        Lengkapi formulir self-assessment untuk jurnal Anda
-                    </p>
+                    <h1 className="text-3xl font-bold">{isEdit ? 'Edit Assessment' : 'Buat Assessment Baru'}</h1>
+                    <p className="mt-1 text-muted-foreground">Lengkapi formulir self-assessment untuk jurnal Anda</p>
                 </div>
 
                 {/* Flash Message */}
                 {flash?.error && (
-                    <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start gap-2">
-                        <AlertCircle className="w-5 h-5 mt-0.5" />
+                    <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+                        <AlertCircle className="mt-0.5 h-5 w-5" />
                         <span>{flash.error}</span>
                     </div>
                 )}
@@ -373,11 +314,8 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                 <span>Progress Pengisian</span>
                                 <span className="font-semibold">{calculateProgress()}%</span>
                             </div>
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-primary transition-all duration-300"
-                                    style={{ width: `${calculateProgress()}%` }}
-                                />
+                            <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+                                <div className="h-full bg-primary transition-all duration-300" style={{ width: `${calculateProgress()}%` }} />
                             </div>
                         </div>
                     </CardContent>
@@ -392,10 +330,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                         {!isEdit ? (
                             <div className="space-y-2">
                                 <Label htmlFor="journal_id">Jurnal *</Label>
-                                <Select
-                                    value={data.journal_id as string}
-                                    onValueChange={(value) => setData('journal_id', value)}
-                                >
+                                <Select value={data.journal_id as string} onValueChange={(value) => setData('journal_id', value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih jurnal..." />
                                     </SelectTrigger>
@@ -407,14 +342,12 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.journal_id && (
-                                    <p className="text-sm text-red-500">{errors.journal_id}</p>
-                                )}
+                                {errors.journal_id && <p className="text-sm text-red-500">{errors.journal_id}</p>}
                             </div>
                         ) : (
                             <div className="space-y-2">
                                 <Label>Jurnal</Label>
-                                <div className="p-3 bg-muted rounded-lg">
+                                <div className="rounded-lg bg-muted p-3">
                                     <div className="font-semibold">{assessment?.journal.title}</div>
                                     <div className="text-sm text-muted-foreground">ISSN: {assessment?.journal.issn}</div>
                                 </div>
@@ -476,18 +409,14 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                             <CardHeader>
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2">
+                                        <div className="mb-2 flex items-center gap-2">
                                             <Badge variant="outline">{indicator.code}</Badge>
                                             <Badge>{indicator.weight} poin</Badge>
                                         </div>
                                         <CardTitle className="text-lg">
                                             {index + 1}. {indicator.question}
                                         </CardTitle>
-                                        {indicator.description && (
-                                            <CardDescription className="mt-2">
-                                                {indicator.description}
-                                            </CardDescription>
-                                        )}
+                                        {indicator.description && <CardDescription className="mt-2">{indicator.description}</CardDescription>}
                                     </div>
                                 </div>
                             </CardHeader>
@@ -499,9 +428,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                     <Label>Catatan Tambahan (Optional)</Label>
                                     <Textarea
                                         value={getResponse(indicator.id)?.notes || ''}
-                                        onChange={(e) =>
-                                            updateResponse(indicator.id, 'notes', e.target.value)
-                                        }
+                                        onChange={(e) => updateResponse(indicator.id, 'notes', e.target.value)}
                                         placeholder="Penjelasan atau catatan tambahan..."
                                         rows={2}
                                     />
@@ -512,22 +439,13 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-between gap-4 sticky bottom-0 bg-background py-4 border-t">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.visit(route('user.assessments.index'))}
-                    >
+                <div className="sticky bottom-0 flex justify-between gap-4 border-t bg-background py-4">
+                    <Button type="button" variant="outline" onClick={() => router.visit(route('user.assessments.index'))}>
                         Batal
                     </Button>
                     <div className="flex gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleSubmit}
-                            disabled={processing}
-                        >
-                            <Save className="w-4 h-4 mr-2" />
+                        <Button type="button" variant="outline" onClick={handleSubmit} disabled={processing}>
+                            <Save className="mr-2 h-4 w-4" />
                             Simpan Draft
                         </Button>
                         {isEdit && assessment?.status === 'draft' && (
@@ -540,7 +458,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                 }}
                                 disabled={processing || calculateProgress() < 100}
                             >
-                                <Send className="w-4 h-4 mr-2" />
+                                <Send className="mr-2 h-4 w-4" />
                                 Submit Assessment
                             </Button>
                         )}
