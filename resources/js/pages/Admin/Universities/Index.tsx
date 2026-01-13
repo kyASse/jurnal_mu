@@ -71,7 +71,7 @@ import {
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -125,7 +125,7 @@ interface Props {
 }
 
 export default function UniversitiesIndex({ universities, filters, can}: Props) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
 
@@ -144,12 +144,6 @@ export default function UniversitiesIndex({ universities, filters, can}: Props) 
                 route('admin.universities.destroy', id)
             )
         }
-    };
-
-    const handleToggleActive = (id: number) => {
-        router.post(
-            route('admin.universities.toggle-active', id),
-        )
     };
 
     return (

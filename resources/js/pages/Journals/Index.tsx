@@ -30,10 +30,8 @@ import {
 import {
     Search,
     BookOpen,
-    ArrowRight,
     ChevronLeft,
     ChevronRight,
-    ExternalLink,
     Home,
 } from 'lucide-react';
 import JournalCard from '@/components/journal-card';

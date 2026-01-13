@@ -82,6 +82,7 @@ import {
     BookOpen,
     ExternalLink,
 } from 'lucide-react';
+import { type SharedData } from '@/types';
 
 interface Journal {
     id: number;
@@ -116,7 +117,7 @@ interface Props {
 }
 
 export default function JournalsIndex({ journals }: Props) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage<SharedData>().props;
 
     const handleDelete = (id: number, title: string) => {
         if (confirm(`Are you sure you want to delete ${title}?`)) {

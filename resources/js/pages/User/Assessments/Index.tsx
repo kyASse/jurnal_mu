@@ -109,7 +109,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [search, status, router]);
+    }, [search, status]);
 
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus assessment ini?')) {

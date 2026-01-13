@@ -191,7 +191,7 @@ export default function Welcome() {
                             <a href="#" className="hover:text-white">Contact Support</a>
                         </div>
                         <p>&copy; {new Date().getFullYear()} JurnalMu - Muhammadiyah Higher Education Research Network.</p>
-                        <p className="mt-2">Laravel v{usePage<any>().props.laravelVersion} (PHP v{usePage<any>().props.phpVersion})</p>
+                        <p className="mt-2">Laravel v{(usePage().props as { laravelVersion: string; phpVersion: string }).laravelVersion} (PHP v{(usePage().props as { laravelVersion: string; phpVersion: string }).phpVersion})</p>
                     </div>
                 </footer>
             </div>

@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookOpen, ArrowRight } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 interface JournalCardProps {
     title: string;
