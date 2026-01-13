@@ -5,8 +5,13 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, BookOpen, LayoutDashboard, Search } from 'lucide-react';
 import { useState } from 'react';
 
+interface WelcomeProps extends SharedData {
+    laravelVersion: string;
+    phpVersion: string;
+}
+
 export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
     // Mock Data representing journals from the database
@@ -236,8 +241,8 @@ export default function Welcome() {
                         </div>
                         <p>&copy; {new Date().getFullYear()} JurnalMu - Muhammadiyah Higher Education Research Network.</p>
                         <p className="mt-2">
-                            Laravel v{(usePage().props as { laravelVersion: string; phpVersion: string }).laravelVersion} (PHP v
-                            {(usePage().props as { laravelVersion: string; phpVersion: string }).phpVersion})
+                            Laravel v{usePage<WelcomeProps>().props.laravelVersion} (PHP v
+                            {usePage<WelcomeProps>().props.phpVersion})
                         </p>
                     </div>
                 </footer>
