@@ -9,7 +9,7 @@ class ResourcesController extends Controller
 {
     /**
      * Display the resources page.
-     * 
+     *
      * This is a placeholder page for the Resources feature
      * which is currently under development.
      */

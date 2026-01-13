@@ -92,7 +92,7 @@ Route::middleware(['auth'])->group(function () {
     | Super Admin Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:' . Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:'.Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
 
         // Data Master (Placeholder)
         Route::get('data-master', [DataMasterController::class, 'index'])
@@ -129,7 +129,7 @@ Route::middleware(['auth'])->group(function () {
     | Admin Kampus Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:' . Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
+    Route::middleware(['role:'.Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
 
         // Users (Pengelola Jurnal) Management
         Route::resource('users', AdminKampusUserController::class);
@@ -161,7 +161,7 @@ Route::middleware(['auth'])->group(function () {
     | User (Pengelola Jurnal) Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:' . Role::USER])->prefix('user')->name('user.')->group(function () {
+    Route::middleware(['role:'.Role::USER])->prefix('user')->name('user.')->group(function () {
 
         // Profil (Placeholder)
         Route::get('profil', [ProfilController::class, 'index'])
@@ -223,5 +223,5 @@ Route::middleware(['auth'])->group(function () {
     // });
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

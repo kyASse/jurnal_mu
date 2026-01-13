@@ -1,27 +1,27 @@
 /**
  * UsersEdit Component for Admin Kampus
- * 
+ *
  * @description
  * A form page for editing existing user (Pengelola Jurnal) accounts within the admin's university.
  * Password fields are optional - leave empty to keep the existing password.
- * 
+ *
  * @features
  * - Pre-filled personal information fields
  * - Optional password update
  * - Status toggle
  * - Form validation with error display
  * - University displayed as read-only info
- * 
+ *
  * @route GET /admin-kampus/users/{id}/edit
  * @route PUT /admin-kampus/users/{id}
  */
-import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Building2, AlertCircle } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { AlertCircle, ArrowLeft, Building2 } from 'lucide-react';
 
 interface User {
     id: number;
@@ -82,28 +82,24 @@ export default function UsersEdit({ user, university }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit User - ${user.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-neutral-950 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
                         <Link href={route('admin-kampus.users.index')}>
                             <Button variant="ghost" className="mb-4">
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to List
                             </Button>
                         </Link>
-                        <h1 className="text-3xl font-bold text-foreground">
-                            Edit User
-                        </h1>
-                        <p className="text-muted-foreground mt-1">
-                            Update user information for {user.name}
-                        </p>
+                        <h1 className="text-3xl font-bold text-foreground">Edit User</h1>
+                        <p className="mt-1 text-muted-foreground">Update user information for {user.name}</p>
                     </div>
 
                     {/* University Info */}
-                    <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                         <div className="flex items-center gap-2">
-                            <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                             <span className="font-medium text-blue-800 dark:text-blue-200">
                                 University: {university.name} ({university.short_name})
                             </span>
@@ -114,7 +110,7 @@ export default function UsersEdit({ user, university }: Props) {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Personal Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground border-b border-sidebar-border/70 dark:border-sidebar-border pb-2">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
                                 Personal Information
                             </h3>
 
@@ -131,9 +127,7 @@ export default function UsersEdit({ user, university }: Props) {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.name && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
-                                )}
+                                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
                             </div>
 
                             {/* Email */}
@@ -150,9 +144,7 @@ export default function UsersEdit({ user, university }: Props) {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.email && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.email}</p>
-                                )}
+                                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                             </div>
 
                             {/* Phone */}
@@ -166,9 +158,7 @@ export default function UsersEdit({ user, university }: Props) {
                                     placeholder="e.g., 081234567890"
                                     className="mt-2"
                                 />
-                                {errors.phone && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
-                                )}
+                                {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
                             </div>
 
                             {/* Position */}
@@ -181,21 +171,19 @@ export default function UsersEdit({ user, university }: Props) {
                                     placeholder="e.g., Editor, Managing Editor"
                                     className="mt-2"
                                 />
-                                {errors.position && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.position}</p>
-                                )}
+                                {errors.position && <p className="mt-1 text-sm text-red-600">{errors.position}</p>}
                             </div>
                         </div>
 
                         {/* Account Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground border-b border-sidebar-border/70 dark:border-sidebar-border pb-2">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
                                 Change Password
                             </h3>
 
                             {/* Password Update Notice */}
-                            <div className="flex items-start gap-2 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                                <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                            <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
+                                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                                 <p className="text-sm text-amber-800 dark:text-amber-200">
                                     Leave password fields empty to keep the current password unchanged.
                                 </p>
@@ -211,12 +199,8 @@ export default function UsersEdit({ user, university }: Props) {
                                     onChange={(e) => setData('password', e.target.value)}
                                     className="mt-2"
                                 />
-                                {errors.password && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-                                )}
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    Minimum 8 characters (leave empty to keep current password)
-                                </p>
+                                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+                                <p className="mt-1 text-sm text-muted-foreground">Minimum 8 characters (leave empty to keep current password)</p>
                             </div>
 
                             {/* Password Confirmation */}
@@ -234,7 +218,7 @@ export default function UsersEdit({ user, university }: Props) {
 
                         {/* Status */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground border-b border-sidebar-border/70 dark:border-sidebar-border pb-2">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
                                 Status
                             </h3>
 
@@ -244,7 +228,7 @@ export default function UsersEdit({ user, university }: Props) {
                                     type="checkbox"
                                     checked={data.is_active}
                                     onChange={(e) => setData('is_active', e.target.checked)}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                 />
                                 <Label htmlFor="is_active" className="cursor-pointer">
                                     Active (User can login and manage journals)
@@ -253,7 +237,7 @@ export default function UsersEdit({ user, university }: Props) {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 pt-6 border-t border-sidebar-border/70 dark:border-sidebar-border">
+                        <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
                             <Link href={route('admin-kampus.users.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel

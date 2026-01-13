@@ -10,7 +10,7 @@ class DataMasterController extends Controller
 {
     /**
      * Display the Data Master page.
-     * 
+     *
      * This is a placeholder page for the Data Master feature
      * which is currently under development.
      */

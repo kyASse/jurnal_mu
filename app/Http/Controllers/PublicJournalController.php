@@ -56,7 +56,7 @@ class PublicJournalController extends Controller
             ->orderBy('title')
             ->paginate(12)
             ->withQueryString()
-            ->through(fn($journal) => [
+            ->through(fn ($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -113,7 +113,7 @@ class PublicJournalController extends Controller
     public function show(Journal $journal): Response
     {
         // Only show active journals to public
-        if (!$journal->is_active) {
+        if (! $journal->is_active) {
             abort(404);
         }
 

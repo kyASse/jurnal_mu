@@ -52,18 +52,12 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/User/Journals/Edit.tsx
  */
-import { Head, Link, useForm } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -113,38 +107,33 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
             <Head title="Edit Journal" />
 
             <div className="py-6">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6">
                         <Link href={route('journals.index')}>
                             <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600">
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to My Journals
                             </Button>
                         </Link>
                         <div className="flex items-center gap-2">
-                            <BookOpen className="w-8 h-8 text-blue-600" />
-                            <h1 className="text-3xl font-bold text-gray-900">
-                                Edit Journal
-                            </h1>
+                            <BookOpen className="h-8 w-8 text-blue-600" />
+                            <h1 className="text-3xl font-bold text-gray-900">Edit Journal</h1>
                         </div>
-                        <p className="text-gray-600 mt-1 ml-10">
-                            Update journal details
-                        </p>
+                        <p className="mt-1 ml-10 text-gray-600">Update journal details</p>
                     </div>
 
                     {/* Form */}
-                    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <form onSubmit={handleSubmit} className="space-y-6">
-
                             {/* Basic Info */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-                                    Journal Information
-                                </h3>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Journal Information</h3>
 
                                 <div>
-                                    <Label htmlFor="title">Journal Title <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="title">
+                                        Journal Title <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input
                                         id="title"
                                         value={data.title}
@@ -153,10 +142,10 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                         className="mt-1"
                                         required
                                     />
-                                    {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title}</p>}
+                                    {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
                                         <Label htmlFor="issn">ISSN (Print)</Label>
                                         <Input
@@ -166,7 +155,7 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                             placeholder="xxxx-xxxx"
                                             className="mt-1"
                                         />
-                                        {errors.issn && <p className="text-sm text-red-600 mt-1">{errors.issn}</p>}
+                                        {errors.issn && <p className="mt-1 text-sm text-red-600">{errors.issn}</p>}
                                     </div>
 
                                     <div>
@@ -178,12 +167,14 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                             placeholder="xxxx-xxxx"
                                             className="mt-1"
                                         />
-                                        {errors.e_issn && <p className="text-sm text-red-600 mt-1">{errors.e_issn}</p>}
+                                        {errors.e_issn && <p className="mt-1 text-sm text-red-600">{errors.e_issn}</p>}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="url">Journal URL <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="url">
+                                        Journal URL <span className="text-red-500">*</span>
+                                    </Label>
                                     <Input
                                         id="url"
                                         type="url"
@@ -193,23 +184,20 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                         className="mt-1"
                                         required
                                     />
-                                    {errors.url && <p className="text-sm text-red-600 mt-1">{errors.url}</p>}
+                                    {errors.url && <p className="mt-1 text-sm text-red-600">{errors.url}</p>}
                                 </div>
                             </div>
 
                             {/* Classification */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-                                    Classification & Metadata
-                                </h3>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Classification & Metadata</h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
-                                        <Label>Scientific Field <span className="text-red-500">*</span></Label>
-                                        <Select
-                                            value={data.scientific_field_id}
-                                            onValueChange={(val) => setData('scientific_field_id', val)}
-                                        >
+                                        <Label>
+                                            Scientific Field <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select value={data.scientific_field_id} onValueChange={(val) => setData('scientific_field_id', val)}>
                                             <SelectTrigger className="mt-1">
                                                 <SelectValue placeholder="Select Field" />
                                             </SelectTrigger>
@@ -221,15 +209,12 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        {errors.scientific_field_id && <p className="text-sm text-red-600 mt-1">{errors.scientific_field_id}</p>}
+                                        {errors.scientific_field_id && <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>}
                                     </div>
 
                                     <div>
                                         <Label>SINTA Rank</Label>
-                                        <Select
-                                            value={data.sinta_rank}
-                                            onValueChange={(val) => setData('sinta_rank', val)}
-                                        >
+                                        <Select value={data.sinta_rank} onValueChange={(val) => setData('sinta_rank', val)}>
                                             <SelectTrigger className="mt-1">
                                                 <SelectValue placeholder="Select Rank (Optional)" />
                                             </SelectTrigger>
@@ -242,17 +227,16 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                                 <SelectItem value="6">SINTA 6</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        {errors.sinta_rank && <p className="text-sm text-red-600 mt-1">{errors.sinta_rank}</p>}
+                                        {errors.sinta_rank && <p className="mt-1 text-sm text-red-600">{errors.sinta_rank}</p>}
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
-                                        <Label htmlFor="frequency">Publication Frequency <span className="text-red-500">*</span></Label>
-                                        <Select
-                                            value={data.frequency}
-                                            onValueChange={(val) => setData('frequency', val)}
-                                        >
+                                        <Label htmlFor="frequency">
+                                            Publication Frequency <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Select value={data.frequency} onValueChange={(val) => setData('frequency', val)}>
                                             <SelectTrigger className="mt-1">
                                                 <SelectValue placeholder="Select Frequency" />
                                             </SelectTrigger>
@@ -265,7 +249,7 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                                 <SelectItem value="Other">Other</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        {errors.frequency && <p className="text-sm text-red-600 mt-1">{errors.frequency}</p>}
+                                        {errors.frequency && <p className="mt-1 text-sm text-red-600">{errors.frequency}</p>}
                                     </div>
 
                                     <div>
@@ -280,7 +264,7 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                             placeholder="e.g. 2010"
                                             className="mt-1"
                                         />
-                                        {errors.first_published_year && <p className="text-sm text-red-600 mt-1">{errors.first_published_year}</p>}
+                                        {errors.first_published_year && <p className="mt-1 text-sm text-red-600">{errors.first_published_year}</p>}
                                     </div>
                                 </div>
 
@@ -293,11 +277,11 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                         placeholder="e.g. Universitas Muhammadiyah Yogyakarta"
                                         className="mt-1"
                                     />
-                                    {errors.publisher && <p className="text-sm text-red-600 mt-1">{errors.publisher}</p>}
+                                    {errors.publisher && <p className="mt-1 text-sm text-red-600">{errors.publisher}</p>}
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-end gap-4 pt-4 border-t">
+                            <div className="flex items-center justify-end gap-4 border-t pt-4">
                                 <Link href={route('journals.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
@@ -307,7 +291,6 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                     {processing ? 'Saving...' : 'Update Journal'}
                                 </Button>
                             </div>
-
                         </form>
                     </div>
                 </div>

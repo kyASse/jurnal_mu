@@ -63,25 +63,13 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/User/Journals/Index.tsx
  */
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import {
-    Plus,
-    Edit,
-    Trash2,
-    BookOpen,
-    ExternalLink,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type SharedData } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { BookOpen, Edit, ExternalLink, Plus, Trash2 } from 'lucide-react';
 
 interface Journal {
     id: number;
@@ -111,12 +99,12 @@ interface Props {
             url: string | null;
             label: string;
             active: boolean;
-        }>
+        }>;
     };
 }
 
 export default function JournalsIndex({ journals }: Props) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage<SharedData>().props;
 
     const handleDelete = (id: number, title: string) => {
         if (confirm(`Are you sure you want to delete ${title}?`)) {
@@ -128,23 +116,21 @@ export default function JournalsIndex({ journals }: Props) {
         <AppLayout>
             <Head title="My Journals" />
 
-            <div className='py-6'>
-                <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+            <div className="py-6">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
-                    <div className='mb-6'>
-                        <div className='flex items-center justify-between'>
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between">
                             <div>
-                                <h1 className='text-3xl font-bold text-gray-900 flex items-center gap-2'>
-                                    <BookOpen className='w-8 h-8 text-blue-600' />
+                                <h1 className="flex items-center gap-2 text-3xl font-bold text-gray-900">
+                                    <BookOpen className="h-8 w-8 text-blue-600" />
                                     My Journals
                                 </h1>
-                                <p className="text-gray-600 mt-1">
-                                    Manage journals that you are responsible for
-                                </p>
+                                <p className="mt-1 text-gray-600">Manage journals that you are responsible for</p>
                             </div>
                             <Link href={route('journals.create')}>
-                                <Button className='flex items-center gap-2'>
-                                    <Plus className='w-4 h-4' />
+                                <Button className="flex items-center gap-2">
+                                    <Plus className="h-4 w-4" />
                                     Add New Journal
                                 </Button>
                             </Link>
@@ -152,19 +138,11 @@ export default function JournalsIndex({ journals }: Props) {
                     </div>
 
                     {/* Flash Messages */}
-                    {flash.success && (
-                        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash.error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
-                            {flash.error}
-                        </div>
-                    )}
+                    {flash?.success && <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800">{flash.success}</div>}
+                    {flash?.error && <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">{flash.error}</div>}
 
                     {/* Table */}
-                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div className="overflow-hidden rounded-lg bg-white shadow-sm">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -178,7 +156,7 @@ export default function JournalsIndex({ journals }: Props) {
                             <TableBody>
                                 {journals.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                                        <TableCell colSpan={5} className="py-8 text-center text-gray-500">
                                             No journals found. Click "Add New Journal" to start.
                                         </TableCell>
                                     </TableRow>
@@ -192,9 +170,9 @@ export default function JournalsIndex({ journals }: Props) {
                                                         href={journal.url}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                                        className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
                                                     >
-                                                        Visit Website <ExternalLink className="w-3 h-3" />
+                                                        Visit Website <ExternalLink className="h-3 w-3" />
                                                     </a>
                                                 </div>
                                             </TableCell>
@@ -205,31 +183,23 @@ export default function JournalsIndex({ journals }: Props) {
                                                     {!journal.issn && !journal.e_issn && <span className="text-gray-400">-</span>}
                                                 </div>
                                             </TableCell>
-                                            <TableCell>
-                                                {journal.scientific_field?.name || '-'}
-                                            </TableCell>
+                                            <TableCell>{journal.scientific_field?.name || '-'}</TableCell>
                                             <TableCell>
                                                 {journal.sinta_rank ? (
-                                                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-                                                        SINTA {journal.sinta_rank}
-                                                    </Badge>
+                                                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">SINTA {journal.sinta_rank}</Badge>
                                                 ) : (
-                                                    <span className="text-gray-400 text-sm">Not Indexed</span>
+                                                    <span className="text-sm text-gray-400">Not Indexed</span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link href={route('journals.edit', journal.id)}>
                                                         <Button variant="ghost" size="sm">
-                                                            <Edit className="w-4 h-4" />
+                                                            <Edit className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(journal.id, journal.title)}
-                                                    >
-                                                        <Trash2 className="w-4 h-4 text-red-600" />
+                                                    <Button variant="ghost" size="sm" onClick={() => handleDelete(journal.id, journal.title)}>
+                                                        <Trash2 className="h-4 w-4 text-red-600" />
                                                     </Button>
                                                 </div>
                                             </TableCell>

@@ -10,7 +10,7 @@ class JurnalController extends Controller
 {
     /**
      * Display the jurnal management page.
-     * 
+     *
      * This is a placeholder page for the Jurnal feature
      * which is currently under development.
      */

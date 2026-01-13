@@ -10,7 +10,7 @@ class BorangIndikatorController extends Controller
 {
     /**
      * Display the Borang Indikator page.
-     * 
+     *
      * This is a placeholder page for the Borang Indikator feature
      * which is currently under development.
      */

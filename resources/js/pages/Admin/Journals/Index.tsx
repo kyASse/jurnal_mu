@@ -1,10 +1,10 @@
 /**
  * JournalsIndex Component for Super Admin
- * 
+ *
  * @description
  * A comprehensive list view page for viewing all journals across all universities.
  * This component provides filtering, searching, pagination for journal monitoring.
- * 
+ *
  * @features
  * - Search by title, ISSN, or e-ISSN
  * - Filter by university/PTM
@@ -15,39 +15,19 @@
  * - View journal details (coming in next iteration)
  * - Display assessment status and score
  * - Flash messages for feedback
- * 
+ *
  * @route GET /admin/journals
  */
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Eye,
-    Search,
-    BookOpen,
-    ChevronLeft,
-    ChevronRight,
-    ExternalLink,
-} from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -129,14 +109,7 @@ interface Props {
     statusOptions: FilterOption[];
 }
 
-export default function JournalsIndex({ 
-    journals, 
-    filters, 
-    universities,
-    scientificFields,
-    sintaRanks,
-    statusOptions 
-}: Props) {
+export default function JournalsIndex({ journals, filters, universities, scientificFields, sintaRanks, statusOptions }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [universityFilter, setUniversityFilter] = useState(filters.university_id?.toString() || '');
@@ -148,14 +121,14 @@ export default function JournalsIndex({
         e.preventDefault();
         router.get(
             route('admin.journals.index'),
-            { 
-                search, 
+            {
+                search,
                 university_id: universityFilter,
                 status: statusFilter,
                 sinta_rank: sintaRankFilter,
                 scientific_field_id: scientificFieldFilter,
             },
-            { preserveState: true }
+            { preserveState: true },
         );
     };
 
@@ -183,7 +156,7 @@ export default function JournalsIndex({
 
     const getSintaRankColor = (rank: number | null) => {
         if (!rank) return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
-        
+
         if (rank <= 2) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
         if (rank <= 4) return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
@@ -195,41 +168,39 @@ export default function JournalsIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="All Journals" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-neutral-950 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                                    <BookOpen className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                                <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
+                                    <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                                     All Journals
                                 </h1>
-                                <p className="text-muted-foreground mt-1">
-                                    View and monitor all journals across all universities
-                                </p>
+                                <p className="mt-1 text-muted-foreground">View and monitor all journals across all universities</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Flash Messages */}
                     {flash?.success && (
-                        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200">
+                        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
                             {flash.success}
                         </div>
                     )}
                     {flash?.error && (
-                        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+                        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
                             {flash.error}
                         </div>
                     )}
 
                     {/* Filters */}
-                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border p-4 mb-6">
+                    <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <form onSubmit={handleSearch} className="space-y-4">
                             {/* Search */}
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
                                 <Input
                                     type="text"
                                     placeholder="Search by journal title, ISSN, or e-ISSN..."
@@ -242,8 +213,8 @@ export default function JournalsIndex({
                             {/* Filter Row 1 */}
                             <div className="flex gap-4">
                                 {/* University Filter - Super Admin Only */}
-                                <Select 
-                                    value={universityFilter || 'all'} 
+                                <Select
+                                    value={universityFilter || 'all'}
                                     onValueChange={(value) => setUniversityFilter(value === 'all' ? '' : value)}
                                 >
                                     <SelectTrigger className="w-64">
@@ -260,8 +231,8 @@ export default function JournalsIndex({
                                 </Select>
 
                                 {/* Scientific Field Filter */}
-                                <Select 
-                                    value={scientificFieldFilter || 'all'} 
+                                <Select
+                                    value={scientificFieldFilter || 'all'}
                                     onValueChange={(value) => setScientificFieldFilter(value === 'all' ? '' : value)}
                                 >
                                     <SelectTrigger className="w-64">
@@ -278,10 +249,7 @@ export default function JournalsIndex({
                                 </Select>
 
                                 {/* Status Filter */}
-                                <Select 
-                                    value={statusFilter || 'all'} 
-                                    onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value)}
-                                >
+                                <Select value={statusFilter || 'all'} onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value)}>
                                     <SelectTrigger className="w-48">
                                         <SelectValue placeholder="All Status" />
                                     </SelectTrigger>
@@ -296,10 +264,7 @@ export default function JournalsIndex({
                                 </Select>
 
                                 {/* SINTA Rank Filter */}
-                                <Select 
-                                    value={sintaRankFilter || 'all'} 
-                                    onValueChange={(value) => setSintaRankFilter(value === 'all' ? '' : value)}
-                                >
+                                <Select value={sintaRankFilter || 'all'} onValueChange={(value) => setSintaRankFilter(value === 'all' ? '' : value)}>
                                     <SelectTrigger className="w-48">
                                         <SelectValue placeholder="All SINTA Ranks" />
                                     </SelectTrigger>
@@ -315,27 +280,22 @@ export default function JournalsIndex({
 
                                 <Button type="submit">Search</Button>
                                 {hasActiveFilters && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={handleClearFilters}
-                                    >
+                                    <Button type="button" variant="outline" onClick={handleClearFilters}>
                                         Clear Filters
                                     </Button>
                                 )}
                             </div>
-
                         </form>
                     </div>
 
                     {/* Results Count */}
                     <div className="mb-4 text-sm text-muted-foreground">
-                        Showing {journals.data.length > 0 ? ((journals.current_page - 1) * journals.per_page) + 1 : 0} to{' '}
+                        Showing {journals.data.length > 0 ? (journals.current_page - 1) * journals.per_page + 1 : 0} to{' '}
                         {Math.min(journals.current_page * journals.per_page, journals.total)} of {journals.total} journals
                     </div>
 
                     {/* Table */}
-                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+                    <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -353,10 +313,10 @@ export default function JournalsIndex({
                             <TableBody>
                                 {journals.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={9} className="text-center py-12">
+                                        <TableCell colSpan={9} className="py-12 text-center">
                                             <div className="flex flex-col items-center gap-2">
-                                                <BookOpen className="w-12 h-12 text-muted-foreground/50" />
-                                                <p className="text-muted-foreground font-medium">
+                                                <BookOpen className="h-12 w-12 text-muted-foreground/50" />
+                                                <p className="font-medium text-muted-foreground">
                                                     {hasActiveFilters ? 'No journals found matching your filters' : 'No journals registered yet'}
                                                 </p>
                                             </div>
@@ -367,49 +327,39 @@ export default function JournalsIndex({
                                         <TableRow key={journal.id}>
                                             <TableCell>
                                                 <div>
-                                                    <div className="font-semibold text-foreground">
-                                                        {journal.title}
-                                                    </div>
-                                                    <a 
-                                                        href={journal.url} 
-                                                        target="_blank" 
+                                                    <div className="font-semibold text-foreground">{journal.title}</div>
+                                                    <a
+                                                        href={journal.url}
+                                                        target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
+                                                        className="mt-1 flex items-center gap-1 text-xs text-blue-600 hover:underline dark:text-blue-400"
                                                     >
                                                         {journal.url.substring(0, 35)}...
-                                                        <ExternalLink className="w-3 h-3" />
+                                                        <ExternalLink className="h-3 w-3" />
                                                     </a>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="text-sm font-medium">
-                                                    {journal.university.name}
-                                                </div>
+                                                <div className="text-sm font-medium">{journal.university.name}</div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-sm">
                                                     {journal.issn && <div>ISSN: {journal.issn}</div>}
-                                                    {journal.e_issn && (
-                                                        <div className="text-muted-foreground">e-ISSN: {journal.e_issn}</div>
-                                                    )}
+                                                    {journal.e_issn && <div className="text-muted-foreground">e-ISSN: {journal.e_issn}</div>}
                                                     {!journal.issn && !journal.e_issn && '-'}
                                                 </div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-sm">
                                                     <div className="font-medium">{journal.user.name}</div>
-                                                    <div className="text-muted-foreground text-xs">{journal.user.email}</div>
+                                                    <div className="text-xs text-muted-foreground">{journal.user.email}</div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="text-sm">
-                                                    {journal.scientific_field?.name || '-'}
-                                                </div>
+                                                <div className="text-sm">{journal.scientific_field?.name || '-'}</div>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <Badge className={getSintaRankColor(journal.sinta_rank)}>
-                                                    {journal.sinta_rank_label}
-                                                </Badge>
+                                                <Badge className={getSintaRankColor(journal.sinta_rank)}>{journal.sinta_rank_label}</Badge>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <Badge className={getStatusBadgeColor(journal.assessment_status)}>
@@ -418,9 +368,7 @@ export default function JournalsIndex({
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {journal.latest_score !== null ? (
-                                                    <span className="font-semibold text-foreground">
-                                                        {journal.latest_score.toFixed(1)}%
-                                                    </span>
+                                                    <span className="font-semibold text-foreground">{journal.latest_score.toFixed(1)}%</span>
                                                 ) : (
                                                     <span className="text-muted-foreground">-</span>
                                                 )}
@@ -429,7 +377,7 @@ export default function JournalsIndex({
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link href={route('admin.journals.show', journal.id)}>
                                                         <Button variant="ghost" size="sm" title="View Details">
-                                                            <Eye className="w-4 h-4" />
+                                                            <Eye className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
                                                 </div>
@@ -458,7 +406,7 @@ export default function JournalsIndex({
                                                 disabled={!link.url}
                                                 onClick={() => link.url && router.visit(link.url)}
                                             >
-                                                <ChevronLeft className="w-4 h-4" />
+                                                <ChevronLeft className="h-4 w-4" />
                                                 Previous
                                             </Button>
                                         );
@@ -473,7 +421,7 @@ export default function JournalsIndex({
                                                 onClick={() => link.url && router.visit(link.url)}
                                             >
                                                 Next
-                                                <ChevronRight className="w-4 h-4" />
+                                                <ChevronRight className="h-4 w-4" />
                                             </Button>
                                         );
                                     }

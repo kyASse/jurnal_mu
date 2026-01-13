@@ -29,6 +29,10 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    flash?: {
+        success?: string;
+        error?: string;
+    };
     [key: string]: unknown;
 }
 
@@ -49,9 +53,7 @@ export interface User {
     avatar?: string;
 }
 
-export type PageProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
-> = T & {
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     auth: {
         user: User;
     };

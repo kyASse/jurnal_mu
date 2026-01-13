@@ -1,5 +1,14 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '@/components/ui/sidebar';
+import {
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
@@ -12,16 +21,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             <SidebarMenu>
                 {items.map((item) => {
                     // Compute isActive for parent based on whether any subitem matches current URL
-                    const hasActiveSubitem = item.items?.some(subItem => page.url.startsWith(subItem.href)) ?? false;
+                    const hasActiveSubitem = item.items?.some((subItem) => page.url.startsWith(subItem.href)) ?? false;
                     const isParentActive = item.isActive ?? hasActiveSubitem;
-                    
+
                     return item.items && item.items.length > 0 ? (
-                        <Collapsible
-                            key={item.title}
-                            asChild
-                            defaultOpen={isParentActive}
-                            className="group/collapsible"
-                        >
+                        <Collapsible key={item.title} asChild defaultOpen={isParentActive} className="group/collapsible">
                             <SidebarMenuItem>
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton tooltip={item.title}>

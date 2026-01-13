@@ -38,8 +38,8 @@ class RegisteredUserController extends Controller
             'phone' => 'nullable|string|max:20',
         ]);
 
-        // Get role_id for 'user' role
-        $userRoleId = \DB::table('roles')->where('name', 'user')->value('id');
+        // Get role_id for 'User' role
+        $userRoleId = \DB::table('roles')->where('name', \App\Models\Role::USER)->value('id');
 
         // Fallback: if role not found, throw error
         if (! $userRoleId) {

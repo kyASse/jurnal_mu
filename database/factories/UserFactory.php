@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -29,6 +30,8 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            // Note: role_id should be explicitly set when creating users
+            // Tests should create roles first, then pass role_id to factory
         ];
     }
 
@@ -40,5 +43,50 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    /**
+     * Indicate that the user should have the Super Admin role.
+     */
+    public function superAdmin(): static
+    {
+        return $this->state(function (array $attributes) {
+            $roleId = \DB::table('roles')->where('name', Role::SUPER_ADMIN)->value('id');
+
+            return [
+                'role_id' => $roleId,
+                'university_id' => null,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the user should have the Admin Kampus role.
+     */
+    public function adminKampus(?int $universityId = null): static
+    {
+        return $this->state(function (array $attributes) use ($universityId) {
+            $roleId = \DB::table('roles')->where('name', Role::ADMIN_KAMPUS)->value('id');
+
+            return [
+                'role_id' => $roleId,
+                'university_id' => $universityId,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the user should have the User (Journal Manager) role.
+     */
+    public function user(?int $universityId = null): static
+    {
+        return $this->state(function (array $attributes) use ($universityId) {
+            $roleId = \DB::table('roles')->where('name', Role::USER)->value('id');
+
+            return [
+                'role_id' => $roleId,
+                'university_id' => $universityId,
+            ];
+        });
     }
 }

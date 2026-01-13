@@ -9,7 +9,7 @@ class SupportController extends Controller
 {
     /**
      * Display the support page.
-     * 
+     *
      * This is a placeholder page for the Support feature
      * which is currently under development.
      */
