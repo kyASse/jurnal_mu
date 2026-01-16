@@ -4,22 +4,22 @@ import { Link } from '@inertiajs/react';
 import { BookOpen } from 'lucide-react';
 
 interface JournalCardProps {
+    id: number;
     title: string;
     issn?: string | null;
     e_issn?: string | null;
     sinta_rank?: number | null;
     university?: string;
-    url?: string;
     coverColor?: string; // Optional color for the card header pattern
 }
 
 export default function JournalCard({
+    id,
     title,
     issn,
     e_issn,
     sinta_rank,
     university = 'Universitas Muhammadiyah',
-    url = '#',
     coverColor = 'bg-[#079C4E]', // Default to Official Green
 }: JournalCardProps) {
     return (
@@ -51,7 +51,7 @@ export default function JournalCard({
 
                 {/* Title */}
                 <h3 className="font-heading mb-2 line-clamp-2 text-xl leading-tight font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
-                    <Link href={url}>{title}</Link>
+                    <Link href={route('journals.show', id)}>{title}</Link>
                 </h3>
 
                 {/* ISSN Info */}
@@ -69,10 +69,10 @@ export default function JournalCard({
                 {/* Actions */}
                 <div className="mt-6 flex items-center gap-2">
                     <Button asChild className="w-full bg-[#079C4E] font-semibold text-white hover:bg-[#068a45]">
-                        <Link href={url}>View Journal</Link>
+                        <Link href={route('journals.show', id)}>View Journal</Link>
                     </Button>
                     <Button asChild variant="outline" size="icon" className="shrink-0 border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10">
-                        <a href={`${url}/archive`} target="_blank" title="Archives">
+                        <a href="#" title="More options">
                             <BookOpen className="h-4 w-4" />
                         </a>
                     </Button>

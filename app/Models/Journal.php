@@ -195,6 +195,31 @@ class Journal extends Model
     }
 
     /**
+     * Get accreditation status label (alias for accreditation_label for controller compatibility)
+     */
+    public function getAccreditationStatusLabelAttribute(): string
+    {
+        return $this->getAccreditationLabelAttribute();
+    }
+
+    /**
+     * Get frequency label with proper formatting
+     */
+    public function getFrequencyLabelAttribute(): string
+    {
+        $frequencies = [
+            'monthly' => 'Monthly (12 issues per year)',
+            'bimonthly' => 'Bimonthly (6 issues per year)',
+            'quarterly' => 'Quarterly (4 issues per year)',
+            'triannual' => 'Triannual (3 issues per year)',
+            'biannual' => 'Biannual (2 issues per year)',
+            'annual' => 'Annual (1 issue per year)',
+        ];
+
+        return $frequencies[$this->frequency] ?? ucfirst($this->frequency);
+    }
+
+    /**
      * Get latest assessment status
      */
     public function getAssessmentStatusAttribute(): ?string

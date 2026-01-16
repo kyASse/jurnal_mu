@@ -189,6 +189,7 @@ export default function Welcome() {
                         {featuredJournals.map((journal) => (
                             <JournalCard
                                 key={journal.id}
+                                id={journal.id}
                                 title={journal.title}
                                 sinta_rank={journal.sinta_rank}
                                 issn={journal.issn}
