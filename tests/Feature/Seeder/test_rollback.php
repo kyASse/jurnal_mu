@@ -2,9 +2,9 @@
 
 // Quick script to check database state after rollback
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
-$app = require_once __DIR__ . '/bootstrap/app.php';
+$app = require_once __DIR__ . '/../../../bootstrap/app.php';
 $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 echo "=== AFTER ROLLBACK CHECK ===" . PHP_EOL;
