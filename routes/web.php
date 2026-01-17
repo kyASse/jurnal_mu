@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\AccreditationTemplateController;
 use App\Http\Controllers\Admin\AdminKampusController;
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
 use App\Http\Controllers\Admin\BorangIndikatorController;
 use App\Http\Controllers\Admin\DataMasterController;
+use App\Http\Controllers\Admin\EssayQuestionController;
+use App\Http\Controllers\Admin\EvaluationCategoryController;
+use App\Http\Controllers\Admin\EvaluationIndicatorController;
+use App\Http\Controllers\Admin\EvaluationSubCategoryController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
 use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
@@ -101,6 +106,53 @@ Route::middleware(['auth'])->group(function () {
         // Borang Indikator (Placeholder)
         Route::get('borang-indikator', [BorangIndikatorController::class, 'index'])
             ->name('borang-indikator.index');
+
+        /*
+        |--------------------------------------------------------------------------
+        | v1.1 Hierarchical Assessment System (NEW)
+        |--------------------------------------------------------------------------
+        */
+
+        // Accreditation Templates Management
+        Route::resource('templates', AccreditationTemplateController::class);
+        Route::post('templates/{template}/clone', [AccreditationTemplateController::class, 'clone'])
+            ->name('templates.clone');
+        Route::post('templates/{template}/toggle', [AccreditationTemplateController::class, 'toggleActive'])
+            ->name('templates.toggle');
+        Route::get('templates/{template}/tree', [AccreditationTemplateController::class, 'tree'])
+            ->name('templates.tree');
+
+        // Evaluation Categories Management (Level 1 - Unsur Evaluasi)
+        Route::resource('categories', EvaluationCategoryController::class);
+        Route::post('categories/reorder', [EvaluationCategoryController::class, 'reorder'])
+            ->name('categories.reorder');
+
+        // Evaluation Sub-Categories Management (Level 2 - Sub-Unsur)
+        Route::resource('sub-categories', EvaluationSubCategoryController::class);
+        Route::post('sub-categories/{subCategory}/move', [EvaluationSubCategoryController::class, 'move'])
+            ->name('sub-categories.move');
+        Route::post('sub-categories/reorder', [EvaluationSubCategoryController::class, 'reorder'])
+            ->name('sub-categories.reorder');
+
+        // Essay Questions Management (linked to Categories)
+        Route::resource('essays', EssayQuestionController::class);
+        Route::post('essays/{essay}/toggle', [EssayQuestionController::class, 'toggleActive'])
+            ->name('essays.toggle');
+        Route::post('essays/reorder', [EssayQuestionController::class, 'reorder'])
+            ->name('essays.reorder');
+
+        // Evaluation Indicators Management (v1.1 hierarchical + v1.0 legacy)
+        Route::resource('indicators', EvaluationIndicatorController::class);
+        Route::post('indicators/{indicator}/migrate', [EvaluationIndicatorController::class, 'migrate'])
+            ->name('indicators.migrate');
+        Route::post('indicators/reorder', [EvaluationIndicatorController::class, 'reorder'])
+            ->name('indicators.reorder');
+
+        /*
+        |--------------------------------------------------------------------------
+        | v1.0 Legacy Routes
+        |--------------------------------------------------------------------------
+        */
 
         // Universities Management
         Route::resource('universities', UniversityController::class);
