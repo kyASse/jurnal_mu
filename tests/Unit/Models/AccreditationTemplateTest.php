@@ -51,6 +51,82 @@ test('accreditation template has categories relationship', function () {
         ->and($this->template->categories->first()->name)->toBe('Visi Misi');
 });
 
+test('accreditation template has sub categories through relationship', function () {
+    $category = $this->template->categories()->create([
+        'code' => 'A',
+        'name' => 'Visi Misi',
+        'weight' => 10.00,
+        'display_order' => 1,
+    ]);
+    
+    $subCategory = $category->subCategories()->create([
+        'code' => 'A.1',
+        'name' => 'Visi',
+        'display_order' => 1,
+    ]);
+    
+    $this->template->refresh();
+    
+    expect($this->template->subCategories)->toHaveCount(1)
+        ->and($this->template->subCategories->first()->id)->toBe($subCategory->id)
+        ->and($this->template->subCategories->first()->name)->toBe('Visi');
+});
+
+test('accreditation template has indicators through relationship', function () {
+    $category = $this->template->categories()->create([
+        'code' => 'A',
+        'name' => 'Visi Misi',
+        'weight' => 10.00,
+        'display_order' => 1,
+    ]);
+    
+    $subCategory = $category->subCategories()->create([
+        'code' => 'A.1',
+        'name' => 'Visi',
+        'display_order' => 1,
+    ]);
+    
+    $indicator = $subCategory->indicators()->create([
+        'sub_category_id' => $subCategory->id,
+        'code' => 'A.1.1',
+        'question' => 'Test indicator',
+        'answer_type' => 'boolean',
+        'weight' => 5.0,
+        'sort_order' => 1,
+        'is_active' => true,
+    ]);
+    
+    $this->template->refresh();
+    
+    expect($this->template->indicators)->toHaveCount(1)
+        ->and($this->template->indicators->first()->id)->toBe($indicator->id)
+        ->and($this->template->indicators->first()->question)->toBe('Test indicator');
+});
+
+test('accreditation template has essay questions through relationship', function () {
+    $category = $this->template->categories()->create([
+        'code' => 'A',
+        'name' => 'Visi Misi',
+        'weight' => 10.00,
+        'display_order' => 1,
+    ]);
+    
+    $essay = $category->essayQuestions()->create([
+        'code' => 'A.E1',
+        'question' => 'Jelaskan visi lembaga',
+        'max_words' => 500,
+        'is_required' => true,
+        'display_order' => 1,
+        'is_active' => true,
+    ]);
+    
+    $this->template->refresh();
+    
+    expect($this->template->essayQuestions)->toHaveCount(1)
+        ->and($this->template->essayQuestions->first()->id)->toBe($essay->id)
+        ->and($this->template->essayQuestions->first()->question)->toBe('Jelaskan visi lembaga');
+});
+
 test('active scope filters only active templates', function () {
     AccreditationTemplate::create([
         'name' => 'Inactive Template',

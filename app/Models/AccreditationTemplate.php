@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 /**
  * AccreditationTemplate Model
  * 
@@ -101,20 +102,32 @@ class AccreditationTemplate extends Model
     }
 
     /**
-     * Get all indicators through sub-categories.
+     * Query indicators through categories and sub-categories (3-level relationship).
+     * Note: Laravel's hasManyThrough only supports 2 levels.
+     * Use this as a query method: $template->indicators()->where(...)->get()
      * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function indicators(): HasManyThrough
+    public function indicators()
     {
-        return $this->hasManyThrough(
-            EvaluationIndicator::class,
-            EvaluationSubCategory::class,
-            'category_id',          // FK on sub_categories (via categories)
-            'sub_category_id',      // FK on indicators table
-            'id',                   // Local key on templates table
-            'id'                    // Local key on sub_categories table
-        )->orderBy('evaluation_indicators.sort_order');
+        return EvaluationIndicator::whereHas('subCategory.category', function ($query) {
+            $query->where('template_id', $this->id);
+        })->orderBy('sort_order');
+    }
+
+    /**
+     * Get indicators attribute (cached collection).
+     * Use this as a property: $template->indicators
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getIndicatorsAttribute()
+    {
+        if (!array_key_exists('indicators', $this->relations)) {
+            $this->setRelation('indicators', $this->indicators()->get());
+        }
+        
+        return $this->getRelation('indicators');
     }
 
     /**
@@ -217,29 +230,39 @@ class AccreditationTemplate extends Model
     /**
      * Clone this template with all its hierarchy (deep copy).
      * 
+     * Performance: Eager loads all relationships before cloning to prevent N+1 queries.
+     * Without eager loading: O(1 + N + N*M + N*M*P) queries
+     * With eager loading: O(4) queries regardless of hierarchy depth
+     * 
      * @param string|null $newName Optional new name for the cloned template
      * @return self
      */
     public function cloneTemplate(?string $newName = null): self
     {
+        // Eager load entire hierarchy to prevent N+1 queries
+        $this->load([
+            'categories.subCategories.indicators',
+            'categories.essayQuestions',
+        ]);
+
         $clone = $this->replicate();
         $clone->name = $newName ?? $this->name . ' - Copy';
         $clone->is_active = false; // New clones start as inactive
         $clone->save();
 
-        // Clone categories
+        // Clone categories (already loaded, no additional queries)
         foreach ($this->categories as $category) {
             $categoryClone = $category->replicate();
             $categoryClone->template_id = $clone->id;
             $categoryClone->save();
 
-            // Clone sub-categories
+            // Clone sub-categories (already loaded, no additional queries)
             foreach ($category->subCategories as $subCategory) {
                 $subCategoryClone = $subCategory->replicate();
                 $subCategoryClone->category_id = $categoryClone->id;
                 $subCategoryClone->save();
 
-                // Clone indicators
+                // Clone indicators (already loaded, no additional queries)
                 foreach ($subCategory->indicators as $indicator) {
                     $indicatorClone = $indicator->replicate();
                     $indicatorClone->sub_category_id = $subCategoryClone->id;
@@ -247,7 +270,7 @@ class AccreditationTemplate extends Model
                 }
             }
 
-            // Clone essay questions
+            // Clone essay questions (already loaded, no additional queries)
             foreach ($category->essayQuestions as $essay) {
                 $essayClone = $essay->replicate();
                 $essayClone->category_id = $categoryClone->id;

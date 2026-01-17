@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\InvalidCategoryMoveException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -143,7 +144,7 @@ class EvaluationSubCategory extends Model
      * 
      * @param int $newCategoryId
      * @return bool
-     * @throws \Exception
+     * @throws \App\Exceptions\InvalidCategoryMoveException
      */
     public function moveToCategory(int $newCategoryId): bool
     {
@@ -151,7 +152,7 @@ class EvaluationSubCategory extends Model
         
         // Validate: target category must be in the same template
         if ($this->category->template_id !== $newCategory->template_id) {
-            throw new \Exception('Cannot move sub-category to a category in a different template');
+            throw new InvalidCategoryMoveException();
         }
 
         $this->category_id = $newCategoryId;
