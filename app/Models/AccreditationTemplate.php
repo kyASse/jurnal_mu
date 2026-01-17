@@ -1,0 +1,259 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+/**
+ * AccreditationTemplate Model
+ * 
+ * Top-level template for hierarchical borang indikator management.
+ * Supports two types: 'akreditasi' (BAN-PT) and 'indeksasi' (Scopus/Sinta).
+ * 
+ * Hierarchy:
+ * Template → Categories (Unsur) → SubCategories (Sub-Unsur) → Indicators
+ *         → Essays (linked to Categories)
+ * 
+ * @property int $id
+ * @property string $name
+ * @property string|null $description
+ * @property string|null $version
+ * @property string $type 'akreditasi' or 'indeksasi'
+ * @property bool $is_active
+ * @property \Carbon\Carbon|null $effective_date
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * 
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EvaluationCategory[] $categories
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EvaluationIndicator[] $indicators
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EssayQuestion[] $essayQuestions
+ */
+class AccreditationTemplate extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'accreditation_templates';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'description',
+        'version',
+        'type',
+        'is_active',
+        'effective_date',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+        'effective_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
+
+    /**
+     * Get all categories (Unsur Evaluasi) for this template.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function categories(): HasMany
+    {
+        return $this->hasMany(EvaluationCategory::class, 'template_id')
+            ->orderBy('display_order');
+    }
+
+    /**
+     * Get all sub-categories through categories.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function subCategories(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            EvaluationSubCategory::class,
+            EvaluationCategory::class,
+            'template_id',      // FK on categories table
+            'category_id',      // FK on sub_categories table
+            'id',               // Local key on templates table
+            'id'                // Local key on categories table
+        )->orderBy('evaluation_sub_categories.display_order');
+    }
+
+    /**
+     * Get all indicators through sub-categories.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function indicators(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            EvaluationIndicator::class,
+            EvaluationSubCategory::class,
+            'category_id',          // FK on sub_categories (via categories)
+            'sub_category_id',      // FK on indicators table
+            'id',                   // Local key on templates table
+            'id'                    // Local key on sub_categories table
+        )->orderBy('evaluation_indicators.sort_order');
+    }
+
+    /**
+     * Get all essay questions through categories.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function essayQuestions(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            EssayQuestion::class,
+            EvaluationCategory::class,
+            'template_id',      // FK on categories table
+            'category_id',      // FK on essay_questions table
+            'id',               // Local key on templates table
+            'id'                // Local key on categories table
+        )->orderBy('essay_questions.display_order');
+    }
+
+    /**
+     * Scope: Get only active templates.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope: Get templates by type.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $type 'akreditasi' or 'indeksasi'
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByType($query, string $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
+     * Scope: Order by effective date (newest first).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeLatest($query)
+    {
+        return $query->orderBy('effective_date', 'desc')
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Check if this template can be deleted.
+     * Cannot delete if:
+     * - It's the only active template of its type
+     * - It has submitted assessments using its indicators
+     * 
+     * @return bool
+     */
+    public function canBeDeleted(): bool
+    {
+        // Check if it's the only active template of its type
+        if ($this->is_active) {
+            $activeCount = static::active()
+                ->where('type', $this->type)
+                ->where('id', '!=', $this->id)
+                ->count();
+
+            if ($activeCount === 0) {
+                return false;
+            }
+        }
+
+        // Check if any indicators from this template are used in submitted assessments
+        $indicatorsUsedInAssessments = $this->indicators()
+            ->whereHas('responses', function ($query) {
+                $query->whereHas('journalAssessment', function ($q) {
+                    $q->where('status', 'submitted');
+                });
+            })
+            ->exists();
+
+        return !$indicatorsUsedInAssessments;
+    }
+
+    /**
+     * Get total weight of all categories in this template.
+     * Should not exceed 100.
+     * 
+     * @return float
+     */
+    public function getTotalWeight(): float
+    {
+        return $this->categories()->sum('weight');
+    }
+
+    /**
+     * Clone this template with all its hierarchy (deep copy).
+     * 
+     * @param string|null $newName Optional new name for the cloned template
+     * @return self
+     */
+    public function cloneTemplate(?string $newName = null): self
+    {
+        $clone = $this->replicate();
+        $clone->name = $newName ?? $this->name . ' - Copy';
+        $clone->is_active = false; // New clones start as inactive
+        $clone->save();
+
+        // Clone categories
+        foreach ($this->categories as $category) {
+            $categoryClone = $category->replicate();
+            $categoryClone->template_id = $clone->id;
+            $categoryClone->save();
+
+            // Clone sub-categories
+            foreach ($category->subCategories as $subCategory) {
+                $subCategoryClone = $subCategory->replicate();
+                $subCategoryClone->category_id = $categoryClone->id;
+                $subCategoryClone->save();
+
+                // Clone indicators
+                foreach ($subCategory->indicators as $indicator) {
+                    $indicatorClone = $indicator->replicate();
+                    $indicatorClone->sub_category_id = $subCategoryClone->id;
+                    $indicatorClone->save();
+                }
+            }
+
+            // Clone essay questions
+            foreach ($category->essayQuestions as $essay) {
+                $essayClone = $essay->replicate();
+                $essayClone->category_id = $categoryClone->id;
+                $essayClone->save();
+            }
+        }
+
+        return $clone->fresh();
+    }
+}
