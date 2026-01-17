@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAccreditationTemplateRequest;
 use App\Http\Requests\Admin\UpdateAccreditationTemplateRequest;
 use App\Models\AccreditationTemplate;
+use App\Models\EvaluationIndicator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,11 +33,20 @@ class AccreditationTemplateController extends Controller
     {
         $this->authorize('viewAny', AccreditationTemplate::class);
 
-        $query = AccreditationTemplate::withCount([
-            'categories',
-            'subCategories',
-            'essayQuestions',
-        ]);
+        $query = AccreditationTemplate::query()
+            ->withCount([
+                'categories',
+                'subCategories',
+                'essayQuestions',
+            ])
+            // Eager load indicators count via subquery to avoid N+1
+            ->addSelect([
+                'indicators_count' => EvaluationIndicator::query()
+                    ->join('evaluation_sub_categories', 'evaluation_indicators.sub_category_id', '=', 'evaluation_sub_categories.id')
+                    ->join('evaluation_categories', 'evaluation_sub_categories.category_id', '=', 'evaluation_categories.id')
+                    ->whereColumn('evaluation_categories.template_id', 'accreditation_templates.id')
+                    ->selectRaw('count(*)')
+            ]);
 
         // Search filter
         if ($request->filled('search')) {
@@ -76,7 +86,7 @@ class AccreditationTemplateController extends Controller
                 'effective_date' => $template->effective_date?->format('Y-m-d'),
                 'categories_count' => $template->categories_count,
                 'sub_categories_count' => $template->sub_categories_count,
-                'indicators_count' => $template->indicators()->count(), // Manual count for complex relationship
+                'indicators_count' => $template->indicators_count,
                 'essay_questions_count' => $template->essay_questions_count,
                 'created_at' => $template->created_at?->format('Y-m-d H:i'),
             ]);
