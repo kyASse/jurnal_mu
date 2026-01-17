@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 /**
  * AccreditationTemplate Model
@@ -100,20 +101,32 @@ class AccreditationTemplate extends Model
     }
 
     /**
-     * Get all indicators through sub-categories.
+     * Query indicators through categories and sub-categories (3-level relationship).
+     * Note: Laravel's hasManyThrough only supports 2 levels.
+     * Use this as a query method: $template->indicators()->where(...)->get()
      * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function indicators(): HasManyThrough
+    public function indicators()
     {
-        return $this->hasManyThrough(
-            EvaluationIndicator::class,
-            EvaluationSubCategory::class,
-            'category_id',          // FK on sub_categories (via categories)
-            'sub_category_id',      // FK on indicators table
-            'id',                   // Local key on templates table
-            'id'                    // Local key on sub_categories table
-        )->orderBy('evaluation_indicators.sort_order');
+        return EvaluationIndicator::whereHas('subCategory.category', function ($query) {
+            $query->where('template_id', $this->id);
+        })->orderBy('sort_order');
+    }
+
+    /**
+     * Get indicators attribute (cached collection).
+     * Use this as a property: $template->indicators
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getIndicatorsAttribute()
+    {
+        if (!array_key_exists('indicators', $this->relations)) {
+            $this->setRelation('indicators', $this->indicators()->get());
+        }
+        
+        return $this->getRelation('indicators');
     }
 
     /**
