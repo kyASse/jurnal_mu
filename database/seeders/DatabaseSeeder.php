@@ -21,8 +21,14 @@ class DatabaseSeeder extends Seeder
             ScientificFieldSeeder::class,   // 2. Scientific Fields (no dependencies)
             UniversitySeeder::class,        // 3. Universities (no dependencies)
             UserSeeder::class,              // 4. Users (depends on: roles, universities)
-            EvaluationIndicatorSeeder::class, // 5. Evaluation Indicators (no dependencies)
-            JournalSeeder::class,           // 6. Journals (depends on: universities, users, scientific_fields)
+            EvaluationIndicatorSeeder::class, // 5. Evaluation Indicators (v1.0 legacy data)
+            
+            // === NEW v1.1: Hierarchical Borang Structure ===
+            AccreditationTemplateSeeder::class, // 6. Templates (2 templates: BAN-PT, Scopus)
+            DataMigrationSeeder::class,         // 7. Migrate v1.0 → v1.1 (categories, sub-categories)
+            EssayQuestionSeeder::class,         // 8. Essay Questions (6 samples)
+            
+            JournalSeeder::class,           // 9. Journals (depends on: universities, users, scientific_fields)
         ]);
 
         $this->command->info('');
