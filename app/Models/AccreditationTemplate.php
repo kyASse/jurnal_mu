@@ -229,29 +229,39 @@ class AccreditationTemplate extends Model
     /**
      * Clone this template with all its hierarchy (deep copy).
      * 
+     * Performance: Eager loads all relationships before cloning to prevent N+1 queries.
+     * Without eager loading: O(1 + N + N*M + N*M*P) queries
+     * With eager loading: O(4) queries regardless of hierarchy depth
+     * 
      * @param string|null $newName Optional new name for the cloned template
      * @return self
      */
     public function cloneTemplate(?string $newName = null): self
     {
+        // Eager load entire hierarchy to prevent N+1 queries
+        $this->load([
+            'categories.subCategories.indicators',
+            'categories.essayQuestions',
+        ]);
+
         $clone = $this->replicate();
         $clone->name = $newName ?? $this->name . ' - Copy';
         $clone->is_active = false; // New clones start as inactive
         $clone->save();
 
-        // Clone categories
+        // Clone categories (already loaded, no additional queries)
         foreach ($this->categories as $category) {
             $categoryClone = $category->replicate();
             $categoryClone->template_id = $clone->id;
             $categoryClone->save();
 
-            // Clone sub-categories
+            // Clone sub-categories (already loaded, no additional queries)
             foreach ($category->subCategories as $subCategory) {
                 $subCategoryClone = $subCategory->replicate();
                 $subCategoryClone->category_id = $categoryClone->id;
                 $subCategoryClone->save();
 
-                // Clone indicators
+                // Clone indicators (already loaded, no additional queries)
                 foreach ($subCategory->indicators as $indicator) {
                     $indicatorClone = $indicator->replicate();
                     $indicatorClone->sub_category_id = $subCategoryClone->id;
@@ -259,7 +269,7 @@ class AccreditationTemplate extends Model
                 }
             }
 
-            // Clone essay questions
+            // Clone essay questions (already loaded, no additional queries)
             foreach ($category->essayQuestions as $essay) {
                 $essayClone = $essay->replicate();
                 $essayClone->category_id = $categoryClone->id;
