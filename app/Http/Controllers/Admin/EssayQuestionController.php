@@ -92,6 +92,7 @@ class EssayQuestionController extends Controller
      */
     public function store(StoreEssayRequest $request): RedirectResponse
     {
+        $this->authorize('create', EssayQuestion::class);
         $essay = EssayQuestion::create($request->validated());
 
         return back()->with('success', "Essay question '{$essay->code}' berhasil dibuat.");

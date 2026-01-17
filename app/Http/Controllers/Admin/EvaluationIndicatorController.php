@@ -117,6 +117,7 @@ class EvaluationIndicatorController extends Controller
      */
     public function store(StoreIndicatorRequest $request): RedirectResponse
     {
+        $this->authorize('create', EvaluationIndicator::class);
         $indicator = EvaluationIndicator::create($request->validated());
 
         return back()->with('success', "Indikator '{$indicator->code}' berhasil dibuat.");
