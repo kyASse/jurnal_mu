@@ -89,9 +89,10 @@ class AccreditationTemplateController extends Controller
                 'indicators_count' => $template->indicators_count,
                 'essay_questions_count' => $template->essay_questions_count,
                 'created_at' => $template->created_at?->format('Y-m-d H:i'),
+                'can_be_deleted' => $template->canBeDeleted(),
             ]);
 
-        return Inertia::render('Admin/Templates/Index', [
+        return Inertia::render('Admin/BorangIndikator/Index', [
             'templates' => $templates,
             'filters' => $request->only(['search', 'type', 'is_active']),
         ]);
@@ -268,6 +269,66 @@ class AccreditationTemplateController extends Controller
         $status = $template->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
         return back()->with('success', "Template '{$template->name}' berhasil {$status}.");
+    }
+
+    /**
+     * Show the structure editor (Tree View).
+     *
+     * @route GET /admin/templates/{template}/structure
+     */
+    public function structure(AccreditationTemplate $template): Response
+    {
+        $this->authorize('view', $template);
+
+        // Preload full hierarchy
+        $template->load([
+            'categories' => function ($query) { $query->ordered(); },
+            'categories.subCategories' => function ($query) { $query->ordered(); },
+            'categories.subCategories.indicators' => function ($query) { $query->ordered(); },
+            'categories.essayQuestions' => function ($query) { $query->ordered(); },
+        ]);
+
+        return Inertia::render('Admin/BorangIndikator/Tree', [
+            'template' => $template,
+            // Keep raw Eloquent relationships for components that still rely on the original category models
+            'initialTree' => $template->categories,
+            // Normalized tree structure consumed by the tree editor UI
+            'structuredTree' => $this->buildTreeData($template)
+        ]);
+    }
+
+    private function buildTreeData($template) 
+    {
+         return $template->categories->map(function ($category) {
+            return [
+                'id' => "category-{$category->id}",
+                'type' => 'category',
+                'data' => $category,
+                'children' => [
+                    ...$category->subCategories->map(function ($subCategory) {
+                        return [
+                            'id' => "sub-category-{$subCategory->id}",
+                            'type' => 'sub_category',
+                            'data' => $subCategory,
+                            'children' => $subCategory->indicators->map(function ($indicator) {
+                                return [
+                                    'id' => "indicator-{$indicator->id}",
+                                    'type' => 'indicator',
+                                    'data' => $indicator,
+                                ];
+                            })->values()->toArray(),
+                        ];
+                    })->values()->toArray(),
+                    ...$category->essayQuestions->map(function ($essay) {
+                        return [
+                            'id' => "essay-{$essay->id}",
+                            'type' => 'essay',
+                            'data' => $essay,
+                        ];
+                    })->values()->toArray(),
+                ],
+            ];
+        })->values()->toArray();
     }
 
     /**

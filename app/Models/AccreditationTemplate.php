@@ -205,13 +205,11 @@ class AccreditationTemplate extends Model
         }
 
         // Check if any indicators from this template are used in submitted assessments
-        $indicatorsUsedInAssessments = $this->indicators()
-            ->whereHas('responses', function ($query) {
-                $query->whereHas('journalAssessment', function ($q) {
-                    $q->where('status', 'submitted');
-                });
-            })
-            ->exists();
+        $indicatorsUsedInAssessments = EvaluationIndicator::whereHas('subCategory.category', function ($query) {
+            $query->where('template_id', $this->id);
+        })->whereHas('responses.journalAssessment', function ($query) {
+            $query->where('status', 'submitted');
+        })->exists();
 
         return !$indicatorsUsedInAssessments;
     }

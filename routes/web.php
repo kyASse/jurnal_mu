@@ -103,8 +103,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('data-master', [DataMasterController::class, 'index'])
             ->name('data-master.index');
 
-        // Borang Indikator (Placeholder)
-        Route::get('borang-indikator', [BorangIndikatorController::class, 'index'])
+        // Borang Indikator (Using Accreditation Templates System)
+        Route::get('borang-indikator', [AccreditationTemplateController::class, 'index'])
             ->name('borang-indikator.index');
 
         /*
@@ -119,6 +119,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('templates.clone');
         Route::post('templates/{template}/toggle', [AccreditationTemplateController::class, 'toggleActive'])
             ->name('templates.toggle');
+        Route::get('templates/{template}/structure', [AccreditationTemplateController::class, 'structure'])
+            ->name('templates.structure');
         Route::get('templates/{template}/tree', [AccreditationTemplateController::class, 'tree'])
             ->name('templates.tree');
 
