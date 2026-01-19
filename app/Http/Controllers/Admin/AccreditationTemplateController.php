@@ -290,8 +290,9 @@ class AccreditationTemplateController extends Controller
 
         return Inertia::render('Admin/BorangIndikator/Tree', [
             'template' => $template,
-            'initialTree' => $template->categories, // Pass raw categories, frontend handles tree building? 
-            // Better to pass the structured tree similar to JSON return
+            // Keep raw Eloquent relationships for components that still rely on the original category models
+            'initialTree' => $template->categories,
+            // Normalized tree structure consumed by the tree editor UI
             'structuredTree' => $this->buildTreeData($template)
         ]);
     }
