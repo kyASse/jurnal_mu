@@ -207,19 +207,19 @@ export default function TemplateTree({ template, structuredTree }: Props) {
 
         if (moved) {
             setTreeData(newTree); // Optimistic
-            
+
             // API Call
-            if(routeName) {
-                 router.post(route(routeName), {
-                     items: itemsToReorder.map(id => ({ id: id, sort_order: 0 })) // Index implies order, backend expects list of ids in order
-                 }, {
-                     preserveScroll: true,
-                     onSuccess: () => toast.success("Order updated"),
-                     onError: () => {
-                         toast.error("Failed to update order");
-                         setTreeData(structuredTree); // Revert
-                     }
-                 });
+            if (routeName) {
+                router.post(route(routeName), {
+                    items: itemsToReorder.map((id) => ({ id: id, sort_order: 0 })), // Backend infers order from array index; sort_order is a placeholder field
+                }, {
+                    preserveScroll: true,
+                    onSuccess: () => toast.success("Order updated"),
+                    onError: () => {
+                        toast.error("Failed to update order");
+                        setTreeData(structuredTree); // Revert
+                    },
+                });
             }
         }
     };
