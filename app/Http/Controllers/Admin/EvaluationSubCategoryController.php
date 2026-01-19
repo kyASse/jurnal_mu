@@ -83,6 +83,7 @@ class EvaluationSubCategoryController extends Controller
      */
     public function store(StoreSubCategoryRequest $request): RedirectResponse
     {
+        $this->authorize('create', EvaluationSubCategory::class);
         $subCategory = EvaluationSubCategory::create($request->validated());
 
         return back()->with('success', "Sub-kategori '{$subCategory->name}' berhasil dibuat.");

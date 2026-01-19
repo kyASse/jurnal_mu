@@ -80,6 +80,7 @@ class EvaluationCategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
+        $this->authorize('create', EvaluationCategory::class);
         $category = EvaluationCategory::create($request->validated());
 
         return back()->with('success', "Kategori '{$category->name}' berhasil dibuat.");
