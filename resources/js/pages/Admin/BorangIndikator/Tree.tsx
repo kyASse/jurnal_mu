@@ -120,8 +120,18 @@ export default function TemplateTree({ template, structuredTree }: Props) {
 
         if (!over || active.id === over.id) return;
 
-        // Determine hierarchy level based on ID prefix
-        const type = (active.id as string).split("-")[0]; // "category", "sub", "indicator", "essay"
+        // Determine hierarchy level based on ID prefix without being affected by hyphens in the rest of the ID
+        const activeId = String(active.id);
+        const type =
+            activeId.startsWith("category-")
+                ? "category"
+                : activeId.startsWith("sub-")
+                ? "sub"
+                : activeId.startsWith("indicator-")
+                ? "indicator"
+                : activeId.startsWith("essay-")
+                ? "essay"
+                : "";
 
         // Optimistic Update & API Call
         let newTree = [...treeData];
