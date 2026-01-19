@@ -159,7 +159,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                      const newSubs = arrayMove(subs, oldIndex, newIndex);
                      // Replace subs in children (keeping essays)
                      const essays = cat.children?.filter(c => c.type === 'essay') || [];
-                     cat.children = [...newSubs, ...essays]; // Assuming simple structure for now
+                     cat.children = [...newSubs, ...essays]; // Rebuild children using only sub_category and essay items; additional child types under a category (if introduced) are not handled here.
                      itemsToReorder = newSubs.map(i => i.data.id);
                      routeName = "admin.sub-categories.reorder";
                      moved = true;
