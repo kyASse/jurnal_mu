@@ -89,6 +89,7 @@ class AccreditationTemplateController extends Controller
                 'indicators_count' => $template->indicators_count,
                 'essay_questions_count' => $template->essay_questions_count,
                 'created_at' => $template->created_at?->format('Y-m-d H:i'),
+                'can_be_deleted' => $template->canBeDeleted(),
             ]);
 
         return Inertia::render('Admin/BorangIndikator/Index', [
