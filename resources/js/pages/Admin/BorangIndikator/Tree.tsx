@@ -35,7 +35,6 @@ import {
     DragEndEvent,
     KeyboardSensor,
     PointerSensor,
-    uniqueId,
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
@@ -47,23 +46,51 @@ import {
 } from "@dnd-kit/sortable";
 import { Head, router } from "@inertiajs/react";
 import { ArrowLeft, Plus, Layers3 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-interface TreeItem {
-    id: string; // "category-1"
-    type: "category" | "sub_category" | "indicator" | "essay";
-    data: any;
-    children?: TreeItem[];
-}
+type IndicatorNode = {
+    id: string;
+    type: "indicator";
+    data: EvaluationIndicator;
+    children?: never;
+};
+
+type EssayNode = {
+    id: string;
+    type: "essay";
+    data: EssayQuestion;
+    children?: never;
+};
+
+type SubCategoryNode = {
+    id: string;
+    type: "sub_category";
+    data: EvaluationSubCategory;
+    children?: IndicatorNode[];
+};
+
+type CategoryNode = {
+    id: string;
+    type: "category";
+    data: EvaluationCategory;
+    children?: Array<SubCategoryNode | EssayNode>;
+};
+
+type TreeItem = CategoryNode | SubCategoryNode | IndicatorNode | EssayNode;
+
+const isSubCategoryNode = (node: TreeItem): node is SubCategoryNode =>
+    node.type === "sub_category";
+const isEssayNode = (node: TreeItem): node is EssayNode => node.type === "essay";
+const isIndicatorNode = (node: TreeItem): node is IndicatorNode => node.type === "indicator";
 
 interface Props {
     template: AccreditationTemplate;
-    structuredTree: TreeItem[];
+    structuredTree: CategoryNode[];
 }
 
 export default function TemplateTree({ template, structuredTree }: Props) {
-    const [treeData, setTreeData] = useState<TreeItem[]>(structuredTree);
+    const [treeData, setTreeData] = useState<CategoryNode[]>(structuredTree);
     const [counts, setCounts] = useState({
         categoryCount: 0,
         subCategoryCount: 0,
@@ -96,14 +123,32 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         item?: EssayQuestion;
     }>({ open: false });
 
+    const updateCounts = useCallback((data: TreeItem[]) => {
+        let categoryCount = 0;
+        let subCategoryCount = 0;
+        let indicatorCount = 0;
+
+        data.forEach((cat) => {
+            categoryCount++;
+            cat.children?.forEach((child) => {
+                if (isSubCategoryNode(child)) {
+                    subCategoryCount++;
+                    indicatorCount += child.children?.filter(isIndicatorNode).length || 0;
+                }
+            });
+        });
+
+        setCounts({ categoryCount, subCategoryCount, indicatorCount });
+    }, []);
+
     useEffect(() => {
         setTreeData(structuredTree);
         updateCounts(structuredTree);
-    }, [structuredTree]);
+    }, [structuredTree, updateCounts]);
 
     useEffect(() => {
         updateCounts(treeData);
-    }, [treeData]);
+    }, [treeData, updateCounts]);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -127,7 +172,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         let newTree = [...treeData];
         let moved = false;
         let routeName = "";
-        let itemsToReorder: string[] = [];
+        let itemsToReorder: number[] = [];
 
         if (type === "category") {
             const oldIndex = treeData.findIndex((i) => i.id === active.id);
@@ -148,7 +193,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                  if (oldIndex !== -1 && newIndex !== -1) {
                      const newSubs = arrayMove(subs, oldIndex, newIndex);
                      // Replace subs in children (keeping essays)
-                     const essays = cat.children?.filter(c => c.type === 'essay') || [];
+                     const essays = cat.children?.filter(isEssayNode) || [];
                      cat.children = [...newSubs, ...essays]; // Assuming simple structure for now
                      itemsToReorder = newSubs.map(i => i.data.id);
                      routeName = "admin.sub-categories.reorder";
@@ -159,13 +204,13 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         } else if (type === "essay") {
              // Find parent category
              for (const cat of newTree) {
-                 const essays = cat.children?.filter(c => c.type === 'essay') || [];
+                 const essays = cat.children?.filter(isEssayNode) || [];
                  const oldIndex = essays.findIndex(i => i.id === active.id);
                  const newIndex = essays.findIndex(i => i.id === over.id);
                  
                  if (oldIndex !== -1 && newIndex !== -1) {
                      const newEssays = arrayMove(essays, oldIndex, newIndex);
-                     const subs = cat.children?.filter(c => c.type === 'sub_category') || [];
+                     const subs = cat.children?.filter(isSubCategoryNode) || [];
                      cat.children = [...subs, ...newEssays];
                      itemsToReorder = newEssays.map(i => i.data.id);
                      routeName = "admin.essays.reorder";
@@ -176,7 +221,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         } else if (type === "indicator") {
              // Deep search for sub-category
              for (const cat of newTree) {
-                 const subs = cat.children?.filter(c => c.type === 'sub_category') || [];
+                  const subs = cat.children?.filter(isSubCategoryNode) || [];
                  for(const sub of subs) {
                       const indicators = sub.children || [];
                       const oldIndex = indicators.findIndex(i => i.id === active.id);
@@ -201,7 +246,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
             // API Call
             if(routeName) {
                  router.post(route(routeName), {
-                     items: itemsToReorder.map(id => ({ id: id, sort_order: 0 })) // Index implies order, backend expects list of ids in order
+                     items: itemsToReorder.map(id => ({ id, sort_order: 0 })) // Index implies order, backend expects list of ids in order
                  }, {
                      preserveScroll: true,
                      onSuccess: () => toast.success("Order updated"),
@@ -230,24 +275,6 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                 toast.error("Failed to delete item");
             },
         });
-    };
-
-    const updateCounts = (data: TreeItem[]) => {
-        let categoryCount = 0;
-        let subCategoryCount = 0;
-        let indicatorCount = 0;
-
-        data.forEach((cat) => {
-            categoryCount++;
-            cat.children?.forEach((child) => {
-                if (child.type === "sub_category") {
-                    subCategoryCount++;
-                    indicatorCount += child.children?.filter((c) => c.type === "indicator").length || 0;
-                }
-            });
-        });
-
-        setCounts({ categoryCount, subCategoryCount, indicatorCount });
     };
 
     const breadcrumbs = [
@@ -315,8 +342,8 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                         strategy={verticalListSortingStrategy}
                     >
                         {treeData.map((categoryNode) => {
-                            const subCategories = categoryNode.children?.filter(x => x.type === 'sub_category') || [];
-                            const essayQuestions = categoryNode.children?.filter(x => x.type === 'essay') || [];
+                            const subCategories = categoryNode.children?.filter(isSubCategoryNode) || [];
+                            const essayQuestions = categoryNode.children?.filter(isEssayNode) || [];
 
                             return (
                                 <SortableItem key={categoryNode.id} id={categoryNode.id} className="flex flex-row items-start">
@@ -324,8 +351,8 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                                         category={categoryNode.data}
                                         onEdit={() => setCategoryModal({ open: true, item: categoryNode.data })}
                                         onDelete={() => handleDelete(route('admin.categories.destroy', categoryNode.data.id), categoryNode.data.name)}
-                                        onAddSubCategory={() => setSubModal({ open: true, catId: categoryNode.data.id })}
-                                        onAddEssay={() => setEssayModal({ open: true, catId: categoryNode.data.id })}
+                                        onAddSubCategory={() => setSubModal({ open: true, catId: String(categoryNode.data.id) })}
+                                        onAddEssay={() => setEssayModal({ open: true, catId: String(categoryNode.data.id) })}
                                     >
                                         <div className="pl-4 border-l-2 border-dashed border-gray-200 ml-1">
                                             {/* Sub Categories Context */}
@@ -334,19 +361,19 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                                                     <SortableItem key={subNode.id} id={subNode.id} className="flex flex-row items-start mb-2">
                                                         <SubCategoryItem
                                                             subCategory={subNode.data}
-                                                            onEdit={() => setSubModal({ open: true, catId: categoryNode.data.id, item: subNode.data })}
+                                                            onEdit={() => setSubModal({ open: true, catId: String(categoryNode.data.id), item: subNode.data })}
                                                             onDelete={() => handleDelete(route('admin.sub-categories.destroy', subNode.data.id), subNode.data.name)}
-                                                            onAddIndicator={() => setIndModal({ open: true, subId: subNode.data.id })}
+                                                            onAddIndicator={() => setIndModal({ open: true, subId: String(subNode.data.id) })}
                                                         >
                                                             {/* Indicators Context */}
                                                             <SortableContext items={getItemsIds(subNode.children || [])} strategy={verticalListSortingStrategy}>
                                                                 <div className="grid gap-2">
-                                                                    {subNode.children?.map(indNode => (
+                                                                    {subNode.children?.filter(isIndicatorNode).map(indNode => (
                                                                         <SortableItem key={indNode.id} id={indNode.id} className="flex flex-row items-center">
                                                                             <IndicatorItem 
                                                                                 indicator={indNode.data}
-                                                                                onEdit={() => setIndModal({ open: true, subId: subNode.data.id, item: indNode.data })}
-                                                                                onDelete={() => handleDelete(route('admin.indicators.destroy', indNode.data.id), indNode.data.name)}
+                                                                                onEdit={() => setIndModal({ open: true, subId: String(subNode.data.id), item: indNode.data })}
+                                                                                onDelete={() => handleDelete(route('admin.indicators.destroy', indNode.data.id), indNode.data.question)}
                                                                             />
                                                                         </SortableItem>
                                                                     ))}
@@ -367,7 +394,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                                                     <SortableItem key={essayNode.id} id={essayNode.id} className="flex flex-row items-start">
                                                         <EssayItem 
                                                             essay={essayNode.data}
-                                                            onEdit={() => setEssayModal({ open: true, catId: categoryNode.data.id, item: essayNode.data })}
+                                                            onEdit={() => setEssayModal({ open: true, catId: String(categoryNode.data.id), item: essayNode.data })}
                                                             onDelete={() => handleDelete(route('admin.essays.destroy', essayNode.data.id), essayNode.data.question)}
                                                         />
                                                     </SortableItem>
@@ -395,7 +422,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                 onOpenChange={(v) => setCategoryModal({ ...categoryModal, open: v })}
                 mode={categoryModal.item ? 'edit' : 'create'}
                 category={categoryModal.item}
-                templateId={template.id}
+                templateId={String(template.id)}
             />
             {subModal.catId && (
                 <SubCategoryFormModal

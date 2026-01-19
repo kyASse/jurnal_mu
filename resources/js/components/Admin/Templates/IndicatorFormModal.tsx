@@ -43,6 +43,8 @@ export default function IndicatorFormModal({
 }: Props) {
     const isEdit = mode === "edit";
 
+    type AnswerType = "boolean" | "scale" | "text";
+
     // Match StoreIndicatorRequest validation fields exactly
     const { data, setData, post, put, processing, errors, reset } = useForm({
         sub_category_id: subCategoryId,
@@ -70,7 +72,7 @@ export default function IndicatorFormModal({
                 is_active: indicator.is_active ?? true,
             });
         }
-    }, [indicator, subCategoryId]);
+    }, [indicator, subCategoryId, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -190,7 +192,7 @@ export default function IndicatorFormModal({
                             <Label htmlFor="answer_type">Answer Type</Label>
                             <Select
                                 value={data.answer_type}
-                                onValueChange={(val: any) =>
+                                onValueChange={(val: AnswerType) =>
                                     setData("answer_type", val)
                                 }
                             >

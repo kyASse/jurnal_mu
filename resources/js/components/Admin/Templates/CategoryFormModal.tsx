@@ -55,7 +55,7 @@ export default function CategoryFormModal({
                 display_order: category.display_order ?? 1,
             });
         }
-    }, [category, templateId]);
+    }, [category, templateId, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

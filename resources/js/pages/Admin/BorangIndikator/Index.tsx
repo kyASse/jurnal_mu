@@ -58,10 +58,21 @@ interface Template extends AccreditationTemplate {
     categories_count?: number;
     sub_categories_count?: number;
     indicators_count?: number;
-    essay_questions_count?: number
+    essay_questions_count?: number;
     can_be_deleted?: boolean;
-    type?: string;
 }
+
+const emptyTemplates: PaginatedResponse<Template> = {
+    data: [],
+    links: [],
+    current_page: 1,
+    from: 0,
+    last_page: 1,
+    path: "",
+    per_page: 0,
+    to: 0,
+    total: 0,
+};
 
 interface Props {
     templates: PaginatedResponse<Template>;
@@ -80,7 +91,7 @@ interface Props {
  * @features CRUD templates, toggle active, clone templates, view hierarchy, search/filter by type & status
  */
 export default function BorangIndikatorIndex({
-    templates = { data: [], links: [] } as PaginatedResponse<Template>,
+    templates = emptyTemplates,
     filters = {},
 }: Props) {
     const [search, setSearch] = useState(filters.search || "");

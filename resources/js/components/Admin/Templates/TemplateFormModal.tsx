@@ -20,7 +20,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { AccreditationTemplate } from "@/types/assessment";
 import { useForm } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 interface Props {
@@ -39,6 +39,8 @@ export default function TemplateFormModal({
     mode = "create",
 }: Props) {
     const isEdit = mode === "edit";
+
+    type TemplateType = "akreditasi" | "indeksasi";
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: template?.name || "",
@@ -60,7 +62,7 @@ export default function TemplateFormModal({
                 is_active: template.is_active,
             });
         }
-    }, [template]);
+    }, [template, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -162,7 +164,7 @@ export default function TemplateFormModal({
                             <Label htmlFor="type">Type</Label>
                             <Select
                                 value={data.type}
-                                onValueChange={(val: any) =>
+                                onValueChange={(val: TemplateType) =>
                                     setData("type", val)
                                 }
                             >
