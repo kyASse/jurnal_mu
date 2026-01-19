@@ -165,8 +165,18 @@ export default function TemplateTree({ template, structuredTree }: Props) {
 
         if (!over || active.id === over.id) return;
 
-        // Determine hierarchy level based on ID prefix
-        const type = (active.id as string).split("-")[0]; // "category", "sub", "indicator", "essay"
+        // Determine hierarchy level based on ID prefix without being affected by hyphens in the rest of the ID
+        const activeId = String(active.id);
+        const type =
+            activeId.startsWith("category-")
+                ? "category"
+                : activeId.startsWith("sub-")
+                ? "sub"
+                : activeId.startsWith("indicator-")
+                ? "indicator"
+                : activeId.startsWith("essay-")
+                ? "essay"
+                : "";
 
         // Optimistic Update & API Call
         let newTree = [...treeData];
@@ -193,8 +203,8 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                  if (oldIndex !== -1 && newIndex !== -1) {
                      const newSubs = arrayMove(subs, oldIndex, newIndex);
                      // Replace subs in children (keeping essays)
-                     const essays = cat.children?.filter(isEssayNode) || [];
-                     cat.children = [...newSubs, ...essays]; // Assuming simple structure for now
+                     const essays = cat.children?.filter(c => c.type === 'essay') || [];
+                     cat.children = [...newSubs, ...essays]; // Rebuild children using only sub_category and essay items; additional child types under a category (if introduced) are not handled here.
                      itemsToReorder = newSubs.map(i => i.data.id);
                      routeName = "admin.sub-categories.reorder";
                      moved = true;
@@ -242,19 +252,19 @@ export default function TemplateTree({ template, structuredTree }: Props) {
 
         if (moved) {
             setTreeData(newTree); // Optimistic
-            
+
             // API Call
-            if(routeName) {
-                 router.post(route(routeName), {
-                     items: itemsToReorder.map(id => ({ id, sort_order: 0 })) // Index implies order, backend expects list of ids in order
-                 }, {
-                     preserveScroll: true,
-                     onSuccess: () => toast.success("Order updated"),
-                     onError: () => {
-                         toast.error("Failed to update order");
-                         setTreeData(structuredTree); // Revert
-                     }
-                 });
+            if (routeName) {
+                router.post(route(routeName), {
+                    items: itemsToReorder.map((id) => ({ id: id, sort_order: 0 })), // Backend infers order from array index; sort_order is a placeholder field
+                }, {
+                    preserveScroll: true,
+                    onSuccess: () => toast.success("Order updated"),
+                    onError: () => {
+                        toast.error("Failed to update order");
+                        setTreeData(structuredTree); // Revert
+                    },
+                });
             }
         }
     };
