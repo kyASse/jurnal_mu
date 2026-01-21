@@ -38,7 +38,7 @@ export default function SubCategoryFormModal({ categoryId, subCategory, trigger,
                 display_order: subCategory.display_order ?? 1,
             });
         }
-    }, [subCategory, categoryId]);
+    }, [subCategory, categoryId, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

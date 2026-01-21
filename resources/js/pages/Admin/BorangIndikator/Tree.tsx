@@ -27,7 +27,7 @@ import { toast } from 'sonner';
 interface TreeItem {
     id: string; // "category-1"
     type: 'category' | 'sub_category' | 'indicator' | 'essay';
-    data: any;
+    data: EvaluationCategory | EvaluationSubCategory | EvaluationIndicator | EssayQuestion;
     children?: TreeItem[];
 }
 

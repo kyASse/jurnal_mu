@@ -45,7 +45,7 @@ export default function EssayQuestionFormModal({ categoryId, essay, trigger, ope
                 display_order: essay.display_order ?? 1,
             });
         }
-    }, [essay, categoryId]);
+    }, [essay, categoryId, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

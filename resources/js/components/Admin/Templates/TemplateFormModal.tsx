@@ -40,7 +40,7 @@ export default function TemplateFormModal({ template, trigger, open, onOpenChang
                 is_active: template.is_active,
             });
         }
-    }, [template]);
+    }, [template, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -115,7 +115,7 @@ export default function TemplateFormModal({ template, trigger, open, onOpenChang
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="type">Type</Label>
-                            <Select value={data.type} onValueChange={(val: any) => setData('type', val)}>
+                            <Select value={data.type} onValueChange={(val: 'akreditasi' | 'indeksasi') => setData('type', val)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select type" />
                                 </SelectTrigger>

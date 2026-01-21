@@ -49,7 +49,7 @@ export default function IndicatorFormModal({ subCategoryId, indicator, trigger, 
                 is_active: indicator.is_active ?? true,
             });
         }
-    }, [indicator, subCategoryId]);
+    }, [indicator, subCategoryId, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -137,7 +137,7 @@ export default function IndicatorFormModal({ subCategoryId, indicator, trigger, 
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="answer_type">Answer Type</Label>
-                            <Select value={data.answer_type} onValueChange={(val: any) => setData('answer_type', val)}>
+                            <Select value={data.answer_type} onValueChange={(val: 'boolean' | 'scale' | 'text') => setData('answer_type', val)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select type" />
                                 </SelectTrigger>

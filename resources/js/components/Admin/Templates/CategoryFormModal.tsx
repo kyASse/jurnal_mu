@@ -40,7 +40,7 @@ export default function CategoryFormModal({ templateId, category, trigger, open,
                 display_order: category.display_order ?? 1,
             });
         }
-    }, [category, templateId]);
+    }, [category, templateId, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
