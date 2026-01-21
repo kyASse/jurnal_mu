@@ -17,7 +17,7 @@ class AccreditationTemplateFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->unique()->words(3, true) . ' Template',
+            'name' => fake()->unique()->words(3, true).' Template',
             'description' => fake()->sentence(12),
             'version' => '1.0',
             'type' => fake()->randomElement(['akreditasi', 'indeksasi']),

@@ -18,8 +18,8 @@ class EvaluationIndicatorFactory extends Factory
     {
         return [
             'sub_category_id' => \App\Models\EvaluationSubCategory::factory(),
-            'code' => 'I' . fake()->unique()->numberBetween(1, 999),
-            'question' => fake()->sentence(8) . '?',
+            'code' => 'I'.fake()->unique()->numberBetween(1, 999),
+            'question' => fake()->sentence(8).'?',
             'description' => fake()->paragraph(),
             'weight' => fake()->randomFloat(2, 0, 100),
             'answer_type' => fake()->randomElement(['boolean', 'scale', 'text']),

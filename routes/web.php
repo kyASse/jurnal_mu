@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\AccreditationTemplateController;
 use App\Http\Controllers\Admin\AdminKampusController;
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
-use App\Http\Controllers\Admin\BorangIndikatorController;
 use App\Http\Controllers\Admin\DataMasterController;
 use App\Http\Controllers\Admin\EssayQuestionController;
 use App\Http\Controllers\Admin\EvaluationCategoryController;

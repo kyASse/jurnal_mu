@@ -7,11 +7,11 @@ use Illuminate\Database\Seeder;
 
 /**
  * Seeder for creating default accreditation templates.
- * 
+ *
  * Creates 2 default templates:
  * 1. BAN-PT 2024 - Akreditasi (active template for Indonesian university accreditation)
  * 2. Scopus 2024 - Indeksasi (inactive template for Scopus indexing criteria)
- * 
+ *
  * This seeder should run BEFORE DataMigrationSeeder to establish template structure.
  */
 class AccreditationTemplateSeeder extends Seeder

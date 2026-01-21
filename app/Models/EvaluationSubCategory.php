@@ -11,10 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * EvaluationSubCategory Model (Level 2: Sub-Unsur)
- * 
+ *
  * Represents a sub-category within an evaluation category.
  * Contains indicators (pilihan ganda/scale).
- * 
+ *
  * @property int $id
  * @property int $category_id
  * @property string $code
@@ -24,7 +24,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * 
  * @property-read \App\Models\EvaluationCategory $category
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EvaluationIndicator[] $indicators
  */
@@ -66,8 +65,6 @@ class EvaluationSubCategory extends Model
 
     /**
      * Get the category that owns this sub-category.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function category(): BelongsTo
     {
@@ -76,8 +73,6 @@ class EvaluationSubCategory extends Model
 
     /**
      * Get all indicators for this sub-category.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function indicators(): HasMany
     {
@@ -88,7 +83,7 @@ class EvaluationSubCategory extends Model
     /**
      * Scope: Order by display order.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeOrdered($query)
@@ -99,8 +94,7 @@ class EvaluationSubCategory extends Model
     /**
      * Scope: Get sub-categories for a specific category.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $categoryId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForCategory($query, int $categoryId)
@@ -111,8 +105,6 @@ class EvaluationSubCategory extends Model
     /**
      * Check if this sub-category can be deleted.
      * Cannot delete if it has indicators used in submitted assessments.
-     * 
-     * @return bool
      */
     public function canBeDeleted(): bool
     {
@@ -125,13 +117,11 @@ class EvaluationSubCategory extends Model
             })
             ->exists();
 
-        return !$indicatorsUsedInAssessments;
+        return ! $indicatorsUsedInAssessments;
     }
 
     /**
      * Get the template through category relationship.
-     * 
-     * @return \App\Models\AccreditationTemplate|null
      */
     public function getTemplate(): ?AccreditationTemplate
     {
@@ -141,21 +131,20 @@ class EvaluationSubCategory extends Model
     /**
      * Move this sub-category to a different category.
      * Validates that target category is in the same template.
-     * 
-     * @param int $newCategoryId
-     * @return bool
+     *
      * @throws \App\Exceptions\InvalidCategoryMoveException
      */
     public function moveToCategory(int $newCategoryId): bool
     {
         $newCategory = EvaluationCategory::findOrFail($newCategoryId);
-        
+
         // Validate: target category must be in the same template
         if ($this->category->template_id !== $newCategory->template_id) {
-            throw new InvalidCategoryMoveException();
+            throw new InvalidCategoryMoveException;
         }
 
         $this->category_id = $newCategoryId;
+
         return $this->save();
     }
 }

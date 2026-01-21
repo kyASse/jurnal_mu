@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\User;
+use App\Models\AccreditationTemplate;
+use App\Models\EssayQuestion;
+use App\Models\EvaluationCategory;
+use App\Models\EvaluationIndicator;
+use App\Models\EvaluationSubCategory;
 use App\Models\Role;
 use App\Models\University;
-use App\Models\AccreditationTemplate;
-use App\Models\EvaluationCategory;
-use App\Models\EvaluationSubCategory;
-use App\Models\EssayQuestion;
-use App\Models\EvaluationIndicator;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -26,7 +26,7 @@ beforeEach(function () {
         'name' => 'User',
         'display_name' => 'User',
     ]);
-    
+
     // Create university
     $this->university = University::create([
         'name' => 'Test University',
@@ -36,7 +36,7 @@ beforeEach(function () {
         'province' => 'Test Province',
         'is_active' => true,
     ]);
-    
+
     // Create users
     $this->superAdmin = User::create([
         'name' => 'Super Admin User',
@@ -45,7 +45,7 @@ beforeEach(function () {
         'role_id' => $this->superAdminRole->id,
         'is_active' => true,
     ]);
-    
+
     $this->adminKampus = User::create([
         'name' => 'Admin Kampus User',
         'email' => 'adminkampus@test.com',
@@ -54,7 +54,7 @@ beforeEach(function () {
         'university_id' => $this->university->id,
         'is_active' => true,
     ]);
-    
+
     $this->regularUser = User::create([
         'name' => 'Regular User',
         'email' => 'user@test.com',
@@ -63,7 +63,7 @@ beforeEach(function () {
         'university_id' => $this->university->id,
         'is_active' => true,
     ]);
-    
+
     // Create test data
     $this->template = AccreditationTemplate::create([
         'name' => 'Test Template',
@@ -105,7 +105,7 @@ test('super admin can delete template with multiple active templates', function 
         'is_active' => true,
         'effective_date' => now(),
     ]);
-    
+
     expect($this->superAdmin->can('delete', $this->template))->toBeTrue();
 });
 
@@ -125,7 +125,7 @@ test('super admin can manage categories', function () {
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     expect($this->superAdmin->can('viewAny', EvaluationCategory::class))->toBeTrue()
         ->and($this->superAdmin->can('create', EvaluationCategory::class))->toBeTrue()
         ->and($this->superAdmin->can('update', $category))->toBeTrue()
@@ -140,7 +140,7 @@ test('admin kampus cannot manage categories', function () {
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     expect($this->adminKampus->can('viewAny', EvaluationCategory::class))->toBeFalse()
         ->and($this->adminKampus->can('create', EvaluationCategory::class))->toBeFalse()
         ->and($this->adminKampus->can('update', $category))->toBeFalse();
@@ -154,13 +154,13 @@ test('super admin can manage sub categories', function () {
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     $subCategory = $category->subCategories()->create([
         'code' => 'A.1',
         'name' => 'Test Sub Category',
         'display_order' => 1,
     ]);
-    
+
     expect($this->superAdmin->can('viewAny', EvaluationSubCategory::class))->toBeTrue()
         ->and($this->superAdmin->can('create', EvaluationSubCategory::class))->toBeTrue()
         ->and($this->superAdmin->can('update', $subCategory))->toBeTrue()
@@ -182,7 +182,7 @@ test('super admin can manage essay questions', function () {
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     $essay = $category->essayQuestions()->create([
         'code' => 'E-A-1',
         'question' => 'Test question?',
@@ -191,7 +191,7 @@ test('super admin can manage essay questions', function () {
         'display_order' => 1,
         'is_active' => true,
     ]);
-    
+
     expect($this->superAdmin->can('viewAny', EssayQuestion::class))->toBeTrue()
         ->and($this->superAdmin->can('create', EssayQuestion::class))->toBeTrue()
         ->and($this->superAdmin->can('update', $essay))->toBeTrue()
@@ -213,13 +213,13 @@ test('all users can view indicators', function () {
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     $subCategory = $category->subCategories()->create([
         'code' => 'A.1',
         'name' => 'Test Sub Category',
         'display_order' => 1,
     ]);
-    
+
     $indicator = $subCategory->indicators()->create([
         'code' => 'IND-001',
         'question' => 'Test indicator?',
@@ -228,7 +228,7 @@ test('all users can view indicators', function () {
         'sort_order' => 1,
         'is_active' => true,
     ]);
-    
+
     expect($this->superAdmin->can('viewAny', EvaluationIndicator::class))->toBeTrue()
         ->and($this->adminKampus->can('viewAny', EvaluationIndicator::class))->toBeTrue()
         ->and($this->regularUser->can('viewAny', EvaluationIndicator::class))->toBeTrue()
@@ -242,13 +242,13 @@ test('only super admin can manage indicators', function () {
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     $subCategory = $category->subCategories()->create([
         'code' => 'A.1',
         'name' => 'Test Sub Category',
         'display_order' => 1,
     ]);
-    
+
     $indicator = $subCategory->indicators()->create([
         'code' => 'IND-001',
         'question' => 'Test indicator?',
@@ -257,7 +257,7 @@ test('only super admin can manage indicators', function () {
         'sort_order' => 1,
         'is_active' => true,
     ]);
-    
+
     expect($this->superAdmin->can('create', EvaluationIndicator::class))->toBeTrue()
         ->and($this->superAdmin->can('update', $indicator))->toBeTrue()
         ->and($this->superAdmin->can('delete', $indicator))->toBeTrue()
@@ -277,7 +277,7 @@ test('super admin can migrate legacy indicators', function () {
         'sort_order' => 1,
         'is_active' => true,
     ]);
-    
+
     expect($this->superAdmin->can('migrate', $legacyIndicator))->toBeTrue();
 });
 
@@ -288,13 +288,13 @@ test('cannot migrate non-legacy indicators', function () {
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     $subCategory = $category->subCategories()->create([
         'code' => 'A.1',
         'name' => 'Test Sub Category',
         'display_order' => 1,
     ]);
-    
+
     $hierarchicalIndicator = $subCategory->indicators()->create([
         'code' => 'IND-001',
         'question' => 'New indicator?',
@@ -303,6 +303,6 @@ test('cannot migrate non-legacy indicators', function () {
         'sort_order' => 1,
         'is_active' => true,
     ]);
-    
+
     expect($this->superAdmin->can('migrate', $hierarchicalIndicator))->toBeFalse();
 });

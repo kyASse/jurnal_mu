@@ -11,10 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * EvaluationCategory Model (Level 1: Unsur Evaluasi)
- * 
+ *
  * Represents a category within an accreditation template.
  * Contains sub-categories and essay questions.
- * 
+ *
  * @property int $id
  * @property int $template_id
  * @property string $code
@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * 
  * @property-read \App\Models\AccreditationTemplate $template
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EvaluationSubCategory[] $subCategories
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EssayQuestion[] $essayQuestions
@@ -71,8 +70,6 @@ class EvaluationCategory extends Model
 
     /**
      * Get the template that owns this category.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function template(): BelongsTo
     {
@@ -81,8 +78,6 @@ class EvaluationCategory extends Model
 
     /**
      * Get all sub-categories for this category.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function subCategories(): HasMany
     {
@@ -92,8 +87,6 @@ class EvaluationCategory extends Model
 
     /**
      * Get all essay questions for this category.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function essayQuestions(): HasMany
     {
@@ -103,8 +96,6 @@ class EvaluationCategory extends Model
 
     /**
      * Get all indicators through sub-categories.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function indicators(): HasManyThrough
     {
@@ -121,7 +112,7 @@ class EvaluationCategory extends Model
     /**
      * Scope: Order by display order.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeOrdered($query)
@@ -132,8 +123,7 @@ class EvaluationCategory extends Model
     /**
      * Scope: Get categories for a specific template.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $templateId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForTemplate($query, int $templateId)
@@ -144,8 +134,6 @@ class EvaluationCategory extends Model
     /**
      * Check if this category can be deleted.
      * Cannot delete if it has active sub-categories or indicators used in submitted assessments.
-     * 
-     * @return bool
      */
     public function canBeDeleted(): bool
     {
@@ -158,13 +146,11 @@ class EvaluationCategory extends Model
             })
             ->exists();
 
-        return !$indicatorsUsedInAssessments;
+        return ! $indicatorsUsedInAssessments;
     }
 
     /**
      * Get count statistics for this category.
-     * 
-     * @return array
      */
     public function getStatistics(): array
     {
@@ -172,8 +158,8 @@ class EvaluationCategory extends Model
             'sub_categories_count' => $this->subCategories()->count(),
             'indicators_count' => $this->indicators()->count(),
             'essay_questions_count' => $this->essayQuestions()->count(),
-            'total_items' => $this->subCategories()->count() 
-                + $this->indicators()->count() 
+            'total_items' => $this->subCategories()->count()
+                + $this->indicators()->count()
                 + $this->essayQuestions()->count(),
         ];
     }

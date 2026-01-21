@@ -2,8 +2,8 @@
 
 use App\Models\AccreditationTemplate;
 use App\Models\EvaluationCategory;
-use App\Models\EvaluationSubCategory;
 use App\Models\EvaluationIndicator;
+use App\Models\EvaluationSubCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,14 +16,14 @@ beforeEach(function () {
         'is_active' => true,
         'effective_date' => now(),
     ]);
-    
+
     $this->category = $this->template->categories()->create([
         'code' => 'A',
         'name' => 'Test Category',
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     $this->subCategory = $this->category->subCategories()->create([
         'code' => 'A.1',
         'name' => 'Test Sub Category',
@@ -39,8 +39,8 @@ test('evaluation sub category can be created', function () {
 });
 
 test('evaluation sub category has correct fillable attributes', function () {
-    $fillable = (new EvaluationSubCategory())->getFillable();
-    
+    $fillable = (new EvaluationSubCategory)->getFillable();
+
     expect($fillable)->toContain('category_id')
         ->and($fillable)->toContain('code')
         ->and($fillable)->toContain('name')
@@ -62,7 +62,7 @@ test('evaluation sub category has indicators relationship', function () {
         'sort_order' => 1,
         'is_active' => true,
     ]);
-    
+
     expect($this->subCategory->indicators)->toHaveCount(1)
         ->and($this->subCategory->indicators->first())->toBeInstanceOf(EvaluationIndicator::class);
 });
@@ -73,9 +73,9 @@ test('ordered scope sorts by display_order', function () {
         'name' => 'Second Sub Category',
         'display_order' => 2,
     ]);
-    
+
     $subCategories = EvaluationSubCategory::ordered()->get();
-    
+
     expect($subCategories->first()->display_order)->toBe(1)
         ->and($subCategories->last()->display_order)->toBe(2);
 });
@@ -87,22 +87,22 @@ test('for category scope filters by category id', function () {
         'weight' => 30.00,
         'display_order' => 2,
     ]);
-    
+
     $otherCategory->subCategories()->create([
         'code' => 'B.1',
         'name' => 'Other Sub Category',
         'display_order' => 1,
     ]);
-    
+
     $filteredSubCategories = EvaluationSubCategory::forCategory($this->category->id)->get();
-    
+
     expect($filteredSubCategories)->toHaveCount(1)
         ->and($filteredSubCategories->first()->category_id)->toBe($this->category->id);
 });
 
 test('get template returns template through category', function () {
     $template = $this->subCategory->getTemplate();
-    
+
     expect($template)->toBeInstanceOf(AccreditationTemplate::class)
         ->and($template->name)->toBe('Test Template');
 });
@@ -118,9 +118,9 @@ test('move to category works within same template', function () {
         'weight' => 40.00,
         'display_order' => 2,
     ]);
-    
+
     $result = $this->subCategory->moveToCategory($newCategory->id);
-    
+
     expect($result)->toBeTrue()
         ->and($this->subCategory->fresh()->category_id)->toBe($newCategory->id);
 });
@@ -132,22 +132,22 @@ test('move to category throws exception for different template', function () {
         'is_active' => true,
         'effective_date' => now(),
     ]);
-    
+
     $differentCategory = $differentTemplate->categories()->create([
         'code' => 'X',
         'name' => 'Different Category',
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
-    expect(fn() => $this->subCategory->moveToCategory($differentCategory->id))
+
+    expect(fn () => $this->subCategory->moveToCategory($differentCategory->id))
         ->toThrow(Exception::class, 'Cannot move sub-category to a category in a different template');
 });
 
 test('soft delete works correctly', function () {
     $id = $this->subCategory->id;
     $this->subCategory->delete();
-    
+
     expect(EvaluationSubCategory::find($id))->toBeNull()
         ->and(EvaluationSubCategory::withTrashed()->find($id))->not->toBeNull();
 });

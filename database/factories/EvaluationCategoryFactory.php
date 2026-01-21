@@ -18,7 +18,7 @@ class EvaluationCategoryFactory extends Factory
     {
         return [
             'template_id' => \App\Models\AccreditationTemplate::factory(),
-            'code' => 'K' . fake()->unique()->numberBetween(1, 99),
+            'code' => 'K'.fake()->unique()->numberBetween(1, 99),
             'name' => fake()->words(3, true),
             'description' => fake()->sentence(),
             'weight' => fake()->randomFloat(2, 0, 100),

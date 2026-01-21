@@ -55,7 +55,7 @@ class EvaluationIndicator extends Model
 
     /**
      * Get the sub-category that owns this indicator (NEW v1.1).
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function subCategory()
@@ -65,7 +65,7 @@ class EvaluationIndicator extends Model
 
     /**
      * Get the category through sub-category relationship (NEW v1.1).
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function categoryRelation()
@@ -105,8 +105,7 @@ class EvaluationIndicator extends Model
     /**
      * Scope: Get indicators by sub-category ID (NEW v1.1).
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $subCategoryId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeBySubCategory($query, int $subCategoryId)
@@ -117,8 +116,7 @@ class EvaluationIndicator extends Model
     /**
      * Scope: Get indicators by category ID through relationship (NEW v1.1).
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $categoryId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByCategoryId($query, int $categoryId)
@@ -187,8 +185,6 @@ class EvaluationIndicator extends Model
 
     /**
      * Get the template through sub-category → category chain (NEW v1.1).
-     * 
-     * @return \App\Models\AccreditationTemplate|null
      */
     public function getTemplate(): ?AccreditationTemplate
     {
@@ -197,18 +193,14 @@ class EvaluationIndicator extends Model
 
     /**
      * Check if this is a v1.1 hierarchical indicator.
-     * 
-     * @return bool
      */
     public function isHierarchical(): bool
     {
-        return !is_null($this->sub_category_id);
+        return ! is_null($this->sub_category_id);
     }
 
     /**
      * Check if this is a legacy v1.0 flat indicator.
-     * 
-     * @return bool
      */
     public function isLegacy(): bool
     {
