@@ -241,8 +241,7 @@ export default function Welcome() {
                         </div>
                         <p>&copy; {new Date().getFullYear()} JurnalMu - Muhammadiyah Higher Education Research Network.</p>
                         <p className="mt-2">
-                            Laravel v{usePage<WelcomeProps>().props.laravelVersion} (PHP v
-                            {usePage<WelcomeProps>().props.phpVersion})
+                            Laravel v{usePage<WelcomeProps>().props.laravelVersion} (PHP v{usePage<WelcomeProps>().props.phpVersion})
                         </p>
                     </div>
                 </footer>
