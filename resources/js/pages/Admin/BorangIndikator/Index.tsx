@@ -47,7 +47,20 @@ interface Props {
  * @route GET /admin/borang-indikator
  * @features CRUD templates, toggle active, clone templates, view hierarchy, search/filter by type & status
  */
-export default function BorangIndikatorIndex({ templates = { data: [], links: [], current_page: 1, from: 0, last_page: 1, path: '', per_page: 10, to: 0, total: 0 } as PaginatedResponse<Template>, filters = {} }: Props) {
+export default function BorangIndikatorIndex({
+    templates = {
+        data: [],
+        links: [],
+        current_page: 1,
+        from: 0,
+        last_page: 1,
+        path: '',
+        per_page: 10,
+        to: 0,
+        total: 0,
+    } as PaginatedResponse<Template>,
+    filters = {},
+}: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [typeFilter, setTypeFilter] = useState(filters.type || '');
     const [statusFilter, setStatusFilter] = useState(filters.is_active || '');
