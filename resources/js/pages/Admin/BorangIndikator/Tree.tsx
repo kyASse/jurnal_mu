@@ -70,6 +70,12 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         item?: EssayQuestion;
     }>({ open: false });
 
+    // Type guards
+    const isCategory = (data: TreeItem['data']): data is EvaluationCategory => 'template_id' in data;
+    const isSubCategory = (data: TreeItem['data']): data is EvaluationSubCategory => 'category_id' in data && 'indicators' in data;
+    const isIndicator = (data: TreeItem['data']): data is EvaluationIndicator => 'answer_type' in data;
+    const isEssayQuestion = (data: TreeItem['data']): data is EssayQuestion => 'question' in data && 'guidance' in data;
+
     useEffect(() => {
         setTreeData(structuredTree);
         updateCounts(structuredTree);
@@ -110,7 +116,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         let newTree = [...treeData];
         let moved = false;
         let routeName = '';
-        let itemsToReorder: string[] = [];
+        let itemsToReorder: number[] = [];
 
         if (type === 'category') {
             const oldIndex = treeData.findIndex((i) => i.id === active.id);
@@ -300,74 +306,82 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                 <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
                     <SortableContext items={getItemsIds(treeData)} strategy={verticalListSortingStrategy}>
                         {treeData.map((categoryNode) => {
+                            const catData = isCategory(categoryNode.data) ? categoryNode.data : null;
+                            if (!catData) return null;
+
                             const subCategories = categoryNode.children?.filter((x) => x.type === 'sub_category') || [];
                             const essayQuestions = categoryNode.children?.filter((x) => x.type === 'essay') || [];
 
                             return (
                                 <SortableItem key={categoryNode.id} id={categoryNode.id} className="flex flex-row items-start">
                                     <CategoryItem
-                                        category={categoryNode.data}
-                                        onEdit={() => setCategoryModal({ open: true, item: categoryNode.data })}
-                                        onDelete={() => handleDelete(route('admin.categories.destroy', categoryNode.data.id), categoryNode.data.name)}
-                                        onAddSubCategory={() => setSubModal({ open: true, catId: categoryNode.data.id })}
-                                        onAddEssay={() => setEssayModal({ open: true, catId: categoryNode.data.id })}
+                                        category={catData}
+                                        onEdit={() => setCategoryModal({ open: true, item: catData })}
+                                        onDelete={() => handleDelete(route('admin.categories.destroy', catData.id), catData.name)}
+                                        onAddSubCategory={() => setSubModal({ open: true, catId: String(catData.id) })}
+                                        onAddEssay={() => setEssayModal({ open: true, catId: String(catData.id) })}
                                     >
                                         <div className="ml-1 border-l-2 border-dashed border-gray-200 pl-4">
                                             {/* Sub Categories Context */}
                                             <SortableContext items={getItemsIds(subCategories)} strategy={verticalListSortingStrategy}>
-                                                {subCategories.map((subNode) => (
-                                                    <SortableItem key={subNode.id} id={subNode.id} className="mb-2 flex flex-row items-start">
-                                                        <SubCategoryItem
-                                                            subCategory={subNode.data}
-                                                            onEdit={() =>
-                                                                setSubModal({ open: true, catId: categoryNode.data.id, item: subNode.data })
-                                                            }
-                                                            onDelete={() =>
-                                                                handleDelete(
-                                                                    route('admin.sub-categories.destroy', subNode.data.id),
-                                                                    subNode.data.name,
-                                                                )
-                                                            }
-                                                            onAddIndicator={() => setIndModal({ open: true, subId: subNode.data.id })}
-                                                        >
-                                                            {/* Indicators Context */}
-                                                            <SortableContext
-                                                                items={getItemsIds(subNode.children || [])}
-                                                                strategy={verticalListSortingStrategy}
+                                                {subCategories.map((subNode) => {
+                                                    const subData = isSubCategory(subNode.data) ? subNode.data : null;
+                                                    if (!subData) return null;
+                                                    return (
+                                                        <SortableItem key={subNode.id} id={subNode.id} className="mb-2 flex flex-row items-start">
+                                                            <SubCategoryItem
+                                                                subCategory={subData}
+                                                                onEdit={() => setSubModal({ open: true, catId: String(catData.id), item: subData })}
+                                                                onDelete={() =>
+                                                                    handleDelete(route('admin.sub-categories.destroy', subData.id), subData.name)
+                                                                }
+                                                                onAddIndicator={() => setIndModal({ open: true, subId: String(subData.id) })}
                                                             >
-                                                                <div className="grid gap-2">
-                                                                    {subNode.children?.map((indNode) => (
-                                                                        <SortableItem
-                                                                            key={indNode.id}
-                                                                            id={indNode.id}
-                                                                            className="flex flex-row items-center"
-                                                                        >
-                                                                            <IndicatorItem
-                                                                                indicator={indNode.data}
-                                                                                onEdit={() =>
-                                                                                    setIndModal({
-                                                                                        open: true,
-                                                                                        subId: subNode.data.id,
-                                                                                        item: indNode.data,
-                                                                                    })
-                                                                                }
-                                                                                onDelete={() =>
-                                                                                    handleDelete(
-                                                                                        route('admin.indicators.destroy', indNode.data.id),
-                                                                                        indNode.data.name,
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        </SortableItem>
-                                                                    ))}
-                                                                </div>
-                                                            </SortableContext>
-                                                            {(!subNode.children || subNode.children.length === 0) && (
-                                                                <div className="py-2 text-xs text-muted-foreground italic">No indicators yet.</div>
-                                                            )}
-                                                        </SubCategoryItem>
-                                                    </SortableItem>
-                                                ))}
+                                                                {/* Indicators Context */}
+                                                                <SortableContext
+                                                                    items={getItemsIds(subNode.children || [])}
+                                                                    strategy={verticalListSortingStrategy}
+                                                                >
+                                                                    <div className="grid gap-2">
+                                                                        {subNode.children?.map((indNode) => {
+                                                                            const indData = isIndicator(indNode.data) ? indNode.data : null;
+                                                                            if (!indData) return null;
+                                                                            return (
+                                                                                <SortableItem
+                                                                                    key={indNode.id}
+                                                                                    id={indNode.id}
+                                                                                    className="flex flex-row items-center"
+                                                                                >
+                                                                                    <IndicatorItem
+                                                                                        indicator={indData}
+                                                                                        onEdit={() =>
+                                                                                            setIndModal({
+                                                                                                open: true,
+                                                                                                subId: String(subData.id),
+                                                                                                item: indData,
+                                                                                            })
+                                                                                        }
+                                                                                        onDelete={() =>
+                                                                                            handleDelete(
+                                                                                                route('admin.indicators.destroy', indData.id),
+                                                                                                indData.question,
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                </SortableItem>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </SortableContext>
+                                                                {(!subNode.children || subNode.children.length === 0) && (
+                                                                    <div className="py-2 text-xs text-muted-foreground italic">
+                                                                        No indicators yet.
+                                                                    </div>
+                                                                )}
+                                                            </SubCategoryItem>
+                                                        </SortableItem>
+                                                    );
+                                                })}
                                             </SortableContext>
 
                                             {/* Essays Context */}
@@ -375,22 +389,23 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                                                 {essayQuestions.length > 0 && (
                                                     <div className="mt-4 mb-2 text-sm font-semibold text-blue-800">Essay Questions</div>
                                                 )}
-                                                {essayQuestions.map((essayNode) => (
-                                                    <SortableItem key={essayNode.id} id={essayNode.id} className="flex flex-row items-start">
-                                                        <EssayItem
-                                                            essay={essayNode.data}
-                                                            onEdit={() =>
-                                                                setEssayModal({ open: true, catId: categoryNode.data.id, item: essayNode.data })
-                                                            }
-                                                            onDelete={() =>
-                                                                handleDelete(
-                                                                    route('admin.essays.destroy', essayNode.data.id),
-                                                                    essayNode.data.question,
-                                                                )
-                                                            }
-                                                        />
-                                                    </SortableItem>
-                                                ))}
+                                                {essayQuestions.map((essayNode) => {
+                                                    const essayData = isEssayQuestion(essayNode.data) ? essayNode.data : null;
+                                                    if (!essayData) return null;
+                                                    return (
+                                                        <SortableItem key={essayNode.id} id={essayNode.id} className="flex flex-row items-start">
+                                                            <EssayItem
+                                                                essay={essayData}
+                                                                onEdit={() =>
+                                                                    setEssayModal({ open: true, catId: String(catData.id), item: essayData })
+                                                                }
+                                                                onDelete={() =>
+                                                                    handleDelete(route('admin.essays.destroy', essayData.id), essayData.question)
+                                                                }
+                                                            />
+                                                        </SortableItem>
+                                                    );
+                                                })}
                                             </SortableContext>
                                         </div>
                                     </CategoryItem>
