@@ -1,20 +1,17 @@
 <?php
 
 use App\Models\AccreditationTemplate;
+use App\Models\EssayQuestion;
 use App\Models\EvaluationCategory;
 use App\Models\EvaluationIndicator;
 use App\Models\EvaluationSubCategory;
-use App\Models\EssayQuestion;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\delete;
-use function Pest\Laravel\get;
-use function Pest\Laravel\post;
-use function Pest\Laravel\put;
 
 uses(RefreshDatabase::class);
 

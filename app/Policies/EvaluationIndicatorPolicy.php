@@ -7,10 +7,10 @@ use App\Models\User;
 
 /**
  * EvaluationIndicatorPolicy (NEW v1.1)
- * 
+ *
  * Authorization policy for evaluation indicators.
  * All hierarchical management restricted to Super Admin only.
- * 
+ *
  * Note: This is NEW policy for v1.1. Old indicators (v1.0) without sub_category_id
  * are considered legacy and may have different access rules in the future.
  */
@@ -56,7 +56,7 @@ class EvaluationIndicatorPolicy
      */
     public function delete(User $user, EvaluationIndicator $indicator): bool
     {
-        if (!$user->isSuperAdmin()) {
+        if (! $user->isSuperAdmin()) {
             return false;
         }
 
@@ -67,7 +67,7 @@ class EvaluationIndicatorPolicy
             })
             ->exists();
 
-        return !$usedInSubmittedAssessments;
+        return ! $usedInSubmittedAssessments;
     }
 
     /**

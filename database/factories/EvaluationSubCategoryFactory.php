@@ -18,7 +18,7 @@ class EvaluationSubCategoryFactory extends Factory
     {
         return [
             'category_id' => \App\Models\EvaluationCategory::factory(),
-            'code' => 'SK' . fake()->unique()->numberBetween(1, 99),
+            'code' => 'SK'.fake()->unique()->numberBetween(1, 99),
             'name' => fake()->words(3, true),
             'description' => fake()->sentence(),
             'display_order' => fake()->numberBetween(1, 10),

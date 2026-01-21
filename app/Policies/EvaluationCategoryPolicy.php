@@ -7,7 +7,7 @@ use App\Models\User;
 
 /**
  * EvaluationCategoryPolicy
- * 
+ *
  * Authorization policy for evaluation categories (Unsur Evaluasi).
  * All actions restricted to Super Admin only.
  */
@@ -51,7 +51,7 @@ class EvaluationCategoryPolicy
      */
     public function delete(User $user, EvaluationCategory $category): bool
     {
-        if (!$user->isSuperAdmin()) {
+        if (! $user->isSuperAdmin()) {
             return false;
         }
 

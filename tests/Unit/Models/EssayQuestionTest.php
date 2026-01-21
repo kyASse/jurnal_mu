@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\AccreditationTemplate;
-use App\Models\EvaluationCategory;
 use App\Models\EssayQuestion;
+use App\Models\EvaluationCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,14 +15,14 @@ beforeEach(function () {
         'is_active' => true,
         'effective_date' => now(),
     ]);
-    
+
     $this->category = $this->template->categories()->create([
         'code' => 'A',
         'name' => 'Test Category',
         'weight' => 50.00,
         'display_order' => 1,
     ]);
-    
+
     $this->essay = $this->category->essayQuestions()->create([
         'code' => 'E-A-1',
         'question' => 'Jelaskan visi dan misi institusi Anda?',
@@ -42,8 +42,8 @@ test('essay question can be created', function () {
 });
 
 test('essay question has correct fillable attributes', function () {
-    $fillable = (new EssayQuestion())->getFillable();
-    
+    $fillable = (new EssayQuestion)->getFillable();
+
     expect($fillable)->toContain('category_id')
         ->and($fillable)->toContain('code')
         ->and($fillable)->toContain('question')
@@ -68,9 +68,9 @@ test('active scope filters only active essays', function () {
         'display_order' => 2,
         'is_active' => false,
     ]);
-    
+
     $activeEssays = EssayQuestion::active()->get();
-    
+
     expect($activeEssays)->toHaveCount(1)
         ->and($activeEssays->first()->is_active)->toBeTrue();
 });
@@ -84,9 +84,9 @@ test('required scope filters only required essays', function () {
         'display_order' => 2,
         'is_active' => true,
     ]);
-    
+
     $requiredEssays = EssayQuestion::required()->get();
-    
+
     expect($requiredEssays)->toHaveCount(1)
         ->and($requiredEssays->first()->is_required)->toBeTrue();
 });
@@ -100,9 +100,9 @@ test('ordered scope sorts by display_order', function () {
         'display_order' => 2,
         'is_active' => true,
     ]);
-    
+
     $essays = EssayQuestion::ordered()->get();
-    
+
     expect($essays->first()->display_order)->toBe(1)
         ->and($essays->last()->display_order)->toBe(2);
 });
@@ -114,7 +114,7 @@ test('for category scope filters by category id', function () {
         'weight' => 30.00,
         'display_order' => 2,
     ]);
-    
+
     $otherCategory->essayQuestions()->create([
         'code' => 'E-B-1',
         'question' => 'Other category question?',
@@ -123,48 +123,48 @@ test('for category scope filters by category id', function () {
         'display_order' => 1,
         'is_active' => true,
     ]);
-    
+
     $filteredEssays = EssayQuestion::forCategory($this->category->id)->get();
-    
+
     expect($filteredEssays)->toHaveCount(1)
         ->and($filteredEssays->first()->category_id)->toBe($this->category->id);
 });
 
 test('get template returns template through category', function () {
     $template = $this->essay->getTemplate();
-    
+
     expect($template)->toBeInstanceOf(AccreditationTemplate::class)
         ->and($template->name)->toBe('Test Template');
 });
 
 test('validate word count returns true for valid answer', function () {
-    $validAnswer = str_repeat('word ', 400) . 'word'; // 401 words
-    
+    $validAnswer = str_repeat('word ', 400).'word'; // 401 words
+
     expect($this->essay->validateWordCount($validAnswer))->toBeTrue();
 });
 
 test('validate word count returns false for exceeding answer', function () {
-    $exceedingAnswer = str_repeat('word ', 600) . 'word'; // 601 words
-    
+    $exceedingAnswer = str_repeat('word ', 600).'word'; // 601 words
+
     expect($this->essay->validateWordCount($exceedingAnswer))->toBeFalse();
 });
 
 test('get word count returns correct count', function () {
     $answer = 'This is a test answer with exactly ten words here';
-    
+
     expect($this->essay->getWordCount($answer))->toBe(10);
 });
 
 test('get word count strips html tags', function () {
     $answer = '<p>This is <strong>bold</strong> and <em>italic</em> text</p>';
-    
+
     expect($this->essay->getWordCount($answer))->toBe(6);
 });
 
 test('soft delete works correctly', function () {
     $id = $this->essay->id;
     $this->essay->delete();
-    
+
     expect(EssayQuestion::find($id))->toBeNull()
         ->and(EssayQuestion::withTrashed()->find($id))->not->toBeNull();
 });

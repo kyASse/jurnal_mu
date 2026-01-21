@@ -148,7 +148,7 @@ class EvaluationSubCategoryController extends Controller
     {
         $this->authorize('delete', $subCategory);
 
-        if (!$subCategory->canBeDeleted()) {
+        if (! $subCategory->canBeDeleted()) {
             return back()->with('error', 'Sub-kategori tidak dapat dihapus karena memiliki indikator yang digunakan dalam assessment yang sudah disubmit.');
         }
 

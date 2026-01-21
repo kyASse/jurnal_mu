@@ -18,8 +18,8 @@ class EssayQuestionFactory extends Factory
     {
         return [
             'category_id' => \App\Models\EvaluationCategory::factory(),
-            'code' => 'E' . fake()->unique()->numberBetween(1, 99),
-            'question' => fake()->sentence(10) . '?',
+            'code' => 'E'.fake()->unique()->numberBetween(1, 99),
+            'question' => fake()->sentence(10).'?',
             'guidance' => fake()->paragraph(2),
             'max_words' => fake()->randomElement([500, 1000, 1500, 2000]),
             'is_required' => fake()->boolean(70),

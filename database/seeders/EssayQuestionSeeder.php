@@ -9,13 +9,13 @@ use Illuminate\Database\Seeder;
 
 /**
  * Seeder for creating sample essay questions.
- * 
+ *
  * Creates 6 sample essays (3 per template):
  * - 3 for BAN-PT Akreditasi template
  * - 3 for Scopus Indeksasi template
- * 
+ *
  * Essay questions are linked to categories (NOT sub-categories per advisor requirement).
- * 
+ *
  * REQUIREMENTS:
  * - Must run AFTER AccreditationTemplateSeeder and DataMigrationSeeder
  * - Categories must exist before creating essays
@@ -39,8 +39,9 @@ class EssayQuestionSeeder extends Seeder
             ->where('is_active', false)
             ->first();
 
-        if (!$banptTemplate || !$scopusTemplate) {
+        if (! $banptTemplate || ! $scopusTemplate) {
             $this->command->error('❌ ERROR: Templates not found! Run AccreditationTemplateSeeder first.');
+
             return;
         }
 
@@ -51,6 +52,7 @@ class EssayQuestionSeeder extends Seeder
 
         if ($banptCategories->isEmpty()) {
             $this->command->error('❌ ERROR: No categories found for BAN-PT template! Run DataMigrationSeeder first.');
+
             return;
         }
 

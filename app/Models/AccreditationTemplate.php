@@ -8,17 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
 /**
  * AccreditationTemplate Model
- * 
+ *
  * Top-level template for hierarchical borang indikator management.
  * Supports two types: 'akreditasi' (BAN-PT) and 'indeksasi' (Scopus/Sinta).
- * 
+ *
  * Hierarchy:
  * Template → Categories (Unsur) → SubCategories (Sub-Unsur) → Indicators
  *         → Essays (linked to Categories)
- * 
+ *
  * @property int $id
  * @property string $name
  * @property string|null $description
@@ -29,7 +28,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * 
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EvaluationCategory[] $categories
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EvaluationSubCategory[] $subCategories
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EvaluationIndicator[] $indicators
@@ -75,8 +73,6 @@ class AccreditationTemplate extends Model
 
     /**
      * Get all categories (Unsur Evaluasi) for this template.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function categories(): HasMany
     {
@@ -86,8 +82,6 @@ class AccreditationTemplate extends Model
 
     /**
      * Get all sub-categories through categories.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function subCategories(): HasManyThrough
     {
@@ -105,7 +99,7 @@ class AccreditationTemplate extends Model
      * Query indicators through categories and sub-categories (3-level relationship).
      * Note: Laravel's hasManyThrough only supports 2 levels.
      * Use this as a query method: $template->indicators()->where(...)->get()
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function indicators()
@@ -118,22 +112,20 @@ class AccreditationTemplate extends Model
     /**
      * Get indicators attribute (cached collection).
      * Use this as a property: $template->indicators
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getIndicatorsAttribute()
     {
-        if (!array_key_exists('indicators', $this->relations)) {
+        if (! array_key_exists('indicators', $this->relations)) {
             $this->setRelation('indicators', $this->indicators()->get());
         }
-        
+
         return $this->getRelation('indicators');
     }
 
     /**
      * Get all essay questions through categories.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function essayQuestions(): HasManyThrough
     {
@@ -150,7 +142,7 @@ class AccreditationTemplate extends Model
     /**
      * Scope: Get only active templates.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
@@ -161,8 +153,8 @@ class AccreditationTemplate extends Model
     /**
      * Scope: Get templates by type.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $type 'akreditasi' or 'indeksasi'
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $type  'akreditasi' or 'indeksasi'
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByType($query, string $type)
@@ -173,7 +165,7 @@ class AccreditationTemplate extends Model
     /**
      * Scope: Order by effective date (newest first).
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeLatest($query)
@@ -187,8 +179,6 @@ class AccreditationTemplate extends Model
      * Cannot delete if:
      * - It's the only active template of its type
      * - It has submitted assessments using its indicators
-     * 
-     * @return bool
      */
     public function canBeDeleted(): bool
     {
@@ -211,14 +201,12 @@ class AccreditationTemplate extends Model
             $query->where('status', 'submitted');
         })->exists();
 
-        return !$indicatorsUsedInAssessments;
+        return ! $indicatorsUsedInAssessments;
     }
 
     /**
      * Get total weight of all categories in this template.
      * Should not exceed 100.
-     * 
-     * @return float
      */
     public function getTotalWeight(): float
     {
@@ -227,13 +215,12 @@ class AccreditationTemplate extends Model
 
     /**
      * Clone this template with all its hierarchy (deep copy).
-     * 
+     *
      * Performance: Eager loads all relationships before cloning to prevent N+1 queries.
      * Without eager loading: O(1 + N + N*M + N*M*P) queries
      * With eager loading: O(4) queries regardless of hierarchy depth
-     * 
-     * @param string|null $newName Optional new name for the cloned template
-     * @return self
+     *
+     * @param  string|null  $newName  Optional new name for the cloned template
      */
     public function cloneTemplate(?string $newName = null): self
     {
@@ -244,7 +231,7 @@ class AccreditationTemplate extends Model
         ]);
 
         $clone = $this->replicate();
-        $clone->name = $newName ?? $this->name . ' - Copy';
+        $clone->name = $newName ?? $this->name.' - Copy';
         $clone->is_active = false; // New clones start as inactive
         $clone->save();
 

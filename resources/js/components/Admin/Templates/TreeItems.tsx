@@ -1,35 +1,13 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import {
-    EssayQuestion,
-    EvaluationCategory,
-    EvaluationIndicator,
-    EvaluationSubCategory,
-} from "@/types/assessment";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
-    Edit,
-    GripVertical,
-    MoreHorizontal,
-    Plus,
-    Trash2,
-} from "lucide-react";
-import React from "react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+import { EssayQuestion, EvaluationCategory, EvaluationIndicator, EvaluationSubCategory } from '@/types/assessment';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Edit, GripVertical, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
+import React from 'react';
 
 // --- Sortable Wrapper ---
 interface SortableItemProps {
@@ -39,14 +17,7 @@ interface SortableItemProps {
 }
 
 export function SortableItem({ id, children, className }: SortableItemProps) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id });
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -56,8 +27,8 @@ export function SortableItem({ id, children, className }: SortableItemProps) {
 
     return (
         <div ref={setNodeRef} style={style} className={className}>
-            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mr-2 mt-1">
-                 <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+            <div {...attributes} {...listeners} className="mt-1 mr-2 cursor-grab active:cursor-grabbing">
+                <GripVertical className="h-4 w-4 text-muted-foreground/50" />
             </div>
             <div className="flex-1">{children}</div>
         </div>
@@ -74,37 +45,33 @@ interface CategoryItemProps {
     children?: React.ReactNode;
 }
 
-export function CategoryItem({
-    category,
-    onEdit,
-    onDelete,
-    onAddSubCategory,
-    onAddEssay,
-    children,
-}: CategoryItemProps) {
+export function CategoryItem({ category, onEdit, onDelete, onAddSubCategory, onAddEssay, children }: CategoryItemProps) {
     return (
         <Card className="mb-4 border-l-4 border-l-primary">
-            <CardHeader className="py-3 px-4 flex flex-row items-center justify-between space-y-0 bg-muted/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-muted/20 px-4 py-3">
                 <div className="flex items-center gap-2">
                     <Badge variant="outline" className="font-mono text-xs">
                         {category.code}
                     </Badge>
-                    <CardTitle className="text-base font-semibold">
-                        {category.name}
-                    </CardTitle>
+                    <CardTitle className="text-base font-semibold">{category.name}</CardTitle>
                     {category.weight && (
-                         <Badge variant="outline" className="ml-2">Weight: {category.weight}%</Badge>
+                        <Badge variant="outline" className="ml-2">
+                            Weight: {category.weight}%
+                        </Badge>
                     )}
-                    <Badge variant={category.is_active ? "default" : "outline"} className={!category.is_active ? "bg-muted text-muted-foreground border-muted" : ""}>
-                        {category.is_active ? "Aktif" : "Nonaktif"}
+                    <Badge
+                        variant={category.is_active ? 'default' : 'outline'}
+                        className={!category.is_active ? 'border-muted bg-muted text-muted-foreground' : ''}
+                    >
+                        {category.is_active ? 'Aktif' : 'Nonaktif'}
                     </Badge>
                 </div>
                 <div className="flex items-center gap-1">
-                     <Button variant="ghost" size="sm" onClick={onAddSubCategory} title="Add Sub-Category">
-                        <Plus className="h-4 w-4 mr-1" /> Sub
+                    <Button variant="ghost" size="sm" onClick={onAddSubCategory} title="Add Sub-Category">
+                        <Plus className="mr-1 h-4 w-4" /> Sub
                     </Button>
                     <Button variant="ghost" size="sm" onClick={onAddEssay} title="Add Essay Question">
-                        <Plus className="h-4 w-4 mr-1" /> Essay
+                        <Plus className="mr-1 h-4 w-4" /> Essay
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -125,9 +92,7 @@ export function CategoryItem({
                 </div>
             </CardHeader>
             <CardContent className="p-4 pt-2">
-                <div className="space-y-4 pl-2">
-                    {children}
-                </div>
+                <div className="space-y-4 pl-2">{children}</div>
             </CardContent>
         </Card>
     );
@@ -142,32 +107,27 @@ interface SubCategoryItemProps {
     children?: React.ReactNode;
 }
 
-export function SubCategoryItem({
-    subCategory,
-    onEdit,
-    onDelete,
-    onAddIndicator,
-    children,
-}: SubCategoryItemProps) {
+export function SubCategoryItem({ subCategory, onEdit, onDelete, onAddIndicator, children }: SubCategoryItemProps) {
     return (
-        <div className="rounded-md border bg-card text-card-foreground shadow-sm mb-3">
-             <div className="flex items-center justify-between p-3 bg-muted/10">
+        <div className="mb-3 rounded-md border bg-card text-card-foreground shadow-sm">
+            <div className="flex items-center justify-between bg-muted/10 p-3">
                 <div className="flex items-center gap-2">
                     <Badge variant="secondary" className="font-mono text-xs">
                         {subCategory.code}
                     </Badge>
-                    <span className="font-medium text-sm text-foreground">
-                        {subCategory.name}
-                    </span>
-                    <Badge variant={subCategory.is_active ? "default" : "outline"} className={!subCategory.is_active ? "bg-muted text-muted-foreground border-muted" : ""}>
-                        {subCategory.is_active ? "Aktif" : "Nonaktif"}
+                    <span className="text-sm font-medium text-foreground">{subCategory.name}</span>
+                    <Badge
+                        variant={subCategory.is_active ? 'default' : 'outline'}
+                        className={!subCategory.is_active ? 'border-muted bg-muted text-muted-foreground' : ''}
+                    >
+                        {subCategory.is_active ? 'Aktif' : 'Nonaktif'}
                     </Badge>
                 </div>
                 <div className="flex items-center gap-1">
-                     <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={onAddIndicator}>
-                        <Plus className="h-3 w-3 mr-1" /> Indicator
+                    <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={onAddIndicator}>
+                        <Plus className="mr-1 h-3 w-3" /> Indicator
                     </Button>
-                     <DropdownMenu>
+                    <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-7 w-7">
                                 <MoreHorizontal className="h-3 w-3" />
@@ -183,10 +143,8 @@ export function SubCategoryItem({
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-             </div>
-             <div className="p-3 pt-1 pl-6 space-y-2">
-                 {children}
-             </div>
+            </div>
+            <div className="space-y-2 p-3 pt-1 pl-6">{children}</div>
         </div>
     );
 }
@@ -200,36 +158,43 @@ interface IndicatorItemProps {
 
 export function IndicatorItem({ indicator, onEdit, onDelete }: IndicatorItemProps) {
     const getAnswerTypeBadgeClass = (type: string) => {
-        switch(type) {
-            case 'boolean': return 'bg-green-100 text-green-700 border-green-200';
-            case 'scale': return 'bg-blue-100 text-blue-700 border-blue-200';
-            case 'text': return 'bg-purple-100 text-purple-700 border-purple-200';
-            default: return 'bg-gray-100 text-gray-700 border-gray-200';
+        switch (type) {
+            case 'boolean':
+                return 'bg-green-100 text-green-700 border-green-200';
+            case 'scale':
+                return 'bg-blue-100 text-blue-700 border-blue-200';
+            case 'text':
+                return 'bg-purple-100 text-purple-700 border-purple-200';
+            default:
+                return 'bg-gray-100 text-gray-700 border-gray-200';
         }
     };
 
     return (
-        <div className="flex items-center justify-between rounded border bg-background p-2 text-sm shadow-sm group hover:border-primary/50 transition-colors">
-            <div className="flex-1 mr-2">
+        <div className="group flex items-center justify-between rounded border bg-background p-2 text-sm shadow-sm transition-colors hover:border-primary/50">
+            <div className="mr-2 flex-1">
                 <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="font-mono text-[10px] px-1 py-0 h-5">
+                    <Badge variant="outline" className="h-5 px-1 py-0 font-mono text-[10px]">
                         {indicator.code}
                     </Badge>
-                    <span className="font-medium truncate">{indicator.question}</span>
-                    <Badge variant={indicator.is_active ? "default" : "outline"} className={`text-[10px] px-1 py-0 h-5 ${!indicator.is_active ? "bg-muted text-muted-foreground border-muted" : ""}`}>
-                        {indicator.is_active ? "Aktif" : "Nonaktif"}
+                    <span className="truncate font-medium">{indicator.question}</span>
+                    <Badge
+                        variant={indicator.is_active ? 'default' : 'outline'}
+                        className={`h-5 px-1 py-0 text-[10px] ${!indicator.is_active ? 'border-muted bg-muted text-muted-foreground' : ''}`}
+                    >
+                        {indicator.is_active ? 'Aktif' : 'Nonaktif'}
                     </Badge>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                    <Badge variant="outline" className={cn("text-[10px] px-1 py-0 h-4", getAnswerTypeBadgeClass(indicator.answer_type))}>
+                <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="outline" className={cn('h-4 px-1 py-0 text-[10px]', getAnswerTypeBadgeClass(indicator.answer_type))}>
                         {indicator.answer_type}
                     </Badge>
                     <span>Weight: {indicator.weight}</span>
-                    {indicator.description && <span className="truncate max-w-[200px]">{indicator.description}</span>}
+                    {indicator.description && <span className="max-w-[200px] truncate">{indicator.description}</span>}
                 </div>
             </div>
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
+            <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
                     <Edit className="h-3 w-3" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-600" onClick={onDelete}>
@@ -249,19 +214,24 @@ interface EssayItemProps {
 
 export function EssayItem({ essay, onEdit, onDelete }: EssayItemProps) {
     return (
-        <div className="flex items-center justify-between rounded border border-dashed border-blue-200 bg-blue-50/30 p-2 text-sm shadow-sm group mb-2">
-             <div className="flex-1 mr-2">
-                <div className="flex items-center gap-2 mb-1">
-                     <Badge variant="outline" className="text-blue-600 border-blue-200 text-[10px]">Essay</Badge>
-                     <span className="font-mono text-xs text-muted-foreground">{essay.code}</span>
-                     <Badge variant={essay.is_active ? "default" : "outline"} className={`text-[10px] px-1 py-0 h-5 ${!essay.is_active ? "bg-muted text-muted-foreground border-muted" : ""}`}>
-                        {essay.is_active ? "Aktif" : "Nonaktif"}
+        <div className="group mb-2 flex items-center justify-between rounded border border-dashed border-blue-200 bg-blue-50/30 p-2 text-sm shadow-sm">
+            <div className="mr-2 flex-1">
+                <div className="mb-1 flex items-center gap-2">
+                    <Badge variant="outline" className="border-blue-200 text-[10px] text-blue-600">
+                        Essay
+                    </Badge>
+                    <span className="font-mono text-xs text-muted-foreground">{essay.code}</span>
+                    <Badge
+                        variant={essay.is_active ? 'default' : 'outline'}
+                        className={`h-5 px-1 py-0 text-[10px] ${!essay.is_active ? 'border-muted bg-muted text-muted-foreground' : ''}`}
+                    >
+                        {essay.is_active ? 'Aktif' : 'Nonaktif'}
                     </Badge>
                 </div>
-                <div className="font-medium line-clamp-2">{essay.question}</div>
-             </div>
-             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
+                <div className="line-clamp-2 font-medium">{essay.question}</div>
+            </div>
+            <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
                     <Edit className="h-3 w-3" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-600" onClick={onDelete}>

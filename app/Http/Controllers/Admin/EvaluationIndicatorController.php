@@ -214,7 +214,7 @@ class EvaluationIndicatorController extends Controller
     {
         $this->authorize('migrate', $indicator);
 
-        if (!$indicator->isLegacy()) {
+        if (! $indicator->isLegacy()) {
             return back()->with('error', 'Indikator sudah menggunakan struktur hierarchical v1.1.');
         }
 

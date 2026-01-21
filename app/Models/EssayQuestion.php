@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * EssayQuestion Model
- * 
+ *
  * Represents an essay-type question linked to a category (Unsur Evaluasi).
  * Different from indicators - essays are manually evaluated, not auto-scored.
- * 
+ *
  * @property int $id
  * @property int $category_id
  * @property string $code
@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * 
  * @property-read \App\Models\EvaluationCategory $category
  */
 class EssayQuestion extends Model
@@ -72,8 +71,6 @@ class EssayQuestion extends Model
 
     /**
      * Get the category that owns this essay question.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function category(): BelongsTo
     {
@@ -83,7 +80,7 @@ class EssayQuestion extends Model
     /**
      * Scope: Get only active essay questions.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
@@ -94,7 +91,7 @@ class EssayQuestion extends Model
     /**
      * Scope: Get only required essay questions.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRequired($query)
@@ -105,7 +102,7 @@ class EssayQuestion extends Model
     /**
      * Scope: Order by display order.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeOrdered($query)
@@ -116,8 +113,7 @@ class EssayQuestion extends Model
     /**
      * Scope: Get essay questions for a specific category.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $categoryId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForCategory($query, int $categoryId)
@@ -127,8 +123,6 @@ class EssayQuestion extends Model
 
     /**
      * Get the template through category relationship.
-     * 
-     * @return \App\Models\AccreditationTemplate|null
      */
     public function getTemplate(): ?AccreditationTemplate
     {
@@ -137,21 +131,16 @@ class EssayQuestion extends Model
 
     /**
      * Validate word count for an answer.
-     * 
-     * @param string $answer
-     * @return bool
      */
     public function validateWordCount(string $answer): bool
     {
         $wordCount = str_word_count(strip_tags($answer));
+
         return $wordCount <= $this->max_words;
     }
 
     /**
      * Get word count for an answer.
-     * 
-     * @param string $answer
-     * @return int
      */
     public function getWordCount(string $answer): int
     {

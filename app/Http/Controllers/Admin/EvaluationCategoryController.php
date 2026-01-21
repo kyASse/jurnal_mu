@@ -154,7 +154,7 @@ class EvaluationCategoryController extends Controller
     {
         $this->authorize('delete', $category);
 
-        if (!$category->canBeDeleted()) {
+        if (! $category->canBeDeleted()) {
             return back()->with('error', 'Kategori tidak dapat dihapus karena memiliki indikator yang digunakan dalam assessment yang sudah disubmit.');
         }
 

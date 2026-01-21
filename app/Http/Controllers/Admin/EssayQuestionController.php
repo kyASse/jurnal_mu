@@ -165,7 +165,7 @@ class EssayQuestionController extends Controller
     {
         $this->authorize('toggleActive', $essay);
 
-        $essay->is_active = !$essay->is_active;
+        $essay->is_active = ! $essay->is_active;
         $essay->save();
 
         $status = $essay->is_active ? 'diaktifkan' : 'dinonaktifkan';

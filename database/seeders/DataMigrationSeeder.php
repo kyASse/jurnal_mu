@@ -7,18 +7,17 @@ use App\Models\EvaluationCategory;
 use App\Models\EvaluationIndicator;
 use App\Models\EvaluationSubCategory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Migrates v1.0 legacy indicators to v1.1 hierarchical structure.
- * 
+ *
  * PROCESS:
  * 1. Extract unique categories from existing 12 indicators
  * 2. Create EvaluationCategory records linked to BAN-PT template
  * 3. Extract unique sub_categories, create EvaluationSubCategory records
  * 4. Update indicators: populate sub_category_id via code/category matching
  * 5. Validation: verify all indicators migrated, no orphaned records
- * 
+ *
  * REQUIREMENTS:
  * - Must run AFTER AccreditationTemplateSeeder
  * - Must run BEFORE EssayQuestionSeeder
@@ -39,8 +38,9 @@ class DataMigrationSeeder extends Seeder
             ->where('is_active', true)
             ->first();
 
-        if (!$template) {
+        if (! $template) {
             $this->command->error('❌ ERROR: BAN-PT template not found! Run AccreditationTemplateSeeder first.');
+
             return;
         }
 
@@ -52,6 +52,7 @@ class DataMigrationSeeder extends Seeder
 
         if ($legacyIndicators->isEmpty()) {
             $this->command->warn('⚠️  No legacy indicators found (all already migrated).');
+
             return;
         }
 
@@ -62,7 +63,7 @@ class DataMigrationSeeder extends Seeder
         $uniqueCategories = $legacyIndicators->groupBy('category')->map(function ($indicators, $categoryName) {
             return [
                 'name' => $categoryName,
-                'codes' => $indicators->pluck('code')->map(fn($code) => explode('-', $code)[0])->unique()->first(),
+                'codes' => $indicators->pluck('code')->map(fn ($code) => explode('-', $code)[0])->unique()->first(),
                 'total_weight' => $indicators->sum('weight'),
                 'count' => $indicators->count(),
             ];
@@ -129,9 +130,10 @@ class DataMigrationSeeder extends Seeder
         foreach ($legacyIndicators as $indicator) {
             $key = "{$indicator->category}::{$indicator->sub_category}";
 
-            if (!isset($subCategoryMapping[$key])) {
+            if (! isset($subCategoryMapping[$key])) {
                 $this->command->error("  ✗ FAILED: Indicator {$indicator->code} - No sub_category found for '{$key}'");
                 $failedCount++;
+
                 continue;
             }
 
@@ -169,7 +171,7 @@ class DataMigrationSeeder extends Seeder
             $actualWeight = $category->subCategories()
                 ->with('indicators')
                 ->get()
-                ->flatMap(fn($sub) => $sub->indicators)
+                ->flatMap(fn ($sub) => $sub->indicators)
                 ->sum('weight');
 
             $expectedWeight = $category->weight;

@@ -7,7 +7,7 @@ use App\Models\User;
 
 /**
  * EssayQuestionPolicy
- * 
+ *
  * Authorization policy for essay questions.
  * All actions restricted to Super Admin only.
  */

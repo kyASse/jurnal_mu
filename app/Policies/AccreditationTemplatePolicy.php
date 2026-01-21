@@ -7,7 +7,7 @@ use App\Models\User;
 
 /**
  * AccreditationTemplatePolicy
- * 
+ *
  * Authorization policy for hierarchical borang template management.
  * All actions restricted to Super Admin only.
  */
@@ -51,7 +51,7 @@ class AccreditationTemplatePolicy
      */
     public function delete(User $user, AccreditationTemplate $template): bool
     {
-        if (!$user->isSuperAdmin()) {
+        if (! $user->isSuperAdmin()) {
             return false;
         }
 

@@ -6,10 +6,10 @@ use Exception;
 
 /**
  * InvalidCategoryMoveException
- * 
+ *
  * Thrown when attempting to move an evaluation sub-category to a category
  * that belongs to a different accreditation template.
- * 
+ *
  * This ensures data integrity by preventing cross-template operations
  * that could corrupt the hierarchical structure.
  */
@@ -18,9 +18,6 @@ class InvalidCategoryMoveException extends Exception
     /**
      * Create a new exception instance.
      *
-     * @param string $message
-     * @param int $code
-     * @param \Throwable|null $previous
      * @return void
      */
     public function __construct(
@@ -34,7 +31,7 @@ class InvalidCategoryMoveException extends Exception
     /**
      * Render the exception as an HTTP response.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function render($request)

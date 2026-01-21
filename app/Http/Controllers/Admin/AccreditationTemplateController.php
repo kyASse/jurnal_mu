@@ -45,7 +45,7 @@ class AccreditationTemplateController extends Controller
                     ->join('evaluation_sub_categories', 'evaluation_indicators.sub_category_id', '=', 'evaluation_sub_categories.id')
                     ->join('evaluation_categories', 'evaluation_sub_categories.category_id', '=', 'evaluation_categories.id')
                     ->whereColumn('evaluation_categories.template_id', 'accreditation_templates.id')
-                    ->selectRaw('count(*)')
+                    ->selectRaw('count(*)'),
             ]);
 
         // Search filter
@@ -216,7 +216,7 @@ class AccreditationTemplateController extends Controller
     {
         $this->authorize('delete', $template);
 
-        if (!$template->canBeDeleted()) {
+        if (! $template->canBeDeleted()) {
             return back()->with('error', 'Template tidak dapat dihapus karena merupakan satu-satunya template aktif dengan tipe ini, atau memiliki indikator yang digunakan dalam assessment yang sudah disubmit.');
         }
 
@@ -263,7 +263,7 @@ class AccreditationTemplateController extends Controller
     {
         $this->authorize('toggleActive', $template);
 
-        $template->is_active = !$template->is_active;
+        $template->is_active = ! $template->is_active;
         $template->save();
 
         $status = $template->is_active ? 'diaktifkan' : 'dinonaktifkan';
@@ -282,10 +282,18 @@ class AccreditationTemplateController extends Controller
 
         // Preload full hierarchy
         $template->load([
-            'categories' => function ($query) { $query->ordered(); },
-            'categories.subCategories' => function ($query) { $query->ordered(); },
-            'categories.subCategories.indicators' => function ($query) { $query->ordered(); },
-            'categories.essayQuestions' => function ($query) { $query->ordered(); },
+            'categories' => function ($query) {
+                $query->ordered();
+            },
+            'categories.subCategories' => function ($query) {
+                $query->ordered();
+            },
+            'categories.subCategories.indicators' => function ($query) {
+                $query->ordered();
+            },
+            'categories.essayQuestions' => function ($query) {
+                $query->ordered();
+            },
         ]);
 
         return Inertia::render('Admin/BorangIndikator/Tree', [
@@ -293,13 +301,13 @@ class AccreditationTemplateController extends Controller
             // Keep raw Eloquent relationships for components that still rely on the original category models
             'initialTree' => $template->categories,
             // Normalized tree structure consumed by the tree editor UI
-            'structuredTree' => $this->buildTreeData($template)
+            'structuredTree' => $this->buildTreeData($template),
         ]);
     }
 
-    private function buildTreeData($template) 
+    private function buildTreeData($template)
     {
-         return $template->categories->map(function ($category) {
+        return $template->categories->map(function ($category) {
             return [
                 'id' => "category-{$category->id}",
                 'type' => 'category',
