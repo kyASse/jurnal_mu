@@ -22,6 +22,7 @@ export interface EvaluationCategory {
     description: string | null;
     weight: number;
     display_order: number;
+    is_active: boolean;
     sub_categories: EvaluationSubCategory[];
     essay_questions: EssayQuestion[];
 }
@@ -33,6 +34,7 @@ export interface EvaluationSubCategory {
     name: string;
     description: string | null;
     display_order: number;
+    is_active: boolean;
     indicators: EvaluationIndicator[];
 }
 

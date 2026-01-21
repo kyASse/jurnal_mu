@@ -414,7 +414,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                 onOpenChange={(v) => setCategoryModal({ ...categoryModal, open: v })}
                 mode={categoryModal.item ? 'edit' : 'create'}
                 category={categoryModal.item}
-                templateId={template.id}
+                templateId={String(template.id)}
             />
             {subModal.catId && (
                 <SubCategoryFormModal
