@@ -112,6 +112,10 @@ Route::middleware(['auth'])->group(function () {
         |--------------------------------------------------------------------------
         */
 
+        // Borang Indikator List View (Hierarchical)
+        Route::get('borang-indikator/list', [AccreditationTemplateController::class, 'listView'])
+            ->name('borang-indikator.list');
+
         // Accreditation Templates Management
         Route::resource('templates', AccreditationTemplateController::class);
         Route::post('templates/{template}/clone', [AccreditationTemplateController::class, 'clone'])
@@ -164,6 +168,15 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('admin-kampus', AdminKampusController::class);
         Route::post('admin-kampus/{admin_kampus}/toggle-active', [AdminKampusController::class, 'toggleActive'])
             ->name('admin-kampus.toggle-active');
+
+        // Users (Pengelola Jurnal) Management
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+        Route::post('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
+            ->name('users.toggle-active');
+
+        // Reviewer Management (v1.1 - Placeholder)
+        Route::get('reviewers', [\App\Http\Controllers\Admin\ReviewerController::class, 'index'])
+            ->name('reviewers.index');
 
         // View all journals (read-only for monitoring)
         Route::get('journals', [\App\Http\Controllers\Admin\JournalController::class, 'index'])

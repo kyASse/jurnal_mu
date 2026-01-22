@@ -52,17 +52,28 @@ class UserPolicy
 
     /**
      * Determine whether the user can assign when creating.
+     * 
+     * Now supports multi-role assignment. Returns true if user can assign at least one of the specified roles.
      */
     public function canAssignRole(User $user, string $roleName): bool
     {
-        // Suoer Admin can assign any role except Super Admin
+        // Super Admin can assign any role except Super Admin
         if ($user->isSuperAdmin()) {
-            return in_array($roleName, ['Admin Kampus', 'User']);
+            return in_array($roleName, [
+                'Admin Kampus',
+                'User',
+                'Pengelola Jurnal',
+                'Reviewer',
+            ]);
         }
 
-        // Admin kampus can only assign User role
+        // Admin kampus can assign User, Pengelola Jurnal, and Reviewer roles
         if ($user->isAdminKampus()) {
-            return $roleName === 'User';
+            return in_array($roleName, [
+                'User',
+                'Pengelola Jurnal',
+                'Reviewer',
+            ]);
         }
 
         return false;

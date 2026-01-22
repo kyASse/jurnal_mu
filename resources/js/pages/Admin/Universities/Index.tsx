@@ -38,6 +38,16 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/Universities/Index.tsx
  */
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +57,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, Building2, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -63,6 +74,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface University {
     id: number;
     code: string;
+    ptm_code?: string;
     name: string;
     short_name: string;
     city: string;
@@ -71,6 +83,9 @@ interface University {
     email: string;
     website: string;
     logo_url: string;
+    accreditation_status?: string;
+    cluster?: string;
+    profile_description?: string;
     is_active: boolean;
     users_count: number;
     journals_count: number;
@@ -94,6 +109,8 @@ interface Props {
     filters: {
         search: string;
         is_active: string;
+        accreditation_status: string;
+        cluster: string;
     };
     can: {
         create: boolean;
@@ -104,15 +121,49 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
     const { flash } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
+    const [accreditationFilter, setAccreditationFilter] = useState(filters.accreditation_status || '');
+    const [clusterFilter, setClusterFilter] = useState(filters.cluster || '');
+    const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; universityId?: number; universityName?: string }>({ open: false });
+
+    // Convert flash messages to toast notifications
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin.universities.index'), { search, is_active: isActiveFilter === 'all' ? '' : isActiveFilter }, { preserveState: true });
+        router.get(
+            route('admin.universities.index'),
+            {
+                search,
+                is_active: isActiveFilter === 'all' ? '' : isActiveFilter,
+                accreditation_status: accreditationFilter === 'all' ? '' : accreditationFilter,
+                cluster: clusterFilter === 'all' ? '' : clusterFilter,
+            },
+            { preserveState: true },
+        );
     };
 
-    const handleDelete = (id: number, name: string) => {
-        if (confirm(`Are you sure you want to delete ${name}?`)) {
-            router.delete(route('admin.universities.destroy', id));
+    const openDeleteDialog = (id: number, name: string) => {
+        setDeleteDialog({ open: true, universityId: id, universityName: name });
+    };
+
+    const confirmDelete = () => {
+        if (deleteDialog.universityId) {
+            router.delete(route('admin.universities.destroy', deleteDialog.universityId), {
+                onSuccess: () => {
+                    toast.success('University deleted successfully');
+                    setDeleteDialog({ open: false });
+                },
+                onError: () => {
+                    toast.error('Failed to delete university');
+                },
+            });
         }
     };
 
@@ -157,45 +208,77 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
 
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
-                        <form onSubmit={handleSearch} className="flex gap-4">
-                            <div className="flex-1">
-                                <div className="relative">
-                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
-                                    <Input
-                                        type="text"
-                                        placeholder="Search by name, code, or city..."
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                        className="pl-10"
-                                    />
+                        <form onSubmit={handleSearch} className="flex flex-col gap-4">
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <div className="relative">
+                                        <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
+                                        <Input
+                                            type="text"
+                                            placeholder="Search by name, code, PTM code, or city..."
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            className="pl-10"
+                                        />
+                                    </div>
                                 </div>
+
+                                <Select value={isActiveFilter} onValueChange={(value) => setIsActiveFilter(value)}>
+                                    <SelectTrigger className="w-48">
+                                        <SelectValue placeholder="All Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Status</SelectItem>
+                                        <SelectItem value="1">Active</SelectItem>
+                                        <SelectItem value="0">Inactive</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
 
-                            <Select value={isActiveFilter} onValueChange={(value) => setIsActiveFilter(value)}>
-                                <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="All Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Status</SelectItem>
-                                    <SelectItem value="1">Active</SelectItem>
-                                    <SelectItem value="0">Inactive</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="flex gap-4">
+                                <Select value={accreditationFilter} onValueChange={(value) => setAccreditationFilter(value)}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="All Accreditation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Accreditation</SelectItem>
+                                        <SelectItem value="Unggul">Unggul</SelectItem>
+                                        <SelectItem value="Baik Sekali">Baik Sekali</SelectItem>
+                                        <SelectItem value="Baik">Baik</SelectItem>
+                                        <SelectItem value="Cukup">Cukup</SelectItem>
+                                    </SelectContent>
+                                </Select>
 
-                            <Button type="submit">Search</Button>
-                            {(search || (isActiveFilter && isActiveFilter !== 'all')) && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => {
-                                        setSearch('');
-                                        setIsActiveFilter('all');
-                                        router.get(route('admin.universities.index'));
-                                    }}
-                                >
-                                    Clear
-                                </Button>
-                            )}
+                                <Select value={clusterFilter} onValueChange={(value) => setClusterFilter(value)}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="All Cluster" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Cluster</SelectItem>
+                                        <SelectItem value="Mandiri">Mandiri</SelectItem>
+                                        <SelectItem value="Utama">Utama</SelectItem>
+                                        <SelectItem value="Madya">Madya</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Button type="submit" className="w-32">Search</Button>
+                                {(search || (isActiveFilter && isActiveFilter !== 'all') || (accreditationFilter && accreditationFilter !== 'all') || (clusterFilter && clusterFilter !== 'all')) && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-32"
+                                        onClick={() => {
+                                            setSearch('');
+                                            setIsActiveFilter('all');
+                                            setAccreditationFilter('all');
+                                            setClusterFilter('all');
+                                            router.get(route('admin.universities.index'));
+                                        }}
+                                    >
+                                        Clear
+                                    </Button>
+                                )}
+                            </div>
                         </form>
                     </div>
 
@@ -205,7 +288,10 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Code</TableHead>
+                                    <TableHead>PTM Code</TableHead>
                                     <TableHead>Name</TableHead>
+                                    <TableHead>Accreditation</TableHead>
+                                    <TableHead>Cluster</TableHead>
                                     <TableHead>Location</TableHead>
                                     <TableHead className="text-center">Status</TableHead>
                                     <TableHead className="text-center">
@@ -226,7 +312,7 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
                             <TableBody>
                                 {universities.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                                        <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
                                             No universities found.
                                         </TableCell>
                                     </TableRow>
@@ -234,6 +320,9 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
                                     universities.data.map((university) => (
                                         <TableRow key={university.id}>
                                             <TableCell className="font-medium">{university.code}</TableCell>
+                                            <TableCell className="font-mono text-sm">
+                                                {university.ptm_code || <span className="text-muted-foreground">-</span>}
+                                            </TableCell>
                                             <TableCell>
                                                 <div>
                                                     <div className="font-semibold text-foreground">{university.name}</div>
@@ -241,6 +330,24 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
                                                         <div className="text-sm text-muted-foreground">{university.short_name}</div>
                                                     )}
                                                 </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {university.accreditation_status ? (
+                                                    <Badge variant="outline" className="font-medium">
+                                                        {university.accreditation_status}
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {university.cluster ? (
+                                                    <Badge variant="secondary" className="font-medium">
+                                                        {university.cluster}
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-sm">
@@ -282,7 +389,7 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                                onClick={() => handleDelete(university.id, university.name)}
+                                                                onClick={() => openDeleteDialog(university.id, university.name)}
                                                                 title="Delete"
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
@@ -339,6 +446,25 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete University</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete <strong>{deleteDialog.universityName}</strong>? This action cannot be undone and all
+                            associated data will be permanently removed.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }

@@ -1,21 +1,48 @@
 /**
- * UsersEdit Component for Admin Kampus
+ * UsersCreate Component
  *
  * @description
- * A form page for editing existing user accounts within the admin's university.
- * Password fields are optional - leave empty to keep the existing password.
- * Multiple roles can be assigned.
+ * A comprehensive form page for creating new Pengelola Jurnal (Journal Manager) accounts.
+ * Super Admin can create User role accounts and assign them to any university.
+ *
+ * @component
+ *
+ * @interface University
+ * @property {number} id - Unique identifier for the university
+ * @property {string} name - Full name of the university
+ * @property {string} short_name - Abbreviated university name
+ * @property {string} code - University code
+ *
+ * @interface Props
+ * @property {University[]} universities - Array of available universities for assignment
  *
  * @features
- * - Pre-filled personal information fields
- * - Multi-role selection (not Super Admin)
- * - Optional password update
- * - Status toggle
+ * - Personal Information Section (name, email, phone)
+ * - Account Information Section (password, confirmation)
+ * - University Assignment Section
+ * - Reviewer Status Toggle (v1.1 feature)
+ * - Active Status Toggle
  * - Form validation with error display
- * - University displayed as read-only info
+ * - Loading state during submission
+ * - Cancel and submit buttons
+ * - Breadcrumb navigation
+ * - Dark mode support
  *
- * @route GET /admin-kampus/users/{id}/edit
- * @route PUT /admin-kampus/users/{id}
+ * @formData
+ * @property {string} name - User's full name
+ * @property {string} email - Login email address
+ * @property {string} password - Account password
+ * @property {string} password_confirmation - Password confirmation
+ * @property {string} phone - Contact phone number
+ * @property {string} university_id - Assigned university ID
+ * @property {boolean} is_reviewer - Reviewer status (default: false)
+ * @property {boolean} is_active - Account active status (default: true)
+ *
+ * @route GET /admin/users/create
+ * @route POST /admin/users (form submission)
+ *
+ * @author JurnalMU Team
+ * @filepath /resources/js/pages/Admin/Users/Create.tsx
  */
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,24 +52,33 @@ import MultiRoleSelect from '@/components/multi-role-select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { AlertCircle, ArrowLeft, Building2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    phone: string | null;
-    position: string | null;
-    scientific_field_id: number | null;
-    is_active: boolean;
-    role_ids: number[];
-}
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+    {
+        title: 'User Management',
+        href: '#',
+    },
+    {
+        title: 'Pengelola Jurnal',
+        href: '/admin/users',
+    },
+    {
+        title: 'Create',
+        href: '/admin/users/create',
+    },
+];
 
 interface University {
     id: number;
     name: string;
     short_name: string;
+    code: string;
 }
 
 interface Role {
@@ -59,82 +95,52 @@ interface ScientificField {
 }
 
 interface Props {
-    user: User;
-    university: University;
+    universities: University[];
     roles: Role[];
     scientificFields: ScientificField[];
 }
 
-export default function UsersEdit({ user, university, roles, scientificFields }: Props) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Dashboard',
-            href: '/dashboard',
-        },
-        {
-            title: 'User Management',
-            href: '/admin-kampus/users',
-        },
-        {
-            title: user.name,
-            href: `/admin-kampus/users/${user.id}`,
-        },
-        {
-            title: 'Edit',
-            href: `/admin-kampus/users/${user.id}/edit`,
-        },
-    ];
-
-    const { data, setData, put, processing, errors } = useForm({
-        name: user.name,
-        email: user.email,
+export default function UsersCreate({ universities, roles, scientificFields }: Props) {
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        email: '',
         password: '',
         password_confirmation: '',
-        phone: user.phone || '',
-        position: user.position || '',
-        scientific_field_id: user.scientific_field_id?.toString() || '',
-        role_ids: user.role_ids || [],
-        is_active: user.is_active,
+        phone: '',
+        university_id: '',
+        scientific_field_id: '',
+        role_ids: [] as number[],
+        is_active: true as boolean,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin-kampus.users.update', user.id), {
+        post(route('admin.users.store'), {
             onSuccess: () => {
-                toast.success('User updated successfully');
+                toast.success('Pengelola Jurnal created successfully');
             },
             onError: () => {
-                toast.error('Failed to update user. Please check the form.');
+                toast.error('Failed to create Pengelola Jurnal. Please check the form.');
             },
         });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit User - ${user.name}`} />
+            <Head title="Create Pengelola Jurnal" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
-                        <Link href={route('admin-kampus.users.index')}>
+                        <Link href={route('admin.users.index')}>
                             <Button variant="ghost" className="mb-4">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to List
                             </Button>
                         </Link>
-                        <h1 className="text-3xl font-bold text-foreground">Edit User</h1>
-                        <p className="mt-1 text-muted-foreground">Update user information for {user.name}</p>
-                    </div>
-
-                    {/* University Info */}
-                    <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-                        <div className="flex items-center gap-2">
-                            <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            <span className="font-medium text-blue-800 dark:text-blue-200">
-                                University: {university.name} ({university.short_name})
-                            </span>
-                        </div>
+                        <h1 className="text-3xl font-bold text-foreground">Create New Pengelola Jurnal</h1>
+                        <p className="mt-1 text-muted-foreground">Add a new journal manager</p>
                     </div>
 
                     {/* Form */}
@@ -154,7 +160,7 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
                                     id="name"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
-                                    placeholder="e.g., John Doe"
+                                    placeholder="e.g., Budi Santoso, S.Kom., M.T."
                                     required
                                     className="mt-2"
                                 />
@@ -171,7 +177,7 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
                                     type="email"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    placeholder="e.g., john.doe@example.com"
+                                    placeholder="e.g., budi.santoso@ajm.ac.id"
                                     required
                                     className="mt-2"
                                 />
@@ -186,75 +192,82 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
                                     type="tel"
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value)}
-                                    placeholder="e.g., 081234567890"
+                                    placeholder="e.g., 0812-3456-7890"
                                     className="mt-2"
                                 />
                                 {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-                            </div>
-
-                            {/* Position */}
-                            <div>
-                                <Label htmlFor="position">Position / Title</Label>
-                                <Input
-                                    id="position"
-                                    value={data.position}
-                                    onChange={(e) => setData('position', e.target.value)}
-                                    placeholder="e.g., Editor, Managing Editor"
-                                    className="mt-2"
-                                />
-                                {errors.position && <p className="mt-1 text-sm text-red-600">{errors.position}</p>}
                             </div>
                         </div>
 
                         {/* Account Information */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
-                                Change Password
+                                Account Information
                             </h3>
-
-                            {/* Password Update Notice */}
-                            <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
-                                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
-                                <p className="text-sm text-amber-800 dark:text-amber-200">
-                                    Leave password fields empty to keep the current password unchanged.
-                                </p>
-                            </div>
 
                             {/* Password */}
                             <div>
-                                <Label htmlFor="password">New Password</Label>
+                                <Label htmlFor="password">
+                                    Password <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="password"
                                     type="password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
+                                    required
                                     className="mt-2"
                                 />
                                 {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-                                <p className="mt-1 text-sm text-muted-foreground">Minimum 8 characters (leave empty to keep current password)</p>
+                                <p className="mt-1 text-sm text-muted-foreground">Minimum 8 characters</p>
                             </div>
 
                             {/* Password Confirmation */}
                             <div>
-                                <Label htmlFor="password_confirmation">Confirm New Password</Label>
+                                <Label htmlFor="password_confirmation">
+                                    Confirm Password <span className="text-red-500">*</span>
+                                </Label>
                                 <Input
                                     id="password_confirmation"
                                     type="password"
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    required
                                     className="mt-2"
                                 />
                             </div>
                         </div>
 
-                        {/* Scientific Field */}
+                        {/* University Assignment */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
-                                Scientific Field
+                                University Assignment
                             </h3>
 
+                            {/* University */}
                             <div>
-                                <Label htmlFor="scientific_field_id">Bidang Ilmu</Label>
+                                <Label htmlFor="university_id">
+                                    University <span className="text-red-500">*</span>
+                                </Label>
+                                <Select value={data.university_id.toString()} onValueChange={(value) => setData('university_id', value)}>
+                                    <SelectTrigger className="mt-2">
+                                        <SelectValue placeholder="Select University" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {universities.map((uni) => (
+                                            <SelectItem key={uni.id} value={uni.id.toString()}>
+                                                {uni.code} - {uni.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.university_id && <p className="mt-1 text-sm text-red-600">{errors.university_id}</p>}
+                                <p className="mt-1 text-sm text-muted-foreground">This user will manage journals for this university</p>
+                            </div>
+
+                            {/* Scientific Field */}
+                            <div>
+                                <Label htmlFor="scientific_field_id">Scientific Field</Label>
                                 <Select
                                     value={data.scientific_field_id || undefined}
                                     onValueChange={(value) => setData('scientific_field_id', value || '')}
@@ -289,19 +302,19 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
                                 roles={roles}
                                 selectedRoleIds={data.role_ids}
                                 onChange={(roleIds) => setData('role_ids', roleIds)}
+                                label="Assign Roles"
                                 error={errors.role_ids}
-                                label="User Roles"
                                 required
                             />
                             <p className="text-sm text-muted-foreground">
-                                Select one or more roles for this user. The first selected role will be the primary role.
+                                Users can have multiple roles. For example, a user can be both a Pengelola Jurnal and a Reviewer.
                             </p>
                         </div>
 
                         {/* Status */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
-                                Status
+                                Account Status
                             </h3>
 
                             <div className="flex items-center space-x-2">
@@ -310,23 +323,23 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
                                     type="checkbox"
                                     checked={data.is_active}
                                     onChange={(e) => setData('is_active', e.target.checked)}
-                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                                 />
                                 <Label htmlFor="is_active" className="cursor-pointer">
-                                    Active (User can login and manage journals)
+                                    Active (User can login and access the system)
                                 </Label>
                             </div>
                         </div>
 
                         {/* Actions */}
                         <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
-                            <Link href={route('admin-kampus.users.index')}>
+                            <Link href={route('admin.users.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel
                                 </Button>
                             </Link>
                             <Button type="submit" disabled={processing}>
-                                {processing ? 'Updating...' : 'Update User'}
+                                {processing ? 'Creating...' : 'Create User'}
                             </Button>
                         </div>
                     </form>

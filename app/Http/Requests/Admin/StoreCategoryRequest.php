@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\AccreditationTemplate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class StoreCategoryRequest extends FormRequest
 {
@@ -27,6 +29,30 @@ class StoreCategoryRequest extends FormRequest
             'weight' => ['required', 'numeric', 'min:0', 'max:100'],
             'display_order' => ['nullable', 'integer', 'min:1'],
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($validator->errors()->isEmpty() && $this->filled('template_id') && $this->filled('weight')) {
+                $template = AccreditationTemplate::find($this->template_id);
+                
+                if ($template) {
+                    $currentTotalWeight = $template->getTotalWeight();
+                    $newWeight = (float) $this->weight;
+                    
+                    if (($currentTotalWeight + $newWeight) > 100) {
+                        $validator->errors()->add(
+                            'weight',
+                            "Total bobot kategori akan melebihi 100% (saat ini: {$currentTotalWeight}%). Maksimal bobot yang dapat ditambahkan: " . (100 - $currentTotalWeight) . '%'
+                        );
+                    }
+                }
+            }
+        });
     }
 
     public function attributes(): array

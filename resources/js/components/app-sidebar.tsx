@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { ROLE_NAMES } from '@/constants/roles';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Award, BookOpen, BookType, Box, ClipboardList, FileText, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
+import { Award, BookOpen, BookType, Box, Building2, ClipboardList, FileText, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Common navigation items shared across all roles
@@ -51,14 +51,24 @@ export function AppSidebar() {
                 title: 'Borang Indikator',
                 href: route('admin.borang-indikator.index'),
                 icon: ClipboardList,
+                items: [
+                    { title: 'Templates', href: route('admin.templates.index') },
+                    { title: 'List View', href: route('admin.borang-indikator.list') },
+                ]
+            },
+            {
+                title: 'Universities',
+                href: route('admin.universities.index'),
+                icon: Building2,
             },
             {
                 title: 'User Management',
                 href: '#',
                 icon: Users,
                 items: [
-                    { title: 'Universities', href: route('admin.universities.index') },
                     { title: 'Admin Kampus', href: route('admin.admin-kampus.index') },
+                    { title: 'Pengelola Jurnal', href: route('admin.users.index') },
+                    { title: 'Reviewer', href: route('admin.reviewers.index') },
                 ],
             },
             {
