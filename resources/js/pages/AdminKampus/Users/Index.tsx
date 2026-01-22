@@ -2,12 +2,15 @@
  * UsersIndex Component for Admin Kampus
  *
  * @description
- * A comprehensive list view page for managing users (Pengelola Jurnal) within the admin's university.
+ * A comprehensive list view page for managing users within the admin's university.
  * This component provides filtering, searching, pagination, and CRUD operations for user accounts.
+ * Supports multi-role display and filtering.
  *
  * @features
  * - Search by name or email
+ * - Filter by role
  * - Filter by active/inactive status
+ * - Display user roles as badges
  * - Paginated results with navigation
  * - View, Edit, Delete user actions
  * - Toggle active status
@@ -46,6 +49,11 @@ interface User {
     position: string | null;
     avatar_url: string | null;
     is_active: boolean;
+    roles: Array<{
+        id: number;
+        name: string;
+        display_name: string;
+    }>;
     journals_count: number;
     last_login_at: string | null;
     created_at: string;
@@ -55,6 +63,12 @@ interface University {
     id: number;
     name: string;
     short_name: string;
+}
+
+interface Role {
+    id: number;
+    name: string;
+    display_name: string;
 }
 
 interface Props {
@@ -71,20 +85,27 @@ interface Props {
         }>;
     };
     university: University;
+    roles: Role[];
     filters: {
         search: string;
         is_active: string;
+        role_id: string;
     };
 }
 
-export default function UsersIndex({ users, university, filters }: Props) {
+export default function UsersIndex({ users, university, roles, filters }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
+    const [roleIdFilter, setRoleIdFilter] = useState(filters.role_id || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter }, { preserveState: true });
+        router.get(
+            route('admin-kampus.users.index'),
+            { search, is_active: isActiveFilter, role_id: roleIdFilter },
+            { preserveState: true }
+        );
     };
 
     const handleDelete = (id: number, name: string) => {
@@ -151,6 +172,21 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                 </div>
                             </div>
 
+                            {/* Role Filter */}
+                            <Select value={roleIdFilter || 'all'} onValueChange={(value) => setRoleIdFilter(value === 'all' ? '' : value)}>
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="All Roles" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Roles</SelectItem>
+                                    {roles.map((role) => (
+                                        <SelectItem key={role.id} value={role.id.toString()}>
+                                            {role.display_name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
                             {/* Status Filter */}
                             <Select value={isActiveFilter || 'all'} onValueChange={(value) => setIsActiveFilter(value === 'all' ? '' : value)}>
                                 <SelectTrigger className="w-48">
@@ -164,13 +200,14 @@ export default function UsersIndex({ users, university, filters }: Props) {
                             </Select>
 
                             <Button type="submit">Search</Button>
-                            {(search || isActiveFilter) && (
+                            {(search || isActiveFilter || roleIdFilter) && (
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => {
                                         setSearch('');
                                         setIsActiveFilter('');
+                                        setRoleIdFilter('');
                                         router.get(route('admin-kampus.users.index'));
                                     }}
                                 >
@@ -186,6 +223,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>User</TableHead>
+                                    <TableHead>Roles</TableHead>
                                     <TableHead>Contact</TableHead>
                                     <TableHead className="text-center">Status</TableHead>
                                     <TableHead className="text-center">
@@ -199,7 +237,7 @@ export default function UsersIndex({ users, university, filters }: Props) {
                             <TableBody>
                                 {users.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                                        <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                                             No users found.
                                         </TableCell>
                                     </TableRow>
@@ -221,6 +259,19 @@ export default function UsersIndex({ users, university, filters }: Props) {
                                                         <div className="font-semibold text-foreground">{user.name}</div>
                                                         {user.position && <div className="text-sm text-muted-foreground">{user.position}</div>}
                                                     </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles && user.roles.length > 0 ? (
+                                                        user.roles.map((role) => (
+                                                            <Badge key={role.id} variant="outline" className="text-xs">
+                                                                {role.display_name}
+                                                            </Badge>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-sm text-muted-foreground">No roles</span>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                             <TableCell>

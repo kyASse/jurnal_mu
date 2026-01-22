@@ -325,6 +325,7 @@ export default function UsersIndex({ users, universities, filters }: Props) {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Pengelola Jurnal</TableHead>
+                                    <TableHead>Roles</TableHead>
                                     <TableHead>University</TableHead>
                                     <TableHead>Contact</TableHead>
                                     <TableHead className="text-center">Status</TableHead>
@@ -339,7 +340,7 @@ export default function UsersIndex({ users, universities, filters }: Props) {
                             <TableBody>
                                 {users.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                                        <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
                                             No users found.
                                         </TableCell>
                                     </TableRow>
@@ -372,6 +373,19 @@ export default function UsersIndex({ users, universities, filters }: Props) {
                                                             </div>
                                                         )}
                                                     </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles && user.roles.length > 0 ? (
+                                                        user.roles.map((role) => (
+                                                            <Badge key={role.id} variant="outline" className="text-xs">
+                                                                {role.display_name}
+                                                            </Badge>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-sm text-muted-foreground">No roles</span>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                             <TableCell>

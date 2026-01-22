@@ -23,12 +23,17 @@ class UserController extends Controller
 
         $authUser = $request->user();
 
-        // Base query: Only users with 'User' role from admin's university
+        // Base query: Users from admin's university (excluding Super Admin)
         $query = User::query()
-            ->with(['role', 'university'])
+            ->with(['role', 'roles', 'university'])
             ->forUniversity($authUser->university_id)
-            ->whereHas('role', function ($q) {
-                $q->where('name', 'User');
+            ->where(function ($q) {
+                $q->whereHas('role', function ($query) {
+                    $query->whereNotIn('name', [Role::SUPER_ADMIN]);
+                })
+                ->orWhereHas('roles', function ($query) {
+                    $query->whereNotIn('name', [Role::SUPER_ADMIN]);
+                });
             });
 
         // Apply search filter
@@ -41,28 +46,64 @@ class UserController extends Controller
             $query->where('is_active', $request->boolean('is_active'));
         }
 
+        // Apply role filter
+        if ($request->filled('role_id')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('role_id', $request->role_id)
+                    ->orWhereHas('roles', function ($query) use ($request) {
+                        $query->where('roles.id', $request->role_id);
+                    });
+            });
+        }
+
         // Get users with journal count
         $users = $query
             ->withCount('journals')
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString()
-            ->through(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                'position' => $user->position,
-                'avatar_url' => $user->avatar_url,
-                'is_active' => $user->is_active,
-                'journals_count' => $user->journals_count,
-                'last_login_at' => $user->last_login_at?->format('Y-m-d H:i:s'),
-                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-            ]);
+            ->through(function ($user) {
+                // Get all roles for this user
+                $userRoles = $user->roles->map(fn($role) => [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'display_name' => $role->display_name,
+                ])->toArray();
+
+                // Add primary role if not already in roles array
+                if ($user->role && ! collect($userRoles)->contains('id', $user->role->id)) {
+                    $userRoles[] = [
+                        'id' => $user->role->id,
+                        'name' => $user->role->name,
+                        'display_name' => $user->role->display_name,
+                    ];
+                }
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'position' => $user->position,
+                    'avatar_url' => $user->avatar_url,
+                    'is_active' => $user->is_active,
+                    'roles' => $userRoles,
+                    'journals_count' => $user->journals_count,
+                    'last_login_at' => $user->last_login_at?->format('Y-m-d H:i:s'),
+                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
+
+        // Get assignable roles for filter (not Super Admin)
+        $roles = Role::query()
+            ->whereNotIn('name', [Role::SUPER_ADMIN])
+            ->orderBy('display_name')
+            ->get(['id', 'name', 'display_name']);
 
         return Inertia::render('AdminKampus/Users/Index', [
             'users' => $users,
-            'filters' => $request->only(['search', 'is_active']),
+            'roles' => $roles,
+            'filters' => $request->only(['search', 'is_active', 'role_id']),
             'university' => [
                 'id' => $authUser->university->id,
                 'name' => $authUser->university->name,
@@ -80,12 +121,19 @@ class UserController extends Controller
 
         $authUser = $request->user();
 
+        // Get assignable roles (not Super Admin)
+        $roles = Role::query()
+            ->whereNotIn('name', [Role::SUPER_ADMIN])
+            ->orderBy('display_name')
+            ->get(['id', 'name', 'display_name', 'description']);
+
         return Inertia::render('AdminKampus/Users/Create', [
             'university' => [
                 'id' => $authUser->university->id,
                 'name' => $authUser->university->name,
                 'short_name' => $authUser->university->short_name,
             ],
+            'roles' => $roles,
         ]);
     }
 
@@ -105,31 +153,47 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
+            'role_ids' => 'required|array|min:1',
+            'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'boolean',
         ]);
 
-        // Get 'User' role
-        $userRole = Role::where('name', 'User')->firstOrFail();
-
-        // Verify admin can assign this role
-        if (! $authUser->can('canAssignRole', [User::class, 'User'])) {
-            abort(403, 'You are not authorized to assign this role.');
+        // Verify no Super Admin role in selection
+        $superAdminRole = Role::where('name', Role::SUPER_ADMIN)->first();
+        if ($superAdminRole && in_array($superAdminRole->id, $validated['role_ids'])) {
+            abort(403, 'Admin Kampus cannot assign Super Admin role.');
         }
 
-        // Create new user with auto-assigned university and role
-        User::create([
+        // Get the first role as primary role for backwards compatibility
+        $primaryRoleId = $validated['role_ids'][0];
+
+        // Create new user with auto-assigned university and primary role
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
             'university_id' => $authUser->university_id, // Auto-assign from admin's university
-            'role_id' => $userRole->id, // Auto-assign 'User' role
+            'role_id' => $primaryRoleId,
             'is_active' => $validated['is_active'],
+            'is_reviewer' => false, // Will be updated if Reviewer role is selected
         ]);
 
+        // Attach all selected roles to the user
+        $user->roles()->attach($validated['role_ids'], [
+            'assigned_at' => now(),
+            'assigned_by' => $authUser->id,
+        ]);
+
+        // Update is_reviewer flag if Reviewer role is selected
+        $reviewerRole = Role::where('name', Role::REVIEWER)->first();
+        if ($reviewerRole && in_array($reviewerRole->id, $validated['role_ids'])) {
+            $user->update(['is_reviewer' => true]);
+        }
+
         return redirect()->route('admin-kampus.users.index')
-            ->with('success', 'User created successfully.');
+            ->with('success', 'User created successfully with assigned roles.');
     }
 
     /**
@@ -180,11 +244,25 @@ class UserController extends Controller
      */
     public function edit(Request $request, User $user): Response
     {
-        $user->load('role');
+        $user->load(['role', 'roles']);
         $this->authorize('update', $user);
 
         $authUser = $request->user();
         $this->ensureUserBelongsToUniversityAndIsUser($user, $authUser);
+
+        // Get assignable roles (not Super Admin)
+        $roles = Role::query()
+            ->whereNotIn('name', [Role::SUPER_ADMIN])
+            ->orderBy('display_name')
+            ->get(['id', 'name', 'display_name', 'description']);
+
+        // Get user's current role IDs
+        $userRoleIds = $user->roles->pluck('id')->toArray();
+
+        // If no roles in pivot table but has primary role, add it
+        if (empty($userRoleIds) && $user->role_id) {
+            $userRoleIds = [$user->role_id];
+        }
 
         return Inertia::render('AdminKampus/Users/Edit', [
             'user' => [
@@ -194,12 +272,14 @@ class UserController extends Controller
                 'phone' => $user->phone,
                 'position' => $user->position,
                 'is_active' => $user->is_active,
+                'role_ids' => $userRoleIds,
             ],
             'university' => [
                 'id' => $authUser->university->id,
                 'name' => $authUser->university->name,
                 'short_name' => $authUser->university->short_name,
             ],
+            'roles' => $roles,
         ]);
     }
 
@@ -221,8 +301,16 @@ class UserController extends Controller
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
+            'role_ids' => 'required|array|min:1',
+            'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'boolean',
         ]);
+
+        // Verify no Super Admin role in selection
+        $superAdminRole = Role::where('name', Role::SUPER_ADMIN)->first();
+        if ($superAdminRole && in_array($superAdminRole->id, $validated['role_ids'])) {
+            abort(403, 'Admin Kampus cannot assign Super Admin role.');
+        }
 
         // Prepare data for update
         $data = [
@@ -231,6 +319,7 @@ class UserController extends Controller
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
             'is_active' => $validated['is_active'] ?? $user->is_active,
+            'role_id' => $validated['role_ids'][0], // Update primary role
         ];
 
         // Include password in update if provided
@@ -238,11 +327,25 @@ class UserController extends Controller
             $data['password'] = Hash::make($validated['password']);
         }
 
-        // Update user with all fields in a single query
+        // Update is_reviewer flag based on role selection
+        $reviewerRole = Role::where('name', Role::REVIEWER)->first();
+        $data['is_reviewer'] = $reviewerRole && in_array($reviewerRole->id, $validated['role_ids']);
+
+        // Update user with all fields
         $user->update($data);
 
+        // Sync roles in pivot table
+        $user->roles()->sync(
+            collect($validated['role_ids'])->mapWithKeys(fn ($roleId) => [
+                $roleId => [
+                    'assigned_at' => now(),
+                    'assigned_by' => $authUser->id,
+                ]
+            ])->toArray()
+        );
+
         return redirect()->route('admin-kampus.users.index')
-            ->with('success', 'User updated successfully.');
+            ->with('success', 'User updated successfully with assigned roles.');
     }
 
     /**
@@ -290,13 +393,13 @@ class UserController extends Controller
     }
 
     /**
-     * Ensure the user belongs to the admin's university and has 'User' role.
+     * Ensure the user belongs to the admin's university and is not Super Admin.
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     private function ensureUserBelongsToUniversityAndIsUser(User $user, User $authUser): void
     {
-        // Load role for isUser() check if not already loaded
+        // Load role for isSuperAdmin() check if not already loaded
         if (! $user->relationLoaded('role')) {
             $user->load('role');
         }
@@ -306,8 +409,8 @@ class UserController extends Controller
             abort(404, 'User not found.');
         }
 
-        // Verify it's a 'User' role
-        if (! $user->isUser()) {
+        // Verify it's not a Super Admin
+        if ($user->isSuperAdmin()) {
             abort(404, 'User not found.');
         }
     }

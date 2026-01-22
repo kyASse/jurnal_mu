@@ -2,11 +2,13 @@
  * UsersEdit Component for Admin Kampus
  *
  * @description
- * A form page for editing existing user (Pengelola Jurnal) accounts within the admin's university.
+ * A form page for editing existing user accounts within the admin's university.
  * Password fields are optional - leave empty to keep the existing password.
+ * Multiple roles can be assigned.
  *
  * @features
  * - Pre-filled personal information fields
+ * - Multi-role selection (not Super Admin)
  * - Optional password update
  * - Status toggle
  * - Form validation with error display
@@ -18,10 +20,12 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import MultiRoleSelect from '@/components/multi-role-select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { AlertCircle, ArrowLeft, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface User {
     id: number;
@@ -30,6 +34,7 @@ interface User {
     phone: string | null;
     position: string | null;
     is_active: boolean;
+    role_ids: number[];
 }
 
 interface University {
@@ -38,12 +43,20 @@ interface University {
     short_name: string;
 }
 
+interface Role {
+    id: number;
+    name: string;
+    display_name: string;
+    description: string;
+}
+
 interface Props {
     user: User;
     university: University;
+    roles: Role[];
 }
 
-export default function UsersEdit({ user, university }: Props) {
+export default function UsersEdit({ user, university, roles }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -70,12 +83,20 @@ export default function UsersEdit({ user, university }: Props) {
         password_confirmation: '',
         phone: user.phone || '',
         position: user.position || '',
+        role_ids: user.role_ids || [],
         is_active: user.is_active,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin-kampus.users.update', user.id));
+        put(route('admin-kampus.users.update', user.id), {
+            onSuccess: () => {
+                toast.success('User updated successfully');
+            },
+            onError: () => {
+                toast.error('Failed to update user. Please check the form.');
+            },
+        });
     };
 
     return (
@@ -214,6 +235,25 @@ export default function UsersEdit({ user, university }: Props) {
                                     className="mt-2"
                                 />
                             </div>
+                        </div>
+
+                        {/* Role Assignment */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                Role Assignment
+                            </h3>
+
+                            <MultiRoleSelect
+                                roles={roles}
+                                selectedRoleIds={data.role_ids}
+                                onChange={(roleIds) => setData('role_ids', roleIds)}
+                                error={errors.role_ids}
+                                label="User Roles"
+                                required
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                Select one or more roles for this user. The first selected role will be the primary role.
+                            </p>
                         </div>
 
                         {/* Status */}

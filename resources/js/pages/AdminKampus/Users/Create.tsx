@@ -2,12 +2,13 @@
  * UsersCreate Component for Admin Kampus
  *
  * @description
- * A form page for creating new user (Pengelola Jurnal) accounts within the admin's university.
- * University is auto-assigned from admin's profile, Role is auto-assigned to 'User'.
+ * A form page for creating new user accounts within the admin's university.
+ * University is auto-assigned from admin's profile. Multiple roles can be assigned.
  *
  * @features
  * - Personal information fields (name, email, phone, position)
  * - Password with confirmation
+ * - Multi-role selection (not Super Admin)
  * - Status toggle
  * - Form validation with error display
  * - University displayed as read-only info
@@ -18,10 +19,12 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import MultiRoleSelect from '@/components/multi-role-select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,11 +47,19 @@ interface University {
     short_name: string;
 }
 
-interface Props {
-    university: University;
+interface Role {
+    id: number;
+    name: string;
+    display_name: string;
+    description: string;
 }
 
-export default function UsersCreate({ university }: Props) {
+interface Props {
+    university: University;
+    roles: Role[];
+}
+
+export default function UsersCreate({ university, roles }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
@@ -56,12 +67,20 @@ export default function UsersCreate({ university }: Props) {
         password_confirmation: '',
         phone: '',
         position: '',
+        role_ids: [] as number[],
         is_active: true as boolean,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('admin-kampus.users.store'));
+        post(route('admin-kampus.users.store'), {
+            onSuccess: () => {
+                toast.success('User created successfully');
+            },
+            onError: () => {
+                toast.error('Failed to create user. Please check the form.');
+            },
+        });
     };
 
     return (
@@ -91,7 +110,7 @@ export default function UsersCreate({ university }: Props) {
                             </span>
                         </div>
                         <p className="mt-1 text-sm text-blue-600 dark:text-blue-300">
-                            This user will be automatically assigned to your university with 'User' role.
+                            This user will be automatically assigned to your university.
                         </p>
                     </div>
 
@@ -201,6 +220,25 @@ export default function UsersCreate({ university }: Props) {
                                     className="mt-2"
                                 />
                             </div>
+                        </div>
+
+                        {/* Role Assignment */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                Role Assignment
+                            </h3>
+
+                            <MultiRoleSelect
+                                roles={roles}
+                                selectedRoleIds={data.role_ids}
+                                onChange={(roleIds) => setData('role_ids', roleIds)}
+                                error={errors.role_ids}
+                                label="User Roles"
+                                required
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                Select one or more roles for this user. The first selected role will be the primary role.
+                            </p>
                         </div>
 
                         {/* Status */}
