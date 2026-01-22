@@ -112,6 +112,10 @@ Route::middleware(['auth'])->group(function () {
         |--------------------------------------------------------------------------
         */
 
+        // Borang Indikator List View (Hierarchical)
+        Route::get('borang-indikator/list', [AccreditationTemplateController::class, 'listView'])
+            ->name('borang-indikator.list');
+
         // Accreditation Templates Management
         Route::resource('templates', AccreditationTemplateController::class);
         Route::post('templates/{template}/clone', [AccreditationTemplateController::class, 'clone'])
