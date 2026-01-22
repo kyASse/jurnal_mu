@@ -54,8 +54,6 @@ export function AppSidebar() {
                 items: [
                     { title: 'Templates', href: route('admin.templates.index') },
                     { title: 'List View', href: route('admin.borang-indikator.list') },
-                    { title: 'Categories', href: route('admin.categories.index') },
-                    { title: 'Sub Categories', href: route('admin.sub-categories.index') },
                 ]
             },
             {
