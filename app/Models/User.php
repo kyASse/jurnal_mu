@@ -28,6 +28,7 @@ class User extends Authenticatable
         'role_id',
         'university_id',
         'is_active',
+        'is_reviewer',
         'last_login_at',
         'email_verified_at',
     ];
@@ -53,6 +54,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'is_active' => 'boolean',
+            'is_reviewer' => 'boolean',
             'password' => 'hashed',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
