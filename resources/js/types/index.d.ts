@@ -39,6 +39,7 @@ export interface SharedData {
 export interface Role {
     id: number;
     name: string;
+    display_name: string;
     description: string;
 }
 
@@ -48,9 +49,36 @@ export interface User {
     email: string;
     email_verified_at?: string;
     role: Role;
+    roles?: Role[]; // Multi-role support
     university_id?: number;
     avatar_url?: string;
     avatar?: string;
+    is_reviewer?: boolean;
+}
+
+export interface University {
+    id: number;
+    code: string;
+    ptm_code?: string;
+    name: string;
+    short_name?: string;
+    address?: string;
+    city?: string;
+    province?: string;
+    postal_code?: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+    logo_url?: string;
+    accreditation_status?: string;
+    cluster?: string;
+    profile_description?: string;
+    is_active: boolean;
+    users_count?: number;
+    journals_count?: number;
+    full_address?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {

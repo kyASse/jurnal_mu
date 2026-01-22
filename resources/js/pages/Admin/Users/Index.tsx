@@ -1,24 +1,95 @@
 /**
- * UsersIndex Component for Admin Kampus
+ * UsersIndex Component
  *
  * @description
- * A comprehensive list view page for managing users within the admin's university.
- * This component provides filtering, searching, pagination, and CRUD operations for user accounts.
- * Supports multi-role display and filtering.
+ * A comprehensive list view page for managing Pengelola Jurnal (Journal Managers) across all PTM universities.
+ * Super Admin can view, filter, and manage all User role accounts system-wide.
+ * This component provides filtering, searching, pagination, and CRUD operations for User accounts.
+ *
+ * @component
+ *
+ * @interface User
+ * @property {number} id - Unique identifier for the user
+ * @property {string} name - Full name of the user
+ * @property {string} email - Email address
+ * @property {string} phone - Phone number
+ * @property {string|null} avatar_url - URL to the profile avatar image (optional)
+ * @property {boolean} is_active - Account active status
+ * @property {boolean} is_reviewer - Reviewer status flag (v1.1 feature)
+ * @property {Object|null} university - Associated university information
+ * @property {number} university.id - University unique identifier
+ * @property {string} university.name - Full university name
+ * @property {string} university.short_name - Abbreviated university name
+ * @property {string} university.code - University code
+ * @property {number} journals_count - Number of journals managed by this user
+ * @property {string} last_login_at - Timestamp of last login
+ * @property {string} created_at - Account creation timestamp
+ *
+ * @interface University
+ * @property {number} id - Unique identifier for the university
+ * @property {string} name - Full name of the university
+ * @property {string} short_name - Abbreviated name
+ * @property {string} code - University code
+ *
+ * @interface Props
+ * @property {Object} users - Paginated users data
+ * @property {User[]} users.data - Array of user records
+ * @property {number} users.current_page - Current page number
+ * @property {number} users.last_page - Total number of pages
+ * @property {number} users.per_page - Records per page
+ * @property {number} users.total - Total number of records
+ * @property {Array} users.links - Pagination links
+ * @property {University[]} universities - Array of all universities for filtering
+ * @property {Object} filters - Current filter values
+ * @property {string} filters.search - Search query (name or email)
+ * @property {string} filters.university_id - University filter ID
+ * @property {string} filters.is_active - Active status filter
+ * @property {string} filters.is_reviewer - Reviewer status filter
+ *
+ * @param {Props} props - Component props
+ *
+ * @returns The rendered users list page
  *
  * @features
  * - Search by name or email
- * - Filter by role
+ * - Filter by university assignment
  * - Filter by active/inactive status
- * - Display user roles as badges
+ * - Filter by reviewer status
  * - Paginated results with navigation
- * - View, Edit, Delete user actions
- * - Toggle active status
+ * - View user details
+ * - Edit user information
+ * - Delete user (with confirmation)
  * - Add new user button
  * - Flash messages for success/error feedback
+ * - Responsive table layout
+ * - Dark mode support
+ * - Clear filters functionality
+ * - Reviewer badge indicator
  *
- * @route GET /admin-kampus/users
+ * @route GET /admin/users
+ *
+ * @requires @inertiajs/react
+ * @requires @/components/ui/button
+ * @requires @/components/ui/input
+ * @requires @/components/ui/table
+ * @requires @/components/ui/badge
+ * @requires @/components/ui/select
+ * @requires @/layouts/app-layout
+ * @requires lucide-react
+ *
+ * @author JurnalMU Team
+ * @filepath /resources/js/pages/Admin/Users/Index.tsx
  */
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,8 +98,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, Users as UsersIcon } from 'lucide-react';
-import { useState } from 'react';
+import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, UserCheck, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,7 +109,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'User Management',
-        href: '/admin-kampus/users',
+        href: '#',
+    },
+    {
+        title: 'Pengelola Jurnal',
+        href: '/admin/users',
     },
 ];
 
@@ -45,17 +121,23 @@ interface User {
     id: number;
     name: string;
     email: string;
-    phone: string | null;
-    position: string | null;
+    phone: string;
     avatar_url: string | null;
     is_active: boolean;
+    is_reviewer: boolean;
     roles: Array<{
         id: number;
         name: string;
         display_name: string;
     }>;
+    university: {
+        id: number;
+        name: string;
+        short_name: string;
+        code: string;
+    } | null;
     journals_count: number;
-    last_login_at: string | null;
+    last_login_at: string;
     created_at: string;
 }
 
@@ -63,12 +145,7 @@ interface University {
     id: number;
     name: string;
     short_name: string;
-}
-
-interface Role {
-    id: number;
-    name: string;
-    display_name: string;
+    code: string;
 }
 
 interface Props {
@@ -84,43 +161,67 @@ interface Props {
             active: boolean;
         }>;
     };
-    university: University;
-    roles: Role[];
+    universities: University[];
     filters: {
         search: string;
+        university_id: string;
         is_active: string;
-        role_id: string;
+        is_reviewer: string;
     };
 }
 
-export default function UsersIndex({ users, university, roles, filters }: Props) {
+export default function UsersIndex({ users, universities, filters }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
+    const [universityId, setUniversityId] = useState(filters.university_id || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
-    const [roleIdFilter, setRoleIdFilter] = useState(filters.role_id || '');
+    const [isReviewerFilter, setIsReviewerFilter] = useState(filters.is_reviewer || '');
+    const [deleteDialog, setDeleteDialog] = useState<{
+        open: boolean;
+        userId?: number;
+        userName?: string;
+    }>({ open: false });
+
+    // Show toast notifications from flash messages
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(
-            route('admin-kampus.users.index'),
-            { search, is_active: isActiveFilter, role_id: roleIdFilter },
+            route('admin.users.index'),
+            { search, university_id: universityId, is_active: isActiveFilter, is_reviewer: isReviewerFilter },
             { preserveState: true }
         );
     };
 
-    const handleDelete = (id: number, name: string) => {
-        if (confirm(`Apakah Anda yakin ingin menghapus ${name}?`)) {
-            router.delete(route('admin-kampus.users.destroy', id));
-        }
+    const openDeleteDialog = (id: number, name: string) => {
+        setDeleteDialog({ open: true, userId: id, userName: name });
     };
 
-    const handleToggleActive = (id: number) => {
-        router.post(route('admin-kampus.users.toggle-active', id));
+    const confirmDelete = () => {
+        if (deleteDialog.userId) {
+            router.delete(route('admin.users.destroy', deleteDialog.userId), {
+                onSuccess: () => {
+                    toast.success('Pengelola Jurnal deleted successfully');
+                    setDeleteDialog({ open: false });
+                },
+                onError: () => {
+                    toast.error('Failed to delete Pengelola Jurnal');
+                },
+            });
+        }
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="User Management" />
+            <Head title="Pengelola Jurnal Management" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
@@ -129,31 +230,19 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
-                                    <UsersIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                                    User Management
+                                    <UserCheck className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                                    Pengelola Jurnal Management
                                 </h1>
-                                <p className="mt-1 text-muted-foreground">Manage users (Pengelola Jurnal) for {university.name}</p>
+                                <p className="mt-1 text-muted-foreground">Manage journal managers across all PTM universities</p>
                             </div>
-                            <Link href={route('admin-kampus.users.create')}>
+                            <Link href={route('admin.users.create')}>
                                 <Button className="flex items-center gap-2">
                                     <Plus className="h-4 w-4" />
-                                    Add User
+                                    Add Pengelola Jurnal
                                 </Button>
                             </Link>
                         </div>
                     </div>
-
-                    {/* Flash Messages */}
-                    {flash?.success && (
-                        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash?.error && (
-                        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
-                            {flash.error}
-                        </div>
-                    )}
 
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
@@ -172,16 +261,16 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                 </div>
                             </div>
 
-                            {/* Role Filter */}
-                            <Select value={roleIdFilter || 'all'} onValueChange={(value) => setRoleIdFilter(value === 'all' ? '' : value)}>
-                                <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="All Roles" />
+                            {/* University Filter */}
+                            <Select value={universityId || 'all'} onValueChange={(value) => setUniversityId(value === 'all' ? '' : value)}>
+                                <SelectTrigger className="w-64">
+                                    <SelectValue placeholder="All Universities" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Roles</SelectItem>
-                                    {roles.map((role) => (
-                                        <SelectItem key={role.id} value={role.id.toString()}>
-                                            {role.display_name}
+                                    <SelectItem value="all">All Universities</SelectItem>
+                                    {universities.map((uni) => (
+                                        <SelectItem key={uni.id} value={uni.id.toString()}>
+                                            {uni.code} - {uni.short_name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -189,7 +278,7 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
 
                             {/* Status Filter */}
                             <Select value={isActiveFilter || 'all'} onValueChange={(value) => setIsActiveFilter(value === 'all' ? '' : value)}>
-                                <SelectTrigger className="w-48">
+                                <SelectTrigger className="w-40">
                                     <SelectValue placeholder="All Status" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -199,16 +288,29 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                 </SelectContent>
                             </Select>
 
+                            {/* Reviewer Filter */}
+                            <Select value={isReviewerFilter || 'all'} onValueChange={(value) => setIsReviewerFilter(value === 'all' ? '' : value)}>
+                                <SelectTrigger className="w-40">
+                                    <SelectValue placeholder="Reviewer" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Users</SelectItem>
+                                    <SelectItem value="1">Reviewer</SelectItem>
+                                    <SelectItem value="0">Non-Reviewer</SelectItem>
+                                </SelectContent>
+                            </Select>
+
                             <Button type="submit">Search</Button>
-                            {(search || isActiveFilter || roleIdFilter) && (
+                            {(search || universityId || isActiveFilter || isReviewerFilter) && (
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => {
                                         setSearch('');
+                                        setUniversityId('');
                                         setIsActiveFilter('');
-                                        setRoleIdFilter('');
-                                        router.get(route('admin-kampus.users.index'));
+                                        setIsReviewerFilter('');
+                                        router.get(route('admin.users.index'));
                                     }}
                                 >
                                     Clear
@@ -222,8 +324,9 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>User</TableHead>
+                                    <TableHead>Pengelola Jurnal</TableHead>
                                     <TableHead>Roles</TableHead>
+                                    <TableHead>University</TableHead>
                                     <TableHead>Contact</TableHead>
                                     <TableHead className="text-center">Status</TableHead>
                                     <TableHead className="text-center">
@@ -237,7 +340,7 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                             <TableBody>
                                 {users.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                                        <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
                                             No users found.
                                         </TableCell>
                                     </TableRow>
@@ -257,7 +360,18 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                                     )}
                                                     <div>
                                                         <div className="font-semibold text-foreground">{user.name}</div>
-                                                        {user.position && <div className="text-sm text-muted-foreground">{user.position}</div>}
+                                                        {user.roles && user.roles.length > 0 && (
+                                                            <div className="mt-1 flex flex-wrap gap-1">
+                                                                {user.roles.map((role) => (
+                                                                    <Badge 
+                                                                        key={role.id}
+                                                                        className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                                                                    >
+                                                                        {role.display_name}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -273,6 +387,16 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                                         <span className="text-sm text-muted-foreground">No roles</span>
                                                     )}
                                                 </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {user.university ? (
+                                                    <div>
+                                                        <div className="font-medium text-foreground">{user.university.code}</div>
+                                                        <div className="text-sm text-muted-foreground">{user.university.short_name}</div>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-sm">
@@ -297,39 +421,17 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Link href={route('admin-kampus.users.show', user.id)}>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            title="View Details"
-                                                            aria-label={`View details for ${user.name}`}
-                                                        >
+                                                    <Link href={route('admin.users.show', user.id)}>
+                                                        <Button variant="ghost" size="sm">
                                                             <Eye className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
-                                                    <Link href={route('admin-kampus.users.edit', user.id)}>
-                                                        <Button variant="ghost" size="sm" title="Edit User" aria-label={`Edit ${user.name}`}>
+                                                    <Link href={route('admin.users.edit', user.id)}>
+                                                        <Button variant="ghost" size="sm">
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleToggleActive(user.id)}
-                                                        title={user.is_active ? 'Deactivate' : 'Activate'}
-                                                        aria-label={user.is_active ? `Deactivate ${user.name}` : `Activate ${user.name}`}
-                                                    >
-                                                        <Power
-                                                            className={`h-4 w-4 ${user.is_active ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`}
-                                                        />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(user.id, user.name)}
-                                                        title="Delete User"
-                                                        aria-label={`Delete ${user.name}`}
-                                                    >
+                                                    <Button variant="ghost" size="sm" onClick={() => openDeleteDialog(user.id, user.name)}>
                                                         <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                                                     </Button>
                                                 </div>
@@ -363,7 +465,7 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                                         ) : isLast ? (
                                                             <ChevronRight className="h-4 w-4" />
                                                         ) : (
-                                                            <span>{link.label}</span>
+                                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
                                                         )}
                                                     </Button>
                                                 </Link>
@@ -376,6 +478,25 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Pengelola Jurnal</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete <strong>{deleteDialog.userName}</strong>? This action cannot be undone and all
+                            associated data will be permanently removed.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }
