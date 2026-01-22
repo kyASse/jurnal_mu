@@ -169,6 +169,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin-kampus/{admin_kampus}/toggle-active', [AdminKampusController::class, 'toggleActive'])
             ->name('admin-kampus.toggle-active');
 
+        // Users (Pengelola Jurnal) Management
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+        Route::post('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
+            ->name('users.toggle-active');
+
+        // Reviewer Management (v1.1 - Placeholder)
+        Route::get('reviewers', [\App\Http\Controllers\Admin\ReviewerController::class, 'index'])
+            ->name('reviewers.index');
+
         // View all journals (read-only for monitoring)
         Route::get('journals', [\App\Http\Controllers\Admin\JournalController::class, 'index'])
             ->name('journals.index');
