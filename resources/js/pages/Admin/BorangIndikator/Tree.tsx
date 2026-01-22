@@ -21,7 +21,7 @@ import { DndContext, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, use
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Head, router } from '@inertiajs/react';
 import { ArrowLeft, Layers3, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface TreeItem {
@@ -33,11 +33,11 @@ interface TreeItem {
 
 interface Props {
     template: AccreditationTemplate;
-    structuredTree: CategoryNode[];
+    structuredTree: TreeItem[];
 }
 
 export default function TemplateTree({ template, structuredTree }: Props) {
-    const [treeData, setTreeData] = useState<CategoryNode[]>(structuredTree);
+    const [treeData, setTreeData] = useState<TreeItem[]>(structuredTree);
     const [counts, setCounts] = useState({
         categoryCount: 0,
         subCategoryCount: 0,
@@ -76,6 +76,24 @@ export default function TemplateTree({ template, structuredTree }: Props) {
     const isIndicator = (data: TreeItem['data']): data is EvaluationIndicator => 'answer_type' in data;
     const isEssayQuestion = (data: TreeItem['data']): data is EssayQuestion => 'question' in data && 'guidance' in data;
 
+    const updateCounts = useCallback((data: TreeItem[]) => {
+        let categoryCount = 0;
+        let subCategoryCount = 0;
+        let indicatorCount = 0;
+
+        data.forEach((cat) => {
+            categoryCount++;
+            cat.children?.forEach((child) => {
+                if (child.type === 'sub_category') {
+                    subCategoryCount++;
+                    indicatorCount += child.children?.filter((c) => c.type === 'indicator').length || 0;
+                }
+            });
+        });
+
+        setCounts({ categoryCount, subCategoryCount, indicatorCount });
+    }, []);
+
     useEffect(() => {
         setTreeData(structuredTree);
         updateCounts(structuredTree);
@@ -105,12 +123,12 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         const type = activeId.startsWith('category-')
             ? 'category'
             : activeId.startsWith('sub-')
-              ? 'sub'
-              : activeId.startsWith('indicator-')
-                ? 'indicator'
-                : activeId.startsWith('essay-')
-                  ? 'essay'
-                  : '';
+                ? 'sub'
+                : activeId.startsWith('indicator-')
+                    ? 'indicator'
+                    : activeId.startsWith('essay-')
+                        ? 'essay'
+                        : '';
 
         // Optimistic Update & API Call
         let newTree = [...treeData];
@@ -130,16 +148,16 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         } else if (type === 'sub') {
             // Find parent category of the sub-category
             for (const cat of newTree) {
-                const subs = cat.children?.filter((c) => c.type === 'sub_category') || [];
-                const oldIndex = subs.findIndex((i) => i.id === active.id);
-                const newIndex = subs.findIndex((i) => i.id === over.id);
+                const subs = cat.children?.filter((c: TreeItem) => c.type === 'sub_category') || [];
+                const oldIndex = subs.findIndex((i: TreeItem) => i.id === active.id);
+                const newIndex = subs.findIndex((i: TreeItem) => i.id === over.id);
 
                 if (oldIndex !== -1 && newIndex !== -1) {
                     const newSubs = arrayMove(subs, oldIndex, newIndex);
                     // Replace subs in children (keeping essays)
-                    const essays = cat.children?.filter((c) => c.type === 'essay') || [];
+                    const essays = cat.children?.filter((c: TreeItem) => c.type === 'essay') || [];
                     cat.children = [...newSubs, ...essays]; // Rebuild children using only sub_category and essay items; additional child types under a category (if introduced) are not handled here.
-                    itemsToReorder = newSubs.map((i) => i.data.id);
+                    itemsToReorder = newSubs.map((i: TreeItem) => i.data.id);
                     routeName = 'admin.sub-categories.reorder';
                     moved = true;
                     break;
@@ -148,15 +166,15 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         } else if (type === 'essay') {
             // Find parent category
             for (const cat of newTree) {
-                const essays = cat.children?.filter((c) => c.type === 'essay') || [];
-                const oldIndex = essays.findIndex((i) => i.id === active.id);
-                const newIndex = essays.findIndex((i) => i.id === over.id);
+                const essays = cat.children?.filter((c: TreeItem) => c.type === 'essay') || [];
+                const oldIndex = essays.findIndex((i: TreeItem) => i.id === active.id);
+                const newIndex = essays.findIndex((i: TreeItem) => i.id === over.id);
 
                 if (oldIndex !== -1 && newIndex !== -1) {
                     const newEssays = arrayMove(essays, oldIndex, newIndex);
-                    const subs = cat.children?.filter((c) => c.type === 'sub_category') || [];
+                    const subs = cat.children?.filter((c: TreeItem) => c.type === 'sub_category') || [];
                     cat.children = [...subs, ...newEssays];
-                    itemsToReorder = newEssays.map((i) => i.data.id);
+                    itemsToReorder = newEssays.map((i: TreeItem) => i.data.id);
                     routeName = 'admin.essays.reorder';
                     moved = true;
                     break;
@@ -165,16 +183,16 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         } else if (type === 'indicator') {
             // Deep search for sub-category
             for (const cat of newTree) {
-                const subs = cat.children?.filter((c) => c.type === 'sub_category') || [];
+                const subs = cat.children?.filter((c: TreeItem) => c.type === 'sub_category') || [];
                 for (const sub of subs) {
                     const indicators = sub.children || [];
-                    const oldIndex = indicators.findIndex((i) => i.id === active.id);
-                    const newIndex = indicators.findIndex((i) => i.id === over.id);
+                    const oldIndex = indicators.findIndex((i: TreeItem) => i.id === active.id);
+                    const newIndex = indicators.findIndex((i: TreeItem) => i.id === over.id);
 
                     if (oldIndex !== -1 && newIndex !== -1) {
                         const newInds = arrayMove(indicators, oldIndex, newIndex);
                         sub.children = newInds;
-                        itemsToReorder = newInds.map((i) => i.data.id);
+                        itemsToReorder = newInds.map((i: TreeItem) => i.data.id);
                         routeName = 'admin.indicators.reorder';
                         moved = true;
                         break;
@@ -223,24 +241,6 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                 toast.error('Failed to delete item');
             },
         });
-    };
-
-    const updateCounts = (data: TreeItem[]) => {
-        let categoryCount = 0;
-        let subCategoryCount = 0;
-        let indicatorCount = 0;
-
-        data.forEach((cat) => {
-            categoryCount++;
-            cat.children?.forEach((child) => {
-                if (child.type === 'sub_category') {
-                    subCategoryCount++;
-                    indicatorCount += child.children?.filter((c) => c.type === 'indicator').length || 0;
-                }
-            });
-        });
-
-        setCounts({ categoryCount, subCategoryCount, indicatorCount });
     };
 
     const breadcrumbs = [
@@ -309,8 +309,8 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                             const catData = isCategory(categoryNode.data) ? categoryNode.data : null;
                             if (!catData) return null;
 
-                            const subCategories = categoryNode.children?.filter((x) => x.type === 'sub_category') || [];
-                            const essayQuestions = categoryNode.children?.filter((x) => x.type === 'essay') || [];
+                            const subCategories = categoryNode.children?.filter((x: TreeItem) => x.type === 'sub_category') || [];
+                            const essayQuestions = categoryNode.children?.filter((x: TreeItem) => x.type === 'essay') || [];
 
                             return (
                                 <SortableItem key={categoryNode.id} id={categoryNode.id} className="flex flex-row items-start">
@@ -324,7 +324,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                                         <div className="ml-1 border-l-2 border-dashed border-gray-200 pl-4">
                                             {/* Sub Categories Context */}
                                             <SortableContext items={getItemsIds(subCategories)} strategy={verticalListSortingStrategy}>
-                                                {subCategories.map((subNode) => {
+                                                {subCategories.map((subNode: TreeItem) => {
                                                     const subData = isSubCategory(subNode.data) ? subNode.data : null;
                                                     if (!subData) return null;
                                                     return (
@@ -343,7 +343,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                                                                     strategy={verticalListSortingStrategy}
                                                                 >
                                                                     <div className="grid gap-2">
-                                                                        {subNode.children?.map((indNode) => {
+                                                                        {subNode.children?.map((indNode: TreeItem) => {
                                                                             const indData = isIndicator(indNode.data) ? indNode.data : null;
                                                                             if (!indData) return null;
                                                                             return (
@@ -389,7 +389,7 @@ export default function TemplateTree({ template, structuredTree }: Props) {
                                                 {essayQuestions.length > 0 && (
                                                     <div className="mt-4 mb-2 text-sm font-semibold text-blue-800">Essay Questions</div>
                                                 )}
-                                                {essayQuestions.map((essayNode) => {
+                                                {essayQuestions.map((essayNode: TreeItem) => {
                                                     const essayData = isEssayQuestion(essayNode.data) ? essayNode.data : null;
                                                     if (!essayData) return null;
                                                     return (
