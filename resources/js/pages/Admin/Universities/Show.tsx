@@ -51,16 +51,30 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/Universities/Show.tsx
  */
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, BookOpen, Calendar, Edit, Globe, Mail, MapPin, Phone, Trash2, Users } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface University {
     id: number;
     code: string;
+    ptm_code?: string;
     name: string;
     short_name: string;
     address: string;
@@ -71,6 +85,9 @@ interface University {
     email: string;
     website: string;
     logo_url: string;
+    accreditation_status?: string;
+    cluster?: string;
+    profile_description?: string;
     is_active: boolean;
     full_address: string;
     created_at: string;
@@ -103,6 +120,8 @@ interface Props {
 }
 
 export default function UniversitiesShow({ university, users, journals, can }: Props) {
+    const [deleteDialog, setDeleteDialog] = useState(false);
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -119,9 +138,14 @@ export default function UniversitiesShow({ university, users, journals, can }: P
     ];
 
     const handleDelete = () => {
-        if (confirm(`Are you sure you want to delete ${university.name}?`)) {
-            router.delete(route('admin.universities.destroy', university.id));
-        }
+        router.delete(route('admin.universities.destroy', university.id), {
+            onSuccess: () => {
+                toast.success('University deleted successfully');
+            },
+            onError: () => {
+                toast.error('Failed to delete university');
+            },
+        });
     };
 
     return (
@@ -151,10 +175,25 @@ export default function UniversitiesShow({ university, users, journals, can }: P
                                     )}
                                     <div>
                                         <h1 className="text-3xl font-bold text-foreground">{university.name}</h1>
-                                        <div className="mt-2 flex items-center gap-3">
+                                        <div className="mt-2 flex flex-wrap items-center gap-2">
                                             <Badge variant="outline" className="border-sidebar-border/70 font-mono dark:border-sidebar-border">
                                                 {university.code}
                                             </Badge>
+                                            {university.ptm_code && (
+                                                <Badge variant="outline" className="border-blue-200 bg-blue-50 font-mono text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                                                    PTM: {university.ptm_code}
+                                                </Badge>
+                                            )}
+                                            {university.accreditation_status && (
+                                                <Badge variant="outline" className="border-purple-200 bg-purple-50 font-medium text-purple-700 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                                                    {university.accreditation_status}
+                                                </Badge>
+                                            )}
+                                            {university.cluster && (
+                                                <Badge variant="secondary" className="font-medium">
+                                                    {university.cluster}
+                                                </Badge>
+                                            )}
                                             {university.is_active ? (
                                                 <Badge className="border-0 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
                                                     Active
@@ -191,6 +230,14 @@ export default function UniversitiesShow({ university, users, journals, can }: P
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {/* Main Info */}
                         <div className="space-y-6 lg:col-span-2">
+                            {/* University Profile */}
+                            {university.profile_description && (
+                                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                                    <h2 className="mb-4 text-xl font-semibold text-foreground">Profile</h2>
+                                    <p className="text-foreground leading-relaxed">{university.profile_description}</p>
+                                </div>
+                            )}
+
                             {/* Contact Information */}
                             <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                                 <h2 className="mb-4 text-xl font-semibold text-foreground">Contact Information</h2>
@@ -314,6 +361,39 @@ export default function UniversitiesShow({ university, users, journals, can }: P
 
                         {/* Sidebar */}
                         <div className="space-y-6">
+                            {/* University Info */}
+                            <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                                <h2 className="mb-4 text-xl font-semibold text-foreground">University Info</h2>
+                                <div className="space-y-3">
+                                    <div>
+                                        <div className="mb-1 text-sm text-muted-foreground">University Code</div>
+                                        <div className="font-mono text-base font-semibold text-foreground">{university.code}</div>
+                                    </div>
+                                    {university.ptm_code && (
+                                        <div className="border-t border-sidebar-border/50 pt-3">
+                                            <div className="mb-1 text-sm text-muted-foreground">PTM Code (PDDIKTI)</div>
+                                            <div className="font-mono text-base font-semibold text-foreground">{university.ptm_code}</div>
+                                        </div>
+                                    )}
+                                    {university.accreditation_status && (
+                                        <div className="border-t border-sidebar-border/50 pt-3">
+                                            <div className="mb-1 text-sm text-muted-foreground">Accreditation Status</div>
+                                            <Badge variant="outline" className="mt-1 border-purple-200 bg-purple-50 font-medium text-purple-700 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                                                {university.accreditation_status}
+                                            </Badge>
+                                        </div>
+                                    )}
+                                    {university.cluster && (
+                                        <div className="border-t border-sidebar-border/50 pt-3">
+                                            <div className="mb-1 text-sm text-muted-foreground">Cluster</div>
+                                            <Badge variant="secondary" className="mt-1 font-medium">
+                                                {university.cluster}
+                                            </Badge>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
                             {/* Statistics */}
                             <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                                 <h2 className="mb-4 text-xl font-semibold text-foreground">Statistics</h2>
@@ -363,6 +443,25 @@ export default function UniversitiesShow({ university, users, journals, can }: P
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={deleteDialog} onOpenChange={setDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete University</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete <strong>{university.name}</strong>? This action cannot be undone and all associated
+                            data (Admin Kampus, Pengelola Jurnal, and journals) will be permanently removed.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }

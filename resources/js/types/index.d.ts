@@ -53,6 +53,31 @@ export interface User {
     avatar?: string;
 }
 
+export interface University {
+    id: number;
+    code: string;
+    ptm_code?: string;
+    name: string;
+    short_name?: string;
+    address?: string;
+    city?: string;
+    province?: string;
+    postal_code?: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+    logo_url?: string;
+    accreditation_status?: string;
+    cluster?: string;
+    profile_description?: string;
+    is_active: boolean;
+    users_count?: number;
+    journals_count?: number;
+    full_address?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     auth: {
         user: User;
