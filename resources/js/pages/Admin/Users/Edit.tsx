@@ -124,6 +124,7 @@ interface User {
     email: string;
     phone: string | null;
     university_id: number;
+    scientific_field_id: number | null;
     is_active: boolean;
     is_reviewer: boolean;
     role_ids: number[];
@@ -143,13 +144,20 @@ interface Role {
     description: string;
 }
 
+interface ScientificField {
+    id: number;
+    name: string;
+    code: string;
+}
+
 interface Props {
     user: User;
     universities: University[];
     roles: Role[];
+    scientificFields: ScientificField[];
 }
 
-export default function UsersEdit({ user, universities, roles }: Props) {
+export default function UsersEdit({ user, universities, roles, scientificFields }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -180,6 +188,7 @@ export default function UsersEdit({ user, universities, roles }: Props) {
         password_confirmation: '',
         phone: user.phone || '',
         university_id: user.university_id.toString() || '',
+        scientific_field_id: user.scientific_field_id?.toString() || '',
         role_ids: user.role_ids || [],
         is_active: user.is_active,
     });
@@ -324,6 +333,32 @@ export default function UsersEdit({ user, universities, roles }: Props) {
                                     </SelectContent>
                                 </Select>
                                 {errors.university_id && <p className="mt-1 text-sm text-red-600">{errors.university_id}</p>}
+                            </div>
+
+                            {/* Scientific Field */}
+                            <div>
+                                <Label htmlFor="scientific_field_id">Scientific Field</Label>
+                                <Select
+                                    value={data.scientific_field_id || undefined}
+                                    onValueChange={(value) => setData('scientific_field_id', value || '')}
+                                >
+                                    <SelectTrigger className="mt-2">
+                                        <SelectValue placeholder="Select Scientific Field (Optional)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {scientificFields.map((field) => (
+                                            <SelectItem key={field.id} value={field.id.toString()}>
+                                                {field.code} - {field.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.scientific_field_id && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>
+                                )}
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    Bidang ilmu pengelola jurnal (optional, untuk filtering)
+                                </p>
                             </div>
                         </div>
 

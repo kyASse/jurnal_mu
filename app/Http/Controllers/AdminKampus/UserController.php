@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
+use App\Models\ScientificField;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -127,6 +128,12 @@ class UserController extends Controller
             ->orderBy('display_name')
             ->get(['id', 'name', 'display_name', 'description']);
 
+        // Get all active scientific fields
+        $scientificFields = ScientificField::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
         return Inertia::render('AdminKampus/Users/Create', [
             'university' => [
                 'id' => $authUser->university->id,
@@ -134,6 +141,7 @@ class UserController extends Controller
                 'short_name' => $authUser->university->short_name,
             ],
             'roles' => $roles,
+            'scientificFields' => $scientificFields,
         ]);
     }
 
@@ -153,6 +161,7 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
+            'scientific_field_id' => 'nullable|exists:scientific_fields,id',
             'role_ids' => 'required|array|min:1',
             'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'boolean',
@@ -174,6 +183,7 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
+            'scientific_field_id' => $validated['scientific_field_id'] ?? null,
             'university_id' => $authUser->university_id, // Auto-assign from admin's university
             'role_id' => $primaryRoleId,
             'is_active' => $validated['is_active'],
@@ -208,7 +218,7 @@ class UserController extends Controller
         $this->ensureUserBelongsToUniversityAndIsUser($user, $authUser);
 
         // Load remaining relationships
-        $user->load(['university', 'journals.scientificField']);
+        $user->load(['university', 'scientificField', 'journals.scientificField']);
 
         return Inertia::render('AdminKampus/Users/Show', [
             'user' => [
@@ -219,6 +229,11 @@ class UserController extends Controller
                 'position' => $user->position,
                 'avatar_url' => $user->avatar_url,
                 'is_active' => $user->is_active,
+                'scientific_field' => $user->scientificField ? [
+                    'id' => $user->scientificField->id,
+                    'name' => $user->scientificField->name,
+                    'code' => $user->scientificField->code,
+                ] : null,
                 'last_login_at' => $user->last_login_at?->format('Y-m-d H:i'),
                 'created_at' => $user->created_at->format('Y-m-d H:i'),
                 'updated_at' => $user->updated_at->format('Y-m-d H:i'),
@@ -244,7 +259,7 @@ class UserController extends Controller
      */
     public function edit(Request $request, User $user): Response
     {
-        $user->load(['role', 'roles']);
+        $user->load(['role', 'roles', 'scientificField']);
         $this->authorize('update', $user);
 
         $authUser = $request->user();
@@ -255,6 +270,12 @@ class UserController extends Controller
             ->whereNotIn('name', [Role::SUPER_ADMIN])
             ->orderBy('display_name')
             ->get(['id', 'name', 'display_name', 'description']);
+
+        // Get all active scientific fields
+        $scientificFields = ScientificField::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
 
         // Get user's current role IDs
         $userRoleIds = $user->roles->pluck('id')->toArray();
@@ -271,6 +292,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'position' => $user->position,
+                'scientific_field_id' => $user->scientific_field_id,
                 'is_active' => $user->is_active,
                 'role_ids' => $userRoleIds,
             ],
@@ -280,6 +302,7 @@ class UserController extends Controller
                 'short_name' => $authUser->university->short_name,
             ],
             'roles' => $roles,
+            'scientificFields' => $scientificFields,
         ]);
     }
 
@@ -301,6 +324,7 @@ class UserController extends Controller
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
+            'scientific_field_id' => 'nullable|exists:scientific_fields,id',
             'role_ids' => 'required|array|min:1',
             'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'boolean',
@@ -318,6 +342,7 @@ class UserController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
+            'scientific_field_id' => $validated['scientific_field_id'] ?? null,
             'is_active' => $validated['is_active'] ?? $user->is_active,
             'role_id' => $validated['role_ids'][0], // Update primary role
         ];

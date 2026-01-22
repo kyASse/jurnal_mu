@@ -88,12 +88,19 @@ interface Role {
     description: string;
 }
 
+interface ScientificField {
+    id: number;
+    name: string;
+    code: string;
+}
+
 interface Props {
     universities: University[];
     roles: Role[];
+    scientificFields: ScientificField[];
 }
 
-export default function UsersCreate({ universities, roles }: Props) {
+export default function UsersCreate({ universities, roles, scientificFields }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
@@ -101,6 +108,7 @@ export default function UsersCreate({ universities, roles }: Props) {
         password_confirmation: '',
         phone: '',
         university_id: '',
+        scientific_field_id: '',
         role_ids: [] as number[],
         is_active: true as boolean,
     });
@@ -255,6 +263,32 @@ export default function UsersCreate({ universities, roles }: Props) {
                                 </Select>
                                 {errors.university_id && <p className="mt-1 text-sm text-red-600">{errors.university_id}</p>}
                                 <p className="mt-1 text-sm text-muted-foreground">This user will manage journals for this university</p>
+                            </div>
+
+                            {/* Scientific Field */}
+                            <div>
+                                <Label htmlFor="scientific_field_id">Scientific Field</Label>
+                                <Select
+                                    value={data.scientific_field_id || undefined}
+                                    onValueChange={(value) => setData('scientific_field_id', value || '')}
+                                >
+                                    <SelectTrigger className="mt-2">
+                                        <SelectValue placeholder="Select Scientific Field (Optional)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {scientificFields.map((field) => (
+                                            <SelectItem key={field.id} value={field.id.toString()}>
+                                                {field.code} - {field.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.scientific_field_id && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>
+                                )}
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    Bidang ilmu pengelola jurnal (optional, untuk filtering)
+                                </p>
                             </div>
                         </div>
 

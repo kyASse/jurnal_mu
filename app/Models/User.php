@@ -27,6 +27,7 @@ class User extends Authenticatable
         'position',
         'role_id',
         'university_id',
+        'scientific_field_id',
         'is_active',
         'is_reviewer',
         'last_login_at',
@@ -91,6 +92,14 @@ class User extends Authenticatable
     public function university()
     {
         return $this->belongsTo(University::class);
+    }
+
+    /**
+     * Get the scientific field of this user
+     */
+    public function scientificField()
+    {
+        return $this->belongsTo(ScientificField::class);
     }
 
     /**

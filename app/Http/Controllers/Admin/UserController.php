@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
+use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -134,9 +135,16 @@ class UserController extends Controller
             ->orderBy('display_name')
             ->get(['id', 'name', 'display_name', 'description']);
 
+        // Get all active scientific fields
+        $scientificFields = ScientificField::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
         return Inertia::render('Admin/Users/Create', [
             'universities' => $universities,
             'roles' => $roles,
+            'scientificFields' => $scientificFields,
         ]);
     }
 
@@ -155,6 +163,7 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
             'university_id' => 'required|exists:universities,id',
+            'scientific_field_id' => 'nullable|exists:scientific_fields,id',
             'role_ids' => 'required|array|min:1',
             'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'required|boolean',
@@ -171,6 +180,7 @@ class UserController extends Controller
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
             'university_id' => $validated['university_id'],
+            'scientific_field_id' => $validated['scientific_field_id'] ?? null,
             'role_id' => $primaryRoleId, // Set primary role for backwards compatibility
             'is_active' => $validated['is_active'],
             'is_reviewer' => false, // Will be set by role assignment
@@ -205,7 +215,7 @@ class UserController extends Controller
         }
 
         // Load relationships
-        $user->load(['role', 'university', 'journals.scientificField']);
+        $user->load(['role', 'university', 'scientificField', 'journals.scientificField']);
 
         return Inertia::render('Admin/Users/Show', [
             'user' => [
@@ -217,6 +227,11 @@ class UserController extends Controller
                 'avatar_url' => $user->avatar_url,
                 'is_active' => $user->is_active,
                 'is_reviewer' => $user->is_reviewer ?? false,
+                'scientific_field' => $user->scientificField ? [
+                    'id' => $user->scientificField->id,
+                    'name' => $user->scientificField->name,
+                    'code' => $user->scientificField->code,
+                ] : null,
                 'university' => $user->university ? [
                     'id' => $user->university->id,
                     'name' => $user->university->name,
@@ -251,7 +266,7 @@ class UserController extends Controller
             abort(404, 'User not found.');
         }
 
-        $user->load(['university', 'roles']);
+        $user->load(['university', 'roles', 'scientificField']);
 
         // Get all active universities
         $universities = University::active()
@@ -263,6 +278,12 @@ class UserController extends Controller
             ->whereNotIn('name', [Role::SUPER_ADMIN])
             ->orderBy('display_name')
             ->get(['id', 'name', 'display_name', 'description']);
+
+        // Get all active scientific fields
+        $scientificFields = ScientificField::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
 
         // Get user's current role IDs
         $userRoleIds = $user->roles->pluck('id')->toArray();
@@ -280,12 +301,14 @@ class UserController extends Controller
                 'phone' => $user->phone,
                 'position' => $user->position,
                 'university_id' => $user->university_id,
+                'scientific_field_id' => $user->scientific_field_id,
                 'is_active' => $user->is_active,
                 'is_reviewer' => $user->is_reviewer ?? false,
                 'role_ids' => $userRoleIds,
             ],
             'universities' => $universities,
             'roles' => $roles,
+            'scientificFields' => $scientificFields,
         ]);
     }
 
@@ -309,6 +332,7 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
             'university_id' => 'required|exists:universities,id',
+            'scientific_field_id' => 'nullable|exists:scientific_fields,id',
             'role_ids' => 'required|array|min:1',
             'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'boolean',
@@ -324,6 +348,7 @@ class UserController extends Controller
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
             'university_id' => $validated['university_id'],
+            'scientific_field_id' => $validated['scientific_field_id'] ?? null,
             'role_id' => $primaryRoleId, // Update primary role
             'is_active' => $validated['is_active'] ?? $user->is_active,
         ]);

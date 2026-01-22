@@ -418,10 +418,10 @@ Berikut adalah daftar perubahan dan fitur yang harus diimplementasikan berdasark
 
 ### Phase 1 (High Priority - Week 1-2)
 1. ✅ Borang Indikator (DONE)
-2. Universities Management enhancement (PTM code, accreditation, cluster, 250 char profile)
-3. Multi-role system (database + UI)
-4. User Management consolidation
-5. Scientific Field in user profile
+2. ✅Universities Management enhancement (PTM code, accreditation, cluster, 250 char profile)
+3. ✅Multi-role system (database + UI)
+4. ✅User Management consolidation
+5. ✅Scientific Field in user profile
 
 ### Phase 2 (Medium Priority - Week 3-4)
 6. Journal profile enhancement (Sinta, indexation, accreditation status)

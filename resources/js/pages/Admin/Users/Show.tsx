@@ -86,7 +86,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Award, BookOpen, Building2, Calendar, Edit, Mail, MapPin, Phone, UserCheck } from 'lucide-react';
+import { ArrowLeft, Award, BookOpen, Building2, Calendar, Edit, Mail, MapPin, Phone, Shield, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface User {
@@ -97,6 +97,11 @@ interface User {
     avatar_url: string | null;
     is_active: boolean;
     is_reviewer: boolean;
+    scientific_field: {
+        id: number;
+        name: string;
+        code: string;
+    } | null;
     university: {
         id: number;
         name: string;
@@ -244,6 +249,24 @@ export default function UsersShow({ user, journals }: Props) {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Scientific Field Information */}
+                            {user.scientific_field && (
+                                <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
+                                    <h2 className="mb-4 text-xl font-semibold text-foreground">Scientific Field</h2>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <Shield className="h-5 w-5 text-muted-foreground" />
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Bidang Ilmu</p>
+                                                <p className="font-semibold text-foreground">
+                                                    {user.scientific_field.code} - {user.scientific_field.name}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* University Information */}
                             {user.university && (

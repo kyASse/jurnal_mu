@@ -21,7 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, BookOpen, Briefcase, Building2, CalendarClock, CalendarPlus, Clock, Edit, Mail, Phone, Power, Trash2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Briefcase, Building2, CalendarClock, CalendarPlus, Clock, Edit, Mail, Phone, Power, Shield, Trash2 } from 'lucide-react';
 
 interface User {
     id: number;
@@ -31,6 +31,11 @@ interface User {
     position: string | null;
     avatar_url: string | null;
     is_active: boolean;
+    scientific_field: {
+        id: number;
+        name: string;
+        code: string;
+    } | null;
     last_login_at: string | null;
     created_at: string;
     updated_at: string;
@@ -203,6 +208,17 @@ export default function UsersShow({ user, journals, university }: Props) {
                                         <p className="font-medium">{university.name}</p>
                                     </div>
                                 </div>
+                                {user.scientific_field && (
+                                    <div className="flex items-center gap-3">
+                                        <Shield className="h-5 w-5 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">Scientific Field</p>
+                                            <p className="font-medium">
+                                                {user.scientific_field.code} - {user.scientific_field.name}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
