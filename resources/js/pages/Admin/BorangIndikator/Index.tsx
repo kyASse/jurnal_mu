@@ -31,6 +31,18 @@ interface Template extends AccreditationTemplate {
     can_be_deleted?: boolean;
 }
 
+const emptyTemplates: PaginatedResponse<Template> = {
+    data: [],
+    links: [],
+    current_page: 1,
+    from: 0,
+    last_page: 1,
+    path: "",
+    per_page: 0,
+    to: 0,
+    total: 0,
+};
+
 interface Props {
     templates: PaginatedResponse<Template>;
     filters: {
