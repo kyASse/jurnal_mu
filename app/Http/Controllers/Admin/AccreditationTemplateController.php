@@ -425,4 +425,117 @@ class AccreditationTemplateController extends Controller
             'tree' => $tree,
         ]);
     }
+
+    /**
+     * Display hierarchical list view of categories, sub-categories, and indicators.
+     *
+     * @route GET /admin/borang-indikator/list
+     *
+     * @features Expandable hierarchy, cascading filters, pagination
+     */
+    public function listView(Request $request): Response
+    {
+        $this->authorize('viewAny', AccreditationTemplate::class);
+
+        $query = \App\Models\EvaluationCategory::query()
+            ->with([
+                'subCategories.indicators',
+                'template',
+            ])
+            ->withCount(['subCategories', 'indicators']);
+
+        // Filter by template
+        if ($request->filled('template_id')) {
+            $query->forTemplate((int) $request->template_id);
+        }
+
+        // Search filter (code or name)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%");
+            });
+        }
+
+        // Status filter
+        if ($request->filled('is_active')) {
+            if ($request->is_active === '1') {
+                $query->where('is_active', true);
+            } elseif ($request->is_active === '0') {
+                $query->where('is_active', false);
+            }
+        }
+
+        // Sort filter
+        $sortBy = $request->get('sort', 'display_order_asc');
+        match ($sortBy) {
+            'display_order_desc' => $query->orderByDesc('display_order'),
+            'weight_desc' => $query->orderByDesc('weight'),
+            'weight_asc' => $query->orderBy('weight'),
+            default => $query->ordered(), // display_order_asc (default scope)
+        };
+
+        $categories = $query
+            ->paginate(50)
+            ->withQueryString()
+            ->through(fn ($category) => [
+                'id' => $category->id,
+                'template_id' => $category->template_id,
+                'code' => $category->code,
+                'name' => $category->name,
+                'description' => $category->description,
+                'weight' => $category->weight,
+                'display_order' => $category->display_order,
+                'is_active' => $category->is_active,
+                'sub_categories_count' => $category->sub_categories_count,
+                'indicators_count' => $category->indicators_count,
+                'can_be_deleted' => $category->canBeDeleted(),
+                'updated_at' => $category->updated_at?->toISOString(),
+                'sub_categories' => $category->subCategories->map(fn ($subCategory) => [
+                    'id' => $subCategory->id,
+                    'category_id' => $subCategory->category_id,
+                    'code' => $subCategory->code,
+                    'name' => $subCategory->name,
+                    'description' => $subCategory->description,
+                    'display_order' => $subCategory->display_order,
+                    'is_active' => $subCategory->is_active,
+                    'can_be_deleted' => $subCategory->canBeDeleted(),
+                    'updated_at' => $subCategory->updated_at?->toISOString(),
+                    'indicators' => $subCategory->indicators->map(fn ($indicator) => [
+                        'id' => $indicator->id,
+                        'sub_category_id' => $indicator->sub_category_id,
+                        'code' => $indicator->code,
+                        'question' => $indicator->question,
+                        'description' => $indicator->description,
+                        'weight' => $indicator->weight,
+                        'answer_type' => $indicator->answer_type,
+                        'requires_attachment' => $indicator->requires_attachment,
+                        'sort_order' => $indicator->sort_order,
+                        'is_active' => $indicator->is_active,
+                        'can_be_deleted' => method_exists($indicator, 'canBeDeleted') ? $indicator->canBeDeleted() : true,
+                        'updated_at' => $indicator->updated_at?->toISOString(),
+                    ])->values(),
+                ])->values(),
+                'template' => $category->template ? [
+                    'id' => $category->template->id,
+                    'name' => $category->template->name,
+                    'type' => $category->template->type,
+                ] : null,
+            ]);
+
+        // Get all templates for filter dropdown
+        $templates = AccreditationTemplate::query()
+            ->select(['id', 'name', 'type', 'is_active'])
+            ->active()
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Admin/BorangIndikator/List', [
+            'categories' => $categories,
+            'templates' => $templates,
+            'filters' => $request->only(['search', 'type', 'template_id', 'is_active', 'sort']),
+        ]);
+    }
 }
