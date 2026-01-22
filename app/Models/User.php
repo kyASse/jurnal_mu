@@ -69,11 +69,20 @@ class User extends Authenticatable
     */
 
     /**
-     * Get the role of this user
+     * Get the role of this user (backwards compatibility - returns primary role)
      */
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get all roles of this user (many-to-many relationship)
+     */
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles')
+            ->withPivot('assigned_at', 'assigned_by');
     }
 
     /**
@@ -199,7 +208,13 @@ class User extends Authenticatable
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role && $this->role->name === Role::SUPER_ADMIN;
+        // Check in primary role (backwards compatibility)
+        if ($this->role && $this->role->name === Role::SUPER_ADMIN) {
+            return true;
+        }
+
+        // Check in roles relationship (multi-role)
+        return $this->roles()->where('name', Role::SUPER_ADMIN)->exists();
     }
 
     /**
@@ -207,15 +222,116 @@ class User extends Authenticatable
      */
     public function isAdminKampus(): bool
     {
-        return $this->role && $this->role->name === Role::ADMIN_KAMPUS;
+        // Check in primary role (backwards compatibility)
+        if ($this->role && $this->role->name === Role::ADMIN_KAMPUS) {
+            return true;
+        }
+
+        // Check in roles relationship (multi-role)
+        return $this->roles()->where('name', Role::ADMIN_KAMPUS)->exists();
+    }
+
+    /**
+     * Check if user is Pengelola Jurnal (User role)
+     */
+    public function isUser(): bool
+    {
+        // Check in primary role (backwards compatibility)
+        if ($this->role && $this->role->name === Role::USER) {
+            return true;
+        }
+
+        // Check in roles relationship (multi-role)
+        return $this->roles()->where('name', Role::USER)->exists();
     }
 
     /**
      * Check if user is Pengelola Jurnal
      */
-    public function isUser(): bool
+    public function isPengelolaJurnal(): bool
     {
-        return $this->role && $this->role->name === Role::USER;
+        // Pengelola Jurnal is the same as User role, or a separate role
+        return $this->isUser() || $this->roles()->where('name', Role::PENGELOLA_JURNAL)->exists();
+    }
+
+    /**
+     * Check if user is Reviewer
+     */
+    public function isReviewer(): bool
+    {
+        // Check is_reviewer flag (backwards compatibility)
+        if ($this->is_reviewer) {
+            return true;
+        }
+
+        // Check in roles relationship (multi-role)
+        return $this->roles()->where('name', Role::REVIEWER)->exists();
+    }
+
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole(string $roleName): bool
+    {
+        // Check in primary role (backwards compatibility)
+        if ($this->role && $this->role->name === $roleName) {
+            return true;
+        }
+
+        // Check in roles relationship (multi-role)
+        return $this->roles()->where('name', $roleName)->exists();
+    }
+
+    /**
+     * Check if user has any of the specified roles
+     */
+    public function hasAnyRole(array $roleNames): bool
+    {
+        // Check in primary role (backwards compatibility)
+        if ($this->role && in_array($this->role->name, $roleNames)) {
+            return true;
+        }
+
+        // Check in roles relationship (multi-role)
+        return $this->roles()->whereIn('name', $roleNames)->exists();
+    }
+
+    /**
+     * Check if user has all of the specified roles
+     */
+    public function hasAllRoles(array $roleNames): bool
+    {
+        $userRoles = $this->roles()->pluck('name')->toArray();
+
+        // Add primary role if exists
+        if ($this->role) {
+            $userRoles[] = $this->role->name;
+        }
+
+        $userRoles = array_unique($userRoles);
+
+        foreach ($roleNames as $roleName) {
+            if (! in_array($roleName, $userRoles)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get all role names for this user
+     */
+    public function getRoleNames(): array
+    {
+        $roleNames = $this->roles()->pluck('name')->toArray();
+
+        // Add primary role if exists and not already in array
+        if ($this->role && ! in_array($this->role->name, $roleNames)) {
+            $roleNames[] = $this->role->name;
+        }
+
+        return array_unique($roleNames);
     }
 
     /**

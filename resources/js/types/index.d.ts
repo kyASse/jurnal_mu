@@ -39,6 +39,7 @@ export interface SharedData {
 export interface Role {
     id: number;
     name: string;
+    display_name: string;
     description: string;
 }
 
@@ -48,9 +49,11 @@ export interface User {
     email: string;
     email_verified_at?: string;
     role: Role;
+    roles?: Role[]; // Multi-role support
     university_id?: number;
     avatar_url?: string;
     avatar?: string;
+    is_reviewer?: boolean;
 }
 
 export interface University {

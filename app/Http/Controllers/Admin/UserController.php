@@ -22,11 +22,16 @@ class UserController extends Controller
         // Only Super Admin can access
         $this->authorize('manage-users');
 
-        // Base query for User role only
+        // Base query for User role only (including new Pengelola Jurnal role)
         $query = User::query()
-            ->with(['role', 'university'])
-            ->whereHas('role', function ($query) {
-                $query->where('name', 'User');
+            ->with(['role', 'roles', 'university'])
+            ->where(function ($q) {
+                $q->whereHas('role', function ($query) {
+                    $query->whereIn('name', ['User', 'Pengelola Jurnal']);
+                })
+                ->orWhereHas('roles', function ($query) {
+                    $query->whereIn('name', ['User', 'Pengelola Jurnal']);
+                });
             });
 
         // Apply filters if any
@@ -46,7 +51,12 @@ class UserController extends Controller
 
         // Filter by Reviewer Status
         if ($request->has('is_reviewer') && $request->is_reviewer !== null) {
-            $query->where('is_reviewer', $request->boolean('is_reviewer'));
+            $query->where(function ($q) use ($request) {
+                $q->where('is_reviewer', $request->boolean('is_reviewer'))
+                    ->orWhereHas('roles', function ($query) {
+                        $query->where('name', Role::REVIEWER);
+                    });
+            });
         }
 
         // Get Users with counts
@@ -55,24 +65,43 @@ class UserController extends Controller
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString()
-            ->through(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                'avatar_url' => $user->avatar_url,
-                'is_active' => $user->is_active,
-                'is_reviewer' => $user->is_reviewer ?? false,
-                'university' => $user->university ? [
-                    'id' => $user->university->id,
-                    'name' => $user->university->name,
-                    'short_name' => $user->university->short_name,
-                    'code' => $user->university->code,
-                ] : null,
-                'journals_count' => $user->journals_count ?? 0,
-                'last_login_at' => $user->last_login_at?->format('Y-m-d H:i:s'),
-                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-            ]);
+            ->through(function ($user) {
+                // Get all roles for this user
+                $userRoles = $user->roles->map(fn($role) => [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'display_name' => $role->display_name,
+                ])->toArray();
+
+                // Add primary role if not already in roles array
+                if ($user->role && ! collect($userRoles)->contains('id', $user->role->id)) {
+                    $userRoles[] = [
+                        'id' => $user->role->id,
+                        'name' => $user->role->name,
+                        'display_name' => $user->role->display_name,
+                    ];
+                }
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'avatar_url' => $user->avatar_url,
+                    'is_active' => $user->is_active,
+                    'is_reviewer' => $user->is_reviewer ?? false,
+                    'roles' => $userRoles,
+                    'university' => $user->university ? [
+                        'id' => $user->university->id,
+                        'name' => $user->university->name,
+                        'short_name' => $user->university->short_name,
+                        'code' => $user->university->code,
+                    ] : null,
+                    'journals_count' => $user->journals_count ?? 0,
+                    'last_login_at' => $user->last_login_at?->format('Y-m-d H:i:s'),
+                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
 
         // Get all universities for filter dropdown
         $universities = University::query()
@@ -99,8 +128,15 @@ class UserController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'short_name', 'code']);
 
+        // Get assignable roles (not Super Admin)
+        $roles = Role::query()
+            ->whereNotIn('name', [Role::SUPER_ADMIN])
+            ->orderBy('display_name')
+            ->get(['id', 'name', 'display_name', 'description']);
+
         return Inertia::render('Admin/Users/Create', [
             'universities' => $universities,
+            'roles' => $roles,
         ]);
     }
 
@@ -119,12 +155,13 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
             'university_id' => 'required|exists:universities,id',
+            'role_ids' => 'required|array|min:1',
+            'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'required|boolean',
-            'is_reviewer' => 'boolean',
         ]);
 
-        // Get User role
-        $userRole = Role::where('name', 'User')->firstOrFail();
+        // Get the first role as primary role for backwards compatibility
+        $primaryRoleId = $validated['role_ids'][0];
 
         // Create new User
         $user = User::create([
@@ -134,13 +171,25 @@ class UserController extends Controller
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
             'university_id' => $validated['university_id'],
-            'role_id' => $userRole->id,
+            'role_id' => $primaryRoleId, // Set primary role for backwards compatibility
             'is_active' => $validated['is_active'],
-            'is_reviewer' => $validated['is_reviewer'] ?? false,
+            'is_reviewer' => false, // Will be set by role assignment
         ]);
 
+        // Attach all selected roles to the user
+        $user->roles()->attach($validated['role_ids'], [
+            'assigned_at' => now(),
+            'assigned_by' => auth()->id(),
+        ]);
+
+        // Update is_reviewer flag if Reviewer role is selected
+        $reviewerRole = Role::where('name', Role::REVIEWER)->first();
+        if ($reviewerRole && in_array($reviewerRole->id, $validated['role_ids'])) {
+            $user->update(['is_reviewer' => true]);
+        }
+
         return redirect()->route('admin.users.index')
-            ->with('success', 'Pengelola Jurnal created successfully.');
+            ->with('success', 'User created successfully with assigned roles.');
     }
 
     /**
@@ -198,16 +247,30 @@ class UserController extends Controller
         $this->authorize('manage-users');
 
         // Verify it's a User
-        if (! $user->isUser()) {
-            abort(404, 'Pengelola Jurnal not found.');
+        if (! $user->isUser() && ! $user->isPengelolaJurnal()) {
+            abort(404, 'User not found.');
         }
 
-        $user->load('university');
+        $user->load(['university', 'roles']);
 
         // Get all active universities
         $universities = University::active()
             ->orderBy('name')
             ->get(['id', 'name', 'short_name', 'code']);
+
+        // Get assignable roles (not Super Admin)
+        $roles = Role::query()
+            ->whereNotIn('name', [Role::SUPER_ADMIN])
+            ->orderBy('display_name')
+            ->get(['id', 'name', 'display_name', 'description']);
+
+        // Get user's current role IDs
+        $userRoleIds = $user->roles->pluck('id')->toArray();
+
+        // If no roles in pivot table but has primary role, add it
+        if (empty($userRoleIds) && $user->role_id) {
+            $userRoleIds = [$user->role_id];
+        }
 
         return Inertia::render('Admin/Users/Edit', [
             'user' => [
@@ -219,8 +282,10 @@ class UserController extends Controller
                 'university_id' => $user->university_id,
                 'is_active' => $user->is_active,
                 'is_reviewer' => $user->is_reviewer ?? false,
+                'role_ids' => $userRoleIds,
             ],
             'universities' => $universities,
+            'roles' => $roles,
         ]);
     }
 
@@ -232,8 +297,8 @@ class UserController extends Controller
         $this->authorize('manage-users');
 
         // Verify it's a User
-        if (! $user->isUser()) {
-            abort(404, 'Pengelola Jurnal not found.');
+        if (! $user->isUser() && ! $user->isPengelolaJurnal()) {
+            abort(404, 'User not found.');
         }
 
         // Validate request
@@ -244,9 +309,13 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
             'university_id' => 'required|exists:universities,id',
+            'role_ids' => 'required|array|min:1',
+            'role_ids.*' => 'required|exists:roles,id',
             'is_active' => 'boolean',
-            'is_reviewer' => 'boolean',
         ]);
+
+        // Get the first role as primary role for backwards compatibility
+        $primaryRoleId = $validated['role_ids'][0];
 
         // Update User
         $user->update([
@@ -255,9 +324,22 @@ class UserController extends Controller
             'phone' => $validated['phone'] ?? null,
             'position' => $validated['position'] ?? null,
             'university_id' => $validated['university_id'],
+            'role_id' => $primaryRoleId, // Update primary role
             'is_active' => $validated['is_active'] ?? $user->is_active,
-            'is_reviewer' => $validated['is_reviewer'] ?? $user->is_reviewer ?? false,
         ]);
+
+        // Sync roles in pivot table
+        $user->roles()->sync(collect($validated['role_ids'])->mapWithKeys(function ($roleId) {
+            return [$roleId => [
+                'assigned_at' => now(),
+                'assigned_by' => auth()->id(),
+            ]];
+        }));
+
+        // Update is_reviewer flag based on role assignment
+        $reviewerRole = Role::where('name', Role::REVIEWER)->first();
+        $hasReviewerRole = $reviewerRole && in_array($reviewerRole->id, $validated['role_ids']);
+        $user->update(['is_reviewer' => $hasReviewerRole]);
 
         // Update password if provided
         if (! empty($validated['password'])) {
@@ -267,7 +349,7 @@ class UserController extends Controller
         }
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Pengelola Jurnal updated successfully.');
+            ->with('success', 'User updated successfully with new role assignments.');
     }
 
     /**

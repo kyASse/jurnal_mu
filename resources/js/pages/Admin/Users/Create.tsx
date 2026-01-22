@@ -48,6 +48,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import MultiRoleSelect from '@/components/multi-role-select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -80,11 +81,19 @@ interface University {
     code: string;
 }
 
-interface Props {
-    universities: University[];
+interface Role {
+    id: number;
+    name: string;
+    display_name: string;
+    description: string;
 }
 
-export default function UsersCreate({ universities }: Props) {
+interface Props {
+    universities: University[];
+    roles: Role[];
+}
+
+export default function UsersCreate({ universities, roles }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
@@ -92,7 +101,7 @@ export default function UsersCreate({ universities }: Props) {
         password_confirmation: '',
         phone: '',
         university_id: '',
-        is_reviewer: false as boolean,
+        role_ids: [] as number[],
         is_active: true as boolean,
     });
 
@@ -249,38 +258,42 @@ export default function UsersCreate({ universities }: Props) {
                             </div>
                         </div>
 
-                        {/* Status & Permissions */}
+                        {/* Role Assignment */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
-                                Status & Permissions
+                                Role Assignment
                             </h3>
 
-                            <div className="space-y-3">
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        id="is_active"
-                                        type="checkbox"
-                                        checked={data.is_active}
-                                        onChange={(e) => setData('is_active', e.target.checked)}
-                                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                                    />
-                                    <Label htmlFor="is_active" className="cursor-pointer">
-                                        Active (User can login and manage journals)
-                                    </Label>
-                                </div>
+                            <MultiRoleSelect
+                                roles={roles}
+                                selectedRoleIds={data.role_ids}
+                                onChange={(roleIds) => setData('role_ids', roleIds)}
+                                label="Assign Roles"
+                                error={errors.role_ids}
+                                required
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                Users can have multiple roles. For example, a user can be both a Pengelola Jurnal and a Reviewer.
+                            </p>
+                        </div>
 
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        id="is_reviewer"
-                                        type="checkbox"
-                                        checked={data.is_reviewer}
-                                        onChange={(e) => setData('is_reviewer', e.target.checked)}
-                                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <Label htmlFor="is_reviewer" className="cursor-pointer">
-                                        Reviewer (Can review coaching requests from other journals)
-                                    </Label>
-                                </div>
+                        {/* Status */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                Account Status
+                            </h3>
+
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    id="is_active"
+                                    type="checkbox"
+                                    checked={data.is_active}
+                                    onChange={(e) => setData('is_active', e.target.checked)}
+                                    className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                />
+                                <Label htmlFor="is_active" className="cursor-pointer">
+                                    Active (User can login and access the system)
+                                </Label>
                             </div>
                         </div>
 
@@ -292,7 +305,7 @@ export default function UsersCreate({ universities }: Props) {
                                 </Button>
                             </Link>
                             <Button type="submit" disabled={processing}>
-                                {processing ? 'Creating...' : 'Create Pengelola Jurnal'}
+                                {processing ? 'Creating...' : 'Create User'}
                             </Button>
                         </div>
                     </form>

@@ -111,6 +111,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import MultiRoleSelect from '@/components/multi-role-select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -125,6 +126,7 @@ interface User {
     university_id: number;
     is_active: boolean;
     is_reviewer: boolean;
+    role_ids: number[];
 }
 
 interface University {
@@ -134,12 +136,20 @@ interface University {
     code: string;
 }
 
+interface Role {
+    id: number;
+    name: string;
+    display_name: string;
+    description: string;
+}
+
 interface Props {
     user: User;
     universities: University[];
+    roles: Role[];
 }
 
-export default function UsersEdit({ user, universities }: Props) {
+export default function UsersEdit({ user, universities, roles }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -170,7 +180,7 @@ export default function UsersEdit({ user, universities }: Props) {
         password_confirmation: '',
         phone: user.phone || '',
         university_id: user.university_id.toString() || '',
-        is_reviewer: user.is_reviewer || false,
+        role_ids: user.role_ids || [],
         is_active: user.is_active,
     });
 
@@ -317,30 +327,29 @@ export default function UsersEdit({ user, universities }: Props) {
                             </div>
                         </div>
 
-                        {/* Reviewer Status (v1.1 Feature) */}
+                        {/* Role Assignment */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
-                                Reviewer Status
+                                Role Assignment
                             </h3>
 
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    id="is_reviewer"
-                                    type="checkbox"
-                                    checked={data.is_reviewer}
-                                    onChange={(e) => setData('is_reviewer', e.target.checked)}
-                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                />
-                                <Label htmlFor="is_reviewer" className="cursor-pointer">
-                                    Mark as Reviewer (can review journal assessments)
-                                </Label>
-                            </div>
+                            <MultiRoleSelect
+                                roles={roles}
+                                selectedRoleIds={data.role_ids}
+                                onChange={(roleIds) => setData('role_ids', roleIds)}
+                                label="Assign Roles"
+                                error={errors.role_ids}
+                                required
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                Users can have multiple roles. For example, a user can be both a Pengelola Jurnal and a Reviewer.
+                            </p>
                         </div>
 
                         {/* Status */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
-                                Status
+                                Account Status
                             </h3>
 
                             <div className="flex items-center space-x-2">

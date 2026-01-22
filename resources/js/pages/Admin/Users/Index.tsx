@@ -125,6 +125,11 @@ interface User {
     avatar_url: string | null;
     is_active: boolean;
     is_reviewer: boolean;
+    roles: Array<{
+        id: number;
+        name: string;
+        display_name: string;
+    }>;
     university: {
         id: number;
         name: string;
@@ -353,14 +358,19 @@ export default function UsersIndex({ users, universities, filters }: Props) {
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-semibold text-foreground">{user.name}</span>
-                                                            {user.is_reviewer && (
-                                                                <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/20">
-                                                                    Reviewer
-                                                                </Badge>
-                                                            )}
-                                                        </div>
+                                                        <div className="font-semibold text-foreground">{user.name}</div>
+                                                        {user.roles && user.roles.length > 0 && (
+                                                            <div className="mt-1 flex flex-wrap gap-1">
+                                                                {user.roles.map((role) => (
+                                                                    <Badge 
+                                                                        key={role.id}
+                                                                        className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                                                                    >
+                                                                        {role.display_name}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </TableCell>
