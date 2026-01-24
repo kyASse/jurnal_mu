@@ -27,8 +27,13 @@ class Journal extends Model
         'first_published_year',
         'scientific_field_id',
         'sinta_rank',
+        'sinta_indexed_date',
         'accreditation_status',
         'accreditation_grade',
+        'dikti_accreditation_number',
+        'accreditation_issued_date',
+        'accreditation_expiry_date',
+        'indexations',
         'editor_in_chief',
         'email',
         'is_active',
@@ -42,6 +47,10 @@ class Journal extends Model
     protected $casts = [
         'first_published_year' => 'integer',
         'sinta_rank' => 'integer',
+        'sinta_indexed_date' => 'date',
+        'accreditation_issued_date' => 'date',
+        'accreditation_expiry_date' => 'date',
+        'indexations' => 'array',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -166,6 +175,21 @@ class Journal extends Model
         });
     }
 
+    /**
+     * Scope to filter by indexation platform
+     */
+    public function scopeByIndexation($query, ?string $platform)
+    {
+        if (! $platform) {
+            return $query;
+        }
+
+        return $query->whereNotNull('indexations')
+            ->where(function ($q) use ($platform) {
+                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
+            });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Accessors
@@ -208,6 +232,89 @@ class Journal extends Model
     public function getLatestScoreAttribute(): ?float
     {
         return $this->latestAssessment?->percentage;
+    }
+
+    /**
+     * Check if Dikti accreditation is expired
+     */
+    public function getIsAccreditationExpiredAttribute(): bool
+    {
+        if (! $this->accreditation_expiry_date) {
+            return false;
+        }
+
+        return $this->accreditation_expiry_date->isPast();
+    }
+
+    /**
+     * Get accreditation expiry status
+     *
+     * @return string 'expired'|'expiring_soon'|'valid'|'none'
+     */
+    public function getAccreditationExpiryStatusAttribute(): string
+    {
+        if (! $this->accreditation_expiry_date) {
+            return 'none';
+        }
+
+        if ($this->accreditation_expiry_date->isPast()) {
+            return 'expired';
+        }
+
+        if ($this->accreditation_expiry_date->diffInDays(now()) <= 30) {
+            return 'expiring_soon';
+        }
+
+        return 'valid';
+    }
+
+    /**
+     * Get Dikti accreditation label
+     */
+    public function getDiktiAccreditationLabelAttribute(): string
+    {
+        if (! $this->dikti_accreditation_number) {
+            return 'Belum Terakreditasi Dikti';
+        }
+
+        $label = "No. {$this->dikti_accreditation_number}";
+
+        if ($this->accreditation_grade) {
+            $label .= " ({$this->accreditation_grade})";
+        }
+
+        return $label;
+    }
+
+    /**
+     * Get indexation labels as array
+     *
+     * @return array<string>
+     */
+    public function getIndexationLabelsAttribute(): array
+    {
+        if (! $this->indexations || ! is_array($this->indexations)) {
+            return [];
+        }
+
+        return array_keys($this->indexations);
+    }
+
+    /**
+     * Get frequency label (human-readable)
+     */
+    public function getFrequencyLabelAttribute(): string
+    {
+        $frequencies = [
+            'monthly' => 'Bulanan',
+            'bi-monthly' => 'Dua Bulanan',
+            'quarterly' => 'Triwulanan',
+            'semi-annual' => 'Semi-Tahunan',
+            'annual' => 'Tahunan',
+            'other' => 'Lainnya',
+        ];
+
+        return $frequencies[$this->frequency] ?? $this->frequency ?? 'Tidak Diketahui';
     }
 
     /*
