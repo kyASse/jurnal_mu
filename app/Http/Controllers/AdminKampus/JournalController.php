@@ -153,11 +153,27 @@ class JournalController extends Controller
                 'first_published_year' => $journal->first_published_year,
                 'editor_in_chief' => $journal->editor_in_chief,
                 'email' => $journal->email,
+                
+                // SINTA
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
+                'sinta_indexed_date' => $journal->sinta_indexed_date?->format('Y-m-d'),
+                
+                // Dikti Accreditation
                 'accreditation_status' => $journal->accreditation_status,
                 'accreditation_status_label' => $journal->accreditation_status_label,
                 'accreditation_grade' => $journal->accreditation_grade,
+                'dikti_accreditation_number' => $journal->dikti_accreditation_number,
+                'dikti_accreditation_label' => $journal->dikti_accreditation_label,
+                'accreditation_issued_date' => $journal->accreditation_issued_date?->format('Y-m-d'),
+                'accreditation_expiry_date' => $journal->accreditation_expiry_date?->format('Y-m-d'),
+                'is_accreditation_expired' => $journal->is_accreditation_expired,
+                'accreditation_expiry_status' => $journal->accreditation_expiry_status,
+                
+                // Indexations
+                'indexations' => $journal->indexations,
+                'indexation_labels' => $journal->indexation_labels,
+                
                 'is_active' => $journal->is_active,
                 'created_at' => $journal->created_at->format('Y-m-d H:i'),
                 'updated_at' => $journal->updated_at->format('Y-m-d H:i'),
