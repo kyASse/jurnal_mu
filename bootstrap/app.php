@@ -14,7 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    // ->usePublicPath(dirname(__DIR__).'/public') // Commented out - method not available in current Laravel version
     ->withMiddleware(function (Middleware $middleware) {
         // Enable stateful API for Sanctum SPA authentication
         $middleware->statefulApi();
@@ -44,4 +43,5 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })->create()
+    ->usePublicPath(realpath(__DIR__.'/../'));
