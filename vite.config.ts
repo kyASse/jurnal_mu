@@ -16,6 +16,10 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    build:{
+        outDir: 'build',
+        emptyOutDir: true,
+    },
     esbuild: {
         jsx: 'automatic',
     },
