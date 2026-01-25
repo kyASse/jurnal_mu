@@ -102,20 +102,26 @@ interface Props {
         status?: string;
         sinta_rank?: number;
         scientific_field_id?: number;
+        indexation?: string;
+        accreditation_grade?: string;
     };
     universities: University[];
     scientificFields: ScientificField[];
     sintaRanks: FilterOption[];
     statusOptions: FilterOption[];
+    indexationOptions: FilterOption[];
+    accreditationGradeOptions: FilterOption[];
 }
 
-export default function JournalsIndex({ journals, filters, universities, scientificFields, sintaRanks, statusOptions }: Props) {
+export default function JournalsIndex({ journals, filters, universities, scientificFields, sintaRanks, statusOptions, indexationOptions, accreditationGradeOptions }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [universityFilter, setUniversityFilter] = useState(filters.university_id?.toString() || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank?.toString() || '');
     const [scientificFieldFilter, setScientificFieldFilter] = useState(filters.scientific_field_id?.toString() || '');
+    const [indexationFilter, setIndexationFilter] = useState(filters.indexation || '');
+    const [accreditationGradeFilter, setAccreditationGradeFilter] = useState(filters.accreditation_grade || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -127,6 +133,8 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                 status: statusFilter,
                 sinta_rank: sintaRankFilter,
                 scientific_field_id: scientificFieldFilter,
+                indexation: indexationFilter,
+                accreditation_grade: accreditationGradeFilter,
             },
             { preserveState: true },
         );
@@ -138,6 +146,8 @@ export default function JournalsIndex({ journals, filters, universities, scienti
         setStatusFilter('');
         setSintaRankFilter('');
         setScientificFieldFilter('');
+        setIndexationFilter('');
+        setAccreditationGradeFilter('');
         router.get(route('admin.journals.index'));
     };
 
@@ -162,7 +172,7 @@ export default function JournalsIndex({ journals, filters, universities, scienti
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
     };
 
-    const hasActiveFilters = search || universityFilter || statusFilter || sintaRankFilter || scientificFieldFilter;
+    const hasActiveFilters = search || universityFilter || statusFilter || sintaRankFilter || scientificFieldFilter || indexationFilter || accreditationGradeFilter;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -271,6 +281,45 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                     <SelectContent>
                                         <SelectItem value="all">All SINTA Ranks</SelectItem>
                                         {sintaRanks.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Filter Row 2 - New Filters */}
+                            <div className="flex gap-4">
+                                {/* Indexation Filter */}
+                                <Select
+                                    value={indexationFilter || 'all'}
+                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Indexations" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Indexations</SelectItem>
+                                        {indexationOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Dikti Accreditation Filter */}
+                                <Select
+                                    value={accreditationGradeFilter || 'all'}
+                                    onValueChange={(value) => setAccreditationGradeFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Dikti Accreditation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Dikti Accreditation</SelectItem>
+                                        {accreditationGradeOptions.map((option) => (
                                             <SelectItem key={option.value} value={option.value.toString()}>
                                                 {option.label}
                                             </SelectItem>
