@@ -51,6 +51,16 @@ class PublicJournalController extends Controller
             $query->where('scientific_field_id', $request->scientific_field_id);
         }
 
+        // Apply indexation filter
+        if ($request->filled('indexation')) {
+            $query->byIndexation($request->indexation);
+        }
+
+        // Apply Dikti accreditation filter
+        if ($request->filled('accreditation_grade')) {
+            $query->byAccreditationGrade($request->accreditation_grade);
+        }
+
         // Paginate results
         $journals = $query
             ->orderBy('title')
@@ -94,12 +104,22 @@ class PublicJournalController extends Controller
             ['value' => 6, 'label' => 'SINTA 6'],
         ]);
 
+        $indexationOptions = collect(Journal::getIndexationPlatforms())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
+        $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
         return Inertia::render('Journals/Index', [
             'journals' => $journals,
-            'filters' => $request->only(['search', 'university_id', 'sinta_rank', 'scientific_field_id']),
+            'filters' => $request->only(['search', 'university_id', 'sinta_rank', 'scientific_field_id', 'indexation', 'accreditation_grade']),
             'universities' => $universities,
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
+            'indexationOptions' => $indexationOptions,
+            'accreditationGradeOptions' => $accreditationGradeOptions,
         ]);
     }
 

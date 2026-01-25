@@ -189,7 +189,17 @@ class Journal extends Model
                 $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
             });
     }
+    /**
+     * Scope to filter by Dikti accreditation grade
+     */
+    public function scopeByAccreditationGrade($query, ?string $grade)
+    {
+        if (! $grade) {
+            return $query;
+        }
 
+        return $query->where('accreditation_grade', $grade);
+    }
     /*
     |--------------------------------------------------------------------------
     | Accessors
@@ -339,5 +349,40 @@ class Journal extends Model
         return $this->assessments()
             ->whereIn('status', ['submitted', 'reviewed'])
             ->exists();
+    }
+
+    /**
+     * Get available indexation platforms
+     *
+     * @return array<string, string>
+     */
+    public static function getIndexationPlatforms(): array
+    {
+        return [
+            'Scopus' => 'Scopus',
+            'Web of Science' => 'Web of Science',
+            'DOAJ' => 'DOAJ',
+            'Google Scholar' => 'Google Scholar',
+            'Dimensions' => 'Dimensions',
+            'EBSCO' => 'EBSCO',
+            'ProQuest' => 'ProQuest',
+            'Crossref' => 'Crossref',
+            'BASE' => 'BASE',
+        ];
+    }
+
+    /**
+     * Get available Dikti accreditation grades
+     *
+     * @return array<string, string>
+     */
+    public static function getAccreditationGrades(): array
+    {
+        return [
+            'Unggul' => 'Unggul',
+            'Baik Sekali' => 'Baik Sekali',
+            'Baik' => 'Baik',
+            'Cukup' => 'Cukup',
+        ];
     }
 }
