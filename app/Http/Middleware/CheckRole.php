@@ -29,11 +29,8 @@ class CheckRole
                 ->with('error', 'Your account has been deactivated. Please contact the administrator.');
         }
 
-        // Get user role name
-        $userRole = $request->user()->role->name;
-
-        // Check if user has requiered role
-        if (! in_array($userRole, $roles)) {
+        // Check if user has any of the required roles (supports multi-role)
+        if (! $request->user()->hasAnyRole($roles)) {
             abort(403, 'You do not have permission to access this page.');
         }
 

@@ -217,8 +217,18 @@ Route::middleware(['auth'])->group(function () {
             ->name('pembinaan.index');
 
         // Review assessments from their university
-        Route::get('assessments', [AdminKampusAssessmentController::class, 'index'])
-            ->name('assessments.index');
+        Route::prefix('assessments')->name('assessments.')->group(function () {
+            Route::get('/', [AdminKampusAssessmentController::class, 'index'])
+                ->name('index');
+            Route::get('{assessment}', [AdminKampusAssessmentController::class, 'show'])
+                ->name('show');
+            Route::get('{assessment}/review', [AdminKampusAssessmentController::class, 'review'])
+                ->name('review');
+            Route::post('{assessment}/approve', [AdminKampusAssessmentController::class, 'approve'])
+                ->name('approve');
+            Route::post('{assessment}/request-revision', [AdminKampusAssessmentController::class, 'requestRevision'])
+                ->name('request-revision');
+        });
 
     });
 
