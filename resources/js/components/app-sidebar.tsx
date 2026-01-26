@@ -100,6 +100,11 @@ export function AppSidebar() {
                 href: route('admin-kampus.pembinaan.index'),
                 icon: Award,
             },
+            {
+                title: 'Assessments',
+                href: route('admin-kampus.assessments.index'),
+                icon: FileText,
+            },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.USER) {
