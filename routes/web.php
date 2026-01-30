@@ -206,7 +206,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('update');
             Route::delete('{pembinaan}', [AdminPembinaanController::class, 'destroy'])
                 ->name('destroy');
-            Roume('toggle-status');
+            Route::post('{pembinaan}/toggle-status', [AdminPembinaanController::class, 'toggleStatus'])
+                ->name('toggle-status');
         });
 
     });
@@ -233,8 +234,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('reviewer', [ReviewerController::class, 'index'])
             ->name('reviewer.index');
 
-        // Pembinaan Rte::post('{pembinaan}/toggle-status', [AdminPembinaanController::class, 'toggleStatus'])
-                ->naegistration Management (v1.1)
+        // Pembinaan Registration Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
             Route::get('/', [AdminKampusPembinaanController::class, 'index'])
                 ->name('index');
