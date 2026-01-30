@@ -186,9 +186,106 @@ export interface PaginatedData<T> {
     last_page: number;
     per_page: number;
     total: number;
+    prev_page_url?: string | null;
+    next_page_url?: string | null;
     links: Array<{
         url: string | null;
         label: string;
         active: boolean;
     }>;
+}
+
+// Pembinaan (v1.1) types
+export interface AccreditationTemplate {
+    id: number;
+    name: string;
+    type: string;
+    is_active: boolean;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface Pembinaan {
+    id: number;
+    name: string;
+    description?: string;
+    category: 'akreditasi' | 'indeksasi';
+    status: 'draft' | 'active' | 'closed';
+    accreditation_template_id?: number;
+    accreditation_template?: AccreditationTemplate;
+    registration_start: string;
+    registration_end: string;
+    assessment_start: string;
+    assessment_end: string;
+    quota?: number;
+    registrations_count?: number;
+    pending_registrations_count?: number;
+    approved_registrations_count?: number;
+    creator?: User;
+    created_at: string;
+    updated_at?: string;
+    deleted_at?: string;
+}
+
+export interface PembinaanRegistration {
+    id: number;
+    pembinaan_id: number;
+    journal_id: number;
+    user_id: number;
+    status: 'pending' | 'approved' | 'rejected';
+    registered_at: string;
+    reviewed_at?: string;
+    reviewed_by?: number;
+    rejection_reason?: string;
+    pembinaan?: Pembinaan;
+    journal?: Journal;
+    user?: User;
+    reviewer?: User;
+    attachments?: PembinaanRegistrationAttachment[];
+    reviews?: PembinaanReview[];
+    reviewer_assignments?: ReviewerAssignment[];
+    attachments_count?: number;
+    reviews_count?: number;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface PembinaanRegistrationAttachment {
+    id: number;
+    registration_id: number;
+    file_name: string;
+    file_path: string;
+    file_type: string;
+    file_size?: number;
+    document_type?: string;
+    uploaded_by: number;
+    uploader?: User;
+    created_at?: string;
+}
+
+export interface PembinaanReview {
+    id: number;
+    registration_id: number;
+    reviewer_id: number;
+    score?: number;
+    feedback?: string;
+    recommendation?: string;
+    reviewed_at: string;
+    registration?: PembinaanRegistration;
+    reviewer?: User;
+    created_at?: string;
+}
+
+export interface ReviewerAssignment {
+    id: number;
+    reviewer_id: number;
+    registration_id: number;
+    assigned_by: number;
+    assigned_at: string;
+    status: 'assigned' | 'in_progress' | 'completed';
+    reviewer?: User;
+    registration?: PembinaanRegistration;
+    assigner?: User;
+    created_at?: string;
+    updated_at?: string;
 }
