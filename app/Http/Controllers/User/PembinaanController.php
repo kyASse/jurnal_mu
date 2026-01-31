@@ -56,10 +56,20 @@ class PembinaanController extends Controller
         $this->authorize('view', $pembinaan);
 
         $pembinaan->load(['accreditationTemplate', 'creator'])
-            ->loadCount(['registrations', 'approvedRegistrations']);
+            ->loadCount([
+                'registrations',
+                'approvedRegistrations',
+                'pendingRegistrations',
+            ]);
+
+        $user = auth()->user();
+        $isRegistered = $pembinaan->registrations()
+            ->where('user_id', $user->id)
+            ->exists();
 
         return Inertia::render('User/Pembinaan/Show', [
-            'pembinaan' => $pembinaan,
+            'program' => $pembinaan,
+            'isRegistered' => $isRegistered,
         ]);
     }
 
@@ -78,7 +88,7 @@ class PembinaanController extends Controller
             ->get();
 
         return Inertia::render('User/Pembinaan/Register', [
-            'pembinaan' => $pembinaan,
+            'program' => $pembinaan,
             'journals' => $journals,
         ]);
     }
@@ -97,10 +107,9 @@ class PembinaanController extends Controller
             'attachments.*.document_type' => 'required|string|max:100',
         ]);
 
-        // Authorize via policy
+        // Authorize via policy (pass journal and pembinaan IDs; User is injected automatically)
         $this->authorize('register', [
             PembinaanRegistration::class,
-            $user->id,
             $validated['journal_id'],
             $pembinaan->id,
         ]);
@@ -149,7 +158,7 @@ class PembinaanController extends Controller
             'pembinaan.accreditationTemplate',
             'journal.scientificField',
             'journal.university',
-            'reviewer',
+            'reviewer.university',
             'attachments.uploader',
             'reviews.reviewer',
         ]);
