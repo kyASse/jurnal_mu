@@ -126,20 +126,12 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
 
     const handleSearch = (value: string) => {
         setSearch(value);
-        router.get(
-            route('admin.pembinaan.show', pembinaan.id),
-            { search: value, status },
-            { preserveState: true, replace: true }
-        );
+        router.get(route('admin.pembinaan.show', pembinaan.id), { search: value, status }, { preserveState: true, replace: true });
     };
 
     const handleStatusFilter = (value: string) => {
         setStatus(value);
-        router.get(
-            route('admin.pembinaan.show', pembinaan.id),
-            { search, status: value || undefined },
-            { preserveState: true, replace: true }
-        );
+        router.get(route('admin.pembinaan.show', pembinaan.id), { search, status: value || undefined }, { preserveState: true, replace: true });
     };
 
     const handleToggleStatus = () => {
@@ -157,7 +149,7 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                 onError: () => {
                     toast.error('Failed to change status');
                 },
-            }
+            },
         );
     };
 
@@ -181,11 +173,7 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
             approved: 'default',
             rejected: 'destructive',
         };
-        return (
-            <Badge variant={variants[status as keyof typeof variants] as any}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Badge>
-        );
+        return <Badge variant={variants[status as keyof typeof variants] as any}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
     };
 
     const formatDate = (date: string) => {
@@ -214,7 +202,7 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6 space-y-4">
-                        <Button variant="ghost" size="sm" className="gap-2 h-auto p-0" asChild>
+                        <Button variant="ghost" size="sm" className="h-auto gap-2 p-0" asChild>
                             <Link href={route('admin.pembinaan.index')}>
                                 <ArrowLeft className="h-4 w-4" />
                                 Back to List
@@ -224,18 +212,13 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                             <h1 className="text-3xl font-bold tracking-tight">{pembinaan.name}</h1>
                             <p className="mt-2 text-sm text-muted-foreground">
                                 {pembinaan.category.charAt(0).toUpperCase() + pembinaan.category.slice(1)}
-                                {pembinaan.accreditation_template &&
-                                    ` • ${pembinaan.accreditation_template.name}`}
+                                {pembinaan.accreditation_template && ` • ${pembinaan.accreditation_template.name}`}
                             </p>
                         </div>
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex flex-wrap items-center gap-2">
                             {getStatusBadge(pembinaan.status)}
-                            {pembinaan.category === 'akreditasi' && (
-                                <Badge variant="outline">Akreditasi</Badge>
-                            )}
-                            {pembinaan.category === 'indeksasi' && (
-                                <Badge variant="outline">Indeksasi</Badge>
-                            )}
+                            {pembinaan.category === 'akreditasi' && <Badge variant="outline">Akreditasi</Badge>}
+                            {pembinaan.category === 'indeksasi' && <Badge variant="outline">Indeksasi</Badge>}
                         </div>
                     </div>
 
@@ -274,9 +257,7 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                                     <CardTitle className="text-sm font-medium">Pending</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-yellow-600">
-                                        {pembinaan.pending_registrations_count}
-                                    </div>
+                                    <div className="text-2xl font-bold text-yellow-600">{pembinaan.pending_registrations_count}</div>
                                 </CardContent>
                             </Card>
 
@@ -285,9 +266,7 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                                     <CardTitle className="text-sm font-medium">Approved</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-green-600">
-                                        {pembinaan.approved_registrations_count}
-                                    </div>
+                                    <div className="text-2xl font-bold text-green-600">{pembinaan.approved_registrations_count}</div>
                                 </CardContent>
                             </Card>
 
@@ -319,8 +298,8 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                                     <div className="flex items-center gap-2 rounded-lg bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
                                         <span>ℹ️</span>
                                         <span>
-                                            Current status: <strong>{pembinaan.status}</strong>. Change to{' '}
-                                            <strong>Active</strong> to accept registrations.
+                                            Current status: <strong>{pembinaan.status}</strong>. Change to <strong>Active</strong> to accept
+                                            registrations.
                                         </span>
                                     </div>
                                 )}
@@ -350,12 +329,10 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                                     </h3>
                                     <div className="rounded-lg border p-3 text-sm">
                                         <div>
-                                            <span className="font-medium">Start:</span>{' '}
-                                            {formatDateTime(pembinaan.registration_start)}
+                                            <span className="font-medium">Start:</span> {formatDateTime(pembinaan.registration_start)}
                                         </div>
                                         <div>
-                                            <span className="font-medium">End:</span>{' '}
-                                            {formatDateTime(pembinaan.registration_end)}
+                                            <span className="font-medium">End:</span> {formatDateTime(pembinaan.registration_end)}
                                         </div>
                                     </div>
                                 </div>
@@ -367,12 +344,10 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                                     </h3>
                                     <div className="rounded-lg border p-3 text-sm">
                                         <div>
-                                            <span className="font-medium">Start:</span>{' '}
-                                            {formatDateTime(pembinaan.assessment_start)}
+                                            <span className="font-medium">Start:</span> {formatDateTime(pembinaan.assessment_start)}
                                         </div>
                                         <div>
-                                            <span className="font-medium">End:</span>{' '}
-                                            {formatDateTime(pembinaan.assessment_end)}
+                                            <span className="font-medium">End:</span> {formatDateTime(pembinaan.assessment_end)}
                                         </div>
                                     </div>
                                 </div>
@@ -397,7 +372,7 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                             <div className="rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
                                     <div className="relative flex-1">
-                                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
                                             placeholder="Search journals..."
                                             value={search}
@@ -434,7 +409,7 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                             </div>
 
                             {/* Table */}
-                            <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border\">
+                            <div className="dark:border-sidebar-border\ overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -461,30 +436,21 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
                                                 <TableRow key={registration.id}>
                                                     <TableCell>
                                                         <div>
-                                                            <div className="font-medium">
-                                                                {registration.journal.title}
-                                                            </div>
-                                                            <div className="text-sm text-muted-foreground">
-                                                                ISSN: {registration.journal.issn}
-                                                            </div>
+                                                            <div className="font-medium">{registration.journal.title}</div>
+                                                            <div className="text-sm text-muted-foreground">ISSN: {registration.journal.issn}</div>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
-                                                        {registration.journal.university.short_name ||
-                                                            registration.journal.university.name}
+                                                        {registration.journal.university.short_name || registration.journal.university.name}
                                                     </TableCell>
                                                     <TableCell>
                                                         <div>
                                                             <div className="text-sm">{registration.user.name}</div>
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {registration.user.email}
-                                                            </div>
+                                                            <div className="text-xs text-muted-foreground">{registration.user.email}</div>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>{getStatusBadge(registration.status)}</TableCell>
-                                                    <TableCell className="text-sm">
-                                                        {formatDate(registration.registered_at)}
-                                                    </TableCell>
+                                                    <TableCell className="text-sm">{formatDate(registration.registered_at)}</TableCell>
                                                     <TableCell>
                                                         <div className="flex justify-end">
                                                             <Button variant="ghost" size="icon" title="View Details">
@@ -501,28 +467,19 @@ export default function PembinaanShow({ pembinaan, registrations, filters }: Pro
 
                             {/* Pagination */}
                             {registrations.data.length > 0 && (
-                                <div className="flex items-center justify-between border-t pt-4\">
+                                <div className="pt-4\ flex items-center justify-between border-t">
                                     <div className="text-sm text-muted-foreground">
-                                        Showing {registrations.from} to {registrations.to} of {registrations.total}{' '}
-                                        registrations
+                                        Showing {registrations.from} to {registrations.to} of {registrations.total} registrations
                                     </div>
                                     <div className="flex gap-2">
                                         {registrations.prev_page_url && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => router.get(registrations.prev_page_url!)}
-                                            >
+                                            <Button variant="outline" size="sm" onClick={() => router.get(registrations.prev_page_url!)}>
                                                 <ChevronLeft className="h-4 w-4" />
                                                 Previous
                                             </Button>
                                         )}
                                         {registrations.next_page_url && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => router.get(registrations.next_page_url!)}
-                                            >
+                                            <Button variant="outline" size="sm" onClick={() => router.get(registrations.next_page_url!)}>
                                                 Next
                                                 <ChevronRight className="h-4 w-4" />
                                             </Button>

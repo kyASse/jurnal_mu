@@ -336,7 +336,9 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                                 placeholder="e.g. 105/E/KPT/2023"
                                                 className="mt-1"
                                             />
-                                            {errors.dikti_accreditation_number && <p className="mt-1 text-sm text-red-600">{errors.dikti_accreditation_number}</p>}
+                                            {errors.dikti_accreditation_number && (
+                                                <p className="mt-1 text-sm text-red-600">{errors.dikti_accreditation_number}</p>
+                                            )}
                                         </div>
 
                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -350,7 +352,9 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                                     max={new Date().toISOString().split('T')[0]}
                                                     className="mt-1"
                                                 />
-                                                {errors.accreditation_issued_date && <p className="mt-1 text-sm text-red-600">{errors.accreditation_issued_date}</p>}
+                                                {errors.accreditation_issued_date && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_issued_date}</p>
+                                                )}
                                             </div>
 
                                             <div>
@@ -363,7 +367,9 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                                     min={data.accreditation_issued_date || undefined}
                                                     className="mt-1"
                                                 />
-                                                {errors.accreditation_expiry_date && <p className="mt-1 text-sm text-red-600">{errors.accreditation_expiry_date}</p>}
+                                                {errors.accreditation_expiry_date && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_expiry_date}</p>
+                                                )}
                                             </div>
                                         </div>
                                     </>
@@ -377,11 +383,11 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
 
                                 <div className="space-y-3">
                                     {indexationOptions.map((option) => {
-                                        const isSelected = data.indexations.some(i => i.platform === option.value);
-                                        const selectedItem = data.indexations.find(i => i.platform === option.value);
+                                        const isSelected = data.indexations.some((i) => i.platform === option.value);
+                                        const selectedItem = data.indexations.find((i) => i.platform === option.value);
 
                                         return (
-                                            <div key={option.value} className="border rounded-md p-4">
+                                            <div key={option.value} className="rounded-md border p-4">
                                                 <div className="flex items-start gap-3">
                                                     <input
                                                         type="checkbox"
@@ -389,15 +395,21 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                                         checked={isSelected}
                                                         onChange={(e) => {
                                                             if (e.target.checked) {
-                                                                setData('indexations', [...data.indexations, { platform: option.value, indexed_at: '' }]);
+                                                                setData('indexations', [
+                                                                    ...data.indexations,
+                                                                    { platform: option.value, indexed_at: '' },
+                                                                ]);
                                                             } else {
-                                                                setData('indexations', data.indexations.filter(i => i.platform !== option.value));
+                                                                setData(
+                                                                    'indexations',
+                                                                    data.indexations.filter((i) => i.platform !== option.value),
+                                                                );
                                                             }
                                                         }}
                                                         className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                                     />
                                                     <div className="flex-1">
-                                                        <Label htmlFor={`indexation-${option.value}`} className="font-medium cursor-pointer">
+                                                        <Label htmlFor={`indexation-${option.value}`} className="cursor-pointer font-medium">
                                                             {option.label}
                                                         </Label>
                                                         {isSelected && (
@@ -407,11 +419,14 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                                                     type="date"
                                                                     value={selectedItem?.indexed_at || ''}
                                                                     onChange={(e) => {
-                                                                        setData('indexations', data.indexations.map(i =>
-                                                                            i.platform === option.value
-                                                                                ? { ...i, indexed_at: e.target.value }
-                                                                                : i
-                                                                        ));
+                                                                        setData(
+                                                                            'indexations',
+                                                                            data.indexations.map((i) =>
+                                                                                i.platform === option.value
+                                                                                    ? { ...i, indexed_at: e.target.value }
+                                                                                    : i,
+                                                                            ),
+                                                                        );
                                                                     }}
                                                                     max={new Date().toISOString().split('T')[0]}
                                                                     className="mt-1"

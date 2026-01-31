@@ -5,10 +5,10 @@
  * @features View journal info, list assessments, view assessment details, download attachments
  * @route GET /admin-kampus/journals/{id}
  */
+import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { SintaBadge, IndexationBadge, AccreditationBadge } from '@/components/badges';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -171,11 +171,12 @@ export default function JournalShow({ journal }: Props) {
                                                 expiry_date={journal.accreditation_expiry_date}
                                             />
                                         )}
-                                        {journal.indexation_labels && journal.indexation_labels.slice(0, 3).map((label) => (
-                                            <IndexationBadge key={label} platform={label} />
-                                        ))}
+                                        {journal.indexation_labels &&
+                                            journal.indexation_labels.slice(0, 3).map((label) => <IndexationBadge key={label} platform={label} />)}
                                         {journal.indexation_labels && journal.indexation_labels.length > 3 && (
-                                            <Badge variant="outline" className="text-xs">+{journal.indexation_labels.length - 3} more</Badge>
+                                            <Badge variant="outline" className="text-xs">
+                                                +{journal.indexation_labels.length - 3} more
+                                            </Badge>
                                         )}
                                     </div>
                                 </div>

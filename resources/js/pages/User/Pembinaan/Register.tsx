@@ -93,7 +93,7 @@ export default function PembinaanRegister({ program, journals }: Props) {
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
     };
 
     const validateFile = (file: File): string | null => {
@@ -239,261 +239,242 @@ export default function PembinaanRegister({ program, journals }: Props) {
                                 <p className="mt-1 text-muted-foreground">{program.name}</p>
                             </div>
                         </div>
-                        </div>
+                    </div>
 
                     <div className="grid gap-6 lg:grid-cols-3">
                         {/* Registration Form */}
                         <div className="lg:col-span-2">
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Journal Selection */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <FileText className="h-5 w-5" />
-                                        Select Journal
-                                    </CardTitle>
-                                    <CardDescription>Choose which journal you want to register</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="journal">Journal *</Label>
-                                        <Select value={selectedJournal} onValueChange={setSelectedJournal}>
-                                            <SelectTrigger id="journal" className={errors.journal ? 'border-destructive' : ''}>
-                                                <SelectValue placeholder="Select a journal" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {journals.map((journal) => (
-                                                    <SelectItem key={journal.id} value={journal.id.toString()}>
-                                                        <div className="flex flex-col">
-                                                            <span className="font-medium">{journal.title}</span>
-                                                            <span className="text-xs text-muted-foreground">
-                                                                ISSN: {journal.issn || 'N/A'}
-                                                            </span>
-                                                        </div>
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.journal && (
-                                            <p className="text-sm text-destructive">{errors.journal}</p>
-                                        )}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Journal Selection */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <FileText className="h-5 w-5" />
+                                            Select Journal
+                                        </CardTitle>
+                                        <CardDescription>Choose which journal you want to register</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="journal">Journal *</Label>
+                                            <Select value={selectedJournal} onValueChange={setSelectedJournal}>
+                                                <SelectTrigger id="journal" className={errors.journal ? 'border-destructive' : ''}>
+                                                    <SelectValue placeholder="Select a journal" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {journals.map((journal) => (
+                                                        <SelectItem key={journal.id} value={journal.id.toString()}>
+                                                            <div className="flex flex-col">
+                                                                <span className="font-medium">{journal.title}</span>
+                                                                <span className="text-xs text-muted-foreground">ISSN: {journal.issn || 'N/A'}</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.journal && <p className="text-sm text-destructive">{errors.journal}</p>}
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                            {/* File Upload */}
+                                {/* File Upload */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Upload className="h-5 w-5" />
+                                            Upload Documents
+                                        </CardTitle>
+                                        <CardDescription>Upload supporting documents (PDF, JPG, PNG - max 5MB each)</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {/* Dropzone */}
+                                        <div
+                                            onDrop={handleDrop}
+                                            onDragOver={handleDragOver}
+                                            onDragLeave={handleDragLeave}
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+                                                isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/25 hover:border-primary/50'
+                                            }`}
+                                        >
+                                            <Upload className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                                            <p className="mb-2 font-medium">Click to upload or drag and drop files here</p>
+                                            <p className="text-sm text-muted-foreground">PDF, JPG, PNG up to 5MB each</p>
+                                            <Input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                multiple
+                                                accept=".pdf,.jpg,.jpeg,.png"
+                                                onChange={(e) => handleFileSelect(e.target.files)}
+                                                className="hidden"
+                                            />
+                                        </div>
+
+                                        {errors.files && (
+                                            <div className="flex gap-2 rounded-lg border border-destructive/50 bg-destructive/10 p-3">
+                                                <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
+                                                <p className="text-sm whitespace-pre-line text-destructive">{errors.files}</p>
+                                            </div>
+                                        )}
+
+                                        {/* Uploaded Files */}
+                                        {uploadedFiles.length > 0 && (
+                                            <div className="space-y-3">
+                                                <Separator />
+                                                <h4 className="font-semibold">Uploaded Files ({uploadedFiles.length})</h4>
+                                                <div className="space-y-3">
+                                                    {uploadedFiles.map((uploadedFile) => (
+                                                        <div key={uploadedFile.id} className="flex items-start gap-3 rounded-lg border p-3">
+                                                            {uploadedFile.preview ? (
+                                                                <img
+                                                                    src={uploadedFile.preview}
+                                                                    alt="Preview"
+                                                                    className="h-16 w-16 rounded object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-16 w-16 items-center justify-center rounded bg-muted">
+                                                                    <FileText className="h-8 w-8 text-muted-foreground" />
+                                                                </div>
+                                                            )}
+
+                                                            <div className="flex-1 space-y-2">
+                                                                <div>
+                                                                    <p className="font-medium">{uploadedFile.file.name}</p>
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        {formatFileSize(uploadedFile.file.size)}
+                                                                    </p>
+                                                                </div>
+
+                                                                <Select
+                                                                    value={uploadedFile.documentType}
+                                                                    onValueChange={(value) => updateDocumentType(uploadedFile.id, value)}
+                                                                >
+                                                                    <SelectTrigger className="h-8">
+                                                                        <SelectValue placeholder="Select document type" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {DOCUMENT_TYPES.map((type) => (
+                                                                            <SelectItem key={type.value} value={type.value}>
+                                                                                {type.label}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => removeFile(uploadedFile.id)}
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+
+                                {/* Submit */}
+                                <div className="flex gap-3">
+                                    <Button type="submit" size="lg" disabled={isSubmitting}>
+                                        {isSubmitting ? (
+                                            <>Processing...</>
+                                        ) : (
+                                            <>
+                                                <CheckCircle2 className="mr-2 h-5 w-5" />
+                                                Submit Registration
+                                            </>
+                                        )}
+                                    </Button>
+                                    <Button type="button" variant="outline" size="lg" asChild>
+                                        <a href={route('user.pembinaan.programs.show', program.id)}>Cancel</a>
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Sidebar - Program Info */}
+                        <div className="space-y-6">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Upload className="h-5 w-5" />
-                                        Upload Documents
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Upload supporting documents (PDF, JPG, PNG - max 5MB each)
-                                    </CardDescription>
+                                    <CardTitle>Program Details</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {/* Dropzone */}
-                                    <div
-                                        onDrop={handleDrop}
-                                        onDragOver={handleDragOver}
-                                        onDragLeave={handleDragLeave}
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
-                                            isDragging
-                                                ? 'border-primary bg-primary/10'
-                                                : 'border-muted-foreground/25 hover:border-primary/50'
-                                        }`}
-                                    >
-                                        <Upload className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                                        <p className="mb-2 font-medium">
-                                            Click to upload or drag and drop files here
+                                    <div>
+                                        <p className="text-sm font-medium">Program Name</p>
+                                        <p className="text-sm text-muted-foreground">{program.name}</p>
+                                    </div>
+
+                                    <Separator />
+
+                                    <div>
+                                        <p className="mb-1 text-sm font-medium">Category</p>
+                                        <Badge variant="outline" className="capitalize">
+                                            {program.category}
+                                        </Badge>
+                                    </div>
+
+                                    <Separator />
+
+                                    <div>
+                                        <p className="mb-2 flex items-center gap-2 text-sm font-medium">
+                                            <Calendar className="h-4 w-4" />
+                                            Registration Period
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            PDF, JPG, PNG up to 5MB each
+                                            {formatDate(program.registration_start)}
+                                            <br />
+                                            to
+                                            <br />
+                                            {formatDate(program.registration_end)}
                                         </p>
-                                        <Input
-                                            ref={fileInputRef}
-                                            type="file"
-                                            multiple
-                                            accept=".pdf,.jpg,.jpeg,.png"
-                                            onChange={(e) => handleFileSelect(e.target.files)}
-                                            className="hidden"
-                                        />
                                     </div>
 
-                                    {errors.files && (
-                                        <div className="flex gap-2 rounded-lg border border-destructive/50 bg-destructive/10 p-3">
-                                            <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
-                                            <p className="text-sm text-destructive whitespace-pre-line">
-                                                {errors.files}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {/* Uploaded Files */}
-                                    {uploadedFiles.length > 0 && (
-                                        <div className="space-y-3">
+                                    {program.quota && (
+                                        <>
                                             <Separator />
-                                            <h4 className="font-semibold">Uploaded Files ({uploadedFiles.length})</h4>
-                                            <div className="space-y-3">
-                                                {uploadedFiles.map((uploadedFile) => (
-                                                    <div
-                                                        key={uploadedFile.id}
-                                                        className="flex items-start gap-3 rounded-lg border p-3"
-                                                    >
-                                                        {uploadedFile.preview ? (
-                                                            <img
-                                                                src={uploadedFile.preview}
-                                                                alt="Preview"
-                                                                className="h-16 w-16 rounded object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="flex h-16 w-16 items-center justify-center rounded bg-muted">
-                                                                <FileText className="h-8 w-8 text-muted-foreground" />
-                                                            </div>
-                                                        )}
-
-                                                        <div className="flex-1 space-y-2">
-                                                            <div>
-                                                                <p className="font-medium">{uploadedFile.file.name}</p>
-                                                                <p className="text-xs text-muted-foreground">
-                                                                    {formatFileSize(uploadedFile.file.size)}
-                                                                </p>
-                                                            </div>
-
-                                                            <Select
-                                                                value={uploadedFile.documentType}
-                                                                onValueChange={(value) =>
-                                                                    updateDocumentType(uploadedFile.id, value)
-                                                                }
-                                                            >
-                                                                <SelectTrigger className="h-8">
-                                                                    <SelectValue placeholder="Select document type" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    {DOCUMENT_TYPES.map((type) => (
-                                                                        <SelectItem key={type.value} value={type.value}>
-                                                                            {type.label}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => removeFile(uploadedFile.id)}
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                ))}
+                                            <div>
+                                                <p className="mb-1 text-sm font-medium">Quota</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {program.approved_registrations_count || 0} / {program.quota} registered
+                                                </p>
                                             </div>
-                                        </div>
+                                        </>
                                     )}
                                 </CardContent>
                             </Card>
 
-                            {/* Submit */}
-                            <div className="flex gap-3">
-                                <Button type="submit" size="lg" disabled={isSubmitting}>
-                                    {isSubmitting ? (
-                                        <>Processing...</>
-                                    ) : (
-                                        <>
-                                            <CheckCircle2 className="mr-2 h-5 w-5" />
-                                            Submit Registration
-                                        </>
-                                    )}
-                                </Button>
-                                <Button type="button" variant="outline" size="lg" asChild>
-                                    <a href={route('user.pembinaan.programs.show', program.id)}>Cancel</a>
-                                </Button>
-                            </div>
-                        </form>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Required Documents</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
+                                            ISSN Certificate
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
+                                            Journal Cover
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
+                                            Accreditation Certificate (if any)
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                            Other supporting documents
+                                        </li>
+                                    </ul>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
-
-                    {/* Sidebar - Program Info */}
-                    <div className="space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Program Details</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div>
-                                    <p className="text-sm font-medium">Program Name</p>
-                                    <p className="text-sm text-muted-foreground">{program.name}</p>
-                                </div>
-
-                                <Separator />
-
-                                <div>
-                                    <p className="mb-1 text-sm font-medium">Category</p>
-                                    <Badge variant="outline" className="capitalize">
-                                        {program.category}
-                                    </Badge>
-                                </div>
-
-                                <Separator />
-
-                                <div>
-                                    <p className="mb-2 text-sm font-medium flex items-center gap-2">
-                                        <Calendar className="h-4 w-4" />
-                                        Registration Period
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {formatDate(program.registration_start)}
-                                        <br />
-                                        to
-                                        <br />
-                                        {formatDate(program.registration_end)}
-                                    </p>
-                                </div>
-
-                                {program.quota && (
-                                    <>
-                                        <Separator />
-                                        <div>
-                                            <p className="mb-1 text-sm font-medium">Quota</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {program.approved_registrations_count || 0} / {program.quota} registered
-                                            </p>
-                                        </div>
-                                    </>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Required Documents</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="space-y-2 text-sm">
-                                    <li className="flex gap-2">
-                                        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-                                        ISSN Certificate
-                                    </li>
-                                    <li className="flex gap-2">
-                                        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-                                        Journal Cover
-                                    </li>
-                                    <li className="flex gap-2">
-                                        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-                                        Accreditation Certificate (if any)
-                                    </li>
-                                    <li className="flex gap-2">
-                                        <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                        Other supporting documents
-                                    </li>
-                                </ul>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
                 </div>
             </div>
         </AppLayout>

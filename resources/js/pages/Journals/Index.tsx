@@ -86,7 +86,15 @@ interface Props {
     accreditationGradeOptions: FilterOption[];
 }
 
-export default function JournalsIndex({ journals, filters, universities, scientificFields, sintaRanks, indexationOptions, accreditationGradeOptions }: Props) {
+export default function JournalsIndex({
+    journals,
+    filters,
+    universities,
+    scientificFields,
+    sintaRanks,
+    indexationOptions,
+    accreditationGradeOptions,
+}: Props) {
     const { auth } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [universityFilter, setUniversityFilter] = useState(filters.university_id?.toString() || '');

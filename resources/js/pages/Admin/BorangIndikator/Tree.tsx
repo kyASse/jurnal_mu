@@ -123,12 +123,12 @@ export default function TemplateTree({ template, structuredTree }: Props) {
         const type = activeId.startsWith('category-')
             ? 'category'
             : activeId.startsWith('sub-')
-                ? 'sub'
-                : activeId.startsWith('indicator-')
-                    ? 'indicator'
-                    : activeId.startsWith('essay-')
-                        ? 'essay'
-                        : '';
+              ? 'sub'
+              : activeId.startsWith('indicator-')
+                ? 'indicator'
+                : activeId.startsWith('essay-')
+                  ? 'essay'
+                  : '';
 
         // Optimistic Update & API Call
         let newTree = [...treeData];

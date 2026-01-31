@@ -21,7 +21,16 @@
  *
  * @author JurnalMU Team
  */
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +39,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PembinaanRegistration } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { AlertCircle, ArrowLeft, Award, BookOpen, Calendar, CheckCircle2, Clock, Download, FileText, Trash2, Upload, User, XCircle } from 'lucide-react';
+import {
+    AlertCircle,
+    ArrowLeft,
+    Award,
+    BookOpen,
+    Calendar,
+    CheckCircle2,
+    Clock,
+    Download,
+    FileText,
+    Trash2,
+    Upload,
+    User,
+    XCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -144,27 +167,30 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                 <p className="mt-1 text-muted-foreground">View your registration status and information</p>
                             </div>
                         </div>
-                        </div>
+                    </div>
 
                     {/* Status Banner */}
                     <Card className={statusConfig.bgColor}>
-                    <CardContent className="flex items-center gap-4 py-6">
-                        <div className={`rounded-full p-3 ${statusConfig.bgColor}`}>
-                            <StatusIcon className={`h-8 w-8 ${statusConfig.color}`} />
-                        </div>
-                        <div className="flex-1">
-                            <h2 className={`text-xl font-bold ${statusConfig.color}`}>{statusConfig.label}</h2>
-                            <p className="text-sm text-muted-foreground">{statusConfig.description}</p>
-                        </div>
-                        <Badge variant={statusConfig.variant as 'default' | 'secondary' | 'outline' | 'destructive'} className="text-base px-4 py-2">
-                            {registration.status.charAt(0).toUpperCase() + registration.status.slice(1)}
-                        </Badge>
-                    </CardContent>
-                </Card>
+                        <CardContent className="flex items-center gap-4 py-6">
+                            <div className={`rounded-full p-3 ${statusConfig.bgColor}`}>
+                                <StatusIcon className={`h-8 w-8 ${statusConfig.color}`} />
+                            </div>
+                            <div className="flex-1">
+                                <h2 className={`text-xl font-bold ${statusConfig.color}`}>{statusConfig.label}</h2>
+                                <p className="text-sm text-muted-foreground">{statusConfig.description}</p>
+                            </div>
+                            <Badge
+                                variant={statusConfig.variant as 'default' | 'secondary' | 'outline' | 'destructive'}
+                                className="px-4 py-2 text-base"
+                            >
+                                {registration.status.charAt(0).toUpperCase() + registration.status.slice(1)}
+                            </Badge>
+                        </CardContent>
+                    </Card>
 
                     <div className="grid gap-6 lg:grid-cols-3">
                         {/* Main Content */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="space-y-6 lg:col-span-2">
                             {/* Program & Journal Info */}
                             <Card>
                                 <CardHeader>
@@ -224,9 +250,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="whitespace-pre-wrap text-muted-foreground">
-                                            {registration.rejection_reason}
-                                        </p>
+                                        <p className="whitespace-pre-wrap text-muted-foreground">{registration.rejection_reason}</p>
                                     </CardContent>
                                 </Card>
                             )}
@@ -238,9 +262,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                         <FileText className="h-5 w-5" />
                                         Uploaded Documents
                                     </CardTitle>
-                                    <CardDescription>
-                                        {registration.attachments?.length || 0} file(s) uploaded
-                                    </CardDescription>
+                                    <CardDescription>{registration.attachments?.length || 0} file(s) uploaded</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     {registration.attachments && registration.attachments.length > 0 ? (
@@ -272,10 +294,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <Button variant="ghost" size="sm" asChild>
-                                                                <a
-                                                                    href={route('user.pembinaan.attachments.download', attachment.id)}
-                                                                    download
-                                                                >
+                                                                <a href={route('user.pembinaan.attachments.download', attachment.id)} download>
                                                                     <Download className="h-4 w-4" />
                                                                 </a>
                                                             </Button>
@@ -285,9 +304,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                             </TableBody>
                                         </Table>
                                     ) : (
-                                        <p className="text-center text-sm text-muted-foreground py-6">
-                                            No documents uploaded
-                                        </p>
+                                        <p className="py-6 text-center text-sm text-muted-foreground">No documents uploaded</p>
                                     )}
                                 </CardContent>
                             </Card>
@@ -300,19 +317,15 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                             <Award className="h-5 w-5" />
                                             Review Results
                                         </CardTitle>
-                                        <CardDescription>
-                                            {registration.reviews.length} review(s) completed
-                                        </CardDescription>
+                                        <CardDescription>{registration.reviews.length} review(s) completed</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {registration.reviews.map((review) => (
-                                            <div key={review.id} className="rounded-lg border p-4 space-y-3">
+                                            <div key={review.id} className="space-y-3 rounded-lg border p-4">
                                                 <div className="flex items-start justify-between">
                                                     <div>
                                                         <p className="font-semibold">{review.reviewer?.name}</p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {formatDate(review.reviewed_at)}
-                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">{formatDate(review.reviewed_at)}</p>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-2xl font-bold">{review.score}</p>
@@ -325,9 +338,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                                         <Separator />
                                                         <div>
                                                             <p className="mb-1 text-sm font-medium">Feedback:</p>
-                                                            <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-                                                                {review.feedback}
-                                                            </p>
+                                                            <p className="text-sm whitespace-pre-wrap text-muted-foreground">{review.feedback}</p>
                                                         </div>
                                                     </>
                                                 )}
@@ -371,11 +382,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                                 Upload Additional Files
                                             </Button>
 
-                                            <Button
-                                                variant="destructive"
-                                                className="w-full"
-                                                onClick={() => setShowCancelDialog(true)}
-                                            >
+                                            <Button variant="destructive" className="w-full" onClick={() => setShowCancelDialog(true)}>
                                                 <Trash2 className="mr-2 h-4 w-4" />
                                                 Cancel Registration
                                             </Button>
@@ -430,18 +437,18 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                             </div>
                                             <div className="flex-1 pb-4">
                                                 <p className="font-medium">Registered</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {formatDateTime(registration.registered_at)}
-                                                </p>
+                                                <p className="text-sm text-muted-foreground">{formatDateTime(registration.registered_at)}</p>
                                             </div>
                                         </div>
 
                                         {registration.reviewed_at && (
                                             <div className="flex gap-3">
                                                 <div className="flex flex-col items-center">
-                                                    <div className={`rounded-full p-1 ${
-                                                        registration.status === 'approved' ? 'bg-green-600' : 'bg-destructive'
-                                                    }`}>
+                                                    <div
+                                                        className={`rounded-full p-1 ${
+                                                            registration.status === 'approved' ? 'bg-green-600' : 'bg-destructive'
+                                                        }`}
+                                                    >
                                                         {registration.status === 'approved' ? (
                                                             <CheckCircle2 className="h-4 w-4 text-white" />
                                                         ) : (
@@ -451,9 +458,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="font-medium capitalize">{registration.status}</p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {formatDateTime(registration.reviewed_at)}
-                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">{formatDateTime(registration.reviewed_at)}</p>
                                                 </div>
                                             </div>
                                         )}
@@ -471,13 +476,16 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Cancel Registration?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to cancel this registration? This action cannot be undone. You will
-                            need to register again if you change your mind.
+                            Are you sure you want to cancel this registration? This action cannot be undone. You will need to register again if you
+                            change your mind.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Keep Registration</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleCancelRegistration} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        <AlertDialogAction
+                            onClick={handleCancelRegistration}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
                             Yes, Cancel Registration
                         </AlertDialogAction>
                     </AlertDialogFooter>

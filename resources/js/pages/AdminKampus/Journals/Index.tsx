@@ -105,7 +105,15 @@ interface Props {
     accreditationGradeOptions: FilterOption[];
 }
 
-export default function JournalsIndex({ journals, filters, scientificFields, sintaRanks, statusOptions, indexationOptions, accreditationGradeOptions }: Props) {
+export default function JournalsIndex({
+    journals,
+    filters,
+    scientificFields,
+    sintaRanks,
+    statusOptions,
+    indexationOptions,
+    accreditationGradeOptions,
+}: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');

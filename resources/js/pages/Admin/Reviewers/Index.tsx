@@ -79,8 +79,8 @@ export default function ReviewersIndex() {
                         </div>
 
                         <p className="mb-8 max-w-2xl text-lg text-muted-foreground">
-                            The Reviewer Management feature is currently under development and will be available in version 1.1 of the system.
-                            This feature requires database migration to add reviewer-specific fields to the users table.
+                            The Reviewer Management feature is currently under development and will be available in version 1.1 of the system. This
+                            feature requires database migration to add reviewer-specific fields to the users table.
                         </p>
 
                         {/* Planned Features */}
@@ -96,7 +96,9 @@ export default function ReviewersIndex() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-foreground">View & Filter Reviewers</h3>
-                                        <p className="text-sm text-muted-foreground">Browse all reviewers with filtering by university, expertise, and status</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            Browse all reviewers with filtering by university, expertise, and status
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
@@ -123,7 +125,9 @@ export default function ReviewersIndex() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-foreground">University-Wide Overview</h3>
-                                        <p className="text-sm text-muted-foreground">View reviewers across all PTM universities from Super Admin panel</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            View reviewers across all PTM universities from Super Admin panel
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -133,22 +137,35 @@ export default function ReviewersIndex() {
                         <div className="mb-8 max-w-2xl rounded-lg border border-blue-200 bg-blue-50 p-4 text-left dark:border-blue-800 dark:bg-blue-900/20">
                             <h3 className="mb-2 font-semibold text-blue-900 dark:text-blue-200">Database Migration Required</h3>
                             <p className="text-sm text-blue-800 dark:text-blue-300">
-                                The following fields will be added to the <code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">users</code> table:
+                                The following fields will be added to the{' '}
+                                <code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">users</code> table:
                             </p>
                             <ul className="mt-2 list-inside list-disc text-sm text-blue-800 dark:text-blue-300">
-                                <li><code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">is_reviewer</code> - Boolean flag for reviewer status</li>
-                                <li><code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">reviewer_expertise</code> - Areas of expertise (JSON)</li>
-                                <li><code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">reviewer_bio</code> - Reviewer biography</li>
-                                <li><code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">reviewer_is_active</code> - Active reviewer status</li>
-                                <li><code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">max_assignments</code> - Maximum coaching assignments</li>
+                                <li>
+                                    <code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">is_reviewer</code> - Boolean flag for reviewer
+                                    status
+                                </li>
+                                <li>
+                                    <code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">reviewer_expertise</code> - Areas of expertise
+                                    (JSON)
+                                </li>
+                                <li>
+                                    <code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">reviewer_bio</code> - Reviewer biography
+                                </li>
+                                <li>
+                                    <code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">reviewer_is_active</code> - Active reviewer
+                                    status
+                                </li>
+                                <li>
+                                    <code className="rounded bg-blue-100 px-1 py-0.5 dark:bg-blue-900">max_assignments</code> - Maximum coaching
+                                    assignments
+                                </li>
                             </ul>
                         </div>
 
                         {/* Action Button */}
                         <Link href={route('dashboard')}>
-                            <Button size="lg">
-                                Back to Dashboard
-                            </Button>
+                            <Button size="lg">Back to Dashboard</Button>
                         </Link>
                     </div>
                 </div>

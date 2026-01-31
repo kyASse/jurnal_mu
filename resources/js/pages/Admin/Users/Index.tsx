@@ -98,7 +98,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, UserCheck, Trash2 } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, UserCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -197,7 +197,7 @@ export default function UsersIndex({ users, universities, filters }: Props) {
         router.get(
             route('admin.users.index'),
             { search, university_id: universityId, is_active: isActiveFilter, is_reviewer: isReviewerFilter },
-            { preserveState: true }
+            { preserveState: true },
         );
     };
 
@@ -363,9 +363,9 @@ export default function UsersIndex({ users, universities, filters }: Props) {
                                                         {user.roles && user.roles.length > 0 && (
                                                             <div className="mt-1 flex flex-wrap gap-1">
                                                                 {user.roles.map((role) => (
-                                                                    <Badge 
+                                                                    <Badge
                                                                         key={role.id}
-                                                                        className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                                                                        className="bg-blue-100 text-xs text-blue-800 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/20"
                                                                     >
                                                                         {role.display_name}
                                                                     </Badge>
@@ -485,8 +485,8 @@ export default function UsersIndex({ users, universities, filters }: Props) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Pengelola Jurnal</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete <strong>{deleteDialog.userName}</strong>? This action cannot be undone and all
-                            associated data will be permanently removed.
+                            Are you sure you want to delete <strong>{deleteDialog.userName}</strong>? This action cannot be undone and all associated
+                            data will be permanently removed.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

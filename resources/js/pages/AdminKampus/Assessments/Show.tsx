@@ -1,9 +1,9 @@
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, JournalAssessment } from '@/types';
-import { Head, Link } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, JournalAssessment } from '@/types';
+import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, ClipboardCheck, FileText, User } from 'lucide-react';
 
 /**
@@ -82,7 +82,7 @@ export default function AssessmentShow({ assessment }: Props) {
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="flex items-center gap-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm">
@@ -107,8 +107,7 @@ export default function AssessmentShow({ assessment }: Props) {
                                     <div className="flex items-center gap-2">
                                         <Calendar className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm">
-                                            <span className="font-medium">Reviewed:</span>{' '}
-                                            {new Date(assessment.reviewed_at).toLocaleDateString()}
+                                            <span className="font-medium">Reviewed:</span> {new Date(assessment.reviewed_at).toLocaleDateString()}
                                         </span>
                                     </div>
                                 </>
@@ -116,12 +115,12 @@ export default function AssessmentShow({ assessment }: Props) {
                         </div>
 
                         {assessment.admin_notes && (
-                            <div className="mt-4 p-4 bg-muted rounded-lg">
+                            <div className="mt-4 rounded-lg bg-muted p-4">
                                 <div className="flex items-start gap-2">
-                                    <FileText className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                    <FileText className="mt-0.5 h-4 w-4 text-muted-foreground" />
                                     <div>
-                                        <p className="font-medium text-sm">Admin Notes:</p>
-                                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{assessment.admin_notes}</p>
+                                        <p className="text-sm font-medium">Admin Notes:</p>
+                                        <p className="text-sm whitespace-pre-wrap text-muted-foreground">{assessment.admin_notes}</p>
                                     </div>
                                 </div>
                             </div>
@@ -133,28 +132,22 @@ export default function AssessmentShow({ assessment }: Props) {
                 <Card>
                     <CardHeader>
                         <CardTitle>Assessment Responses</CardTitle>
-                        <CardDescription>
-                            {assessment.responses?.length || 0} responses submitted
-                        </CardDescription>
+                        <CardDescription>{assessment.responses?.length || 0} responses submitted</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {assessment.responses && assessment.responses.length > 0 ? (
                             <div className="space-y-4">
                                 {assessment.responses.map((response) => (
-                                    <div key={response.id} className="border-l-4 border-primary pl-4 py-2">
+                                    <div key={response.id} className="border-l-4 border-primary py-2 pl-4">
                                         <p className="font-medium">
                                             {response.evaluation_indicator?.sub_category?.category?.name} -{' '}
                                             {response.evaluation_indicator?.sub_category?.name}
                                         </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {response.evaluation_indicator?.question}
-                                        </p>
-                                        <p className="text-sm mt-1">
+                                        <p className="text-sm text-muted-foreground">{response.evaluation_indicator?.question}</p>
+                                        <p className="mt-1 text-sm">
                                             <span className="font-medium">Score:</span> {response.score}
                                         </p>
-                                        {response.notes && (
-                                            <p className="text-sm text-muted-foreground mt-1">{response.notes}</p>
-                                        )}
+                                        {response.notes && <p className="mt-1 text-sm text-muted-foreground">{response.notes}</p>}
                                     </div>
                                 ))}
                             </div>

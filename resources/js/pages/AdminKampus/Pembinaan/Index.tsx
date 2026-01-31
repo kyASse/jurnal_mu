@@ -54,20 +54,12 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
 
     const handleSearch = (value: string) => {
         setSearch(value);
-        router.get(
-            route('admin-kampus.pembinaan.index'),
-            { search: value, status },
-            { preserveState: true, replace: true }
-        );
+        router.get(route('admin-kampus.pembinaan.index'), { search: value, status }, { preserveState: true, replace: true });
     };
 
     const handleStatusFilter = (value: string) => {
         setStatus(value);
-        router.get(
-            route('admin-kampus.pembinaan.index'),
-            { search, status: value || undefined },
-            { preserveState: true, replace: true }
-        );
+        router.get(route('admin-kampus.pembinaan.index'), { search, status: value || undefined }, { preserveState: true, replace: true });
     };
 
     const getStatusBadge = (status: string) => {
@@ -76,11 +68,7 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
             approved: 'default',
             rejected: 'destructive',
         };
-        return (
-            <Badge variant={variants[status] || 'secondary'}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Badge>
-        );
+        return <Badge variant={variants[status] || 'secondary'}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
     };
 
     const formatDate = (date: string) => {
@@ -113,9 +101,9 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <div className="space-y-4">
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <div className="flex-1 relative">
-                                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <div className="flex flex-col gap-4 sm:flex-row">
+                                <div className="relative flex-1">
+                                    <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         placeholder="Search by journal name or ISSN..."
                                         value={search}
@@ -137,7 +125,6 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
                             </div>
                         </div>
                     </div>
-
 
                     {/* Results Count */}
                     <div className="mb-4 text-sm text-muted-foreground">
@@ -161,58 +148,38 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
                                 </TableHeader>
                                 <TableBody>
                                     {registrations.data.map((registration) => (
-                                    <TableRow key={registration.id}>
-                                        <TableCell>
-                                            <div>
-                                                <div className="font-medium">
-                                                    {registration.pembinaan?.name}
+                                        <TableRow key={registration.id}>
+                                            <TableCell>
+                                                <div>
+                                                    <div className="font-medium">{registration.pembinaan?.name}</div>
+                                                    <div className="text-sm text-muted-foreground capitalize">{registration.pembinaan?.category}</div>
                                                 </div>
-                                                <div className="text-sm text-muted-foreground capitalize">
-                                                    {registration.pembinaan?.category}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <div className="font-medium">{registration.journal?.title}</div>
+                                                    <div className="text-sm text-muted-foreground">ISSN: {registration.journal?.issn}</div>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div>
-                                                <div className="font-medium">{registration.journal?.title}</div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    ISSN: {registration.journal?.issn}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <div className="text-sm">{registration.user?.name}</div>
+                                                    <div className="text-xs text-muted-foreground">{registration.user?.email}</div>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div>
-                                                <div className="text-sm">{registration.user?.name}</div>
-                                                <div className="text-xs text-muted-foreground">
-                                                    {registration.user?.email}
+                                            </TableCell>
+                                            <TableCell>{getStatusBadge(registration.status)}</TableCell>
+                                            <TableCell className="text-sm">{formatDate(registration.registered_at)}</TableCell>
+                                            <TableCell>
+                                                <div className="flex justify-end">
+                                                    <Button variant="ghost" size="icon" asChild title="View Details">
+                                                        <Link href={route('admin-kampus.pembinaan.registrations.show', registration.id)}>
+                                                            <Eye className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{getStatusBadge(registration.status)}</TableCell>
-                                        <TableCell className="text-sm">
-                                            {formatDate(registration.registered_at)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex justify-end">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    asChild
-                                                    title="View Details"
-                                                >
-                                                    <Link
-                                                        href={route(
-                                                            'admin-kampus.pembinaan.registrations.show',
-                                                            registration.id
-                                                        )}
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
                                 </TableBody>
                             </Table>
                         ) : (
@@ -233,9 +200,7 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
                                             <div className="flex flex-col items-center gap-2">
                                                 <FileText className="h-12 w-12 text-muted-foreground/50" />
                                                 <p className="font-medium text-muted-foreground">No registrations found</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    No registrations match your current filters
-                                                </p>
+                                                <p className="text-sm text-muted-foreground">No registrations match your current filters</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>

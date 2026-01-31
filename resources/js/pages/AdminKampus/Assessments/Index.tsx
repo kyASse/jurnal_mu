@@ -1,20 +1,13 @@
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, JournalAssessment, PaginatedData } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { ClipboardCheck, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, JournalAssessment, PaginatedData } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { ChevronLeft, ChevronRight, ClipboardCheck, Eye, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 /**
@@ -46,7 +39,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
         router.get(
             route('admin-kampus.assessments.index'),
             { search: value, status: status !== 'all' ? status : undefined },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     }, 500);
 
@@ -60,7 +53,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
         router.get(
             route('admin-kampus.assessments.index'),
             { status: value !== 'all' ? value : undefined, search },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     };
 
@@ -102,27 +95,27 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <div className="space-y-4">
-                            <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="flex-1 relative">
-                                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    placeholder="Search by journal title or ISSN..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="pl-9"
-                                />
-                            </div>
-                            <Select value={status} onValueChange={handleStatusChange}>
-                                <SelectTrigger className="w-full sm:w-[200px]">
-                                    <SelectValue placeholder="Filter by status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Status</SelectItem>
-                                    <SelectItem value="draft">Draft</SelectItem>
-                                    <SelectItem value="submitted">Submitted</SelectItem>
-                                    <SelectItem value="reviewed">Reviewed</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="flex flex-col gap-4 sm:flex-row">
+                                <div className="relative flex-1">
+                                    <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Search by journal title or ISSN..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="pl-9"
+                                    />
+                                </div>
+                                <Select value={status} onValueChange={handleStatusChange}>
+                                    <SelectTrigger className="w-full sm:w-[200px]">
+                                        <SelectValue placeholder="Filter by status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Status</SelectItem>
+                                        <SelectItem value="draft">Draft</SelectItem>
+                                        <SelectItem value="submitted">Submitted</SelectItem>
+                                        <SelectItem value="reviewed">Reviewed</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     </div>
@@ -147,45 +140,41 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                        {assessments.data.map((assessment) => (
-                                            <TableRow key={assessment.id}>
-                                                <TableCell>
-                                                    <div>
-                                                        <p className="font-medium">{assessment.journal.title}</p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            ISSN: {assessment.journal.issn}
-                                                        </p>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>{assessment.user.name}</TableCell>
-                                                <TableCell>{getStatusBadge(assessment.status)}</TableCell>
-                                                <TableCell>
-                                                    {assessment.submitted_at
-                                                        ? new Date(assessment.submitted_at).toLocaleDateString()
-                                                        : '-'}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
-                                                        <Button variant="outline" size="sm" asChild>
-                                                            <Link href={route('admin-kampus.assessments.show', assessment.id)}>
-                                                                <Eye className="mr-2 h-4 w-4" />
-                                                                View
+                                    {assessments.data.map((assessment) => (
+                                        <TableRow key={assessment.id}>
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">{assessment.journal.title}</p>
+                                                    <p className="text-sm text-muted-foreground">ISSN: {assessment.journal.issn}</p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>{assessment.user.name}</TableCell>
+                                            <TableCell>{getStatusBadge(assessment.status)}</TableCell>
+                                            <TableCell>
+                                                {assessment.submitted_at ? new Date(assessment.submitted_at).toLocaleDateString() : '-'}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button variant="outline" size="sm" asChild>
+                                                        <Link href={route('admin-kampus.assessments.show', assessment.id)}>
+                                                            <Eye className="mr-2 h-4 w-4" />
+                                                            View
+                                                        </Link>
+                                                    </Button>
+                                                    {assessment.status === 'submitted' && (
+                                                        <Button size="sm" asChild>
+                                                            <Link href={route('admin-kampus.assessments.review', assessment.id)}>
+                                                                <ClipboardCheck className="mr-2 h-4 w-4" />
+                                                                Review
                                                             </Link>
                                                         </Button>
-                                                        {assessment.status === 'submitted' && (
-                                                            <Button size="sm" asChild>
-                                                                <Link href={route('admin-kampus.assessments.review', assessment.id)}>
-                                                                    <ClipboardCheck className="mr-2 h-4 w-4" />
-                                                                    Review
-                                                                </Link>
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         ) : (
                             <Table>
                                 <TableHeader>
@@ -203,9 +192,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                                             <div className="flex flex-col items-center gap-2">
                                                 <ClipboardCheck className="h-12 w-12 text-muted-foreground/50" />
                                                 <p className="font-medium text-muted-foreground">No assessments found</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    No assessments match your current filters
-                                                </p>
+                                                <p className="text-sm text-muted-foreground">No assessments match your current filters</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -270,4 +257,3 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
         </AppLayout>
     );
 }
-

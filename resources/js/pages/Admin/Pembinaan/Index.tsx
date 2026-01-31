@@ -38,7 +38,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PaginatedData } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { CalendarDays, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, FileText } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Edit, Eye, FileText, Plus, Power, Search, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -98,29 +98,17 @@ export default function PembinaanIndex({ pembinaan, filters }: Props) {
 
     const handleSearch = (value: string) => {
         setSearch(value);
-        router.get(
-            route('admin.pembinaan.index'),
-            { search: value, status, category },
-            { preserveState: true, replace: true }
-        );
+        router.get(route('admin.pembinaan.index'), { search: value, status, category }, { preserveState: true, replace: true });
     };
 
     const handleStatusFilter = (value: string) => {
         setStatus(value);
-        router.get(
-            route('admin.pembinaan.index'),
-            { search, status: value || undefined, category },
-            { preserveState: true, replace: true }
-        );
+        router.get(route('admin.pembinaan.index'), { search, status: value || undefined, category }, { preserveState: true, replace: true });
     };
 
     const handleCategoryFilter = (value: string) => {
         setCategory(value);
-        router.get(
-            route('admin.pembinaan.index'),
-            { search, status, category: value || undefined },
-            { preserveState: true, replace: true }
-        );
+        router.get(route('admin.pembinaan.index'), { search, status, category: value || undefined }, { preserveState: true, replace: true });
     };
 
     const handleToggleStatus = (id: number, currentStatus: string) => {
@@ -138,7 +126,7 @@ export default function PembinaanIndex({ pembinaan, filters }: Props) {
                 onError: () => {
                     toast.error('Failed to change status');
                 },
-            }
+            },
         );
     };
 
@@ -164,11 +152,7 @@ export default function PembinaanIndex({ pembinaan, filters }: Props) {
             active: 'default',
             closed: 'outline',
         };
-        return (
-            <Badge variant={variants[status as keyof typeof variants] as any}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Badge>
-        );
+        return <Badge variant={variants[status as keyof typeof variants] as any}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
     };
 
     const getCategoryBadge = (category: string) => {
@@ -299,9 +283,7 @@ export default function PembinaanIndex({ pembinaan, filters }: Props) {
                                                 <div>
                                                     <div className="font-medium">{program.name}</div>
                                                     {program.accreditation_template && (
-                                                        <div className="text-sm text-muted-foreground">
-                                                            {program.accreditation_template.name}
-                                                        </div>
+                                                        <div className="text-sm text-muted-foreground">{program.accreditation_template.name}</div>
                                                     )}
                                                 </div>
                                             </TableCell>
@@ -311,32 +293,20 @@ export default function PembinaanIndex({ pembinaan, filters }: Props) {
                                                 <div className="flex items-center gap-1 text-sm">
                                                     <CalendarDays className="h-3 w-3" />
                                                     <span>
-                                                        {formatDate(program.registration_start)} -{' '}
-                                                        {formatDate(program.registration_end)}
+                                                        {formatDate(program.registration_start)} - {formatDate(program.registration_end)}
                                                     </span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex flex-col items-center gap-1">
-                                                    <div className="text-sm font-medium">
-                                                        {program.approved_registrations_count}
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {program.pending_registrations_count} pending
-                                                    </div>
+                                                    <div className="text-sm font-medium">{program.approved_registrations_count}</div>
+                                                    <div className="text-xs text-muted-foreground">{program.pending_registrations_count} pending</div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                {program.quota ? program.quota : '∞'}
-                                            </TableCell>
+                                            <TableCell className="text-center">{program.quota ? program.quota : '∞'}</TableCell>
                                             <TableCell>
                                                 <div className="flex justify-end gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        asChild
-                                                        title="View Details"
-                                                    >
+                                                    <Button variant="ghost" size="icon" asChild title="View Details">
                                                         <Link href={route('admin.pembinaan.show', program.id)}>
                                                             <Eye className="h-4 w-4" />
                                                         </Link>
@@ -379,21 +349,13 @@ export default function PembinaanIndex({ pembinaan, filters }: Props) {
                             </div>
                             <div className="flex gap-2">
                                 {pembinaan.prev_page_url && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => router.get(pembinaan.prev_page_url!)}
-                                    >
+                                    <Button variant="outline" size="sm" onClick={() => router.get(pembinaan.prev_page_url!)}>
                                         <ChevronLeft className="h-4 w-4" />
                                         Previous
                                     </Button>
                                 )}
                                 {pembinaan.next_page_url && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => router.get(pembinaan.next_page_url!)}
-                                    >
+                                    <Button variant="outline" size="sm" onClick={() => router.get(pembinaan.next_page_url!)}>
                                         Next
                                         <ChevronRight className="h-4 w-4" />
                                     </Button>
@@ -410,8 +372,8 @@ export default function PembinaanIndex({ pembinaan, filters }: Props) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Program?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. The program will be soft deleted and can be restored later.
-                            Note: Programs with approved registrations cannot be deleted.
+                            This action cannot be undone. The program will be soft deleted and can be restored later. Note: Programs with approved
+                            registrations cannot be deleted.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

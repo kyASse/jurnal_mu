@@ -1,6 +1,6 @@
+import { IndexationBadge, SintaBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { SintaBadge, IndexationBadge } from '@/components/badges';
 import { Link } from '@inertiajs/react';
 import { BookOpen } from 'lucide-react';
 
@@ -30,8 +30,8 @@ export default function JournalCard({
     // Display max 3 indexations, prioritizing Scopus, WoS, DOAJ
     const priorityIndexations = ['Scopus', 'WoS', 'DOAJ'];
     const displayIndexations = [
-        ...indexation_labels.filter(label => priorityIndexations.includes(label)),
-        ...indexation_labels.filter(label => !priorityIndexations.includes(label)),
+        ...indexation_labels.filter((label) => priorityIndexations.includes(label)),
+        ...indexation_labels.filter((label) => !priorityIndexations.includes(label)),
     ].slice(0, 3);
 
     const remainingCount = indexation_labels.length - displayIndexations.length;
@@ -51,11 +51,11 @@ export default function JournalCard({
                 {/* Badges Row */}
                 <div className="mb-3 flex flex-wrap items-start gap-2">
                     <SintaBadge rank={sinta_rank} indexed_date={sinta_indexed_date} />
-                    
+
                     {displayIndexations.map((label) => (
                         <IndexationBadge key={label} platform={label} variant="default" />
                     ))}
-                    
+
                     {remainingCount > 0 && (
                         <Badge variant="outline" className="text-xs">
                             +{remainingCount} more

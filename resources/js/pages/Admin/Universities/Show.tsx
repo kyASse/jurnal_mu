@@ -180,12 +180,18 @@ export default function UniversitiesShow({ university, users, journals, can }: P
                                                 {university.code}
                                             </Badge>
                                             {university.ptm_code && (
-                                                <Badge variant="outline" className="border-blue-200 bg-blue-50 font-mono text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-blue-200 bg-blue-50 font-mono text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                                                >
                                                     PTM: {university.ptm_code}
                                                 </Badge>
                                             )}
                                             {university.accreditation_status && (
-                                                <Badge variant="outline" className="border-purple-200 bg-purple-50 font-medium text-purple-700 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-purple-200 bg-purple-50 font-medium text-purple-700 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-400"
+                                                >
                                                     {university.accreditation_status}
                                                 </Badge>
                                             )}
@@ -234,7 +240,7 @@ export default function UniversitiesShow({ university, users, journals, can }: P
                             {university.profile_description && (
                                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                                     <h2 className="mb-4 text-xl font-semibold text-foreground">Profile</h2>
-                                    <p className="text-foreground leading-relaxed">{university.profile_description}</p>
+                                    <p className="leading-relaxed text-foreground">{university.profile_description}</p>
                                 </div>
                             )}
 
@@ -378,7 +384,10 @@ export default function UniversitiesShow({ university, users, journals, can }: P
                                     {university.accreditation_status && (
                                         <div className="border-t border-sidebar-border/50 pt-3">
                                             <div className="mb-1 text-sm text-muted-foreground">Accreditation Status</div>
-                                            <Badge variant="outline" className="mt-1 border-purple-200 bg-purple-50 font-medium text-purple-700 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                                            <Badge
+                                                variant="outline"
+                                                className="mt-1 border-purple-200 bg-purple-50 font-medium text-purple-700 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-400"
+                                            >
                                                 {university.accreditation_status}
                                             </Badge>
                                         </div>
@@ -450,8 +459,8 @@ export default function UniversitiesShow({ university, users, journals, can }: P
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete University</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete <strong>{university.name}</strong>? This action cannot be undone and all associated
-                            data (Admin Kampus, Pengelola Jurnal, and journals) will be permanently removed.
+                            Are you sure you want to delete <strong>{university.name}</strong>? This action cannot be undone and all associated data
+                            (Admin Kampus, Pengelola Jurnal, and journals) will be permanently removed.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

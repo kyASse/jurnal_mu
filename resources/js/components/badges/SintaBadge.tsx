@@ -10,8 +10,8 @@ interface SintaBadgeProps {
 export default function SintaBadge({ rank, indexed_date, showDate = false }: SintaBadgeProps) {
     if (!rank) {
         return (
-            <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300">
-                <Award className="w-3 h-3 mr-1" />
+            <Badge variant="outline" className="border-gray-300 bg-gray-50 text-gray-600">
+                <Award className="mr-1 h-3 w-3" />
                 Belum Terindeks SINTA
             </Badge>
         );
@@ -32,15 +32,16 @@ export default function SintaBadge({ rank, indexed_date, showDate = false }: Sin
     return (
         <div className="flex flex-col gap-1">
             <Badge className={`${colorClass} font-semibold`}>
-                <Award className="w-3 h-3 mr-1" />
+                <Award className="mr-1 h-3 w-3" />
                 SINTA {rank}
             </Badge>
             {showDate && indexed_date && (
                 <span className="text-xs text-gray-500">
-                    Terindeks: {new Date(indexed_date).toLocaleDateString('id-ID', { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric' 
+                    Terindeks:{' '}
+                    {new Date(indexed_date).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
                     })}
                 </span>
             )}

@@ -54,7 +54,7 @@ export function AppSidebar() {
                 items: [
                     { title: 'Templates', href: route('admin.templates.index') },
                     { title: 'List View', href: route('admin.borang-indikator.list') },
-                ]
+                ],
             },
             {
                 title: 'Universities',

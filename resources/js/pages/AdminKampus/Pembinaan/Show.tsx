@@ -30,14 +30,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -45,18 +38,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PembinaanRegistration, type User } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    ArrowLeft,
-    Award,
-    CalendarDays,
-    Check,
-    Download,
-    FileText,
-    Star,
-    Trash2,
-    UserPlus,
-    X,
-} from 'lucide-react';
+import { ArrowLeft, Award, CalendarDays, Check, Download, FileText, Star, Trash2, UserPlus, X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -101,7 +83,7 @@ export default function PembinaanShow({ registration }: Props) {
                 onError: () => {
                     toast.error('Failed to approve registration');
                 },
-            }
+            },
         );
     };
 
@@ -124,7 +106,7 @@ export default function PembinaanShow({ registration }: Props) {
                 onError: () => {
                     toast.error('Failed to reject registration');
                 },
-            }
+            },
         );
     };
 
@@ -161,7 +143,7 @@ export default function PembinaanShow({ registration }: Props) {
                 onError: () => {
                     toast.error('Failed to assign reviewer');
                 },
-            }
+            },
         );
     };
 
@@ -228,9 +210,7 @@ export default function PembinaanShow({ registration }: Props) {
                         </Button>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h1 className="text-2xl font-bold tracking-tight">
-                                    {registration.journal?.title}
-                                </h1>
+                                <h1 className="text-2xl font-bold tracking-tight">{registration.journal?.title}</h1>
                                 {getStatusBadge(registration.status)}
                             </div>
                             <p className="text-muted-foreground">
@@ -277,22 +257,16 @@ export default function PembinaanShow({ registration }: Props) {
                         <CardContent className="space-y-3">
                             <div>
                                 <div className="text-sm font-medium">Program Name</div>
-                                <div className="text-sm text-muted-foreground">
-                                    {registration.pembinaan?.name}
-                                </div>
+                                <div className="text-sm text-muted-foreground">{registration.pembinaan?.name}</div>
                             </div>
                             <div>
                                 <div className="text-sm font-medium">Category</div>
-                                <div className="text-sm capitalize text-muted-foreground">
-                                    {registration.pembinaan?.category}
-                                </div>
+                                <div className="text-sm text-muted-foreground capitalize">{registration.pembinaan?.category}</div>
                             </div>
                             {registration.pembinaan?.accreditation_template && (
                                 <div>
                                     <div className="text-sm font-medium">Template</div>
-                                    <div className="text-sm text-muted-foreground">
-                                        {registration.pembinaan.accreditation_template.name}
-                                    </div>
+                                    <div className="text-sm text-muted-foreground">{registration.pembinaan.accreditation_template.name}</div>
                                 </div>
                             )}
                             <div>
@@ -301,16 +275,18 @@ export default function PembinaanShow({ registration }: Props) {
                                     <CalendarDays className="h-3 w-3" />
                                     <span>
                                         {registration.pembinaan?.assessment_start &&
-                                            new Date(registration.pembinaan.assessment_start).toLocaleDateString(
-                                                'id-ID',
-                                                { day: 'numeric', month: 'short', year: 'numeric' }
-                                            )}{' '}
+                                            new Date(registration.pembinaan.assessment_start).toLocaleDateString('id-ID', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric',
+                                            })}{' '}
                                         -{' '}
                                         {registration.pembinaan?.assessment_end &&
-                                            new Date(registration.pembinaan.assessment_end).toLocaleDateString(
-                                                'id-ID',
-                                                { day: 'numeric', month: 'short', year: 'numeric' }
-                                            )}
+                                            new Date(registration.pembinaan.assessment_end).toLocaleDateString('id-ID', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric',
+                                            })}
                                     </span>
                                 </div>
                             </div>
@@ -344,9 +320,7 @@ export default function PembinaanShow({ registration }: Props) {
                             </div>
                             <div>
                                 <div className="text-sm font-medium">Registered At</div>
-                                <div className="text-sm text-muted-foreground">
-                                    {formatDate(registration.registered_at)}
-                                </div>
+                                <div className="text-sm text-muted-foreground">{formatDate(registration.registered_at)}</div>
                             </div>
                             {registration.reviewed_at && (
                                 <div>
@@ -391,33 +365,19 @@ export default function PembinaanShow({ registration }: Props) {
                         ) : (
                             <div className="space-y-2">
                                 {registration.attachments.map((attachment) => (
-                                    <div
-                                        key={attachment.id}
-                                        className="flex items-center justify-between rounded-lg border p-3"
-                                    >
+                                    <div key={attachment.id} className="flex items-center justify-between rounded-lg border p-3">
                                         <div className="flex items-center gap-3">
                                             <FileText className="h-5 w-5 text-muted-foreground" />
                                             <div>
                                                 <div className="text-sm font-medium">{attachment.file_name}</div>
                                                 <div className="text-xs text-muted-foreground">
                                                     {attachment.document_type} •{' '}
-                                                    {attachment.file_size &&
-                                                        (attachment.file_size / 1024 / 1024).toFixed(2)}{' '}
-                                                    MB
+                                                    {attachment.file_size && (attachment.file_size / 1024 / 1024).toFixed(2)} MB
                                                 </div>
                                             </div>
                                         </div>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            asChild
-                                        >
-                                            <a
-                                                href={`/storage/${attachment.file_path}`}
-                                                download
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
+                                        <Button variant="outline" size="sm" asChild>
+                                            <a href={`/storage/${attachment.file_path}`} download target="_blank" rel="noopener noreferrer">
                                                 <Download className="mr-2 h-4 w-4" />
                                                 Download
                                             </a>
@@ -454,21 +414,13 @@ export default function PembinaanShow({ registration }: Props) {
                                         <TableRow key={assignment.id}>
                                             <TableCell>
                                                 <div>
-                                                    <div className="text-sm font-medium">
-                                                        {assignment.reviewer?.name}
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {assignment.reviewer?.email}
-                                                    </div>
+                                                    <div className="text-sm font-medium">{assignment.reviewer?.name}</div>
+                                                    <div className="text-xs text-muted-foreground">{assignment.reviewer?.email}</div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>{getStatusBadge(assignment.status)}</TableCell>
-                                            <TableCell className="text-sm">
-                                                {formatDate(assignment.assigned_at)}
-                                            </TableCell>
-                                            <TableCell className="text-sm">
-                                                {assignment.assigner?.name}
-                                            </TableCell>
+                                            <TableCell className="text-sm">{formatDate(assignment.assigned_at)}</TableCell>
+                                            <TableCell className="text-sm">{assignment.assigner?.name}</TableCell>
                                             <TableCell>
                                                 <div className="flex justify-end">
                                                     {assignment.status !== 'completed' && (
@@ -506,14 +458,10 @@ export default function PembinaanShow({ registration }: Props) {
                                     <div className="mb-3 flex items-start justify-between">
                                         <div>
                                             <div className="font-medium">{review.reviewer?.name}</div>
-                                            <div className="text-sm text-muted-foreground">
-                                                {formatDate(review.reviewed_at)}
-                                            </div>
+                                            <div className="text-sm text-muted-foreground">{formatDate(review.reviewed_at)}</div>
                                         </div>
                                         {review.score !== undefined && (
-                                            <div className={`text-2xl font-bold ${getScoreColor(review.score)}`}>
-                                                {review.score}/100
-                                            </div>
+                                            <div className={`text-2xl font-bold ${getScoreColor(review.score)}`}>{review.score}/100</div>
                                         )}
                                     </div>
                                     {review.feedback && (
@@ -541,8 +489,8 @@ export default function PembinaanShow({ registration }: Props) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Approve Registration?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will approve the journal registration for {registration.pembinaan?.name}. The journal
-                            manager will be notified and you can then assign reviewers.
+                            This will approve the journal registration for {registration.pembinaan?.name}. The journal manager will be notified and
+                            you can then assign reviewers.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -558,8 +506,7 @@ export default function PembinaanShow({ registration }: Props) {
                     <DialogHeader>
                         <DialogTitle>Reject Registration</DialogTitle>
                         <DialogDescription>
-                            Please provide a reason for rejecting this registration. The journal manager will receive
-                            this feedback.
+                            Please provide a reason for rejecting this registration. The journal manager will receive this feedback.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -590,9 +537,7 @@ export default function PembinaanShow({ registration }: Props) {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Assign Reviewer</DialogTitle>
-                        <DialogDescription>
-                            Select a reviewer from your university to evaluate this registration.
-                        </DialogDescription>
+                        <DialogDescription>Select a reviewer from your university to evaluate this registration.</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
@@ -603,13 +548,9 @@ export default function PembinaanShow({ registration }: Props) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {loadingReviewers ? (
-                                        <div className="p-2 text-center text-sm text-muted-foreground">
-                                            Loading reviewers...
-                                        </div>
+                                        <div className="p-2 text-center text-sm text-muted-foreground">Loading reviewers...</div>
                                     ) : reviewers.length === 0 ? (
-                                        <div className="p-2 text-center text-sm text-muted-foreground">
-                                            No reviewers available
-                                        </div>
+                                        <div className="p-2 text-center text-sm text-muted-foreground">No reviewers available</div>
                                     ) : (
                                         reviewers.map((reviewer) => (
                                             <SelectItem key={reviewer.id} value={reviewer.id.toString()}>
