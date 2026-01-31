@@ -32,21 +32,21 @@ export default function Register() {
         <>
             <Head title="Register" />
 
-            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-yellow-50 p-4">
+            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-yellow-50 p-4 dark:bg-gradient-to-br dark:from-[#020617] dark:via-[#0f172a] dark:to-[#020617]">
                 <div className="w-full max-w-md">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <Link href="/">
-                            <h1 className="text-3xl font-bold text-green-600">Asistensi Jurnal Muhammadiyah</h1>
-                            <p className="mt-2 text-gray-600">Platform Manajemen Jurnal Ilmiah PTM</p>
+                            <h1 className="text-3xl font-bold text-green-600 dark:text-green-300">Asistensi Jurnal Muhammadiyah</h1>
+                            <p className="mt-2 text-gray-600 dark:text-gray-300">Platform Manajemen Jurnal Ilmiah PTM</p>
                         </Link>
                     </div>
 
                     {/* Register Form */}
-                    <div className="rounded-2xl bg-white p-8 shadow-xl">
+                    <div className="rounded-2xl bg-white p-8 shadow-xl dark:bg-[#0f172a] dark:shadow-2xl">
                         <div className="mb-8 text-center">
-                            <h2 className="text-3xl font-bold text-gray-900">Daftar Akun</h2>
-                            <p className="mt-2 text-gray-600">Buat akun baru untuk memulai</p>
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Daftar Akun</h2>
+                            <p className="mt-2 text-gray-600 dark:text-gray-300">Buat akun baru untuk memulai</p>
                         </div>
 
                         <form onSubmit={submit} className="space-y-4">
@@ -61,7 +61,7 @@ export default function Register() {
                                     autoFocus
                                     className="mt-2"
                                 />
-                                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                                {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
                             </div>
 
                             {/* Email */}
@@ -75,14 +75,14 @@ export default function Register() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
                             </div>
 
                             {/* Phone */}
                             <div>
                                 <Label htmlFor="phone">No. Telepon</Label>
                                 <Input id="phone" type="tel" value={data.phone} onChange={(e) => setData('phone', e.target.value)} className="mt-2" />
-                                {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                                {errors.phone && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>}
                             </div>
 
                             {/* Position */}
@@ -95,7 +95,7 @@ export default function Register() {
                                     className="mt-2"
                                     placeholder="Dosen, Staf, dll"
                                 />
-                                {errors.position && <p className="mt-1 text-sm text-red-600">{errors.position}</p>}
+                                {errors.position && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.position}</p>}
                             </div>
 
                             {/* Password */}
@@ -109,7 +109,7 @@ export default function Register() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+                                {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>}
                             </div>
 
                             {/* Password Confirmation */}
@@ -123,7 +123,7 @@ export default function Register() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.password_confirmation && <p className="mt-1 text-sm text-red-600">{errors.password_confirmation}</p>}
+                                {errors.password_confirmation && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password_confirmation}</p>}
                             </div>
 
                             {/* Submit Button */}
@@ -133,9 +133,9 @@ export default function Register() {
                         </form>
 
                         {/* Login Link */}
-                        <p className="mt-6 text-center text-sm text-gray-600">
+                        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
                             Sudah punya akun?{' '}
-                            <Link href={route('login')} className="font-medium text-green-600 hover:text-green-700">
+                            <Link href={route('login')} className="font-medium text-green-600 hover:text-green-700 dark:text-green-300 dark:hover:text-green-400">
                                 Login di sini
                             </Link>
                         </p>

@@ -31,21 +31,21 @@ export default function Login() {
         <>
             <Head title="Login" />
 
-            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-yellow-50 p-4">
+            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-yellow-50 p-4 dark:bg-gradient-to-br dark:from-[#020617] dark:via-[#0f172a] dark:to-[#020617]">
                 <div className="w-full max-w-md">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <Link href="/">
-                            <h1 className="text-3xl font-bold text-green-600">Asistensi Jurnal Muhammadiyah</h1>
-                            <p className="mt-2 text-gray-600">Platform Manajemen Jurnal Ilmiah PTM</p>
+                            <h1 className="text-3xl font-bold text-green-600 dark:text-green-300">Asistensi Jurnal Muhammadiyah</h1>
+                            <p className="mt-2 text-gray-600 dark:text-gray-300">Platform Manajemen Jurnal Ilmiah PTM</p>
                         </Link>
                     </div>
 
                     {/* Login Form */}
-                    <div className="rounded-2xl bg-white p-8 shadow-xl">
+                    <div className="rounded-2xl bg-white p-8 shadow-xl dark:bg-[#0f172a] dark:shadow-2xl">
                         <div className="mb-8 text-center">
-                            <h2 className="text-3xl font-bold text-gray-900">Login</h2>
-                            <p className="mt-2 text-gray-600">Selamat datang kembali!</p>
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Login</h2>
+                            <p className="mt-2 text-gray-600 dark:text-gray-300">Selamat datang kembali!</p>
                         </div>
 
                         <form onSubmit={submit} className="space-y-6">
@@ -61,7 +61,7 @@ export default function Login() {
                                     autoFocus
                                     className="mt-2"
                                 />
-                                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
                             </div>
 
                             {/* Password */}
@@ -75,7 +75,7 @@ export default function Login() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+                                {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>}
                             </div>
 
                             {/* Remember Me */}
@@ -99,10 +99,10 @@ export default function Login() {
                         {/* Divider */}
                         <div className="relative my-6">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300"></div>
+                                <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="bg-white px-2 text-gray-500">Atau login dengan</span>
+                                <span className="bg-white px-2 text-gray-500 dark:bg-[#0f172a] dark:text-gray-300">Atau login dengan</span>
                             </div>
                         </div>
 
@@ -130,9 +130,9 @@ export default function Login() {
                         </Button>
 
                         {/* Register Link */}
-                        <p className="mt-6 text-center text-sm text-gray-600">
+                        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
                             Belum punya akun?{' '}
-                            <Link href={route('register')} className="font-medium text-green-600 hover:text-green-700">
+                            <Link href={route('register')} className="font-medium text-green-600 hover:text-green-700 dark:text-green-300 dark:hover:text-green-400">
                                 Daftar sekarang
                             </Link>
                         </p>
