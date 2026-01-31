@@ -16,27 +16,27 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->enum('category', ['akreditasi', 'indeksasi']);
-            
+
             // Link to accreditation template
             $table->foreignId('accreditation_template_id')
                 ->nullable()
                 ->constrained('accreditation_templates')
                 ->nullOnDelete();
-            
+
             // Registration period
             $table->dateTime('registration_start');
             $table->dateTime('registration_end');
-            
+
             // Assessment period
             $table->dateTime('assessment_start');
             $table->dateTime('assessment_end');
-            
+
             // Quota (optional)
             $table->integer('quota')->nullable();
-            
+
             // Status
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
-            
+
             // Audit fields
             $table->foreignId('created_by')
                 ->constrained('users')
@@ -49,10 +49,10 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('category');
             $table->index('status');

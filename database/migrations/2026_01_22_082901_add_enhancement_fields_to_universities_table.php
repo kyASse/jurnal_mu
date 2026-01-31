@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::table('universities', function (Blueprint $table) {
             // PTM Code from PDDIKTI (5 digit unique identifier)
             $table->string('ptm_code', 10)->unique()->nullable()->after('code');
-            
+
             // Accreditation status (Unggul, Baik Sekali, Baik, Cukup, dll)
             $table->string('accreditation_status', 50)->nullable()->after('logo_url');
-            
+
             // Cluster (Mandiri, Utama, Madya, dll)
             $table->string('cluster', 50)->nullable()->after('accreditation_status');
-            
+
             // Profile description with 250 character limit
             $table->string('profile_description', 250)->nullable()->after('cluster');
         });

@@ -189,6 +189,7 @@ class Journal extends Model
                 $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
             });
     }
+
     /**
      * Scope to filter by Dikti accreditation grade
      */

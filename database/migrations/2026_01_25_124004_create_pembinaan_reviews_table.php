@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pembinaan_reviews', function (Blueprint $table) {
             $table->id();
-            
+
             // Foreign keys
             $table->foreignId('registration_id')
                 ->constrained('pembinaan_registrations')
@@ -21,15 +21,15 @@ return new class extends Migration
             $table->foreignId('reviewer_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
-            
+
             // Review content
             $table->decimal('score', 5, 2)->nullable();
             $table->text('feedback')->nullable();
             $table->text('recommendation')->nullable();
-            
+
             // Review time
             $table->timestamp('reviewed_at')->useCurrent();
-            
+
             // Audit fields
             $table->foreignId('updated_by')
                 ->nullable()
@@ -39,10 +39,10 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('registration_id');
             $table->index('reviewer_id');

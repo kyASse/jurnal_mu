@@ -10,7 +10,7 @@ class ReviewerController extends Controller
 {
     /**
      * Display a listing of Reviewers.
-     * 
+     *
      * v1.1 feature - Reviewer management placeholder
      */
     public function index(): Response
