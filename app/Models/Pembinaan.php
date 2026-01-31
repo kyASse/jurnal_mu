@@ -48,6 +48,16 @@ class Pembinaan extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'approved_registrations_count',
+        'pending_registrations_count',
+    ];
+
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -172,6 +182,22 @@ class Pembinaan extends Model
     | Accessors & Helper Methods
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Get the approved registrations count attribute
+     */
+    public function getApprovedRegistrationsCountAttribute(): int
+    {
+        return $this->approved_registrations_count ?? $this->approvedRegistrations()->count();
+    }
+
+    /**
+     * Get the pending registrations count attribute
+     */
+    public function getPendingRegistrationsCountAttribute(): int
+    {
+        return $this->pending_registrations_count ?? $this->pendingRegistrations()->count();
+    }
 
     /**
      * Check if registration is open
