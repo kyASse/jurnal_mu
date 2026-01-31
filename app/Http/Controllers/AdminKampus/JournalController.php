@@ -70,7 +70,7 @@ class JournalController extends Controller
             ->orderBy('title')
             ->paginate(10)
             ->withQueryString()
-            ->through(fn ($journal) => [
+            ->through(fn($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -105,6 +105,7 @@ class JournalController extends Controller
             ->get();
 
         $sintaRanks = collect([
+            ['value' => 'non_sinta', 'label' => 'Non Sinta'],
             ['value' => 1, 'label' => 'SINTA 1'],
             ['value' => 2, 'label' => 'SINTA 2'],
             ['value' => 3, 'label' => 'SINTA 3'],
@@ -120,11 +121,11 @@ class JournalController extends Controller
         ]);
 
         $indexationOptions = collect(Journal::getIndexationPlatforms())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
         $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
         return Inertia::render('AdminKampus/Journals/Index', [
@@ -211,7 +212,7 @@ class JournalController extends Controller
                     'id' => $journal->scientificField->id,
                     'name' => $journal->scientificField->name,
                 ] : null,
-                'assessments' => $journal->assessments->map(fn ($assessment) => [
+                'assessments' => $journal->assessments->map(fn($assessment) => [
                     'id' => $assessment->id,
                     'assessment_date' => $assessment->assessment_date,
                     'period' => $assessment->period,
