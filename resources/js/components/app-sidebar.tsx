@@ -109,7 +109,7 @@ export function AppSidebar() {
         ];
 
         // Add Reviewer menu only if user has reviewer role
-        if (user.roles && user.roles.some((role: any) => role.name === 'Reviewer')) {
+        if (user.roles && user.roles.some((role: { name: string }) => role.name === 'Reviewer')) {
             adminKampusItems.push({
                 title: 'Reviewer',
                 href: route('admin-kampus.reviewer.index'),
