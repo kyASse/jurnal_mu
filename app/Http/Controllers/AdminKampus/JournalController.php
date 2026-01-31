@@ -55,6 +55,16 @@ class JournalController extends Controller
             $query->where('scientific_field_id', $request->scientific_field_id);
         }
 
+        // Apply indexation filter
+        if ($request->filled('indexation')) {
+            $query->byIndexation($request->indexation);
+        }
+
+        // Apply Dikti accreditation filter
+        if ($request->filled('accreditation_grade')) {
+            $query->byAccreditationGrade($request->accreditation_grade);
+        }
+
         // Paginate results
         $journals = $query
             ->orderBy('title')
@@ -109,12 +119,22 @@ class JournalController extends Controller
             ['value' => 'reviewed', 'label' => 'Reviewed'],
         ]);
 
+        $indexationOptions = collect(Journal::getIndexationPlatforms())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
+        $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
         return Inertia::render('AdminKampus/Journals/Index', [
             'journals' => $journals,
-            'filters' => $request->only(['search', 'status', 'sinta_rank', 'scientific_field_id']),
+            'filters' => $request->only(['search', 'status', 'sinta_rank', 'scientific_field_id', 'indexation', 'accreditation_grade']),
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
             'statusOptions' => $statusOptions,
+            'indexationOptions' => $indexationOptions,
+            'accreditationGradeOptions' => $accreditationGradeOptions,
         ]);
     }
 
@@ -153,11 +173,27 @@ class JournalController extends Controller
                 'first_published_year' => $journal->first_published_year,
                 'editor_in_chief' => $journal->editor_in_chief,
                 'email' => $journal->email,
+
+                // SINTA
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
+                'sinta_indexed_date' => $journal->sinta_indexed_date?->format('Y-m-d'),
+
+                // Dikti Accreditation
                 'accreditation_status' => $journal->accreditation_status,
                 'accreditation_status_label' => $journal->accreditation_status_label,
                 'accreditation_grade' => $journal->accreditation_grade,
+                'dikti_accreditation_number' => $journal->dikti_accreditation_number,
+                'dikti_accreditation_label' => $journal->dikti_accreditation_label,
+                'accreditation_issued_date' => $journal->accreditation_issued_date?->format('Y-m-d'),
+                'accreditation_expiry_date' => $journal->accreditation_expiry_date?->format('Y-m-d'),
+                'is_accreditation_expired' => $journal->is_accreditation_expired,
+                'accreditation_expiry_status' => $journal->accreditation_expiry_status,
+
+                // Indexations
+                'indexations' => $journal->indexations,
+                'indexation_labels' => $journal->indexation_labels,
+
                 'is_active' => $journal->is_active,
                 'created_at' => $journal->created_at->format('Y-m-d H:i'),
                 'updated_at' => $journal->updated_at->format('Y-m-d H:i'),

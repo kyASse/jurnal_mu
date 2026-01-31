@@ -17,7 +17,7 @@ return new class extends Migration
                 ->after('university_id')
                 ->constrained('scientific_fields')
                 ->nullOnDelete();
-            
+
             $table->index('scientific_field_id');
         });
     }

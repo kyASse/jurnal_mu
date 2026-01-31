@@ -150,14 +150,18 @@ export default function UsersShow({ user, journals }: Props) {
     ];
 
     const handleToggleActive = () => {
-        router.post(route('admin.users.toggle-active', user.id), {}, {
-            onSuccess: () => {
-                toast.success(`User ${user.is_active ? 'deactivated' : 'activated'} successfully`);
+        router.post(
+            route('admin.users.toggle-active', user.id),
+            {},
+            {
+                onSuccess: () => {
+                    toast.success(`User ${user.is_active ? 'deactivated' : 'activated'} successfully`);
+                },
+                onError: () => {
+                    toast.error('Failed to update user status');
+                },
             },
-            onError: () => {
-                toast.error('Failed to update user status');
-            },
-        });
+        );
     };
 
     return (

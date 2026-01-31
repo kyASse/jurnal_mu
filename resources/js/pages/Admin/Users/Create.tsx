@@ -44,11 +44,11 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/Admin/Users/Create.tsx
  */
+import MultiRoleSelect from '@/components/multi-role-select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import MultiRoleSelect from '@/components/multi-role-select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -283,12 +283,8 @@ export default function UsersCreate({ universities, roles, scientificFields }: P
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.scientific_field_id && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>
-                                )}
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                    Bidang ilmu pengelola jurnal (optional, untuk filtering)
-                                </p>
+                                {errors.scientific_field_id && <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>}
+                                <p className="mt-1 text-sm text-muted-foreground">Bidang ilmu pengelola jurnal (optional, untuk filtering)</p>
                             </div>
                         </div>
 

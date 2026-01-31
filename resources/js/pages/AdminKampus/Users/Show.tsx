@@ -21,7 +21,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, BookOpen, Briefcase, Building2, CalendarClock, CalendarPlus, Clock, Edit, Mail, Phone, Power, Shield, Trash2 } from 'lucide-react';
+import {
+    ArrowLeft,
+    BookOpen,
+    Briefcase,
+    Building2,
+    CalendarClock,
+    CalendarPlus,
+    Clock,
+    Edit,
+    Mail,
+    Phone,
+    Power,
+    Shield,
+    Trash2,
+} from 'lucide-react';
 
 interface User {
     id: number;

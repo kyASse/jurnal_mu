@@ -54,21 +54,14 @@ interface Props {
     required?: boolean;
 }
 
-export default function MultiRoleSelect({ 
-    roles, 
-    selectedRoleIds, 
-    onChange, 
-    error, 
-    label = 'Roles', 
-    required = false 
-}: Props) {
+export default function MultiRoleSelect({ roles, selectedRoleIds, onChange, error, label = 'Roles', required = false }: Props) {
     const handleRoleToggle = (roleId: number, checked: boolean) => {
         if (checked) {
             // Add role
             onChange([...selectedRoleIds, roleId]);
         } else {
             // Remove role
-            onChange(selectedRoleIds.filter(id => id !== roleId));
+            onChange(selectedRoleIds.filter((id) => id !== roleId));
         }
     };
 
@@ -77,43 +70,31 @@ export default function MultiRoleSelect({
             <Label>
                 {label} {required && <span className="text-red-500">*</span>}
             </Label>
-            
+
             <div className="space-y-3 rounded-md border border-sidebar-border/70 bg-muted/30 p-4 dark:border-sidebar-border dark:bg-muted/10">
                 {roles.map((role) => (
                     <div key={role.id} className="flex items-start space-x-3">
                         <Checkbox
                             id={`role-${role.id}`}
                             checked={selectedRoleIds.includes(role.id)}
-                            onCheckedChange={(checked) => 
-                                handleRoleToggle(role.id, checked as boolean)
-                            }
+                            onCheckedChange={(checked) => handleRoleToggle(role.id, checked as boolean)}
                         />
                         <div className="flex-1 space-y-1">
                             <Label
                                 htmlFor={`role-${role.id}`}
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                                 {role.display_name}
                             </Label>
-                            {role.description && (
-                                <p className="text-xs text-muted-foreground">
-                                    {role.description}
-                                </p>
-                            )}
+                            {role.description && <p className="text-xs text-muted-foreground">{role.description}</p>}
                         </div>
                     </div>
                 ))}
             </div>
-            
-            {error && (
-                <p className="text-sm text-red-600">{error}</p>
-            )}
-            
-            {required && selectedRoleIds.length === 0 && (
-                <p className="text-xs text-muted-foreground">
-                    * Please select at least one role
-                </p>
-            )}
+
+            {error && <p className="text-sm text-red-600">{error}</p>}
+
+            {required && selectedRoleIds.length === 0 && <p className="text-xs text-muted-foreground">* Please select at least one role</p>}
         </div>
     );
 }

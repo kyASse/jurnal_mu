@@ -1,9 +1,6 @@
 import CategoryFormModal from '@/components/Admin/Templates/CategoryFormModal';
 import IndicatorFormModal from '@/components/Admin/Templates/IndicatorFormModal';
 import SubCategoryFormModal from '@/components/Admin/Templates/SubCategoryFormModal';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,6 +11,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@/components/ui/pagination';
@@ -150,7 +150,7 @@ export default function BorangIndikatorList(props: Props) {
                 preserveState: true,
                 preserveScroll: true,
                 onFinish: () => setIsLoading(false),
-            }
+            },
         );
     };
 
@@ -209,7 +209,9 @@ export default function BorangIndikatorList(props: Props) {
         router.delete(route(routeMap[deleteDialog.type], deleteDialog.item.id), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(`${deleteDialog.type === 'category' ? 'Category' : deleteDialog.type === 'subcategory' ? 'Sub-Category' : 'Indicator'} deleted successfully`);
+                toast.success(
+                    `${deleteDialog.type === 'category' ? 'Category' : deleteDialog.type === 'subcategory' ? 'Sub-Category' : 'Indicator'} deleted successfully`,
+                );
                 setDeleteDialog({ open: false });
             },
             onError: (errors) => {
@@ -234,7 +236,9 @@ export default function BorangIndikatorList(props: Props) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-bold tracking-tight">List View - Borang Indikator</h2>
-                        <p className="text-sm text-muted-foreground">View and manage Categories, Sub-Categories, and Indicators in a hierarchical list</p>
+                        <p className="text-sm text-muted-foreground">
+                            View and manage Categories, Sub-Categories, and Indicators in a hierarchical list
+                        </p>
                     </div>
                     <div className="flex gap-2">
                         {templateFilter && (
@@ -252,7 +256,7 @@ export default function BorangIndikatorList(props: Props) {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
                             {/* Search */}
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     placeholder="Search code or name..."
                                     value={search}
@@ -333,7 +337,9 @@ export default function BorangIndikatorList(props: Props) {
                     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
                         <FolderTree className="mb-4 h-12 w-12 text-muted-foreground" />
                         <h3 className="mb-2 text-lg font-semibold">Select a Template</h3>
-                        <p className="text-sm text-muted-foreground">Please select a type and template from the filters above to view the hierarchical structure.</p>
+                        <p className="text-sm text-muted-foreground">
+                            Please select a type and template from the filters above to view the hierarchical structure.
+                        </p>
                     </div>
                 ) : categories.data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
@@ -353,14 +359,16 @@ export default function BorangIndikatorList(props: Props) {
                             {categories.data.map((category) => (
                                 <div key={category.id} className="border-b last:border-b-0">
                                     {/* Category Row */}
-                                    <Collapsible
-                                        open={expandedCategories.has(category.id)}
-                                        onOpenChange={() => toggleCategory(category.id)}
-                                    >
+                                    <Collapsible open={expandedCategories.has(category.id)} onOpenChange={() => toggleCategory(category.id)}>
                                         <div className="flex items-center gap-2 p-4 hover:bg-muted/50">
                                             <CollapsibleTrigger asChild>
                                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                                    <ChevronRight className={cn('h-4 w-4 transition-transform', expandedCategories.has(category.id) && 'rotate-90')} />
+                                                    <ChevronRight
+                                                        className={cn(
+                                                            'h-4 w-4 transition-transform',
+                                                            expandedCategories.has(category.id) && 'rotate-90',
+                                                        )}
+                                                    />
                                                 </Button>
                                             </CollapsibleTrigger>
                                             <Layers className="h-5 w-5 text-blue-500" />
@@ -376,12 +384,19 @@ export default function BorangIndikatorList(props: Props) {
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
                                                                 <Badge variant="secondary">
-                                                                    {category.sub_categories_count || 0} Sub-Unsur • {category.indicators_count || 0} Indikator
+                                                                    {category.sub_categories_count || 0} Sub-Unsur • {category.indicators_count || 0}{' '}
+                                                                    Indikator
                                                                 </Badge>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
                                                                 <p className="text-xs">
-                                                                    Last updated: {category.updated_at ? formatDistanceToNow(new Date(category.updated_at), { addSuffix: true, locale: id }) : 'N/A'}
+                                                                    Last updated:{' '}
+                                                                    {category.updated_at
+                                                                        ? formatDistanceToNow(new Date(category.updated_at), {
+                                                                              addSuffix: true,
+                                                                              locale: id,
+                                                                          })
+                                                                        : 'N/A'}
                                                                 </p>
                                                             </TooltipContent>
                                                         </Tooltip>
@@ -439,7 +454,7 @@ export default function BorangIndikatorList(props: Props) {
                                                                             <ChevronRight
                                                                                 className={cn(
                                                                                     'h-4 w-4 transition-transform',
-                                                                                    expandedSubCategories.has(subCategory.id) && 'rotate-90'
+                                                                                    expandedSubCategories.has(subCategory.id) && 'rotate-90',
                                                                                 )}
                                                                             />
                                                                         </Button>
@@ -455,7 +470,9 @@ export default function BorangIndikatorList(props: Props) {
                                                                             </Badge>
                                                                         </div>
                                                                         {subCategory.description && (
-                                                                            <p className="mt-1 text-xs text-muted-foreground">{subCategory.description}</p>
+                                                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                                                {subCategory.description}
+                                                                            </p>
                                                                         )}
                                                                     </div>
                                                                     <DropdownMenu>
@@ -505,12 +522,19 @@ export default function BorangIndikatorList(props: Props) {
                                                                     <div className="border-l-2 border-green-200 pl-8">
                                                                         {subCategory.indicators && subCategory.indicators.length > 0 ? (
                                                                             subCategory.indicators.map((indicator) => (
-                                                                                <div key={indicator.id} className="flex items-start gap-2 border-t p-4 hover:bg-muted/50">
+                                                                                <div
+                                                                                    key={indicator.id}
+                                                                                    className="flex items-start gap-2 border-t p-4 hover:bg-muted/50"
+                                                                                >
                                                                                     <FileText className="mt-1 h-4 w-4 text-purple-500" />
                                                                                     <div className="flex-1">
                                                                                         <div className="flex items-center gap-2">
-                                                                                            <span className="font-mono text-xs font-medium">{indicator.code}</span>
-                                                                                            {!indicator.is_active && <Badge variant="secondary">Inactive</Badge>}
+                                                                                            <span className="font-mono text-xs font-medium">
+                                                                                                {indicator.code}
+                                                                                            </span>
+                                                                                            {!indicator.is_active && (
+                                                                                                <Badge variant="secondary">Inactive</Badge>
+                                                                                            )}
                                                                                             <Badge variant="outline" className="text-xs">
                                                                                                 {indicator.answer_type}
                                                                                             </Badge>
@@ -520,7 +544,9 @@ export default function BorangIndikatorList(props: Props) {
                                                                                         </div>
                                                                                         <p className="mt-1 text-sm">{indicator.question}</p>
                                                                                         {indicator.description && (
-                                                                                            <p className="mt-1 text-xs text-muted-foreground">{indicator.description}</p>
+                                                                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                                                                {indicator.description}
+                                                                                            </p>
                                                                                         )}
                                                                                     </div>
                                                                                     <DropdownMenu>
@@ -551,13 +577,19 @@ export default function BorangIndikatorList(props: Props) {
                                                                                                         item: indicator,
                                                                                                     })
                                                                                                 }
-                                                                                                disabled={!(indicator as IndicatorWithRelations).can_be_deleted}
+                                                                                                disabled={
+                                                                                                    !(indicator as IndicatorWithRelations)
+                                                                                                        .can_be_deleted
+                                                                                                }
                                                                                                 className="text-destructive focus:text-destructive"
                                                                                             >
                                                                                                 <Trash2 className="mr-2 h-4 w-4" />
                                                                                                 Delete
-                                                                                                {!(indicator as IndicatorWithRelations).can_be_deleted && (
-                                                                                                    <span className="ml-2 text-xs">(Used in assessments)</span>
+                                                                                                {!(indicator as IndicatorWithRelations)
+                                                                                                    .can_be_deleted && (
+                                                                                                    <span className="ml-2 text-xs">
+                                                                                                        (Used in assessments)
+                                                                                                    </span>
                                                                                                 )}
                                                                                             </DropdownMenuItem>
                                                                                         </DropdownMenuContent>
@@ -565,7 +597,9 @@ export default function BorangIndikatorList(props: Props) {
                                                                                 </div>
                                                                             ))
                                                                         ) : (
-                                                                            <div className="p-4 text-center text-sm text-muted-foreground">No indicators found</div>
+                                                                            <div className="p-4 text-center text-sm text-muted-foreground">
+                                                                                No indicators found
+                                                                            </div>
                                                                         )}
                                                                         <div className="border-t p-2">
                                                                             <Button
@@ -597,7 +631,9 @@ export default function BorangIndikatorList(props: Props) {
                                                         variant="ghost"
                                                         size="sm"
                                                         className="w-full"
-                                                        onClick={() => setSubCategoryModal({ open: true, categoryId: category.id.toString(), mode: 'create' })}
+                                                        onClick={() =>
+                                                            setSubCategoryModal({ open: true, categoryId: category.id.toString(), mode: 'create' })
+                                                        }
                                                     >
                                                         <Plus className="mr-2 h-4 w-4" />
                                                         Add Sub-Category

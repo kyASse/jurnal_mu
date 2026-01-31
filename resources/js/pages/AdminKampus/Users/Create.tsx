@@ -16,11 +16,11 @@
  * @route GET /admin-kampus/users/create
  * @route POST /admin-kampus/users
  */
+import MultiRoleSelect from '@/components/multi-role-select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import MultiRoleSelect from '@/components/multi-role-select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -118,9 +118,7 @@ export default function UsersCreate({ university, roles, scientificFields }: Pro
                                 University: {university.name} ({university.short_name})
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-blue-600 dark:text-blue-300">
-                            This user will be automatically assigned to your university.
-                        </p>
+                        <p className="mt-1 text-sm text-blue-600 dark:text-blue-300">This user will be automatically assigned to your university.</p>
                     </div>
 
                     {/* Form */}
@@ -254,12 +252,8 @@ export default function UsersCreate({ university, roles, scientificFields }: Pro
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.scientific_field_id && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>
-                                )}
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                    Bidang ilmu pengelola jurnal (optional, untuk filtering)
-                                </p>
+                                {errors.scientific_field_id && <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>}
+                                <p className="mt-1 text-sm text-muted-foreground">Bidang ilmu pengelola jurnal (optional, untuk filtering)</p>
                             </div>
                         </div>
 

@@ -52,7 +52,7 @@ class UserPolicy
 
     /**
      * Determine whether the user can assign when creating.
-     * 
+     *
      * Now supports multi-role assignment. Returns true if user can assign at least one of the specified roles.
      */
     public function canAssignRole(User $user, string $roleName): bool

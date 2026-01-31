@@ -69,9 +69,18 @@ interface Journal {
     url: string;
     scientific_field_id: number;
     sinta_rank: number | null;
+    sinta_indexed_date?: string | null;
     frequency: string;
     publisher: string;
     first_published_year: number | null;
+    // Dikti Accreditation
+    accreditation_status?: string | null;
+    accreditation_grade?: string | null;
+    dikti_accreditation_number?: string | null;
+    accreditation_issued_date?: string | null;
+    accreditation_expiry_date?: string | null;
+    // Indexations
+    indexations?: Record<string, { indexed_at: string }> | null;
 }
 
 interface Props {
@@ -80,9 +89,21 @@ interface Props {
         id: number;
         name: string;
     }>;
+    indexationOptions: Array<{
+        value: string;
+        label: string;
+    }>;
 }
 
-export default function JournalsEdit({ journal, scientificFields }: Props) {
+export default function JournalsEdit({ journal, scientificFields, indexationOptions }: Props) {
+    // Transform existing indexations from object to array format
+    const existingIndexations = journal.indexations
+        ? Object.entries(journal.indexations).map(([platform, data]) => ({
+              platform,
+              indexed_at: data.indexed_at || '',
+          }))
+        : [];
+
     const { data, setData, put, processing, errors } = useForm({
         title: journal.title || '',
         issn: journal.issn || '',
@@ -90,9 +111,18 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
         url: journal.url || '',
         scientific_field_id: journal.scientific_field_id ? journal.scientific_field_id.toString() : '',
         sinta_rank: journal.sinta_rank ? journal.sinta_rank.toString() : '',
+        sinta_indexed_date: journal.sinta_indexed_date || '',
         frequency: journal.frequency || '',
         publisher: journal.publisher || '',
         first_published_year: journal.first_published_year || '',
+        // Dikti Accreditation
+        accreditation_status: journal.accreditation_status || '',
+        accreditation_grade: journal.accreditation_grade || '',
+        dikti_accreditation_number: journal.dikti_accreditation_number || '',
+        accreditation_issued_date: journal.accreditation_issued_date || '',
+        accreditation_expiry_date: journal.accreditation_expiry_date || '',
+        // Indexations
+        indexations: existingIndexations as Array<{ platform: string; indexed_at: string }>,
     });
 
     const handleSubmit: FormEventHandler = (e) => {
@@ -231,6 +261,22 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                     </div>
                                 </div>
 
+                                {data.sinta_rank && (
+                                    <div>
+                                        <Label htmlFor="sinta_indexed_date">SINTA Indexed Date</Label>
+                                        <Input
+                                            id="sinta_indexed_date"
+                                            type="date"
+                                            value={data.sinta_indexed_date}
+                                            onChange={(e) => setData('sinta_indexed_date', e.target.value)}
+                                            max={new Date().toISOString().split('T')[0]}
+                                            className="mt-1"
+                                        />
+                                        {errors.sinta_indexed_date && <p className="mt-1 text-sm text-red-600">{errors.sinta_indexed_date}</p>}
+                                        <p className="mt-1 text-xs text-gray-500">Tanggal jurnal terindeks di SINTA</p>
+                                    </div>
+                                )}
+
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
                                         <Label htmlFor="frequency">
@@ -279,6 +325,160 @@ export default function JournalsEdit({ journal, scientificFields }: Props) {
                                     />
                                     {errors.publisher && <p className="mt-1 text-sm text-red-600">{errors.publisher}</p>}
                                 </div>
+                            </div>
+
+                            {/* Dikti Accreditation */}
+                            <div className="space-y-4">
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Dikti Accreditation (Optional)</h3>
+
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div>
+                                        <Label htmlFor="accreditation_status">Accreditation Status</Label>
+                                        <Select value={data.accreditation_status} onValueChange={(val) => setData('accreditation_status', val)}>
+                                            <SelectTrigger className="mt-1">
+                                                <SelectValue placeholder="Select Status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Terakreditasi">Terakreditasi</SelectItem>
+                                                <SelectItem value="Dalam Proses">Dalam Proses</SelectItem>
+                                                <SelectItem value="Belum Terakreditasi">Belum Terakreditasi</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.accreditation_status && <p className="mt-1 text-sm text-red-600">{errors.accreditation_status}</p>}
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="accreditation_grade">Accreditation Grade</Label>
+                                        <Select value={data.accreditation_grade} onValueChange={(val) => setData('accreditation_grade', val)}>
+                                            <SelectTrigger className="mt-1">
+                                                <SelectValue placeholder="Select Grade" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="S1">S1 (Sangat Baik)</SelectItem>
+                                                <SelectItem value="S2">S2 (Baik Sekali)</SelectItem>
+                                                <SelectItem value="S3">S3 (Baik)</SelectItem>
+                                                <SelectItem value="S4">S4 (Cukup)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.accreditation_grade && <p className="mt-1 text-sm text-red-600">{errors.accreditation_grade}</p>}
+                                    </div>
+                                </div>
+
+                                {data.accreditation_status === 'Terakreditasi' && (
+                                    <>
+                                        <div>
+                                            <Label htmlFor="dikti_accreditation_number">Accreditation Number</Label>
+                                            <Input
+                                                id="dikti_accreditation_number"
+                                                value={data.dikti_accreditation_number}
+                                                onChange={(e) => setData('dikti_accreditation_number', e.target.value)}
+                                                placeholder="e.g. 105/E/KPT/2023"
+                                                className="mt-1"
+                                            />
+                                            {errors.dikti_accreditation_number && (
+                                                <p className="mt-1 text-sm text-red-600">{errors.dikti_accreditation_number}</p>
+                                            )}
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div>
+                                                <Label htmlFor="accreditation_issued_date">Issued Date</Label>
+                                                <Input
+                                                    id="accreditation_issued_date"
+                                                    type="date"
+                                                    value={data.accreditation_issued_date}
+                                                    onChange={(e) => setData('accreditation_issued_date', e.target.value)}
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_issued_date && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_issued_date}</p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor="accreditation_expiry_date">Expiry Date</Label>
+                                                <Input
+                                                    id="accreditation_expiry_date"
+                                                    type="date"
+                                                    value={data.accreditation_expiry_date}
+                                                    onChange={(e) => setData('accreditation_expiry_date', e.target.value)}
+                                                    min={data.accreditation_issued_date || undefined}
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_expiry_date && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_expiry_date}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Indexations */}
+                            <div className="space-y-4">
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Indexations (Optional)</h3>
+                                <p className="text-sm text-gray-600">Select databases where this journal is indexed</p>
+
+                                <div className="space-y-3">
+                                    {indexationOptions.map((option) => {
+                                        const isSelected = data.indexations.some((i) => i.platform === option.value);
+                                        const selectedItem = data.indexations.find((i) => i.platform === option.value);
+
+                                        return (
+                                            <div key={option.value} className="rounded-md border p-4">
+                                                <div className="flex items-start gap-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`indexation-${option.value}`}
+                                                        checked={isSelected}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setData('indexations', [
+                                                                    ...data.indexations,
+                                                                    { platform: option.value, indexed_at: '' },
+                                                                ]);
+                                                            } else {
+                                                                setData(
+                                                                    'indexations',
+                                                                    data.indexations.filter((i) => i.platform !== option.value),
+                                                                );
+                                                            }
+                                                        }}
+                                                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <div className="flex-1">
+                                                        <Label htmlFor={`indexation-${option.value}`} className="cursor-pointer font-medium">
+                                                            {option.label}
+                                                        </Label>
+                                                        {isSelected && (
+                                                            <div className="mt-2">
+                                                                <Label className="text-xs text-gray-600">Indexed Date</Label>
+                                                                <Input
+                                                                    type="date"
+                                                                    value={selectedItem?.indexed_at || ''}
+                                                                    onChange={(e) => {
+                                                                        setData(
+                                                                            'indexations',
+                                                                            data.indexations.map((i) =>
+                                                                                i.platform === option.value
+                                                                                    ? { ...i, indexed_at: e.target.value }
+                                                                                    : i,
+                                                                            ),
+                                                                        );
+                                                                    }}
+                                                                    max={new Date().toISOString().split('T')[0]}
+                                                                    className="mt-1"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {errors.indexations && <p className="mt-1 text-sm text-red-600">{errors.indexations}</p>}
                             </div>
 
                             <div className="flex items-center justify-end gap-4 border-t pt-4">

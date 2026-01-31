@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreJournalRequest;
+use App\Http\Requests\UpdateJournalRequest;
 use App\Models\Journal;
 use App\Models\ScientificField;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -37,15 +38,16 @@ class JournalController extends Controller
         $this->authorize('create', Journal::class);
         $scientificFields = ScientificField::select('id', 'name')->get();
 
-        return Inertia::render('user/journals/create', [
+        return Inertia::render('User/Journals/Create', [
             'scientificFields' => $scientificFields,
+            'indexationOptions' => $this->getIndexationOptions(),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreJournalRequest $request)
     {
         $this->authorize('create', Journal::class);
         $user = Auth::user();
@@ -55,18 +57,7 @@ class JournalController extends Controller
             return back()->withErrors(['university_id' => 'Anda belum terdaftar di kampus manapun. Hubungi Admin Kampus.']);
         }
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{4}$/',
-            'e_issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{4}$/',
-            'url' => 'required|url|max:500',
-            'scientific_field_id' => 'required|exists:scientific_fields,id',
-            'sinta_rank' => 'nullable|integer|min:1|max:6',
-            'frequency' => 'required|string|max:50',
-            'publisher' => 'nullable|string|max:255',
-            'first_published_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
-        ]);
-
+        $validated = $request->validated();
         $validated['user_id'] = $user->id;
         $validated['university_id'] = $user->university_id;
 
@@ -87,29 +78,18 @@ class JournalController extends Controller
         return Inertia::render('User/Journals/Edit', [
             'journal' => $journal,
             'scientificFields' => $scientificFields,
+            'indexationOptions' => $this->getIndexationOptions(),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Journal $journal)
+    public function update(UpdateJournalRequest $request, Journal $journal)
     {
         $this->authorize('update', $journal);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'issn' => 'nullable|string|max:20',
-            'e_issn' => 'nullable|string|max:20',
-            'url' => 'required|url|max:500',
-            'scientific_field_id' => 'required|exists:scientific_fields,id',
-            'sinta_rank' => 'nullable|integer|min:1|max:6',
-            'frequency' => 'required|string|max:50',
-            'publisher' => 'nullable|string|max:255',
-            'first_published_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
-        ]);
-
-        $journal->update($validated);
+        $journal->update($request->validated());
 
         return redirect()->route('journals.index')->with('success', 'Data jurnal berhasil diperbarui.');
     }
@@ -124,5 +104,22 @@ class JournalController extends Controller
         $journal->delete();
 
         return redirect()->route('journals.index')->with('success', 'Jurnal berhasil dihapus.');
+    }
+
+    /**
+     * Get available indexation platforms
+     */
+    private function getIndexationOptions(): array
+    {
+        return [
+            ['value' => 'Scopus', 'label' => 'Scopus'],
+            ['value' => 'WoS', 'label' => 'Web of Science (WoS)'],
+            ['value' => 'DOAJ', 'label' => 'DOAJ (Directory of Open Access Journals)'],
+            ['value' => 'Copernicus', 'label' => 'Copernicus'],
+            ['value' => 'Google Scholar', 'label' => 'Google Scholar'],
+            ['value' => 'Garuda', 'label' => 'Garuda (Ristekdikti)'],
+            ['value' => 'Dimensions', 'label' => 'Dimensions'],
+            ['value' => 'BASE', 'label' => 'BASE (Bielefeld Academic Search Engine)'],
+        ];
     }
 }

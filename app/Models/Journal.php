@@ -27,8 +27,13 @@ class Journal extends Model
         'first_published_year',
         'scientific_field_id',
         'sinta_rank',
+        'sinta_indexed_date',
         'accreditation_status',
         'accreditation_grade',
+        'dikti_accreditation_number',
+        'accreditation_issued_date',
+        'accreditation_expiry_date',
+        'indexations',
         'editor_in_chief',
         'email',
         'is_active',
@@ -42,6 +47,10 @@ class Journal extends Model
     protected $casts = [
         'first_published_year' => 'integer',
         'sinta_rank' => 'integer',
+        'sinta_indexed_date' => 'date',
+        'accreditation_issued_date' => 'date',
+        'accreditation_expiry_date' => 'date',
+        'indexations' => 'array',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -166,6 +175,32 @@ class Journal extends Model
         });
     }
 
+    /**
+     * Scope to filter by indexation platform
+     */
+    public function scopeByIndexation($query, ?string $platform)
+    {
+        if (! $platform) {
+            return $query;
+        }
+
+        return $query->whereNotNull('indexations')
+            ->where(function ($q) use ($platform) {
+                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
+            });
+    }
+
+    /**
+     * Scope to filter by Dikti accreditation grade
+     */
+    public function scopeByAccreditationGrade($query, ?string $grade)
+    {
+        if (! $grade) {
+            return $query;
+        }
+
+        return $query->where('accreditation_grade', $grade);
+    }
     /*
     |--------------------------------------------------------------------------
     | Accessors
@@ -210,6 +245,89 @@ class Journal extends Model
         return $this->latestAssessment?->percentage;
     }
 
+    /**
+     * Check if Dikti accreditation is expired
+     */
+    public function getIsAccreditationExpiredAttribute(): bool
+    {
+        if (! $this->accreditation_expiry_date) {
+            return false;
+        }
+
+        return $this->accreditation_expiry_date->isPast();
+    }
+
+    /**
+     * Get accreditation expiry status
+     *
+     * @return string 'expired'|'expiring_soon'|'valid'|'none'
+     */
+    public function getAccreditationExpiryStatusAttribute(): string
+    {
+        if (! $this->accreditation_expiry_date) {
+            return 'none';
+        }
+
+        if ($this->accreditation_expiry_date->isPast()) {
+            return 'expired';
+        }
+
+        if ($this->accreditation_expiry_date->diffInDays(now()) <= 30) {
+            return 'expiring_soon';
+        }
+
+        return 'valid';
+    }
+
+    /**
+     * Get Dikti accreditation label
+     */
+    public function getDiktiAccreditationLabelAttribute(): string
+    {
+        if (! $this->dikti_accreditation_number) {
+            return 'Belum Terakreditasi Dikti';
+        }
+
+        $label = "No. {$this->dikti_accreditation_number}";
+
+        if ($this->accreditation_grade) {
+            $label .= " ({$this->accreditation_grade})";
+        }
+
+        return $label;
+    }
+
+    /**
+     * Get indexation labels as array
+     *
+     * @return array<string>
+     */
+    public function getIndexationLabelsAttribute(): array
+    {
+        if (! $this->indexations || ! is_array($this->indexations)) {
+            return [];
+        }
+
+        return array_keys($this->indexations);
+    }
+
+    /**
+     * Get frequency label (human-readable)
+     */
+    public function getFrequencyLabelAttribute(): string
+    {
+        $frequencies = [
+            'monthly' => 'Bulanan',
+            'bi-monthly' => 'Dua Bulanan',
+            'quarterly' => 'Triwulanan',
+            'semi-annual' => 'Semi-Tahunan',
+            'annual' => 'Tahunan',
+            'other' => 'Lainnya',
+        ];
+
+        return $frequencies[$this->frequency] ?? $this->frequency ?? 'Tidak Diketahui';
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Helper Methods
@@ -232,5 +350,40 @@ class Journal extends Model
         return $this->assessments()
             ->whereIn('status', ['submitted', 'reviewed'])
             ->exists();
+    }
+
+    /**
+     * Get available indexation platforms
+     *
+     * @return array<string, string>
+     */
+    public static function getIndexationPlatforms(): array
+    {
+        return [
+            'Scopus' => 'Scopus',
+            'Web of Science' => 'Web of Science',
+            'DOAJ' => 'DOAJ',
+            'Google Scholar' => 'Google Scholar',
+            'Dimensions' => 'Dimensions',
+            'EBSCO' => 'EBSCO',
+            'ProQuest' => 'ProQuest',
+            'Crossref' => 'Crossref',
+            'BASE' => 'BASE',
+        ];
+    }
+
+    /**
+     * Get available Dikti accreditation grades
+     *
+     * @return array<string, string>
+     */
+    public static function getAccreditationGrades(): array
+    {
+        return [
+            'Unggul' => 'Unggul',
+            'Baik Sekali' => 'Baik Sekali',
+            'Baik' => 'Baik',
+            'Cukup' => 'Cukup',
+        ];
     }
 }

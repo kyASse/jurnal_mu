@@ -101,11 +101,7 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(
-            route('admin-kampus.users.index'),
-            { search, is_active: isActiveFilter, role_id: roleIdFilter },
-            { preserveState: true }
-        );
+        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter }, { preserveState: true });
     };
 
     const handleDelete = (id: number, name: string) => {

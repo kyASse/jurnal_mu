@@ -22,7 +22,7 @@ interface Props {
 export default function IndicatorFormModal({ subCategoryId, indicator, trigger, open, onOpenChange, mode = 'create' }: Props) {
     const isEdit = mode === 'edit';
 
-    type AnswerType = "boolean" | "scale" | "text";
+    // AnswerType was defined here previously but is unused — removed to satisfy ESLint
 
     // Match StoreIndicatorRequest validation fields exactly
     const { data, setData, post, put, processing, errors, reset } = useForm({

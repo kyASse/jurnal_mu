@@ -5,13 +5,14 @@
  * @features View journal info, list assessments, view assessment details, download attachments
  * @route GET /admin-kampus/journals/{id}
  */
+import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, Award, Bookmark, BookOpen, Building2, Calendar, ExternalLink, Eye, FileText, Globe, Mail, TrendingUp, User } from 'lucide-react';
+import { ArrowLeft, Bookmark, BookOpen, Building2, Calendar, ExternalLink, Eye, FileText, Globe, Mail, TrendingUp, User } from 'lucide-react';
 
 interface University {
     id: number;
@@ -63,11 +64,23 @@ interface Journal {
     first_published_year: number | null;
     editor_in_chief: string | null;
     email: string | null;
+    // SINTA
     sinta_rank: number | null;
     sinta_rank_label: string;
+    sinta_indexed_date?: string | null;
+    // Dikti Accreditation
     accreditation_status: string | null;
     accreditation_status_label: string;
     accreditation_grade: string | null;
+    dikti_accreditation_number?: string | null;
+    dikti_accreditation_label?: string;
+    accreditation_issued_date?: string | null;
+    accreditation_expiry_date?: string | null;
+    is_accreditation_expired?: boolean;
+    accreditation_expiry_status?: 'valid' | 'expiring_soon' | 'expired' | 'none';
+    // Indexations
+    indexations?: Record<string, { indexed_at: string }> | null;
+    indexation_labels?: string[];
     is_active: boolean;
     created_at: string;
     updated_at: string;
@@ -143,22 +156,26 @@ export default function JournalShow({ journal }: Props) {
                                 </div>
                                 <div>
                                     <h1 className="text-3xl font-bold text-foreground">{journal.title}</h1>
-                                    <div className="mt-2 flex items-center gap-2">
+                                    <div className="mt-2 flex flex-wrap items-center gap-2">
                                         {journal.is_active ? (
                                             <Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">Active</Badge>
                                         ) : (
                                             <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400">Inactive</Badge>
                                         )}
-                                        {journal.sinta_rank && (
-                                            <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
-                                                <Award className="mr-1 h-3 w-3" />
-                                                {journal.sinta_rank_label}
-                                            </Badge>
+                                        <SintaBadge rank={journal.sinta_rank} indexed_date={journal.sinta_indexed_date} />
+                                        {journal.dikti_accreditation_number && (
+                                            <AccreditationBadge
+                                                number={journal.dikti_accreditation_number}
+                                                grade={journal.accreditation_grade}
+                                                expiry_status={journal.accreditation_expiry_status}
+                                                expiry_date={journal.accreditation_expiry_date}
+                                            />
                                         )}
-                                        {journal.accreditation_status && (
-                                            <Badge variant="outline">
-                                                {journal.accreditation_status_label}
-                                                {journal.accreditation_grade && ` (${journal.accreditation_grade})`}
+                                        {journal.indexation_labels &&
+                                            journal.indexation_labels.slice(0, 3).map((label) => <IndexationBadge key={label} platform={label} />)}
+                                        {journal.indexation_labels && journal.indexation_labels.length > 3 && (
+                                            <Badge variant="outline" className="text-xs">
+                                                +{journal.indexation_labels.length - 3} more
                                             </Badge>
                                         )}
                                     </div>

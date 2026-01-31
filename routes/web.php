@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\EssayQuestionController;
 use App\Http\Controllers\Admin\EvaluationCategoryController;
 use App\Http\Controllers\Admin\EvaluationIndicatorController;
 use App\Http\Controllers\Admin\EvaluationSubCategoryController;
+use App\Http\Controllers\Admin\PembinaanController as AdminPembinaanController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
 use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ResourcesController;
+use App\Http\Controllers\ReviewerController as MainReviewerController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\JournalController as UserJournalController;
@@ -188,6 +190,26 @@ Route::middleware(['auth'])->group(function () {
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
             ->name('assessments.index');
 
+        // Pembinaan Management (v1.1)
+        Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
+            Route::get('/', [AdminPembinaanController::class, 'index'])
+                ->name('index');
+            Route::get('create', [AdminPembinaanController::class, 'create'])
+                ->name('create');
+            Route::post('/', [AdminPembinaanController::class, 'store'])
+                ->name('store');
+            Route::get('{pembinaan}', [AdminPembinaanController::class, 'show'])
+                ->name('show');
+            Route::get('{pembinaan}/edit', [AdminPembinaanController::class, 'edit'])
+                ->name('edit');
+            Route::put('{pembinaan}', [AdminPembinaanController::class, 'update'])
+                ->name('update');
+            Route::delete('{pembinaan}', [AdminPembinaanController::class, 'destroy'])
+                ->name('destroy');
+            Route::post('{pembinaan}/toggle-status', [AdminPembinaanController::class, 'toggleStatus'])
+                ->name('toggle-status');
+        });
+
     });
 
     /*
@@ -212,13 +234,37 @@ Route::middleware(['auth'])->group(function () {
         Route::get('reviewer', [ReviewerController::class, 'index'])
             ->name('reviewer.index');
 
-        // Pembinaan (Placeholder)
-        Route::get('pembinaan', [AdminKampusPembinaanController::class, 'index'])
-            ->name('pembinaan.index');
+        // Pembinaan Registration Management (v1.1)
+        Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
+            Route::get('/', [AdminKampusPembinaanController::class, 'index'])
+                ->name('index');
+            Route::get('registrations/{registration}', [AdminKampusPembinaanController::class, 'show'])
+                ->name('registrations.show');
+            Route::post('registrations/{registration}/approve', [AdminKampusPembinaanController::class, 'approve'])
+                ->name('registrations.approve');
+            Route::post('registrations/{registration}/reject', [AdminKampusPembinaanController::class, 'reject'])
+                ->name('registrations.reject');
+            Route::post('registrations/{registration}/assign-reviewer', [AdminKampusPembinaanController::class, 'assignReviewer'])
+                ->name('registrations.assign-reviewer');
+            Route::delete('assignments/{assignment}', [AdminKampusPembinaanController::class, 'removeAssignment'])
+                ->name('assignments.remove');
+            Route::get('reviewers', [AdminKampusPembinaanController::class, 'getReviewers'])
+                ->name('reviewers');
+        });
 
         // Review assessments from their university
-        Route::get('assessments', [AdminKampusAssessmentController::class, 'index'])
-            ->name('assessments.index');
+        Route::prefix('assessments')->name('assessments.')->group(function () {
+            Route::get('/', [AdminKampusAssessmentController::class, 'index'])
+                ->name('index');
+            Route::get('{assessment}', [AdminKampusAssessmentController::class, 'show'])
+                ->name('show');
+            Route::get('{assessment}/review', [AdminKampusAssessmentController::class, 'review'])
+                ->name('review');
+            Route::post('{assessment}/approve', [AdminKampusAssessmentController::class, 'approve'])
+                ->name('approve');
+            Route::post('{assessment}/request-revision', [AdminKampusAssessmentController::class, 'requestRevision'])
+                ->name('request-revision');
+        });
 
     });
 
@@ -262,9 +308,47 @@ Route::middleware(['auth'])->group(function () {
                 ->name('attachments.download');
         });
 
-        // Pembinaan (Placeholder)
-        Route::get('pembinaan', [UserPembinaanController::class, 'index'])
-            ->name('pembinaan.index');
+        // Pembinaan Registration (v1.1)
+        Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
+            Route::get('/', [UserPembinaanController::class, 'index'])
+                ->name('index');
+            Route::get('programs/{pembinaan}', [UserPembinaanController::class, 'show'])
+                ->name('programs.show');
+            Route::get('programs/{pembinaan}/register', [UserPembinaanController::class, 'registerForm'])
+                ->name('programs.register-form');
+            Route::post('programs/{pembinaan}/register', [UserPembinaanController::class, 'register'])
+                ->name('programs.register');
+            Route::get('registrations/{registration}', [UserPembinaanController::class, 'viewRegistration'])
+                ->name('registration');
+            Route::delete('registrations/{registration}', [UserPembinaanController::class, 'cancel'])
+                ->name('registrations.cancel');
+            Route::post('registrations/{registration}/upload', [UserPembinaanController::class, 'uploadAttachment'])
+                ->name('registrations.upload');
+            Route::get('attachments/{attachment}', [UserPembinaanController::class, 'downloadAttachment'])
+                ->name('attachments.download');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reviewer Routes (v1.1)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:'.Role::REVIEWER])->prefix('reviewer')->name('reviewer.')->group(function () {
+
+        // Assignments Management
+        Route::prefix('assignments')->name('assignments.')->group(function () {
+            Route::get('/', [MainReviewerController::class, 'assignments'])
+                ->name('index');
+            Route::get('{assignment}', [MainReviewerController::class, 'show'])
+                ->name('show');
+            Route::get('{assignment}/review', [MainReviewerController::class, 'reviewForm'])
+                ->name('review-form');
+            Route::post('{assignment}/review', [MainReviewerController::class, 'submitReview'])
+                ->name('submit-review');
+            Route::get('{assignment}/attachments/{attachment}', [MainReviewerController::class, 'downloadAttachment'])
+                ->name('attachments.download');
+        });
     });
 
     /*

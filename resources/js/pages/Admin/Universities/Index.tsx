@@ -261,8 +261,13 @@ export default function UniversitiesIndex({ universities, filters, can }: Props)
                                     </SelectContent>
                                 </Select>
 
-                                <Button type="submit" className="w-32">Search</Button>
-                                {(search || (isActiveFilter && isActiveFilter !== 'all') || (accreditationFilter && accreditationFilter !== 'all') || (clusterFilter && clusterFilter !== 'all')) && (
+                                <Button type="submit" className="w-32">
+                                    Search
+                                </Button>
+                                {(search ||
+                                    (isActiveFilter && isActiveFilter !== 'all') ||
+                                    (accreditationFilter && accreditationFilter !== 'all') ||
+                                    (clusterFilter && clusterFilter !== 'all')) && (
                                     <Button
                                         type="button"
                                         variant="outline"

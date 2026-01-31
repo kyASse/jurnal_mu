@@ -39,15 +39,15 @@ class StoreCategoryRequest extends FormRequest
         $validator->after(function (Validator $validator) {
             if ($validator->errors()->isEmpty() && $this->filled('template_id') && $this->filled('weight')) {
                 $template = AccreditationTemplate::find($this->template_id);
-                
+
                 if ($template) {
                     $currentTotalWeight = $template->getTotalWeight();
                     $newWeight = (float) $this->weight;
-                    
+
                     if (($currentTotalWeight + $newWeight) > 100) {
                         $validator->errors()->add(
                             'weight',
-                            "Total bobot kategori akan melebihi 100% (saat ini: {$currentTotalWeight}%). Maksimal bobot yang dapat ditambahkan: " . (100 - $currentTotalWeight) . '%'
+                            "Total bobot kategori akan melebihi 100% (saat ini: {$currentTotalWeight}%). Maksimal bobot yang dapat ditambahkan: ".(100 - $currentTotalWeight).'%'
                         );
                     }
                 }

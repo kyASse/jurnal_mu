@@ -25,7 +25,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// Select UI imports removed — not used in this file
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -133,9 +133,7 @@ export default function UniversitiesCreate() {
                                     maxLength={10}
                                     className="mt-2"
                                 />
-                                <p className="mt-1 text-xs text-muted-foreground">
-                                    Unique code from PDDIKTI for integration with national systems
-                                </p>
+                                <p className="mt-1 text-xs text-muted-foreground">Unique code from PDDIKTI for integration with national systems</p>
                                 {errors.ptm_code && <p className="mt-1 text-sm text-red-600">{errors.ptm_code}</p>}
                             </div>
 
@@ -292,7 +290,7 @@ export default function UniversitiesCreate() {
                                         id="accreditation_status"
                                         value={data.accreditation_status}
                                         onChange={(e) => setData('accreditation_status', e.target.value)}
-                                        className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                     >
                                         <option value="">Select Accreditation</option>
                                         <option value="Unggul">Unggul</option>
@@ -309,7 +307,7 @@ export default function UniversitiesCreate() {
                                         id="cluster"
                                         value={data.cluster}
                                         onChange={(e) => setData('cluster', e.target.value)}
-                                        className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                     >
                                         <option value="">Select Cluster</option>
                                         <option value="Mandiri">Mandiri</option>
@@ -331,9 +329,7 @@ export default function UniversitiesCreate() {
                                     placeholder="Brief description of the university (max 250 characters)"
                                     className="mt-2"
                                 />
-                                <p className="mt-1 text-xs text-muted-foreground">
-                                    {data.profile_description.length}/250 characters
-                                </p>
+                                <p className="mt-1 text-xs text-muted-foreground">{data.profile_description.length}/250 characters</p>
                                 {errors.profile_description && <p className="mt-1 text-sm text-red-600">{errors.profile_description}</p>}
                             </div>
                         </div>

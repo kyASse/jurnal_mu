@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\AccreditationTemplate;
 use App\Models\EvaluationCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -40,20 +39,20 @@ class UpdateCategoryRequest extends FormRequest
             if ($validator->errors()->isEmpty() && $this->filled('weight')) {
                 // Get the category being updated
                 $category = EvaluationCategory::find($this->route('category'));
-                
+
                 if ($category && $category->template) {
                     $template = $category->template;
                     $currentTotalWeight = $template->getTotalWeight();
                     $oldWeight = $category->weight;
                     $newWeight = (float) $this->weight;
-                    
+
                     // Calculate what the total would be after update
                     $projectedTotal = $currentTotalWeight - $oldWeight + $newWeight;
-                    
+
                     if ($projectedTotal > 100) {
                         $validator->errors()->add(
                             'weight',
-                            "Total bobot kategori akan melebihi 100% (proyeksi: {$projectedTotal}%). Maksimal bobot yang dapat diset: " . (100 - ($currentTotalWeight - $oldWeight)) . '%'
+                            "Total bobot kategori akan melebihi 100% (proyeksi: {$projectedTotal}%). Maksimal bobot yang dapat diset: ".(100 - ($currentTotalWeight - $oldWeight)).'%'
                         );
                     }
                 }

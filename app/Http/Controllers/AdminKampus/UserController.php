@@ -32,9 +32,9 @@ class UserController extends Controller
                 $q->whereHas('role', function ($query) {
                     $query->whereNotIn('name', [Role::SUPER_ADMIN]);
                 })
-                ->orWhereHas('roles', function ($query) {
-                    $query->whereNotIn('name', [Role::SUPER_ADMIN]);
-                });
+                    ->orWhereHas('roles', function ($query) {
+                        $query->whereNotIn('name', [Role::SUPER_ADMIN]);
+                    });
             });
 
         // Apply search filter
@@ -65,7 +65,7 @@ class UserController extends Controller
             ->withQueryString()
             ->through(function ($user) {
                 // Get all roles for this user
-                $userRoles = $user->roles->map(fn($role) => [
+                $userRoles = $user->roles->map(fn ($role) => [
                     'id' => $role->id,
                     'name' => $role->name,
                     'display_name' => $role->display_name,
@@ -365,7 +365,7 @@ class UserController extends Controller
                 $roleId => [
                     'assigned_at' => now(),
                     'assigned_by' => $authUser->id,
-                ]
+                ],
             ])->toArray()
         );
 

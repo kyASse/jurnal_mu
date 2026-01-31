@@ -54,7 +54,7 @@ export function AppSidebar() {
                 items: [
                     { title: 'Templates', href: route('admin.templates.index') },
                     { title: 'List View', href: route('admin.borang-indikator.list') },
-                ]
+                ],
             },
             {
                 title: 'Universities',
@@ -76,10 +76,16 @@ export function AppSidebar() {
                 href: route('admin.journals.index'),
                 icon: Library,
             },
+            {
+                title: 'Pembinaan',
+                href: route('admin.pembinaan.index'),
+                icon: Award,
+            },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
-        roleNavItems = [
+        // Build Admin Kampus menu items
+        const adminKampusItems: NavItem[] = [
             {
                 title: 'Pengelola Jurnal',
                 href: route('admin-kampus.users.index'),
@@ -91,17 +97,27 @@ export function AppSidebar() {
                 icon: Library,
             },
             {
-                title: 'Reviewer',
-                href: route('admin-kampus.reviewer.index'),
-                icon: UserCheck,
-            },
-            {
                 title: 'Pembinaan',
                 href: route('admin-kampus.pembinaan.index'),
                 icon: Award,
             },
-            ...commonNavItems,
+            {
+                title: 'Assessments',
+                href: route('admin-kampus.assessments.index'),
+                icon: FileText,
+            },
         ];
+
+        // Add Reviewer menu only if user has reviewer role
+        if (user.roles && user.roles.some((role: { name: string }) => role.name === 'Reviewer')) {
+            adminKampusItems.push({
+                title: 'Reviewer',
+                href: route('admin-kampus.reviewer.index'),
+                icon: UserCheck,
+            });
+        }
+
+        roleNavItems = [...adminKampusItems, ...commonNavItems];
     } else if (user.role.name === ROLE_NAMES.USER) {
         roleNavItems = [
             {

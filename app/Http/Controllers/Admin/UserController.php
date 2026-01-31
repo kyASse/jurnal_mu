@@ -30,9 +30,9 @@ class UserController extends Controller
                 $q->whereHas('role', function ($query) {
                     $query->whereIn('name', ['User', 'Pengelola Jurnal']);
                 })
-                ->orWhereHas('roles', function ($query) {
-                    $query->whereIn('name', ['User', 'Pengelola Jurnal']);
-                });
+                    ->orWhereHas('roles', function ($query) {
+                        $query->whereIn('name', ['User', 'Pengelola Jurnal']);
+                    });
             });
 
         // Apply filters if any
@@ -68,7 +68,7 @@ class UserController extends Controller
             ->withQueryString()
             ->through(function ($user) {
                 // Get all roles for this user
-                $userRoles = $user->roles->map(fn($role) => [
+                $userRoles = $user->roles->map(fn ($role) => [
                     'id' => $role->id,
                     'name' => $role->name,
                     'display_name' => $role->display_name,
