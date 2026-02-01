@@ -273,10 +273,7 @@ export default function JournalsIndex({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                            </div>
 
-                            {/* Filter Row 2 - New Filters */}
-                            <div className="flex gap-4">
                                 {/* Indexation Filter */}
                                 <Select
                                     value={indexationFilter || 'all'}
