@@ -1,6 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import AssessmentNotesTimeline from '@/components/AssessmentNotesTimeline';
+import StatusTimeline, { type TimelineStep } from '@/components/StatusTimeline';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, JournalAssessment } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -25,6 +27,36 @@ export default function AssessmentShow({ assessment }: Props) {
         { title: 'Detail', href: route('admin-kampus.assessments.show', assessment.id) },
     ];
 
+    // Build timeline steps
+    const timelineSteps: TimelineStep[] = [
+        {
+            label: 'Submitted by User',
+            status: assessment.submitted_at ? 'completed' : 'pending',
+            timestamp: assessment.submitted_at || undefined,
+        },
+        {
+            label: 'Approved by Admin Kampus',
+            status: assessment.admin_kampus_approved_at ? 'completed' : assessment.status === 'submitted' ? 'active' : 'pending',
+            timestamp: assessment.admin_kampus_approved_at || undefined,
+            note: assessment.admin_kampus_approval_notes || undefined,
+        },
+        {
+            label: 'Reviewer Assigned',
+            status: assessment.reviewer_id ? 'completed' : 'pending',
+            timestamp: assessment.assigned_at || undefined,
+            note: assessment.reviewer ? `Reviewer: ${assessment.reviewer.name}` : undefined,
+        },
+        {
+            label: 'In Review',
+            status: assessment.status === 'in_review' ? 'active' : assessment.status === 'reviewed' ? 'completed' : 'pending',
+        },
+        {
+            label: 'Review Completed',
+            status: assessment.status === 'reviewed' ? 'completed' : 'pending',
+            timestamp: assessment.reviewed_at || undefined,
+        },
+    ];
+
     const getStatusBadge = (status: string) => {
         const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
             draft: 'secondary',
@@ -45,7 +77,9 @@ export default function AssessmentShow({ assessment }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Assessment - ${assessment.journal.title}`} />
 
-            <div className="space-y-6">
+            <div className="flex gap-6">
+                {/* Main Content */}
+                <div className="flex-1 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -156,7 +190,20 @@ export default function AssessmentShow({ assessment }: Props) {
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Assessment Notes Timeline */}
+                {assessment.notes && assessment.notes.length > 0 && (
+                    <AssessmentNotesTimeline notes={assessment.notes} title="Assessment History" />
+                )}
             </div>
+
+            {/* Sidebar - Status Timeline */}
+            <div className="w-80">
+                <div className="sticky top-6">
+                    <StatusTimeline steps={timelineSteps} title="Assessment Progress" />
+                </div>
+            </div>
+        </div>
         </AppLayout>
     );
 }
