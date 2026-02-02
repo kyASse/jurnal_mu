@@ -33,7 +33,7 @@ Berikut adalah daftar perbaikan dan enhancement yang harus diimplementasikan ber
   - Fokus pada filter yang lebih relevan
 
 #### Header Statistics Dashboard
-- [ ] **Tambahkan grafik statistik di header halaman**
+- [x] **Tambahkan grafik statistik di header halaman**
   - **Visualisasi Indeksasi**
     - Chart/graph untuk menampilkan jumlah jurnal berdasarkan indeksasi
     - Contoh: Scopus, WoS, Doaj, Google Scholar, dll
@@ -49,11 +49,12 @@ Berikut adalah daftar perbaikan dan enhancement yang harus diimplementasikan ber
     - Membantu admin kampus melihat kekuatan bidang ilmu di universitasnya
     - Chart dengan kategori bidang ilmu
 
-- [ ] **Dashboard Statistics Design**
+- [x] **Dashboard Statistics Design**
   - Tempatkan di bagian atas halaman (sebelum tabel jurnal)
   - Gunakan card-based layout untuk setiap kategori statistik
   - Responsif dan mudah dibaca
   - Gunakan library chart seperti Chart.js atau Recharts
+  - **Implementation Note**: Menggunakan ApexCharts dengan react-apexcharts untuk kompatibilitas penuh dengan Inertia.js + React
 
 ---
 
@@ -287,7 +288,7 @@ ADD FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL;
 
 ### Phase 1 (High Priority - Week 1)
 1. ✅ Admin Kampus Journal List: Filter improvements (Non-Sinta, remove redundant filters)
-2. ✅ Admin Kampus Journal List: Statistics dashboard di header
+2. ✅ Admin Kampus Journal List: Statistics dashboard di header - **COMPLETED (2 Feb 2026)**
 3. ✅ Pembinaan Navigation: Split into Akreditasi & Indeksasi sub-menus
 
 ### Phase 2 (Medium Priority - Week 2)
@@ -302,26 +303,70 @@ ADD FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL;
 
 ---
 
+## ✅ Implementation Summary - Statistics Dashboard (Completed 2 Feb 2026)
+
+**Implemented Components:**
+1. **Backend Statistics Calculation** ([JournalController.php](app/Http/Controllers/AdminKampus/JournalController.php#L142-L232))
+   - Method: `calculateJournalStatistics(int $universityId): array`
+   - Aggregates journals by: indexation platforms, SINTA ranks (1-6 + Non-Sinta), scientific fields
+   - Returns totals: total_journals, indexed_journals, sinta_journals, non_sinta_journals
+   - Calculates percentages for each category
+
+2. **TypeScript Interfaces** ([index.d.ts](resources/js/types/index.d.ts#L280-L301))
+   - `JournalStatistics` interface with nested types
+   - `IndexationStatistic`, `AccreditationStatistic`, `ScientificFieldStatistic`
+   - Strongly typed for frontend usage
+
+3. **StatisticsDashboard Component** ([StatisticsDashboard.tsx](resources/js/components/StatisticsDashboard.tsx))
+   - 4 summary cards: Total Jurnal, Jurnal Terindeks, Jurnal SINTA, Non-SINTA
+   - 3 interactive charts using ApexCharts:
+     - **Horizontal Bar Chart**: Indexation distribution (Scopus, WoS, DOAJ, etc.)
+     - **Donut Chart**: SINTA accreditation breakdown (S1-S6 + Non-Sinta)
+     - **Bar Chart**: Scientific field distribution
+   - Responsive grid layout (`md:grid-cols-3`)
+   - Dark mode support
+   - Empty state handling for no data
+
+4. **Integration** ([AdminKampus/Journals/Index.tsx](resources/js/pages/AdminKampus/Journals/Index.tsx#L216-L218))
+   - Dashboard placed between flash messages and filters
+   - Receives statistics prop from backend
+   - Displays above journal list table
+
+**Tech Stack Used:**
+- **Charts**: ApexCharts via `react-apexcharts` (NOT larapex-charts - incompatible with Inertia.js)
+- **UI Components**: shadcn/ui Card components for consistent design
+- **Icons**: Lucide React (BarChart3, PieChart, TrendingUp)
+- **Colors**: Aligned with larapex-charts config colors for consistency
+
+**Why ApexCharts instead of Larapex-charts?**
+- Larapex-charts is Blade-focused (server-side rendering)
+- Requires `{!! $chart->container() !!}` + `{!! $chart->script() !!}` in Blade templates
+- Inertia.js uses React components (client-side rendering)
+- ApexCharts provides native React support via `react-apexcharts`
+- Better TypeScript integration and state management
+
+---
+
 ## 🎯 Next Steps
 
-1. **UI/UX Design**: Design statistics dashboard layout dan chart types
-2. **Frontend Implementation**: Update Admin Kampus journal list page dengan filters dan statistics
-3. **Navigation Restructure**: Implement pembinaan sub-menus (Akreditasi & Indeksasi)
-4. **Backend API**: Create statistics endpoint untuk data visualization
-5. **Assessment Enhancement**: Implement multiple issues dan save draft
-6. **Testing**: Test flow pendaftaran pembinaan dengan kategori baru
+1. ~~**UI/UX Design**: Design statistics dashboard layout dan chart types~~ ✅ **COMPLETED**
+2. ~~**Frontend Implementation**: Update Admin Kampus journal list page dengan filters dan statistics~~ ✅ **COMPLETED**
+3. **Navigation Restructure**: Implement pembinaan sub-menus (Akreditasi & Indeksasi) - **IN PROGRESS**
+4. ~~**Backend API**: Create statistics endpoint untuk data visualization~~ ✅ **COMPLETED**
+5. **Assessment Enhancement**: Implement multiple issues dan save draft - **PENDING**
+6. **Testing**: Test flow pendaftaran pembinaan dengan kategori baru - **PENDING**
 
 ---
 
 ## 📌 Catatan Penting
 
-- **Filter "Non-Sinta"** sangat penting untuk Admin Kampus mengidentifikasi jurnal yang perlu dibina
-- **Statistics Dashboard** memberikan overview cepat kondisi jurnal di universitas
-- **Pemisahan Pembinaan Akreditasi & Indeksasi** memperjelas kategori dan mempermudah navigasi
+- ✅ **Filter "Non-Sinta"** sangat penting untuk Admin Kampus mengidentifikasi jurnal yang perlu dibina - **IMPLEMENTED**
+- ✅ **Statistics Dashboard** memberikan overview cepat kondisi jurnal di universitas - **IMPLEMENTED dengan ApexCharts**
+- ✅ **Pemisahan Pembinaan Akreditasi & Indeksasi** memperjelas kategori dan mempermudah navigasi - **IMPLEMENTED**
 - **Assessment adalah bagian integral dari Pembinaan**, bukan modul terpisah
-- **Multiple Issues** di assessment memungkinkan user mencatat semua masalah yang ditemukan
-- **Draft Functionality** penting agar user tidak kehilangan progress saat pengisian assessment
-- **Reviewer Feedback** ditampilkan ke user sebagai bentuk transparansi hasil review
+- **Multiple Issues** di assessment memungkinkan user mencatat semua masalah yang ditemukan - **NEEDS IMPLEMENTATION**
+- **Draft Functionality** penting agar user tidak kehilangan progress saat pengisian assessment - **NEEDS IMPLEMENTATION**
+- **Reviewer Feedback** ditampilkan ke user sebagai bentuk transparansi hasil review - **NEEDS IMPLEMENTATION**
 
 ---
 
@@ -334,4 +379,4 @@ ADD FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL;
 ---
 
 **Prepared by**: GitHub Copilot  
-**Last Updated**: 30 Januari 2026
+**Last Updated**: 2 Februari 2026 (Statistics Dashboard Implementation Completed)
