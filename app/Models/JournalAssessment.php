@@ -85,6 +85,16 @@ class JournalAssessment extends Model
         return $this->hasMany(AssessmentResponse::class);
     }
 
+    /**
+     * Get all issues for this assessment
+     */
+    public function issues()
+    {
+        return $this->hasMany(AssessmentIssue::class, 'journal_assessment_id')
+                    ->orderBy('display_order')
+                    ->orderBy('created_at');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
