@@ -94,6 +94,20 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
         window.open(route('user.assessments.attachments.download', attachmentId), '_blank');
     };
 
+    // Helper function to safely convert percentage to number
+    const getPercentage = (value: any): number => {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') return parseFloat(value) || 0;
+        return 0;
+    };
+
+    // Helper function to safely convert score to number
+    const getScore = (value: any): number => {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') return parseFloat(value) || 0;
+        return 0;
+    };
+
     const getStatusBadge = () => {
         const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
             gray: 'secondary',
@@ -109,7 +123,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
     };
 
     const getGradeBadge = () => {
-        const percentage = assessment.percentage;
+        const percentage = getPercentage(assessment.percentage);
         if (percentage >= 90) return <Badge className="bg-green-500 px-6 py-2 text-2xl text-white">A</Badge>;
         if (percentage >= 80) return <Badge className="bg-blue-500 px-6 py-2 text-2xl text-white">B</Badge>;
         if (percentage >= 70) return <Badge className="bg-yellow-500 px-6 py-2 text-2xl text-white">C</Badge>;
@@ -234,9 +248,9 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                                     <div className="space-y-2 text-center">
                                         <div className="text-sm text-muted-foreground">Nilai Akhir</div>
                                         {getGradeBadge()}
-                                        <div className="text-sm font-semibold">{assessment.percentage.toFixed(1)}%</div>
+                                        <div className="text-sm font-semibold">{getPercentage(assessment.percentage).toFixed(1)}%</div>
                                         <div className="text-xs text-muted-foreground">
-                                            {assessment.total_score.toFixed(2)} / {assessment.max_score.toFixed(2)} poin
+                                            {getScore(assessment.total_score).toFixed(2)} / {getScore(assessment.max_score).toFixed(2)} poin
                                         </div>
                                     </div>
                                 </div>
@@ -262,9 +276,9 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 {Object.keys(responsesByCategory).map((category) => {
                                     const responses = responsesByCategory[category];
-                                    const totalScore = responses.reduce((sum, r) => sum + r.score, 0);
-                                    const maxScore = responses.reduce((sum, r) => sum + r.evaluation_indicator.weight, 0);
-                                    const percentage = (totalScore / maxScore) * 100;
+                                    const totalScore = responses.reduce((sum, r) => sum + getScore(r.score), 0);
+                                    const maxScore = responses.reduce((sum, r) => sum + getScore(r.evaluation_indicator.weight), 0);
+                                    const percentage = maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
 
                                     return (
                                         <div key={category} className="rounded-lg border p-4">
@@ -300,7 +314,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                                                     <Badge variant="outline">{response.evaluation_indicator.code}</Badge>
                                                     <Badge>{response.evaluation_indicator.weight} poin</Badge>
                                                     {assessment.status !== 'draft' && (
-                                                        <Badge variant="secondary">Skor: {response.score.toFixed(2)}</Badge>
+                                                        <Badge variant="secondary">Skor: {getScore(response.score).toFixed(2)}</Badge>
                                                     )}
                                                 </div>
                                                 <h4 className="font-semibold">
