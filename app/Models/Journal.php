@@ -208,6 +208,79 @@ class Journal extends Model
 
         return $query->where('accreditation_grade', $grade);
     }
+
+    /**
+     * Scope to filter journals by pembinaan period
+     */
+    public function scopeByPembinaanPeriod($query, ?string $period)
+    {
+        if (! $period) {
+            return $query;
+        }
+
+        return $query->whereHas('pembinaanRegistrations', function ($q) use ($period) {
+            $q->whereHas('pembinaan', function ($p) use ($period) {
+                $p->where('name', 'like', "%{$period}%");
+            });
+        });
+    }
+
+    /**
+     * Scope to filter journals by pembinaan year
+     */
+    public function scopeByPembinaanYear($query, ?string $year)
+    {
+        if (! $year) {
+            return $query;
+        }
+
+        return $query->whereHas('pembinaanRegistrations', function ($q) use ($year) {
+            $q->whereYear('registered_at', $year);
+        });
+    }
+
+    /**
+     * Scope to filter journals by participation status
+     * Options: 'sudah_ikut' (has registrations), 'belum_ikut' (no registrations)
+     */
+    public function scopeByParticipation($query, ?string $status)
+    {
+        if (! $status) {
+            return $query;
+        }
+
+        if ($status === 'sudah_ikut') {
+            return $query->has('pembinaanRegistrations');
+        } elseif ($status === 'belum_ikut') {
+            return $query->doesntHave('pembinaanRegistrations');
+        }
+
+        return $query;
+    }
+
+    /**
+     * Scope to filter journals by assessment approval status
+     */
+    public function scopeByApprovalStatus($query, ?string $status)
+    {
+        if (! $status) {
+            return $query;
+        }
+
+        return $query->whereHas('assessments', function ($q) use ($status) {
+            if ($status === 'approved') {
+                $q->whereNotNull('admin_kampus_approved_by')
+                    ->whereNotNull('admin_kampus_approved_at');
+            } elseif ($status === 'pending') {
+                $q->where('status', 'submitted')
+                    ->whereNull('admin_kampus_approved_by');
+            } elseif ($status === 'rejected') {
+                $q->whereNotNull('admin_kampus_approved_by')
+                    ->where('admin_kampus_approval_notes', 'like', '%tolak%');
+            }
+        });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Accessors

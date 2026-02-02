@@ -24,6 +24,9 @@ class JournalAssessment extends Model
         'submitted_at',
         'reviewed_at',
         'reviewed_by',
+        'admin_kampus_approved_by',
+        'admin_kampus_approved_at',
+        'admin_kampus_approval_notes',
         'total_score',
         'max_score',
         'percentage',
@@ -40,6 +43,7 @@ class JournalAssessment extends Model
         'assessment_date' => 'date',
         'submitted_at' => 'datetime',
         'reviewed_at' => 'datetime',
+        'admin_kampus_approved_at' => 'datetime',
         'total_score' => 'decimal:2',
         'max_score' => 'decimal:2',
         'percentage' => 'decimal:2',
@@ -100,8 +104,26 @@ class JournalAssessment extends Model
     public function issues()
     {
         return $this->hasMany(AssessmentIssue::class, 'journal_assessment_id')
-                    ->orderBy('display_order')
-                    ->orderBy('created_at');
+            ->orderBy('display_order')
+            ->orderBy('created_at');
+    }
+
+    /**
+     * Get the Admin Kampus who approved/rejected this assessment
+     */
+    public function adminKampusApprover()
+    {
+        return $this->belongsTo(User::class, 'admin_kampus_approved_by');
+    }
+
+    /**
+     * Get all notes for this assessment (timeline)
+     */
+    public function assessmentNotes()
+    {
+        return $this->hasMany(AssessmentNote::class, 'journal_assessment_id')
+            ->with('user')
+            ->orderBy('created_at', 'asc');
     }
 
     /*
