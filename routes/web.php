@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dikti\AssessmentController as DiktiAssessmentController;
 use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\ReviewerController as MainReviewerController;
 use App\Http\Controllers\SupportController;
@@ -189,6 +190,21 @@ Route::middleware(['auth'])->group(function () {
         // View all assessments (read-only for monitoring)
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
             ->name('assessments.index');
+
+        // Dikti - Reviewer Assignment for Assessments
+        // NOTE: Currently using Super Admin role as Dikti until dedicated Dikti role is created
+        Route::prefix('dikti')->name('dikti.')->group(function () {
+            Route::prefix('assessments')->name('assessments.')->group(function () {
+                Route::get('/', [DiktiAssessmentController::class, 'index'])
+                    ->name('index');
+                Route::get('{assessment}', [DiktiAssessmentController::class, 'show'])
+                    ->name('show');
+                Route::post('{assessment}/assign-reviewer', [DiktiAssessmentController::class, 'assignReviewer'])
+                    ->name('assign-reviewer');
+                Route::post('{assessment}/remove-reviewer', [DiktiAssessmentController::class, 'removeReviewer'])
+                    ->name('remove-reviewer');
+            });
+        });
 
         // Pembinaan Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
