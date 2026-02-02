@@ -23,10 +23,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type JournalStatistics } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search } from 'lucide-react';
 import { useState } from 'react';
+import StatisticsDashboard from '@/components/StatisticsDashboard';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -90,6 +91,7 @@ interface Props {
             active: boolean;
         }>;
     };
+    statistics: JournalStatistics;
     filters: {
         search?: string;
         // Deprecated: status and accreditation_grade no longer used
@@ -109,6 +111,7 @@ interface Props {
 
 export default function JournalsIndex({
     journals,
+    statistics,
     filters,
     scientificFields,
     sintaRanks,
@@ -208,6 +211,11 @@ export default function JournalsIndex({
                             {flash.error}
                         </div>
                     )}
+
+                    {/* Statistics Dashboard */}
+                    <div className="mb-6">
+                        <StatisticsDashboard statistics={statistics} />
+                    </div>
 
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
