@@ -308,8 +308,22 @@ Route::middleware(['auth'])->group(function () {
                 ->name('destroy');
             Route::post('{assessment}/submit', [AssessmentController::class, 'submit'])
                 ->name('submit');
+            Route::post('{assessment}/save-draft', [AssessmentController::class, 'saveDraft'])
+                ->name('save-draft');
             Route::get('attachments/{attachment}', [AssessmentController::class, 'downloadAttachment'])
                 ->name('attachments.download');
+            
+            // Assessment Issues Management
+            Route::prefix('{assessment}/issues')->name('issues.')->group(function () {
+                Route::post('/', [\App\Http\Controllers\User\AssessmentIssueController::class, 'store'])
+                    ->name('store');
+                Route::put('{issue}', [\App\Http\Controllers\User\AssessmentIssueController::class, 'update'])
+                    ->name('update');
+                Route::delete('{issue}', [\App\Http\Controllers\User\AssessmentIssueController::class, 'destroy'])
+                    ->name('destroy');
+                Route::post('reorder', [\App\Http\Controllers\User\AssessmentIssueController::class, 'reorder'])
+                    ->name('reorder');
+            });
         });
 
         // Pembinaan Registration (v1.1)
