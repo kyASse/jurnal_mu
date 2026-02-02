@@ -170,6 +170,7 @@ export interface JournalAssessment {
     id: number;
     journal_id: number;
     user_id: number;
+    pembinaan_registration_id?: number;
     assessment_date: string;
     period?: string;
     status: 'draft' | 'submitted' | 'reviewed';
@@ -254,6 +255,7 @@ export interface PembinaanRegistration {
     journal?: Journal;
     user?: User;
     reviewer?: User;
+    assessment?: JournalAssessment;
     attachments?: PembinaanRegistrationAttachment[];
     reviews?: PembinaanReview[];
     reviewer_assignments?: ReviewerAssignment[];
