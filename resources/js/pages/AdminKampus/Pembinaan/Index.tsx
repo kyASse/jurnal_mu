@@ -41,7 +41,7 @@ interface Props {
 
 export default function PembinaanIndex({ registrations, filters, category }: Props) {
     const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
-    
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',

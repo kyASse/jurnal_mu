@@ -133,6 +133,14 @@ class JournalController extends Controller
         //     ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
         //     ->values();
 
+        $indexationOptions = collect(Journal::getIndexationPlatforms())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
+        $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
         return Inertia::render('AdminKampus/Journals/Index', [
             'journals' => $journals,
             'statistics' => $statistics,

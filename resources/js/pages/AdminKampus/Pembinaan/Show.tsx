@@ -49,7 +49,7 @@ interface Props {
 
 export default function PembinaanShow({ registration, category }: Props) {
     const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
-    
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',

@@ -17,6 +17,7 @@
  *
  * @route GET /admin-kampus/journals
  */
+import StatisticsDashboard from '@/components/StatisticsDashboard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +28,6 @@ import { type BreadcrumbItem, type JournalStatistics } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search } from 'lucide-react';
 import { useState } from 'react';
-import StatisticsDashboard from '@/components/StatisticsDashboard';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -281,6 +281,45 @@ export default function JournalsIndex({
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+
+                            {/* Filter Row 2 - New Filters */}
+                            <div className="flex gap-4">
+                                {/* Indexation Filter */}
+                                <Select
+                                    value={indexationFilter || 'all'}
+                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Indexations" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Indexations</SelectItem>
+                                        {indexationOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Dikti Accreditation Filter - Deprecated */}
+                                {/* <Select
+                                    value={accreditationGradeFilter || 'all'}
+                                    onValueChange={(value) => setAccreditationGradeFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Dikti Accreditation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Dikti Accreditation</SelectItem>
+                                        {accreditationGradeOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select> */}
 
                                 {/* Indexation Filter */}
                                 <Select

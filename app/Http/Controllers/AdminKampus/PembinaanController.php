@@ -43,9 +43,9 @@ class PembinaanController extends Controller
             'user',
             'reviewer',
         ])->forUniversity($user->university_id)
-        ->whereHas('pembinaan', function ($q) use ($category) {
-            $q->where('category', $category);
-        });
+            ->whereHas('pembinaan', function ($q) use ($category) {
+                $q->where('category', $category);
+            });
 
         // Apply filters
         if ($request->filled('status')) {

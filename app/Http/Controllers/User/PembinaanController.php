@@ -213,7 +213,7 @@ class PembinaanController extends Controller
         $registration->delete();
 
         return redirect()
-            ->route('user.pembinaan.' . $registration->pembinaan->category)
+            ->route('user.pembinaan.'.$registration->pembinaan->category)
             ->with('success', 'Registration cancelled successfully.');
     }
 
