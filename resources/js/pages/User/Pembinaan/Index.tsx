@@ -7,7 +7,7 @@
  * 1. Available Programs - Active programs open for registration
  * 2. My Registrations - User's registration history and status
  *
- * @route GET /user/pembinaan
+ * @route GET /user/pembinaan/akreditasi | GET /user/pembinaan/indeksasi
  *
  * @features
  * - Two-tab interface (Available Programs / My Registrations)
@@ -15,6 +15,7 @@
  * - Status badges for registrations
  * - Quick actions (view details, register, view registration)
  * - Pagination for registrations
+ * - Category-filtered programs (Akreditasi or Indeksasi)
  *
  * @author JurnalMU Team
  */
@@ -27,23 +28,29 @@ import { type BreadcrumbItem, type PaginatedData, type Pembinaan, type Pembinaan
 import { Head, Link, router } from '@inertiajs/react';
 import { Award, BookOpen, Calendar, ChevronLeft, ChevronRight, Eye, FileText, Plus, Users } from 'lucide-react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-    {
-        title: 'Pembinaan',
-        href: '/user/pembinaan',
-    },
-];
-
 interface Props {
     availablePrograms: Pembinaan[];
     myRegistrations: PaginatedData<PembinaanRegistration>;
+    category: 'akreditasi' | 'indeksasi';
 }
 
-export default function PembinaanIndex({ availablePrograms, myRegistrations }: Props) {
+export default function PembinaanIndex({ availablePrograms, myRegistrations, category }: Props) {
+    const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+    
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+        },
+        {
+            title: 'Pembinaan',
+            href: '#',
+        },
+        {
+            title: categoryLabel,
+            href: `/user/pembinaan/${category}`,
+        },
+    ];
     const getStatusBadge = (status: string) => {
         const variants = {
             pending: 'secondary',
@@ -81,7 +88,7 @@ export default function PembinaanIndex({ availablePrograms, myRegistrations }: P
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Pembinaan Programs" />
+            <Head title={`Pembinaan ${categoryLabel}`} />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
@@ -91,9 +98,9 @@ export default function PembinaanIndex({ availablePrograms, myRegistrations }: P
                             <div>
                                 <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
                                     <Award className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                                    Pembinaan Programs
+                                    Pembinaan {categoryLabel}
                                 </h1>
-                                <p className="mt-1 text-muted-foreground">Browse available programs and manage your registrations</p>
+                                <p className="mt-1 text-muted-foreground">Browse available {category} programs and manage your registrations</p>
                             </div>
                         </div>
                     </div>
