@@ -154,6 +154,18 @@ export interface AssessmentResponse {
     attachments?: AssessmentAttachment[];
 }
 
+export interface AssessmentIssue {
+    id: number;
+    journal_assessment_id: number;
+    title: string;
+    description: string;
+    category: 'editorial' | 'technical' | 'content_quality' | 'management';
+    priority: 'high' | 'medium' | 'low';
+    display_order: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface JournalAssessment {
     id: number;
     journal_id: number;
@@ -175,6 +187,7 @@ export interface JournalAssessment {
     user: User;
     reviewer?: User;
     responses?: AssessmentResponse[];
+    issues?: AssessmentIssue[];
 }
 
 // Pagination types
