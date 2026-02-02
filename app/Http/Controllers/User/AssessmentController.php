@@ -233,6 +233,7 @@ class AssessmentController extends Controller
             'journal',
             'responses.evaluationIndicator',
             'responses.attachments',
+            'issues',
         ]);
 
         // Get evaluation indicators grouped by category
@@ -440,6 +441,93 @@ class AssessmentController extends Controller
             'text' => $weight, // Full weight for text answers (manual review needed)
             default => 0.00,
         };
+    }
+
+    /**
+     * Save assessment as draft (with issues)
+     *
+     * @route POST /user/assessments/{assessment}/save-draft
+     */
+    public function saveDraft(Request $request, JournalAssessment $assessment)
+    {
+        // Authorization
+        $this->authorize('update', $assessment);
+
+        if ($assessment->status !== 'draft') {
+            return back()->with('error', 'Hanya assessment dengan status draft yang dapat disimpan.');
+        }
+
+        $validated = $request->validate([
+            'responses' => 'nullable|array',
+            'responses.*.evaluation_indicator_id' => 'required|exists:evaluation_indicators,id',
+            'responses.*.answer_boolean' => 'nullable|boolean',
+            'responses.*.answer_scale' => 'nullable|integer|min:1|max:5',
+            'responses.*.answer_text' => 'nullable|string',
+            'responses.*.notes' => 'nullable|string',
+            'issues' => 'nullable|array',
+            'issues.*.title' => 'required|string|max:200',
+            'issues.*.description' => 'required|string|max:1000',
+            'issues.*.category' => 'required|in:editorial,technical,content_quality,management',
+            'issues.*.priority' => 'required|in:high,medium,low',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update assessment timestamp
+            $assessment->touch();
+
+            // Save responses
+            if (!empty($validated['responses'])) {
+                foreach ($validated['responses'] as $responseData) {
+                    $indicator = EvaluationIndicator::find($responseData['evaluation_indicator_id']);
+                    $score = $this->calculateScore($indicator, $responseData);
+
+                    AssessmentResponse::updateOrCreate(
+                        [
+                            'journal_assessment_id' => $assessment->id,
+                            'evaluation_indicator_id' => $responseData['evaluation_indicator_id'],
+                        ],
+                        [
+                            'answer_boolean' => $responseData['answer_boolean'] ?? null,
+                            'answer_scale' => $responseData['answer_scale'] ?? null,
+                            'answer_text' => $responseData['answer_text'] ?? null,
+                            'score' => $score,
+                            'notes' => $responseData['notes'] ?? null,
+                        ]
+                    );
+                }
+            }
+
+            // Save issues
+            if (!empty($validated['issues'])) {
+                // Delete existing issues
+                $assessment->issues()->delete();
+
+                // Create new issues
+                foreach ($validated['issues'] as $index => $issueData) {
+                    $assessment->issues()->create([
+                        'title' => $issueData['title'],
+                        'description' => $issueData['description'],
+                        'category' => $issueData['category'],
+                        'priority' => $issueData['priority'],
+                        'display_order' => $index,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return back()->with('success', 'Draft berhasil disimpan pada ' . now()->format('H:i:s'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Failed to save draft', [
+                'assessment_id' => $assessment->id,
+                'user_id' => $request->user()->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Gagal menyimpan draft: ' . $e->getMessage());
+        }
     }
 
     /**
