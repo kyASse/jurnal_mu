@@ -132,7 +132,10 @@ export default function Login() {
                         {/* Register Link */}
                         <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
                             Belum punya akun?{' '}
-                            <Link href={route('register')} className="font-medium text-green-600 hover:text-green-700 dark:text-green-300 dark:hover:text-green-400">
+                            <Link
+                                href={route('register')}
+                                className="font-medium text-green-600 hover:text-green-700 dark:text-green-300 dark:hover:text-green-400"
+                            >
                                 Daftar sekarang
                             </Link>
                         </p>

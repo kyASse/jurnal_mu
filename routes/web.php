@@ -241,7 +241,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('akreditasi');
             Route::get('indeksasi', [AdminKampusPembinaanController::class, 'indexIndeksasi'])
                 ->name('indeksasi');
-            
+
             Route::get('registrations/{registration}', [AdminKampusPembinaanController::class, 'show'])
                 ->name('registrations.show');
             Route::post('registrations/{registration}/approve', [AdminKampusPembinaanController::class, 'approve'])
@@ -319,7 +319,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('akreditasi');
             Route::get('indeksasi', [UserPembinaanController::class, 'indexIndeksasi'])
                 ->name('indeksasi');
-            
+
             Route::get('programs/{pembinaan}', [UserPembinaanController::class, 'show'])
                 ->name('programs.show');
             Route::get('programs/{pembinaan}/register', [UserPembinaanController::class, 'registerForm'])

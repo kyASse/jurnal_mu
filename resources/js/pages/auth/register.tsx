@@ -123,7 +123,9 @@ export default function Register() {
                                     required
                                     className="mt-2"
                                 />
-                                {errors.password_confirmation && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password_confirmation}</p>}
+                                {errors.password_confirmation && (
+                                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password_confirmation}</p>
+                                )}
                             </div>
 
                             {/* Submit Button */}
@@ -135,7 +137,10 @@ export default function Register() {
                         {/* Login Link */}
                         <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
                             Sudah punya akun?{' '}
-                            <Link href={route('login')} className="font-medium text-green-600 hover:text-green-700 dark:text-green-300 dark:hover:text-green-400">
+                            <Link
+                                href={route('login')}
+                                className="font-medium text-green-600 hover:text-green-700 dark:text-green-300 dark:hover:text-green-400"
+                            >
                                 Login di sini
                             </Link>
                         </p>

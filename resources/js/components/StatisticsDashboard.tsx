@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import Chart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
-import { JournalStatistics } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { JournalStatistics } from '@/types';
+import { ApexOptions } from 'apexcharts';
 import { BarChart3, PieChart, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Chart from 'react-apexcharts';
 
 interface StatisticsDashboardProps {
     statistics: JournalStatistics;
@@ -302,16 +302,9 @@ export default function StatisticsDashboard({ statistics }: StatisticsDashboardP
                     </CardHeader>
                     <CardContent>
                         {hasIndexationData ? (
-                            <Chart
-                                options={indexationChartOptions}
-                                series={indexationChartSeries}
-                                type="bar"
-                                height={300}
-                            />
+                            <Chart options={indexationChartOptions} series={indexationChartSeries} type="bar" height={300} />
                         ) : (
-                            <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
-                                Tidak ada data indeksasi
-                            </div>
+                            <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">Tidak ada data indeksasi</div>
                         )}
                     </CardContent>
                 </Card>
@@ -323,12 +316,7 @@ export default function StatisticsDashboard({ statistics }: StatisticsDashboardP
                         <CardDescription>Persentase jurnal berdasarkan ranking SINTA</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Chart
-                            options={accreditationChartOptions}
-                            series={accreditationChartSeries}
-                            type="donut"
-                            height={300}
-                        />
+                        <Chart options={accreditationChartOptions} series={accreditationChartSeries} type="donut" height={300} />
                     </CardContent>
                 </Card>
 
@@ -340,16 +328,9 @@ export default function StatisticsDashboard({ statistics }: StatisticsDashboardP
                     </CardHeader>
                     <CardContent>
                         {hasScientificFieldData ? (
-                            <Chart
-                                options={scientificFieldChartOptions}
-                                series={scientificFieldChartSeries}
-                                type="bar"
-                                height={300}
-                            />
+                            <Chart options={scientificFieldChartOptions} series={scientificFieldChartSeries} type="bar" height={300} />
                         ) : (
-                            <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
-                                Tidak ada data bidang ilmu
-                            </div>
+                            <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">Tidak ada data bidang ilmu</div>
                         )}
                     </CardContent>
                 </Card>

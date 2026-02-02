@@ -17,6 +17,7 @@
  *
  * @route GET /admin-kampus/journals
  */
+import StatisticsDashboard from '@/components/StatisticsDashboard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +28,6 @@ import { type BreadcrumbItem, type JournalStatistics } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search } from 'lucide-react';
 import { useState } from 'react';
-import StatisticsDashboard from '@/components/StatisticsDashboard';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -303,8 +303,8 @@ export default function JournalsIndex({
                                     </SelectContent>
                                 </Select>
 
-                                {/* Dikti Accreditation Filter */}
-                                <Select
+                                {/* Dikti Accreditation Filter - Deprecated */}
+                                {/* <Select
                                     value={accreditationGradeFilter || 'all'}
                                     onValueChange={(value) => setAccreditationGradeFilter(value === 'all' ? '' : value)}
                                 >
@@ -319,7 +319,7 @@ export default function JournalsIndex({
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
-                                </Select>
+                                </Select> */}
 
                                 {/* Indexation Filter */}
                                 <Select
