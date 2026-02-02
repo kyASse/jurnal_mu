@@ -135,11 +135,18 @@ class Journal extends Model
 
     /**
      * Scope to filter by SINTA rank
+     * 
+     * @param mixed $rank - integer (1-6) for specific rank, 'non_sinta' for journals without SINTA rank
      */
-    public function scopeBySintaRank($query, ?int $rank)
+    public function scopeBySintaRank($query, $rank)
     {
-        if (! $rank) {
+        if (!$rank) {
             return $query;
+        }
+
+        // Handle "Non Sinta" filter
+        if ($rank === 'non_sinta') {
+            return $query->whereNull('sinta_rank');
         }
 
         return $query->where('sinta_rank', $rank);
@@ -150,7 +157,7 @@ class Journal extends Model
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (! $search) {
+        if (!$search) {
             return $query;
         }
 
@@ -166,7 +173,7 @@ class Journal extends Model
      */
     public function scopeByAssessmentStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -180,13 +187,13 @@ class Journal extends Model
      */
     public function scopeByIndexation($query, ?string $platform)
     {
-        if (! $platform) {
+        if (!$platform) {
             return $query;
         }
 
         return $query->whereNotNull('indexations')
             ->where(function ($q) use ($platform) {
-                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
+                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$." . $platform . "')");
             });
     }
 
@@ -195,7 +202,7 @@ class Journal extends Model
      */
     public function scopeByAccreditationGrade($query, ?string $grade)
     {
-        if (! $grade) {
+        if (!$grade) {
             return $query;
         }
 
@@ -220,7 +227,7 @@ class Journal extends Model
      */
     public function getAccreditationLabelAttribute(): string
     {
-        if (! $this->accreditation_status) {
+        if (!$this->accreditation_status) {
             return 'Belum Terakreditasi';
         }
 
@@ -250,7 +257,7 @@ class Journal extends Model
      */
     public function getIsAccreditationExpiredAttribute(): bool
     {
-        if (! $this->accreditation_expiry_date) {
+        if (!$this->accreditation_expiry_date) {
             return false;
         }
 
@@ -264,7 +271,7 @@ class Journal extends Model
      */
     public function getAccreditationExpiryStatusAttribute(): string
     {
-        if (! $this->accreditation_expiry_date) {
+        if (!$this->accreditation_expiry_date) {
             return 'none';
         }
 
@@ -284,7 +291,7 @@ class Journal extends Model
      */
     public function getDiktiAccreditationLabelAttribute(): string
     {
-        if (! $this->dikti_accreditation_number) {
+        if (!$this->dikti_accreditation_number) {
             return 'Belum Terakreditasi Dikti';
         }
 
@@ -304,7 +311,7 @@ class Journal extends Model
      */
     public function getIndexationLabelsAttribute(): array
     {
-        if (! $this->indexations || ! is_array($this->indexations)) {
+        if (!$this->indexations || !is_array($this->indexations)) {
             return [];
         }
 

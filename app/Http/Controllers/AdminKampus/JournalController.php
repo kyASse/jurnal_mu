@@ -40,10 +40,10 @@ class JournalController extends Controller
             $query->search($request->search);
         }
 
-        // Apply status filter
-        if ($request->filled('status')) {
-            $query->byAssessmentStatus($request->status);
-        }
+        // // Deprecated: Status filter is no longer used
+        // if ($request->filled('status')) {
+        //     $query->byAssessmentStatus($request->status);
+        // }
 
         // Apply SINTA rank filter
         if ($request->filled('sinta_rank')) {
@@ -60,17 +60,17 @@ class JournalController extends Controller
             $query->byIndexation($request->indexation);
         }
 
-        // Apply Dikti accreditation filter
-        if ($request->filled('accreditation_grade')) {
-            $query->byAccreditationGrade($request->accreditation_grade);
-        }
+        // // Deprecated: Accreditation Dikti filter is no longer used
+        // if ($request->filled('accreditation_grade')) {
+        //     $query->byAccreditationGrade($request->accreditation_grade);
+        // }
 
         // Paginate results
         $journals = $query
             ->orderBy('title')
             ->paginate(10)
             ->withQueryString()
-            ->through(fn ($journal) => [
+            ->through(fn($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -105,6 +105,7 @@ class JournalController extends Controller
             ->get();
 
         $sintaRanks = collect([
+            ['value' => 'non_sinta', 'label' => 'Non Sinta'],
             ['value' => 1, 'label' => 'SINTA 1'],
             ['value' => 2, 'label' => 'SINTA 2'],
             ['value' => 3, 'label' => 'SINTA 3'],
@@ -113,28 +114,31 @@ class JournalController extends Controller
             ['value' => 6, 'label' => 'SINTA 6'],
         ]);
 
-        $statusOptions = collect([
-            ['value' => 'draft', 'label' => 'Draft'],
-            ['value' => 'submitted', 'label' => 'Submitted'],
-            ['value' => 'reviewed', 'label' => 'Reviewed'],
-        ]);
+        // Deprecated: Status filter is no longer used in Admin Kampus Journals
+        // $statusOptions = collect([
+        //     ['value' => 'draft', 'label' => 'Draft'],
+        //     ['value' => 'submitted', 'label' => 'Submitted'],
+        //     ['value' => 'reviewed', 'label' => 'Reviewed'],
+        // ]);
 
         $indexationOptions = collect(Journal::getIndexationPlatforms())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
-        $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
-            ->values();
+        // Deprecated: Dikti Accreditation Grade filter is no longer used in Admin Kampus Journals
+        // $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
+        //     ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+        //     ->values();
 
         return Inertia::render('AdminKampus/Journals/Index', [
             'journals' => $journals,
-            'filters' => $request->only(['search', 'status', 'sinta_rank', 'scientific_field_id', 'indexation', 'accreditation_grade']),
+            'filters' => $request->only(['search', 'sinta_rank', 'scientific_field_id', 'indexation']),
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
-            'statusOptions' => $statusOptions,
             'indexationOptions' => $indexationOptions,
-            'accreditationGradeOptions' => $accreditationGradeOptions,
+            // Deprecated filters - no longer passed to frontend
+            // 'statusOptions' => $statusOptions,
+            // 'accreditationGradeOptions' => $accreditationGradeOptions,
         ]);
     }
 
@@ -211,7 +215,7 @@ class JournalController extends Controller
                     'id' => $journal->scientificField->id,
                     'name' => $journal->scientificField->name,
                 ] : null,
-                'assessments' => $journal->assessments->map(fn ($assessment) => [
+                'assessments' => $journal->assessments->map(fn($assessment) => [
                     'id' => $assessment->id,
                     'assessment_date' => $assessment->assessment_date,
                     'period' => $assessment->period,
