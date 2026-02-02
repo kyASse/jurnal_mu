@@ -348,6 +348,10 @@ Route::middleware(['auth'])->group(function () {
                 ->name('registrations.upload');
             Route::get('attachments/{attachment}', [UserPembinaanController::class, 'downloadAttachment'])
                 ->name('attachments.download');
+            
+            // Create assessment for pembinaan registration
+            Route::post('registrations/{registration}/create-assessment', [UserPembinaanController::class, 'createAssessment'])
+                ->name('registrations.create-assessment');
         });
     });
 
