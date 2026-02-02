@@ -18,6 +18,7 @@ class JournalAssessment extends Model
         'journal_id',
         'user_id',
         'pembinaan_registration_id',
+        'reviewer_id',
         'assessment_date',
         'period',
         'status',
@@ -27,6 +28,8 @@ class JournalAssessment extends Model
         'admin_kampus_approved_by',
         'admin_kampus_approved_at',
         'admin_kampus_approval_notes',
+        'assigned_by',
+        'assigned_at',
         'total_score',
         'max_score',
         'percentage',
@@ -44,6 +47,7 @@ class JournalAssessment extends Model
         'submitted_at' => 'datetime',
         'reviewed_at' => 'datetime',
         'admin_kampus_approved_at' => 'datetime',
+        'assigned_at' => 'datetime',
         'total_score' => 'decimal:2',
         'max_score' => 'decimal:2',
         'percentage' => 'decimal:2',
@@ -119,11 +123,19 @@ class JournalAssessment extends Model
     /**
      * Get all notes for this assessment (timeline)
      */
-    public function assessmentNotes()
+    public function notes()
     {
         return $this->hasMany(AssessmentNote::class, 'journal_assessment_id')
             ->with('user')
             ->orderBy('created_at', 'asc');
+    }
+
+    /**
+     * Get the Dikti user who assigned the reviewer
+     */
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
     }
 
     /*
