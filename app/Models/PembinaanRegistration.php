@@ -103,6 +103,14 @@ class PembinaanRegistration extends Model
         return $this->hasMany(ReviewerAssignment::class, 'registration_id');
     }
 
+    /**
+     * Get the assessment linked to this registration
+     */
+    public function assessment()
+    {
+        return $this->hasOne(JournalAssessment::class, 'pembinaan_registration_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes

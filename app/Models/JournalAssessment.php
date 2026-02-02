@@ -17,6 +17,7 @@ class JournalAssessment extends Model
     protected $fillable = [
         'journal_id',
         'user_id',
+        'pembinaan_registration_id',
         'assessment_date',
         'period',
         'status',
@@ -75,6 +76,14 @@ class JournalAssessment extends Model
     public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    /**
+     * Get the pembinaan registration this assessment belongs to
+     */
+    public function pembinaanRegistration()
+    {
+        return $this->belongsTo(PembinaanRegistration::class);
     }
 
     /**
