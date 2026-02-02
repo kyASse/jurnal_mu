@@ -65,6 +65,26 @@ class JournalController extends Controller
         //     $query->byAccreditationGrade($request->accreditation_grade);
         // }
 
+        // Apply pembinaan period filter (Phase 2)
+        if ($request->filled('pembinaan_period')) {
+            $query->byPembinaanPeriod($request->pembinaan_period);
+        }
+
+        // Apply pembinaan year filter (Phase 2)
+        if ($request->filled('pembinaan_year')) {
+            $query->byPembinaanYear($request->pembinaan_year);
+        }
+
+        // Apply participation filter (Phase 2)
+        if ($request->filled('participation')) {
+            $query->byParticipation($request->participation);
+        }
+
+        // Apply approval status filter (Phase 2)
+        if ($request->filled('approval_status')) {
+            $query->byApprovalStatus($request->approval_status);
+        }
+
         // Calculate statistics for dashboard (before pagination)
         $statistics = $this->calculateJournalStatistics($authUser->university_id);
 
@@ -141,13 +161,54 @@ class JournalController extends Controller
             ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
+        // Phase 2: Get pembinaan periods and years for filters
+        $pembinaanPeriods = \App\Models\Pembinaan::query()
+            ->select('name')
+            ->distinct()
+            ->orderBy('name')
+            ->pluck('name')
+            ->map(fn ($name) => ['value' => $name, 'label' => $name])
+            ->values();
+
+        $pembinaanYears = \App\Models\PembinaanRegistration::query()
+            ->selectRaw('YEAR(registered_at) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->map(fn ($year) => ['value' => (string) $year, 'label' => (string) $year])
+            ->values();
+
+        $participationOptions = collect([
+            ['value' => 'sudah_ikut', 'label' => 'Sudah Ikut Pembinaan'],
+            ['value' => 'belum_ikut', 'label' => 'Belum Ikut Pembinaan'],
+        ]);
+
+        $approvalStatusOptions = collect([
+            ['value' => 'approved', 'label' => 'Sudah Di-Approve'],
+            ['value' => 'pending', 'label' => 'Menunggu Approval'],
+            ['value' => 'rejected', 'label' => 'Ditolak'],
+        ]);
+
         return Inertia::render('AdminKampus/Journals/Index', [
             'journals' => $journals,
             'statistics' => $statistics,
-            'filters' => $request->only(['search', 'sinta_rank', 'scientific_field_id', 'indexation']),
+            'filters' => $request->only([
+                'search',
+                'sinta_rank',
+                'scientific_field_id',
+                'indexation',
+                'pembinaan_period',
+                'pembinaan_year',
+                'participation',
+                'approval_status',
+            ]),
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
             'indexationOptions' => $indexationOptions,
+            'pembinaanPeriods' => $pembinaanPeriods,
+            'pembinaanYears' => $pembinaanYears,
+            'participationOptions' => $participationOptions,
+            'approvalStatusOptions' => $approvalStatusOptions,
             // Deprecated filters - no longer passed to frontend
             // 'statusOptions' => $statusOptions,
             // 'accreditationGradeOptions' => $accreditationGradeOptions,

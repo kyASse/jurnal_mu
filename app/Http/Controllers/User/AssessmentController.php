@@ -477,7 +477,7 @@ class AssessmentController extends Controller
             $assessment->touch();
 
             // Save responses
-            if (!empty($validated['responses'])) {
+            if (! empty($validated['responses'])) {
                 foreach ($validated['responses'] as $responseData) {
                     $indicator = EvaluationIndicator::find($responseData['evaluation_indicator_id']);
                     $score = $this->calculateScore($indicator, $responseData);
@@ -499,7 +499,7 @@ class AssessmentController extends Controller
             }
 
             // Save issues
-            if (!empty($validated['issues'])) {
+            if (! empty($validated['issues'])) {
                 // Delete existing issues
                 $assessment->issues()->delete();
 
@@ -517,7 +517,7 @@ class AssessmentController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Draft berhasil disimpan pada ' . now()->format('H:i:s'));
+            return back()->with('success', 'Draft berhasil disimpan pada '.now()->format('H:i:s'));
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Failed to save draft', [
@@ -526,7 +526,7 @@ class AssessmentController extends Controller
                 'exception' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal menyimpan draft: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan draft: '.$e->getMessage());
         }
     }
 

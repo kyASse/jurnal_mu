@@ -145,7 +145,7 @@ class AssessmentReviewController extends Controller
                 'exception' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal menyetujui assessment: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyetujui assessment: '.$e->getMessage());
         }
     }
 
@@ -192,7 +192,7 @@ class AssessmentReviewController extends Controller
                 'exception' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal mengirim permintaan revisi: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengirim permintaan revisi: '.$e->getMessage());
         }
     }
 }

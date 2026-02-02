@@ -40,7 +40,7 @@ class AssessmentIssueController extends Controller
 
             return back()->with('success', 'Issue berhasil ditambahkan');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menambahkan issue: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menambahkan issue: '.$e->getMessage());
         }
     }
 
@@ -73,7 +73,7 @@ class AssessmentIssueController extends Controller
 
             return back()->with('success', 'Issue berhasil diupdate');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal mengupdate issue: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengupdate issue: '.$e->getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ class AssessmentIssueController extends Controller
 
             return back()->with('success', 'Issue berhasil dihapus');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menghapus issue: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menghapus issue: '.$e->getMessage());
         }
     }
 
@@ -124,7 +124,7 @@ class AssessmentIssueController extends Controller
         try {
             foreach ($validated['issues'] as $index => $issueId) {
                 $issue = AssessmentIssue::find($issueId);
-                
+
                 // Verify issue belongs to this assessment
                 if ($issue && $issue->journal_assessment_id === $assessment->id) {
                     $issue->update(['display_order' => $index]);
@@ -136,7 +136,8 @@ class AssessmentIssueController extends Controller
             return back()->with('success', 'Urutan issue berhasil diupdate');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal mengupdate urutan: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal mengupdate urutan: '.$e->getMessage());
         }
     }
 }
