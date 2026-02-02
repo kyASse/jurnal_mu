@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import ReviewerFeedback from '@/components/ReviewerFeedback';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, CheckCircle, FileText, Save, Send, Upload, XCircle } from 'lucide-react';
@@ -305,6 +306,9 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                         <span>{flash.error}</span>
                     </div>
                 )}
+
+                {/* Reviewer Feedback - Show if editing after revision request */}
+                {isEdit && assessment && <ReviewerFeedback assessment={assessment} />}
 
                 {/* Progress Bar */}
                 <Card>

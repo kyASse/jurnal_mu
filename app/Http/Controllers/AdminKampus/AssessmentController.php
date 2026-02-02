@@ -4,6 +4,8 @@ namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
 use App\Models\JournalAssessment;
+use App\Notifications\AssessmentApprovedNotification;
+use App\Notifications\AssessmentRevisionRequestedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -89,6 +91,9 @@ class AssessmentController extends Controller
             'reviewer',
             'responses.evaluationIndicator.subCategory.category',
             'responses.attachments',
+            'issues' => function ($query) {
+                $query->orderBy('display_order')->orderBy('created_at');
+            },
         ]);
 
         return Inertia::render('AdminKampus/Assessments/Review', [
@@ -114,6 +119,11 @@ class AssessmentController extends Controller
             'admin_notes' => $validated['admin_notes'] ?? null,
         ]);
 
+        // Send notification to user
+        $assessment->user->notify(
+            new AssessmentApprovedNotification($assessment, $validated['admin_notes'] ?? null)
+        );
+
         return redirect()
             ->route('admin-kampus.assessments.index')
             ->with('success', 'Assessment approved successfully.');
@@ -136,6 +146,11 @@ class AssessmentController extends Controller
             'reviewed_at' => now(),
             'admin_notes' => $validated['admin_notes'],
         ]);
+
+        // Send notification to user
+        $assessment->user->notify(
+            new AssessmentRevisionRequestedNotification($assessment, $validated['admin_notes'])
+        );
 
         return redirect()
             ->route('admin-kampus.assessments.index')

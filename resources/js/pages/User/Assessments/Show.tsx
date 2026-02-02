@@ -8,6 +8,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import ReviewerFeedback from '@/components/ReviewerFeedback';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, CheckCircle, Download, Edit, FileText, Send, TrendingUp, XCircle } from 'lucide-react';
@@ -190,6 +191,9 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
 
                 {/* Flash Message */}
                 {flash?.success && <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-800">{flash.success}</div>}
+
+                {/* Reviewer Feedback */}
+                <ReviewerFeedback assessment={assessment} />
 
                 {/* Summary Card */}
                 <Card>
