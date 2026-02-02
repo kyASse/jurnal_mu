@@ -426,8 +426,8 @@ export default function JournalsIndex({
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {journal.latest_score !== null ? (
-                                                    <span className="font-semibold text-foreground">{journal.latest_score.toFixed(1)}%</span>
+                                                {journal.latest_score !== null && journal.latest_score !== undefined ? (
+                                                    <span className="font-semibold text-foreground">{Number(journal.latest_score).toFixed(1)}%</span>
                                                 ) : (
                                                     <span className="text-muted-foreground">-</span>
                                                 )}

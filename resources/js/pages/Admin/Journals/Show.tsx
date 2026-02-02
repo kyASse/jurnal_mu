@@ -369,12 +369,12 @@ export default function JournalShow({ journal }: Props) {
                                             <TableCell>{assessment.period || '-'}</TableCell>
                                             <TableCell>{getStatusBadge(assessment)}</TableCell>
                                             <TableCell>
-                                                {assessment.total_score.toFixed(1)} / {assessment.max_score.toFixed(1)}
+                                                {Number(assessment.total_score).toFixed(1)} / {Number(assessment.max_score).toFixed(1)}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-semibold">{assessment.percentage.toFixed(1)}%</span>
-                                                    {getGradeBadge(assessment.percentage)}
+                                                    <span className="font-semibold">{Number(assessment.percentage).toFixed(1)}%</span>
+                                                    {getGradeBadge(Number(assessment.percentage))}
                                                 </div>
                                             </TableCell>
                                             <TableCell>{assessment.user.name}</TableCell>

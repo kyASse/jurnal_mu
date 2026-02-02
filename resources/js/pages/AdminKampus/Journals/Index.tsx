@@ -292,11 +292,7 @@ export default function JournalsIndex({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                            </div>
 
-                            {/* Filter Row 2 - New Filters */}
-                            <div className="flex gap-4">
-                                {/* Indexation Filter */}
                                 <Select
                                     value={indexationFilter || 'all'}
                                     onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
@@ -315,7 +311,7 @@ export default function JournalsIndex({
                                 </Select>
                             </div>
 
-                            {/* Filter Row 3 - Phase 2 Pembinaan & Approval Filters */}
+                            {/* Filter Row 2 - Phase 2 Pembinaan & Approval Filters */}
                             <div className="flex gap-4 flex-wrap">
                                 {/* Pembinaan Period Filter */}
                                 <Select
@@ -482,8 +478,8 @@ export default function JournalsIndex({
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {journal.latest_score !== null ? (
-                                                    <span className="font-semibold text-foreground">{journal.latest_score.toFixed(1)}%</span>
+                                                {journal.latest_score !== null && journal.latest_score !== undefined ? (
+                                                    <span className="font-semibold text-foreground">{Number(journal.latest_score).toFixed(1)}%</span>
                                                 ) : (
                                                     <span className="text-muted-foreground">-</span>
                                                 )}
