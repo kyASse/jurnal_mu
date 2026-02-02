@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('assessment_issues', function (Blueprint $table) {
             $table->id();
             $table->foreignId('journal_assessment_id')
-                  ->constrained('journal_assessments')
-                  ->onDelete('cascade');
+                ->constrained('journal_assessments')
+                ->onDelete('cascade');
             $table->string('title', 200);
             $table->text('description');
             $table->enum('category', ['editorial', 'technical', 'content_quality', 'management']);

@@ -18,7 +18,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('pembinaan_registrations')
                 ->onDelete('set null');
-            
+
             // Add index for faster queries
             $table->index('pembinaan_registration_id');
         });
