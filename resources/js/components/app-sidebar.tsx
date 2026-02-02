@@ -81,6 +81,11 @@ export function AppSidebar() {
                 href: route('admin.pembinaan.index'),
                 icon: Award,
             },
+            {
+                title: 'Dikti - Reviewer Assignment',
+                href: route('dikti.assessments.index'),
+                icon: UserCheck,
+            },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
