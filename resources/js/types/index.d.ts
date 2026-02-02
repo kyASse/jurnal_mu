@@ -349,6 +349,11 @@ export interface ScientificFieldStatistic {
 export interface JournalStatistics {
     totals: {
         total_journals: number;
+        /**
+         * Count of Scopus-indexed journals only
+         * Note: "Indexed" in this system specifically means Scopus indexation
+         * (as per meeting notes 02 Feb 2026)
+         */
         indexed_journals: number;
         sinta_journals: number;
         non_sinta_journals: number;
