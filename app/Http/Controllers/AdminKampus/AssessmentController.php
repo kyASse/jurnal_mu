@@ -21,6 +21,9 @@ class AssessmentController extends Controller
         $user = $request->user();
         $status = $request->input('status');
         $search = $request->input('search');
+        $period = $request->input('period'); // NEW: filter by period
+        $year = $request->input('year'); // NEW: filter by year
+        $approvalStatus = $request->input('approval_status'); // NEW: filter by approval status
 
         $assessments = JournalAssessment::with([
             'journal.user',
@@ -28,6 +31,7 @@ class AssessmentController extends Controller
             'journal.scientificField',
             'user',
             'reviewer',
+            'adminKampusApprover',
         ])
             ->whereHas('journal', function ($query) use ($user) {
                 $query->where('university_id', $user->university_id);
@@ -41,16 +45,57 @@ class AssessmentController extends Controller
                         ->orWhere('issn', 'like', "%{$search}%");
                 });
             })
+            ->when($period, function ($query, $period) {
+                $query->where('period', $period);
+            })
+            ->when($year, function ($query, $year) {
+                $query->whereYear('assessment_date', $year);
+            })
+            ->when($approvalStatus, function ($query, $approvalStatus) {
+                if ($approvalStatus === 'approved') {
+                    $query->whereNotNull('admin_kampus_approved_at')
+                        ->where('status', '!=', 'draft');
+                } elseif ($approvalStatus === 'pending') {
+                    $query->where('status', 'submitted')
+                        ->whereNull('admin_kampus_approved_at');
+                } elseif ($approvalStatus === 'rejected') {
+                    $query->where('status', 'draft')
+                        ->whereNotNull('admin_kampus_approved_at');
+                }
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->withQueryString();
+
+        // Get available periods and years for filter dropdowns
+        $availablePeriods = JournalAssessment::whereHas('journal', function ($query) use ($user) {
+            $query->where('university_id', $user->university_id);
+        })
+            ->whereNotNull('period')
+            ->distinct()
+            ->pluck('period')
+            ->sort()
+            ->values();
+
+        $availableYears = JournalAssessment::whereHas('journal', function ($query) use ($user) {
+            $query->where('university_id', $user->university_id);
+        })
+            ->selectRaw('DISTINCT YEAR(assessment_date) as year')
+            ->whereNotNull('assessment_date')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
 
         return Inertia::render('AdminKampus/Assessments/Index', [
             'assessments' => $assessments,
             'filters' => [
                 'status' => $status,
                 'search' => $search,
+                'period' => $period,
+                'year' => $year,
+                'approval_status' => $approvalStatus,
             ],
+            'availablePeriods' => $availablePeriods,
+            'availableYears' => $availableYears,
         ]);
     }
 
@@ -102,7 +147,8 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Approve assessment and mark as reviewed.
+     * Approve assessment as Admin Kampus (LPPM).
+     * After approval, assessment is ready for Dikti to assign reviewer.
      */
     public function approve(Request $request, JournalAssessment $assessment): RedirectResponse
     {
@@ -113,10 +159,18 @@ class AssessmentController extends Controller
         ]);
 
         $assessment->update([
-            'status' => 'reviewed',
-            'reviewed_by' => $request->user()->id,
-            'reviewed_at' => now(),
-            'admin_notes' => $validated['admin_notes'] ?? null,
+            'status' => 'approved_by_lppm', // Admin Kampus approved, waiting for reviewer assignment
+            'admin_kampus_approved_by' => $request->user()->id,
+            'admin_kampus_approved_at' => now(),
+            'admin_kampus_approval_notes' => $validated['admin_notes'] ?? null,
+        ]);
+
+        // Create assessment note for timeline
+        $assessment->notes()->create([
+            'user_id' => $request->user()->id,
+            'author_role' => 'Admin Kampus',
+            'note_type' => 'approval',
+            'content' => $validated['admin_notes'] ?? 'Assessment disetujui oleh Admin Kampus (LPPM)',
         ]);
 
         // Send notification to user
@@ -126,11 +180,12 @@ class AssessmentController extends Controller
 
         return redirect()
             ->route('admin-kampus.assessments.index')
-            ->with('success', 'Assessment approved successfully.');
+            ->with('success', 'Assessment berhasil disetujui. Menunggu assignment reviewer dari Dikti.');
     }
 
     /**
-     * Request revision - send assessment back to draft status.
+     * Reject assessment - send assessment back to draft status.
+     * Admin Kampus (LPPM) requests revision with notes.
      */
     public function requestRevision(Request $request, JournalAssessment $assessment): RedirectResponse
     {
@@ -142,9 +197,17 @@ class AssessmentController extends Controller
 
         $assessment->update([
             'status' => 'draft',
-            'reviewed_by' => $request->user()->id,
-            'reviewed_at' => now(),
-            'admin_notes' => $validated['admin_notes'],
+            'admin_kampus_approved_by' => $request->user()->id,
+            'admin_kampus_approved_at' => now(),
+            'admin_kampus_approval_notes' => $validated['admin_notes'],
+        ]);
+
+        // Create assessment note for timeline
+        $assessment->notes()->create([
+            'user_id' => $request->user()->id,
+            'author_role' => 'Admin Kampus',
+            'note_type' => 'rejection',
+            'content' => $validated['admin_notes'],
         ]);
 
         // Send notification to user
@@ -154,6 +217,6 @@ class AssessmentController extends Controller
 
         return redirect()
             ->route('admin-kampus.assessments.index')
-            ->with('success', 'Revision request sent to user.');
+            ->with('success', 'Assessment ditolak. User akan menerima notifikasi untuk revisi.');
     }
 }
