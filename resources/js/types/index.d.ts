@@ -177,6 +177,10 @@ export interface JournalAssessment {
     submitted_at?: string;
     reviewed_at?: string;
     reviewed_by?: number;
+    // Phase 2: Admin Kampus approval fields
+    admin_kampus_approved_by?: number;
+    admin_kampus_approved_at?: string;
+    admin_kampus_approval_notes?: string;
     total_score?: number;
     max_score?: number;
     percentage?: number;
@@ -187,8 +191,23 @@ export interface JournalAssessment {
     journal: Journal;
     user: User;
     reviewer?: User;
+    admin_kampus_approver?: User; // Phase 2: Admin Kampus who approved
     responses?: AssessmentResponse[];
     issues?: AssessmentIssue[];
+    assessment_notes?: AssessmentNote[]; // Phase 2: Timeline notes
+}
+
+// Phase 2: Assessment Note for timeline
+export interface AssessmentNote {
+    id: number;
+    journal_assessment_id: number;
+    user_id: number;
+    author_role: string;
+    note_type: 'submission' | 'approval' | 'rejection' | 'review' | 'general';
+    content: string;
+    created_at: string;
+    updated_at: string;
+    user: User;
 }
 
 // Pagination types
@@ -247,6 +266,7 @@ export interface PembinaanRegistration {
     journal_id: number;
     user_id: number;
     status: 'pending' | 'approved' | 'rejected';
+    review_status?: 'menunggu_reviewer' | 'sedang_direview' | 'review_selesai' | 'ditolak'; // Phase 2
     registered_at: string;
     reviewed_at?: string;
     reviewed_by?: number;
