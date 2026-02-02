@@ -91,6 +91,7 @@ class PembinaanController extends Controller
         return Inertia::render('User/Pembinaan/Show', [
             'program' => $pembinaan,
             'isRegistered' => $isRegistered,
+            'category' => $pembinaan->category,
         ]);
     }
 
@@ -111,6 +112,7 @@ class PembinaanController extends Controller
         return Inertia::render('User/Pembinaan/Register', [
             'program' => $pembinaan,
             'journals' => $journals,
+            'category' => $pembinaan->category,
         ]);
     }
 
@@ -186,6 +188,7 @@ class PembinaanController extends Controller
 
         return Inertia::render('User/Pembinaan/Registration', [
             'registration' => $registration,
+            'category' => $registration->pembinaan->category,
         ]);
     }
 
@@ -210,7 +213,7 @@ class PembinaanController extends Controller
         $registration->delete();
 
         return redirect()
-            ->route('user.pembinaan.index')
+            ->route('user.pembinaan.' . $registration->pembinaan->category)
             ->with('success', 'Registration cancelled successfully.');
     }
 

@@ -99,6 +99,7 @@ class PembinaanController extends Controller
 
         return Inertia::render('AdminKampus/Pembinaan/Show', [
             'registration' => $registration,
+            'category' => $registration->pembinaan->category,
         ]);
     }
 

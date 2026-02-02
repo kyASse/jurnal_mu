@@ -61,12 +61,12 @@ export default function PembinaanIndex({ registrations, filters, category }: Pro
 
     const handleSearch = (value: string) => {
         setSearch(value);
-        router.get(route('admin-kampus.pembinaan.index'), { search: value, status }, { preserveState: true, replace: true });
+        router.get(route(`admin-kampus.pembinaan.${category}`), { search: value, status }, { preserveState: true, replace: true });
     };
 
     const handleStatusFilter = (value: string) => {
         setStatus(value);
-        router.get(route('admin-kampus.pembinaan.index'), { search, status: value || undefined }, { preserveState: true, replace: true });
+        router.get(route(`admin-kampus.pembinaan.${category}`), { search, status: value || undefined }, { preserveState: true, replace: true });
     };
 
     const getStatusBadge = (status: string) => {
