@@ -289,3 +289,36 @@ export interface ReviewerAssignment {
     created_at?: string;
     updated_at?: string;
 }
+
+// Journal Statistics types for Dashboard
+export interface IndexationStatistic {
+    name: string;
+    count: number;
+    percentage: number;
+}
+
+export interface AccreditationStatistic {
+    sinta_rank: number | null;
+    label: string;
+    count: number;
+    percentage: number;
+}
+
+export interface ScientificFieldStatistic {
+    id: number;
+    name: string;
+    count: number;
+    percentage: number;
+}
+
+export interface JournalStatistics {
+    totals: {
+        total_journals: number;
+        indexed_journals: number;
+        sinta_journals: number;
+        non_sinta_journals: number;
+    };
+    by_indexation: IndexationStatistic[];
+    by_accreditation: AccreditationStatistic[];
+    by_scientific_field: ScientificFieldStatistic[];
+}

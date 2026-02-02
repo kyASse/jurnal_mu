@@ -58,9 +58,10 @@ import { useState } from 'react';
 
 interface Props {
     registration: PembinaanRegistration;
+    category: 'akreditasi' | 'indeksasi';
 }
 
-export default function PembinaanRegistrationShow({ registration }: Props) {
+export default function PembinaanRegistrationShow({ registration, category }: Props) {
     const [showCancelDialog, setShowCancelDialog] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -70,7 +71,11 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
         },
         {
             title: 'Pembinaan',
-            href: route('user.pembinaan.index'),
+            href: '#',
+        },
+        {
+            title: category.charAt(0).toUpperCase() + category.slice(1),
+            href: route(`user.pembinaan.${category}`),
         },
         {
             title: 'Registration Detail',
@@ -158,7 +163,7 @@ export default function PembinaanRegistrationShow({ registration }: Props) {
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
                                 <Button variant="ghost" size="sm" asChild className="mb-2">
-                                    <a href={route('user.pembinaan.index')}>
+                                    <a href={route(`user.pembinaan.${category}`)}>
                                         <ArrowLeft className="mr-2 h-4 w-4" />
                                         Back to Pembinaan
                                     </a>

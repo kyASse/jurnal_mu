@@ -16,22 +16,42 @@ use Inertia\Response;
 class PembinaanController extends Controller
 {
     /**
-     * Display available pembinaan programs and user's registrations.
+     * Display available Akreditasi pembinaan programs and user's registrations.
      */
-    public function index(Request $request): Response
+    public function indexAkreditasi(Request $request): Response
+    {
+        return $this->indexByCategory($request, 'akreditasi');
+    }
+
+    /**
+     * Display available Indeksasi pembinaan programs and user's registrations.
+     */
+    public function indexIndeksasi(Request $request): Response
+    {
+        return $this->indexByCategory($request, 'indeksasi');
+    }
+
+    /**
+     * Common method to display programs by category.
+     */
+    private function indexByCategory(Request $request, string $category): Response
     {
         $user = $request->user();
 
-        // Available programs (active, registration open)
+        // Available programs (active, registration open, filtered by category)
         $availablePrograms = Pembinaan::active()
             ->open()
+            ->byCategory($category)
             ->with(['accreditationTemplate'])
             ->withCount(['registrations', 'approvedRegistrations'])
             ->orderBy('registration_start', 'desc')
             ->get();
 
-        // User's registrations
+        // User's registrations (filtered by category)
         $myRegistrations = PembinaanRegistration::forUser($user->id)
+            ->whereHas('pembinaan', function ($query) use ($category) {
+                $query->where('category', $category);
+            })
             ->with([
                 'pembinaan',
                 'journal',
@@ -45,6 +65,7 @@ class PembinaanController extends Controller
         return Inertia::render('User/Pembinaan/Index', [
             'availablePrograms' => $availablePrograms,
             'myRegistrations' => $myRegistrations,
+            'category' => $category,
         ]);
     }
 
@@ -70,6 +91,7 @@ class PembinaanController extends Controller
         return Inertia::render('User/Pembinaan/Show', [
             'program' => $pembinaan,
             'isRegistered' => $isRegistered,
+            'category' => $pembinaan->category,
         ]);
     }
 
@@ -90,6 +112,7 @@ class PembinaanController extends Controller
         return Inertia::render('User/Pembinaan/Register', [
             'program' => $pembinaan,
             'journals' => $journals,
+            'category' => $pembinaan->category,
         ]);
     }
 
@@ -165,6 +188,7 @@ class PembinaanController extends Controller
 
         return Inertia::render('User/Pembinaan/Registration', [
             'registration' => $registration,
+            'category' => $registration->pembinaan->category,
         ]);
     }
 
@@ -189,7 +213,7 @@ class PembinaanController extends Controller
         $registration->delete();
 
         return redirect()
-            ->route('user.pembinaan.index')
+            ->route('user.pembinaan.'.$registration->pembinaan->category)
             ->with('success', 'Registration cancelled successfully.');
     }
 

@@ -98,8 +98,12 @@ export function AppSidebar() {
             },
             {
                 title: 'Pembinaan',
-                href: route('admin-kampus.pembinaan.index'),
+                href: '#',
                 icon: Award,
+                items: [
+                    { title: 'Akreditasi', href: route('admin-kampus.pembinaan.akreditasi') },
+                    { title: 'Indeksasi', href: route('admin-kampus.pembinaan.indeksasi') },
+                ],
             },
             {
                 title: 'Assessments',
@@ -137,8 +141,12 @@ export function AppSidebar() {
             },
             {
                 title: 'Pembinaan',
-                href: route('user.pembinaan.index'),
+                href: '#',
                 icon: Award,
+                items: [
+                    { title: 'Akreditasi', href: route('user.pembinaan.akreditasi') },
+                    { title: 'Indeksasi', href: route('user.pembinaan.indeksasi') },
+                ],
             },
             ...commonNavItems,
         ];

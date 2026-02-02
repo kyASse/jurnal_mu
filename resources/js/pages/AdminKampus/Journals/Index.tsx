@@ -17,13 +17,14 @@
  *
  * @route GET /admin-kampus/journals
  */
+import StatisticsDashboard from '@/components/StatisticsDashboard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type JournalStatistics } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search } from 'lucide-react';
 import { useState } from 'react';
@@ -90,37 +91,43 @@ interface Props {
             active: boolean;
         }>;
     };
+    statistics: JournalStatistics;
     filters: {
         search?: string;
-        status?: string;
+        // Deprecated: status and accreditation_grade no longer used
+        // status?: string;
         sinta_rank?: number;
         scientific_field_id?: number;
         indexation?: string;
-        accreditation_grade?: string;
+        // accreditation_grade?: string;
     };
     scientificFields: ScientificField[];
     sintaRanks: FilterOption[];
-    statusOptions: FilterOption[];
+    // Deprecated: Status and Dikti accreditation filters no longer used
+    // statusOptions: FilterOption[];
     indexationOptions: FilterOption[];
-    accreditationGradeOptions: FilterOption[];
+    // accreditationGradeOptions: FilterOption[];
 }
 
 export default function JournalsIndex({
     journals,
+    statistics,
     filters,
     scientificFields,
     sintaRanks,
-    statusOptions,
+    // Deprecated: Status and Dikti accreditation options no longer used
+    // statusOptions,
     indexationOptions,
-    accreditationGradeOptions,
+    // accreditationGradeOptions,
 }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
-    const [statusFilter, setStatusFilter] = useState(filters.status || '');
+    // Deprecated: Status and Dikti accreditation filters no longer used
+    // const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank?.toString() || '');
     const [scientificFieldFilter, setScientificFieldFilter] = useState(filters.scientific_field_id?.toString() || '');
     const [indexationFilter, setIndexationFilter] = useState(filters.indexation || '');
-    const [accreditationGradeFilter, setAccreditationGradeFilter] = useState(filters.accreditation_grade || '');
+    // const [accreditationGradeFilter, setAccreditationGradeFilter] = useState(filters.accreditation_grade || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -128,11 +135,12 @@ export default function JournalsIndex({
             route('admin-kampus.journals.index'),
             {
                 search,
-                status: statusFilter,
+                // Deprecated: status and accreditation_grade no longer used
+                // status: statusFilter,
                 sinta_rank: sintaRankFilter,
                 scientific_field_id: scientificFieldFilter,
                 indexation: indexationFilter,
-                accreditation_grade: accreditationGradeFilter,
+                // accreditation_grade: accreditationGradeFilter,
             },
             { preserveState: true },
         );
@@ -140,11 +148,12 @@ export default function JournalsIndex({
 
     const handleClearFilters = () => {
         setSearch('');
-        setStatusFilter('');
+        // Deprecated: Status and Dikti accreditation filters no longer used
+        // setStatusFilter('');
         setSintaRankFilter('');
         setScientificFieldFilter('');
         setIndexationFilter('');
-        setAccreditationGradeFilter('');
+        // setAccreditationGradeFilter('');
         router.get(route('admin-kampus.journals.index'));
     };
 
@@ -169,7 +178,8 @@ export default function JournalsIndex({
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
     };
 
-    const hasActiveFilters = search || statusFilter || sintaRankFilter || scientificFieldFilter || indexationFilter || accreditationGradeFilter;
+    const hasActiveFilters = search || sintaRankFilter || scientificFieldFilter || indexationFilter;
+    // Deprecated: statusFilter and accreditationGradeFilter removed from hasActiveFilters
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -202,6 +212,11 @@ export default function JournalsIndex({
                         </div>
                     )}
 
+                    {/* Statistics Dashboard */}
+                    <div className="mb-6">
+                        <StatisticsDashboard statistics={statistics} />
+                    </div>
+
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <form onSubmit={handleSearch} className="space-y-4">
@@ -219,8 +234,8 @@ export default function JournalsIndex({
 
                             {/* Filter Row */}
                             <div className="flex gap-4">
-                                {/* Status Filter */}
-                                <Select value={statusFilter || 'all'} onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value)}>
+                                {/* Deprecated: Status Filter - No longer used */}
+                                {/* <Select value={statusFilter || 'all'} onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value)}>
                                     <SelectTrigger className="w-48">
                                         <SelectValue placeholder="All Status" />
                                     </SelectTrigger>
@@ -232,15 +247,15 @@ export default function JournalsIndex({
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
-                                </Select>
+                                </Select> */}
 
                                 {/* SINTA Rank Filter */}
                                 <Select value={sintaRankFilter || 'all'} onValueChange={(value) => setSintaRankFilter(value === 'all' ? '' : value)}>
                                     <SelectTrigger className="w-48">
-                                        <SelectValue placeholder="All SINTA Ranks" />
+                                        <SelectValue placeholder="All Accreditation" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All SINTA Ranks</SelectItem>
+                                        <SelectItem value="all">All Accreditation</SelectItem>
                                         {sintaRanks.map((option) => (
                                             <SelectItem key={option.value} value={option.value.toString()}>
                                                 {option.label}
@@ -288,8 +303,8 @@ export default function JournalsIndex({
                                     </SelectContent>
                                 </Select>
 
-                                {/* Dikti Accreditation Filter */}
-                                <Select
+                                {/* Dikti Accreditation Filter - Deprecated */}
+                                {/* <Select
                                     value={accreditationGradeFilter || 'all'}
                                     onValueChange={(value) => setAccreditationGradeFilter(value === 'all' ? '' : value)}
                                 >
@@ -304,7 +319,43 @@ export default function JournalsIndex({
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
+                                </Select> */}
+
+                                {/* Indexation Filter */}
+                                <Select
+                                    value={indexationFilter || 'all'}
+                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Indexations" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Indexations</SelectItem>
+                                        {indexationOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
                                 </Select>
+
+                                {/* Deprecated: Dikti Accreditation Filter - No longer used */}
+                                {/* <Select
+                                    value={accreditationGradeFilter || 'all'}
+                                    onValueChange={(value) => setAccreditationGradeFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Dikti Accreditation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Dikti Accreditation</SelectItem>
+                                        {accreditationGradeOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select> */}
 
                                 <Button type="submit">Search</Button>
                                 {hasActiveFilters && (

@@ -236,8 +236,12 @@ Route::middleware(['auth'])->group(function () {
 
         // Pembinaan Registration Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
-            Route::get('/', [AdminKampusPembinaanController::class, 'index'])
-                ->name('index');
+            // Category-specific routes
+            Route::get('akreditasi', [AdminKampusPembinaanController::class, 'indexAkreditasi'])
+                ->name('akreditasi');
+            Route::get('indeksasi', [AdminKampusPembinaanController::class, 'indexIndeksasi'])
+                ->name('indeksasi');
+
             Route::get('registrations/{registration}', [AdminKampusPembinaanController::class, 'show'])
                 ->name('registrations.show');
             Route::post('registrations/{registration}/approve', [AdminKampusPembinaanController::class, 'approve'])
@@ -310,8 +314,12 @@ Route::middleware(['auth'])->group(function () {
 
         // Pembinaan Registration (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
-            Route::get('/', [UserPembinaanController::class, 'index'])
-                ->name('index');
+            // Category-specific routes
+            Route::get('akreditasi', [UserPembinaanController::class, 'indexAkreditasi'])
+                ->name('akreditasi');
+            Route::get('indeksasi', [UserPembinaanController::class, 'indexIndeksasi'])
+                ->name('indeksasi');
+
             Route::get('programs/{pembinaan}', [UserPembinaanController::class, 'show'])
                 ->name('programs.show');
             Route::get('programs/{pembinaan}/register', [UserPembinaanController::class, 'registerForm'])

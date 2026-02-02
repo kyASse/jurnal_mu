@@ -40,10 +40,10 @@ class JournalController extends Controller
             $query->search($request->search);
         }
 
-        // Apply status filter
-        if ($request->filled('status')) {
-            $query->byAssessmentStatus($request->status);
-        }
+        // // Deprecated: Status filter is no longer used
+        // if ($request->filled('status')) {
+        //     $query->byAssessmentStatus($request->status);
+        // }
 
         // Apply SINTA rank filter
         if ($request->filled('sinta_rank')) {
@@ -60,10 +60,13 @@ class JournalController extends Controller
             $query->byIndexation($request->indexation);
         }
 
-        // Apply Dikti accreditation filter
-        if ($request->filled('accreditation_grade')) {
-            $query->byAccreditationGrade($request->accreditation_grade);
-        }
+        // // Deprecated: Accreditation Dikti filter is no longer used
+        // if ($request->filled('accreditation_grade')) {
+        //     $query->byAccreditationGrade($request->accreditation_grade);
+        // }
+
+        // Calculate statistics for dashboard (before pagination)
+        $statistics = $this->calculateJournalStatistics($authUser->university_id);
 
         // Paginate results
         $journals = $query
@@ -105,6 +108,7 @@ class JournalController extends Controller
             ->get();
 
         $sintaRanks = collect([
+            ['value' => 'non_sinta', 'label' => 'Non Sinta'],
             ['value' => 1, 'label' => 'SINTA 1'],
             ['value' => 2, 'label' => 'SINTA 2'],
             ['value' => 3, 'label' => 'SINTA 3'],
@@ -113,11 +117,21 @@ class JournalController extends Controller
             ['value' => 6, 'label' => 'SINTA 6'],
         ]);
 
-        $statusOptions = collect([
-            ['value' => 'draft', 'label' => 'Draft'],
-            ['value' => 'submitted', 'label' => 'Submitted'],
-            ['value' => 'reviewed', 'label' => 'Reviewed'],
-        ]);
+        // Deprecated: Status filter is no longer used in Admin Kampus Journals
+        // $statusOptions = collect([
+        //     ['value' => 'draft', 'label' => 'Draft'],
+        //     ['value' => 'submitted', 'label' => 'Submitted'],
+        //     ['value' => 'reviewed', 'label' => 'Reviewed'],
+        // ]);
+
+        $indexationOptions = collect(Journal::getIndexationPlatforms())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
+        // Deprecated: Dikti Accreditation Grade filter is no longer used in Admin Kampus Journals
+        // $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
+        //     ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+        //     ->values();
 
         $indexationOptions = collect(Journal::getIndexationPlatforms())
             ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
@@ -129,13 +143,109 @@ class JournalController extends Controller
 
         return Inertia::render('AdminKampus/Journals/Index', [
             'journals' => $journals,
-            'filters' => $request->only(['search', 'status', 'sinta_rank', 'scientific_field_id', 'indexation', 'accreditation_grade']),
+            'statistics' => $statistics,
+            'filters' => $request->only(['search', 'sinta_rank', 'scientific_field_id', 'indexation']),
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
-            'statusOptions' => $statusOptions,
             'indexationOptions' => $indexationOptions,
-            'accreditationGradeOptions' => $accreditationGradeOptions,
+            // Deprecated filters - no longer passed to frontend
+            // 'statusOptions' => $statusOptions,
+            // 'accreditationGradeOptions' => $accreditationGradeOptions,
         ]);
+    }
+
+    /**
+     * Calculate journal statistics for the dashboard.
+     *
+     * Aggregates data by indexation platforms, SINTA ranks, and scientific fields.
+     */
+    private function calculateJournalStatistics(int $universityId): array
+    {
+        // Get all journals for this university
+        $journals = Journal::where('university_id', $universityId)
+            ->with('scientificField')
+            ->get();
+
+        $totalJournals = $journals->count();
+
+        // Calculate totals
+        $indexedJournals = $journals->filter(fn ($j) => ! empty($j->indexations))->count();
+        $sintaJournals = $journals->filter(fn ($j) => $j->sinta_rank !== null)->count();
+        $nonSintaJournals = $totalJournals - $sintaJournals;
+
+        // Aggregate by indexation
+        $indexationCounts = [];
+        foreach ($journals as $journal) {
+            if ($journal->indexations && is_array($journal->indexations)) {
+                foreach (array_keys($journal->indexations) as $platform) {
+                    $indexationCounts[$platform] = ($indexationCounts[$platform] ?? 0) + 1;
+                }
+            }
+        }
+
+        $byIndexation = collect($indexationCounts)
+            ->map(fn ($count, $name) => [
+                'name' => $name,
+                'count' => $count,
+                'percentage' => $totalJournals > 0 ? round(($count / $totalJournals) * 100, 1) : 0,
+            ])
+            ->sortByDesc('count')
+            ->values()
+            ->toArray();
+
+        // Aggregate by SINTA rank
+        $sintaGroups = $journals->groupBy('sinta_rank');
+        $byAccreditation = [];
+
+        // Non-Sinta journals
+        $byAccreditation[] = [
+            'sinta_rank' => null,
+            'label' => 'Non-Sinta',
+            'count' => $nonSintaJournals,
+            'percentage' => $totalJournals > 0 ? round(($nonSintaJournals / $totalJournals) * 100, 1) : 0,
+        ];
+
+        // SINTA 1-6
+        for ($rank = 1; $rank <= 6; $rank++) {
+            $count = $sintaGroups->get($rank)?->count() ?? 0;
+            $byAccreditation[] = [
+                'sinta_rank' => $rank,
+                'label' => "SINTA {$rank}",
+                'count' => $count,
+                'percentage' => $totalJournals > 0 ? round(($count / $totalJournals) * 100, 1) : 0,
+            ];
+        }
+
+        // Aggregate by scientific field
+        $fieldGroups = $journals->filter(fn ($j) => $j->scientificField !== null)
+            ->groupBy('scientific_field_id');
+
+        $byScientificField = $fieldGroups->map(function ($group) use ($totalJournals) {
+            $field = $group->first()->scientificField;
+            $count = $group->count();
+
+            return [
+                'id' => $field->id,
+                'name' => $field->name,
+                'count' => $count,
+                'percentage' => $totalJournals > 0 ? round(($count / $totalJournals) * 100, 1) : 0,
+            ];
+        })
+            ->sortByDesc('count')
+            ->values()
+            ->toArray();
+
+        return [
+            'totals' => [
+                'total_journals' => $totalJournals,
+                'indexed_journals' => $indexedJournals,
+                'sinta_journals' => $sintaJournals,
+                'non_sinta_journals' => $nonSintaJournals,
+            ],
+            'by_indexation' => $byIndexation,
+            'by_accreditation' => $byAccreditation,
+            'by_scientific_field' => $byScientificField,
+        ];
     }
 
     /**

@@ -5,7 +5,7 @@
  * List view for managing Pembinaan registrations from Admin Kampus's university.
  * Admin Kampus can view, filter, approve/reject registrations, and assign reviewers.
  *
- * @route GET /admin-kampus/pembinaan
+ * @route GET /admin-kampus/pembinaan/akreditasi | GET /admin-kampus/pembinaan/indeksasi
  *
  * @features
  * - Paginated list of registrations from own university
@@ -14,6 +14,7 @@
  * - Search by journal name/ISSN
  * - Status badges with color coding
  * - Quick view action
+ * - Category-filtered registrations (Akreditasi or Indeksasi)
  *
  * @author JurnalMU Team
  */
@@ -28,17 +29,6 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Award, ChevronLeft, ChevronRight, Eye, FileText, Search } from 'lucide-react';
 import { useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-    {
-        title: 'Pembinaan',
-        href: '/admin-kampus/pembinaan',
-    },
-];
-
 interface Props {
     registrations: PaginatedData<PembinaanRegistration>;
     filters: {
@@ -46,20 +36,37 @@ interface Props {
         pembinaan_id?: string;
         search?: string;
     };
+    category: 'akreditasi' | 'indeksasi';
 }
 
-export default function PembinaanIndex({ registrations, filters }: Props) {
+export default function PembinaanIndex({ registrations, filters, category }: Props) {
+    const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+        },
+        {
+            title: 'Pembinaan',
+            href: '#',
+        },
+        {
+            title: categoryLabel,
+            href: `/admin-kampus/pembinaan/${category}`,
+        },
+    ];
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || '');
 
     const handleSearch = (value: string) => {
         setSearch(value);
-        router.get(route('admin-kampus.pembinaan.index'), { search: value, status }, { preserveState: true, replace: true });
+        router.get(route(`admin-kampus.pembinaan.${category}`), { search: value, status }, { preserveState: true, replace: true });
     };
 
     const handleStatusFilter = (value: string) => {
         setStatus(value);
-        router.get(route('admin-kampus.pembinaan.index'), { search, status: value || undefined }, { preserveState: true, replace: true });
+        router.get(route(`admin-kampus.pembinaan.${category}`), { search, status: value || undefined }, { preserveState: true, replace: true });
     };
 
     const getStatusBadge = (status: string) => {
@@ -81,7 +88,7 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Pembinaan Registrations" />
+            <Head title={`Pembinaan ${categoryLabel} Registrations`} />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
@@ -91,9 +98,9 @@ export default function PembinaanIndex({ registrations, filters }: Props) {
                             <div>
                                 <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
                                     <Award className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                                    Pembinaan Registrations
+                                    Pembinaan {categoryLabel} Registrations
                                 </h1>
-                                <p className="mt-1 text-muted-foreground">Review and manage journal registrations from your university</p>
+                                <p className="mt-1 text-muted-foreground">Review and manage {category} journal registrations from your university</p>
                             </div>
                         </div>
                     </div>

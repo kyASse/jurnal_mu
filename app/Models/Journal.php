@@ -135,11 +135,18 @@ class Journal extends Model
 
     /**
      * Scope to filter by SINTA rank
+     *
+     * @param  mixed  $rank  - integer (1-6) for specific rank, 'non_sinta' for journals without SINTA rank
      */
-    public function scopeBySintaRank($query, ?int $rank)
+    public function scopeBySintaRank($query, $rank)
     {
         if (! $rank) {
             return $query;
+        }
+
+        // Handle "Non Sinta" filter
+        if ($rank === 'non_sinta') {
+            return $query->whereNull('sinta_rank');
         }
 
         return $query->where('sinta_rank', $rank);

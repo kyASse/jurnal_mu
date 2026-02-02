@@ -34,6 +34,7 @@ import { useRef, useState } from 'react';
 interface Props {
     program: Pembinaan;
     journals: Journal[];
+    category: 'akreditasi' | 'indeksasi';
 }
 
 interface UploadedFile {
@@ -53,7 +54,7 @@ const DOCUMENT_TYPES = [
     { value: 'other', label: 'Other Document' },
 ];
 
-export default function PembinaanRegister({ program, journals }: Props) {
+export default function PembinaanRegister({ program, journals, category }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -61,7 +62,11 @@ export default function PembinaanRegister({ program, journals }: Props) {
         },
         {
             title: 'Pembinaan',
-            href: route('user.pembinaan.index'),
+            href: '#',
+        },
+        {
+            title: category.charAt(0).toUpperCase() + category.slice(1),
+            href: route(`user.pembinaan.${category}`),
         },
         {
             title: program.name,
