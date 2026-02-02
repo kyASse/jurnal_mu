@@ -14,9 +14,25 @@ use Inertia\Response;
 class PembinaanController extends Controller
 {
     /**
-     * Display registrations from the admin's university.
+     * Display Akreditasi registrations from the admin's university.
      */
-    public function index(Request $request): Response
+    public function indexAkreditasi(Request $request): Response
+    {
+        return $this->indexByCategory($request, 'akreditasi');
+    }
+
+    /**
+     * Display Indeksasi registrations from the admin's university.
+     */
+    public function indexIndeksasi(Request $request): Response
+    {
+        return $this->indexByCategory($request, 'indeksasi');
+    }
+
+    /**
+     * Common method to display registrations by category.
+     */
+    private function indexByCategory(Request $request, string $category): Response
     {
         $this->authorize('viewAny', PembinaanRegistration::class);
 
@@ -26,7 +42,10 @@ class PembinaanController extends Controller
             'journal',
             'user',
             'reviewer',
-        ])->forUniversity($user->university_id);
+        ])->forUniversity($user->university_id)
+        ->whereHas('pembinaan', function ($q) use ($category) {
+            $q->where('category', $category);
+        });
 
         // Apply filters
         if ($request->filled('status')) {
@@ -55,6 +74,7 @@ class PembinaanController extends Controller
                 'pembinaan_id' => $request->pembinaan_id,
                 'search' => $request->search,
             ],
+            'category' => $category,
         ]);
     }
 
