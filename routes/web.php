@@ -312,7 +312,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('save-draft');
             Route::get('attachments/{attachment}', [AssessmentController::class, 'downloadAttachment'])
                 ->name('attachments.download');
-            
+
             // Assessment Issues Management
             Route::prefix('{assessment}/issues')->name('issues.')->group(function () {
                 Route::post('/', [\App\Http\Controllers\User\AssessmentIssueController::class, 'store'])
@@ -348,7 +348,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('registrations.upload');
             Route::get('attachments/{attachment}', [UserPembinaanController::class, 'downloadAttachment'])
                 ->name('attachments.download');
-            
+
             // Create assessment for pembinaan registration
             Route::post('registrations/{registration}/create-assessment', [UserPembinaanController::class, 'createAssessment'])
                 ->name('registrations.create-assessment');
