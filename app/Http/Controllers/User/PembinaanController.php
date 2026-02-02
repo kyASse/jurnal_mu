@@ -259,4 +259,39 @@ class PembinaanController extends Controller
 
         return Storage::disk('public')->download($attachment->file_path, $attachment->file_name);
     }
+
+    /**
+     * Create assessment for a pembinaan registration.
+     */
+    public function createAssessment(Request $request, PembinaanRegistration $registration): RedirectResponse
+    {
+        $this->authorize('createAssessment', $registration);
+
+        // Validate registration is approved
+        if ($registration->status !== 'approved') {
+            return back()->with('error', 'Pembinaan belum disetujui. Hanya pembinaan yang disetujui dapat mengisi assessment.');
+        }
+
+        // Validate user owns this registration
+        if ($registration->user_id !== $request->user()->id) {
+            return back()->with('error', 'Anda tidak memiliki akses ke pembinaan ini.');
+        }
+
+        // Check if assessment already exists
+        if ($registration->assessment) {
+            return redirect()->route('user.assessments.edit', $registration->assessment->id)
+                ->with('info', 'Anda sudah memiliki assessment untuk pembinaan ini.');
+        }
+
+        // Create new assessment
+        $assessment = \App\Models\JournalAssessment::create([
+            'journal_id' => $registration->journal_id,
+            'user_id' => $request->user()->id,
+            'pembinaan_registration_id' => $registration->id,
+            'status' => 'draft',
+        ]);
+
+        return redirect()->route('user.assessments.edit', $assessment->id)
+            ->with('success', 'Assessment berhasil dibuat. Silakan isi form assessment.');
+    }
 }
