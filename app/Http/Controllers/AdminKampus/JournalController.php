@@ -230,7 +230,8 @@ class JournalController extends Controller
         $totalJournals = $journals->count();
 
         // Calculate totals
-        $indexedJournals = $journals->filter(fn ($j) => ! empty($j->indexations))->count();
+        // Note: "Indexed journals" means Scopus-indexed only (as per meeting notes 02 Feb 2026)
+        $indexedJournals = $journals->filter(fn ($j) => isset($j->indexations['Scopus']))->count();
         $sintaJournals = $journals->filter(fn ($j) => $j->sinta_rank !== null)->count();
         $nonSintaJournals = $totalJournals - $sintaJournals;
 
