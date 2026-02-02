@@ -105,11 +105,6 @@ export function AppSidebar() {
                     { title: 'Indeksasi', href: route('admin-kampus.pembinaan.indeksasi') },
                 ],
             },
-            {
-                title: 'Assessments',
-                href: route('admin-kampus.assessments.index'),
-                icon: FileText,
-            },
         ];
 
         // Add Reviewer menu only if user has reviewer role
@@ -133,11 +128,6 @@ export function AppSidebar() {
                 title: 'Jurnal',
                 href: route('user.jurnal.index'),
                 icon: BookOpen,
-            },
-            {
-                title: 'Assessments',
-                href: route('user.assessments.index'),
-                icon: FileText,
             },
             {
                 title: 'Pembinaan',
