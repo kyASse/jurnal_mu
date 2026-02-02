@@ -61,29 +61,36 @@ Berikut adalah daftar perbaikan dan enhancement yang harus diimplementasikan ber
 ### 2. **Fitur Pembinaan - Navigation Structure**
 
 #### Menu Navigation Redesign
-- [ ] **Pisahkan Pembinaan menjadi 2 sub-menu di navigasi**
+- [x] **Pisahkan Pembinaan menjadi 2 sub-menu di navigasi** - **IMPLEMENTED (2 Feb 2026)**
   - **Pembinaan Akreditasi**
     - Menu tersendiri untuk pembinaan terkait akreditasi
     - Menampilkan pembinaan dengan kategori "Akreditasi"
     - User mendaftar dan mengikuti pembinaan akreditasi
+    - Route: `/user/pembinaan/akreditasi` dan `/admin-kampus/pembinaan/akreditasi`
   
   - **Pembinaan Indeksasi**
     - Menu tersendiri untuk pembinaan terkait indeksasi
     - Menampilkan pembinaan dengan kategori "Indeksasi"
     - User mendaftar dan mengikuti pembinaan indeksasi
+    - Route: `/user/pembinaan/indeksasi` dan `/admin-kampus/pembinaan/indeksasi`
 
-#### Navigation Structure Example
+#### Navigation Structure Implementation
 ```
-📋 Pembinaan
-  ├── 📊 Pembinaan Akreditasi
-  │   ├── List Pembinaan Akreditasi
-  │   ├── Daftar Pembinaan
-  │   └── Assessment Akreditasi
-  └── 🔍 Pembinaan Indeksasi
-      ├── List Pembinaan Indeksasi
-      ├── Daftar Pembinaan
-      └── Assessment Indeksasi
+📋 Pembinaan (parent, href: '#')
+  ├── 📊 Akreditasi
+  │   ├── User: route('user.pembinaan.akreditasi')
+  │   └── Admin Kampus: route('admin-kampus.pembinaan.akreditasi')
+  └── 🔍 Indeksasi
+      ├── User: route('user.pembinaan.indeksasi')
+      └── Admin Kampus: route('admin-kampus.pembinaan.indeksasi')
 ```
+
+**Implementation Details:**
+- ✅ Old `/pembinaan` route removed - users must choose category from navigation
+- ✅ Category filtering implemented in controllers via `->byCategory($category)`
+- ✅ Navigation uses nested structure with `items` property in app-sidebar.tsx
+- ✅ Page components accept `category` prop for dynamic breadcrumbs and titles
+- ✅ Both User and Admin Kampus roles have category-specific routes and pages
 
 #### Clarification: Assessment adalah Bagian dari Pembinaan
 - [ ] **Assessment tetap bagian dari flow pembinaan**
@@ -289,7 +296,7 @@ ADD FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL;
 ### Phase 1 (High Priority - Week 1)
 1. ✅ Admin Kampus Journal List: Filter improvements (Non-Sinta, remove redundant filters)
 2. ✅ Admin Kampus Journal List: Statistics dashboard di header - **COMPLETED (2 Feb 2026)**
-3. ✅ Pembinaan Navigation: Split into Akreditasi & Indeksasi sub-menus
+3. ✅ Pembinaan Navigation: Split into Akreditasi & Indeksasi sub-menus - **COMPLETED (2 Feb 2026)**
 
 ### Phase 2 (Medium Priority - Week 2)
 4. ✅ Assessment: Multiple issues support

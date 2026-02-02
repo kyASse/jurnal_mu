@@ -31,9 +31,12 @@ import { Award, Calendar, CheckCircle2, Clock, FileText, Plus, Users, XCircle, t
 interface Props {
     program: Pembinaan;
     isRegistered: boolean;
+    category: 'akreditasi' | 'indeksasi';
 }
 
-export default function PembinaanShow({ program, isRegistered }: Props) {
+export default function PembinaanShow({ program, isRegistered, category }: Props) {
+    const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+    
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -41,7 +44,11 @@ export default function PembinaanShow({ program, isRegistered }: Props) {
         },
         {
             title: 'Pembinaan',
-            href: route('user.pembinaan.index'),
+            href: '#',
+        },
+        {
+            title: categoryLabel,
+            href: route(`user.pembinaan.${category}`),
         },
         {
             title: program.name,
@@ -297,7 +304,7 @@ export default function PembinaanShow({ program, isRegistered }: Props) {
                                     )}
 
                                     <Button variant="outline" className="w-full" asChild>
-                                        <Link href={route('user.pembinaan.index')}>Back to Programs</Link>
+                                        <Link href={route(`user.pembinaan.${category}`)}>Back to Programs</Link>
                                     </Button>
                                 </CardContent>
                             </Card>

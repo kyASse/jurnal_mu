@@ -44,9 +44,12 @@ import { toast } from 'sonner';
 
 interface Props {
     registration: PembinaanRegistration;
+    category: 'akreditasi' | 'indeksasi';
 }
 
-export default function PembinaanShow({ registration }: Props) {
+export default function PembinaanShow({ registration, category }: Props) {
+    const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+    
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -54,7 +57,11 @@ export default function PembinaanShow({ registration }: Props) {
         },
         {
             title: 'Pembinaan',
-            href: '/admin-kampus/pembinaan',
+            href: '#',
+        },
+        {
+            title: categoryLabel,
+            href: route(`admin-kampus.pembinaan.${category}`),
         },
         {
             title: registration.journal?.title || 'Registration',
@@ -204,7 +211,7 @@ export default function PembinaanShow({ registration }: Props) {
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Button variant="outline" size="icon" asChild>
-                            <Link href={route('admin-kampus.pembinaan.index')}>
+                            <Link href={route(`admin-kampus.pembinaan.${category}`)}>
                                 <ArrowLeft className="h-4 w-4" />
                             </Link>
                         </Button>
