@@ -123,8 +123,10 @@ class JournalAssessment extends Model
 
     /**
      * Get all notes for this assessment (timeline)
+     * 
+     * Note: Named 'assessmentNotes' to avoid conflict with 'notes' column
      */
-    public function notes()
+    public function assessmentNotes()
     {
         return $this->hasMany(AssessmentNote::class, 'journal_assessment_id')
             ->with('user')
