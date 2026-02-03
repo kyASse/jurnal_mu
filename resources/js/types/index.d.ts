@@ -166,6 +166,28 @@ export interface AssessmentIssue {
     updated_at: string;
 }
 
+export interface AssessmentJournalMetadata {
+    id: number;
+    journal_assessment_id: number;
+    volume: string;
+    number: string;
+    year: number;
+    month: number;
+    url_issue?: string;
+    jumlah_negara_editor: number;
+    jumlah_institusi_editor: number;
+    jumlah_negara_reviewer: number;
+    jumlah_institusi_reviewer: number;
+    jumlah_negara_author?: number;
+    jumlah_institusi_author?: number;
+    display_order: number;
+    created_at: string;
+    updated_at: string;
+    // Computed attributes
+    month_name?: string;
+    issue_identifier?: string;
+}
+
 export interface JournalAssessment {
     id: number;
     journal_id: number;
@@ -181,6 +203,14 @@ export interface JournalAssessment {
     admin_kampus_approved_by?: number;
     admin_kampus_approved_at?: string;
     admin_kampus_approval_notes?: string;
+    // Phase 3: Journal metadata aggregate fields
+    kategori_diusulkan?: string;
+    jumlah_editor?: number;
+    jumlah_reviewer?: number;
+    jumlah_author?: number;
+    jumlah_institusi_editor?: number;
+    jumlah_institusi_reviewer?: number;
+    jumlah_institusi_author?: number;
     total_score?: number;
     max_score?: number;
     percentage?: number;
@@ -194,6 +224,7 @@ export interface JournalAssessment {
     admin_kampus_approver?: User; // Phase 2: Admin Kampus who approved
     responses?: AssessmentResponse[];
     issues?: AssessmentIssue[];
+    journalMetadata?: AssessmentJournalMetadata[]; // Phase 3: Journal issue metadata
     assessmentNotes?: AssessmentNote[]; // Phase 3: Timeline notes (relationship, renamed to avoid column conflict)
 }
 
