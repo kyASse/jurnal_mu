@@ -271,8 +271,8 @@ export default function DiktiAssessmentShow({ assessment, availableReviewers }: 
                     </Card>
 
                     {/* Assessment Notes Timeline */}
-                    {assessment.notes && assessment.notes.length > 0 && (
-                        <AssessmentNotesTimeline notes={assessment.notes} title="Assessment History" />
+                    {assessment.assessmentNotes && assessment.assessmentNotes.length > 0 && (
+                        <AssessmentNotesTimeline notes={assessment.assessmentNotes} title="Assessment History" />
                     )}
                 </div>
 
