@@ -16,9 +16,12 @@ class JournalFactory extends Factory
      */
     public function definition(): array
     {
+        $university = \App\Models\University::factory()->create();
+        $user = \App\Models\User::factory()->user($university->id)->create();
+
         return [
-            'university_id' => \App\Models\University::factory(),
-            'user_id' => \App\Models\User::factory(),
+            'university_id' => $university->id,
+            'user_id' => $user->id,
             'title' => $this->faker->sentence(4),
             'issn' => $this->faker->numerify('####-####'),
             'e_issn' => $this->faker->numerify('####-####'),
