@@ -191,21 +191,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
             ->name('assessments.index');
 
-        // Dikti - Reviewer Assignment for Assessments
-        // NOTE: Currently using Super Admin role as Dikti until dedicated Dikti role is created
-        Route::prefix('dikti')->name('dikti.')->group(function () {
-            Route::prefix('assessments')->name('assessments.')->group(function () {
-                Route::get('/', [DiktiAssessmentController::class, 'index'])
-                    ->name('index');
-                Route::get('{assessment}', [DiktiAssessmentController::class, 'show'])
-                    ->name('show');
-                Route::post('{assessment}/assign-reviewer', [DiktiAssessmentController::class, 'assignReviewer'])
-                    ->name('assign-reviewer');
-                Route::post('{assessment}/remove-reviewer', [DiktiAssessmentController::class, 'removeReviewer'])
-                    ->name('remove-reviewer');
-            });
-        });
-
         // Pembinaan Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
             Route::get('/', [AdminPembinaanController::class, 'index'])
@@ -226,6 +211,27 @@ Route::middleware(['auth'])->group(function () {
                 ->name('toggle-status');
         });
 
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dikti Routes (Reviewer Assignment)
+    |--------------------------------------------------------------------------
+    */
+    // Dikti - Reviewer Assignment for Assessments
+    // NOTE: Routes are outside Super Admin middleware to be available in Ziggy for frontend
+    // Authorization is enforced in the DiktiAssessmentController via policies
+    Route::middleware(['auth'])->prefix('dikti')->name('dikti.')->group(function () {
+        Route::prefix('assessments')->name('assessments.')->group(function () {
+            Route::get('/', [DiktiAssessmentController::class, 'index'])
+                ->name('index');
+            Route::get('{assessment}', [DiktiAssessmentController::class, 'show'])
+                ->name('show');
+            Route::post('{assessment}/assign-reviewer', [DiktiAssessmentController::class, 'assignReviewer'])
+                ->name('assign-reviewer');
+            Route::post('{assessment}/remove-reviewer', [DiktiAssessmentController::class, 'removeReviewer'])
+                ->name('remove-reviewer');
+        });
     });
 
     /*

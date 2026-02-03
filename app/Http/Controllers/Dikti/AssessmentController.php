@@ -19,6 +19,20 @@ use Inertia\Response;
 class AssessmentController extends Controller
 {
     /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        // Ensure only Super Admin can access Dikti routes
+        $this->middleware(function ($request, $next) {
+            if (!$request->user() || !$request->user()->isSuperAdmin()) {
+                abort(403, 'Unauthorized access to Dikti assessment management.');
+            }
+            return $next($request);
+        });
+    }
+
+    /**
      * Display assessments pending reviewer assignment.
      * 
      * @route GET /dikti/assessments
