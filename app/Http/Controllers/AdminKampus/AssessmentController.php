@@ -159,10 +159,12 @@ class AssessmentController extends Controller
         ]);
 
         $assessment->update([
-            'status' => 'approved_by_lppm', // Admin Kampus approved, waiting for reviewer assignment
+            'status' => 'reviewed', // Admin Kampus approved, assessment reviewed
             'admin_kampus_approved_by' => $request->user()->id,
             'admin_kampus_approved_at' => now(),
             'admin_kampus_approval_notes' => $validated['admin_notes'] ?? null,
+            'reviewed_by' => $request->user()->id,
+            'reviewed_at' => now(),
         ]);
 
         // Create assessment note for timeline
