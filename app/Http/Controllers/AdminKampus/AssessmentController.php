@@ -112,6 +112,7 @@ class AssessmentController extends Controller
             'journal.scientificField',
             'user',
             'reviewer',
+            'assessmentNotes.user',
             'responses.evaluationIndicator.subCategory.category',
             'responses.attachments',
         ]);
@@ -168,7 +169,7 @@ class AssessmentController extends Controller
         ]);
 
         // Create assessment note for timeline
-        $assessment->notes()->create([
+        $assessment->assessmentNotes()->create([
             'user_id' => $request->user()->id,
             'author_role' => 'Admin Kampus',
             'note_type' => 'approval',
@@ -205,7 +206,7 @@ class AssessmentController extends Controller
         ]);
 
         // Create assessment note for timeline
-        $assessment->notes()->create([
+        $assessment->assessmentNotes()->create([
             'user_id' => $request->user()->id,
             'author_role' => 'Admin Kampus',
             'note_type' => 'rejection',

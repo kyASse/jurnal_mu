@@ -88,7 +88,7 @@ class AssessmentController extends Controller
             'reviewer',
             'adminKampusApprover',
             'responses.evaluationIndicator',
-            'notes' => function ($query) {
+            'assessmentNotes' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             },
         ]);
@@ -137,7 +137,7 @@ class AssessmentController extends Controller
         ]);
 
         // Create assessment note for timeline
-        $assessment->notes()->create([
+        $assessment->assessmentNotes()->create([
             'user_id' => $request->user()->id,
             'author_role' => 'Dikti',
             'note_type' => 'general',
@@ -175,7 +175,7 @@ class AssessmentController extends Controller
         ]);
 
         // Create assessment note for timeline
-        $assessment->notes()->create([
+        $assessment->assessmentNotes()->create([
             'user_id' => $request->user()->id,
             'author_role' => 'Dikti',
             'note_type' => 'general',
