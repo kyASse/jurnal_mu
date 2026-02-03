@@ -184,7 +184,7 @@ export interface JournalAssessment {
     total_score?: number;
     max_score?: number;
     percentage?: number;
-    notes?: string;
+    notes?: string; // Column: general notes text field
     admin_notes?: string;
     created_at: string;
     updated_at: string;
@@ -194,7 +194,7 @@ export interface JournalAssessment {
     admin_kampus_approver?: User; // Phase 2: Admin Kampus who approved
     responses?: AssessmentResponse[];
     issues?: AssessmentIssue[];
-    assessment_notes?: AssessmentNote[]; // Phase 2: Timeline notes
+    assessmentNotes?: AssessmentNote[]; // Phase 3: Timeline notes (relationship, renamed to avoid column conflict)
 }
 
 // Phase 2: Assessment Note for timeline
