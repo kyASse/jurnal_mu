@@ -15,30 +15,45 @@ Berikut adalah daftar perbaikan dan enhancement yang harus diimplementasikan ber
 ### 1. **Definisi Jurnal Terindeks**
 
 #### Clarification on Indexed Journals
-- [ ] **Jurnal terindeks = Scopus ONLY**
+- [x] **Jurnal terindeks = Scopus ONLY** ✅ **COMPLETED (Phase 3)**
   - Definisi "terindeks" dalam sistem ini hanya merujuk pada **Scopus**
   - Indexation platforms lain (WoS, DOAJ, dll) tetap dicatat tapi tidak dikategorikan sebagai "terindeks"
   - Update label/terminology di UI untuk konsistensi
   - Impact: Statistics dashboard dan filter perlu adjustment
+  - **Implementation**: 
+    - `Journal::isIndexedInScopus()` method added
+    - `Journal::scopeIndexedInScopus()` query scope
+    - StatisticsDashboard label updated to "Jurnal Terindeks Scopus"
+    - Controller statistics calculation updated
 
 ---
 
 ### 2. **Admin Kampus (LPPM) - Approval & Monitoring**
 
 #### Admin Kampus Role in Assessment
-- [ ] **Admin Kampus tidak melakukan assign reviewer**
+- [x] **Admin Kampus tidak melakukan assign reviewer** ✅ **COMPLETED (Phase 3)**
   - Admin Kampus berperan sebagai **LPPM** (Lembaga Penelitian dan Pengabdian Masyarakat)
   - Admin Kampus dapat approve/reject assessment dari user di universitasnya
   - Admin Kampus **TIDAK** dapat assign reviewer ke assessment
   - Assignment reviewer dilakukan oleh **Dikti** (lihat poin 6)
+  - **Implementation**:
+    - `AssessmentController@approve()` - Admin Kampus approves assessment
+    - `AssessmentController@requestRevision()` - Admin Kampus rejects with notes
+    - Policy enforcement via `JournalAssessmentPolicy::review()`
+    - Test coverage: `AssessmentApprovalTest.php` (7/7 tests ✅)
 
 #### Admin Kampus Capabilities
-- [ ] **Admin Kampus dapat melihat:**
-  - Semua jurnal di sistem
+- [x] **Admin Kampus dapat melihat:** ✅ **COMPLETED (Phase 3)**
+  - Semua jurnal di sistem (scoped by university_id)
   - Semua assessment yang sudah disubmit
   - Assessment yang sudah di-approve
   - Assessment yang sudah di-review
   - Hasil assessment dan feedback reviewer
+  - **Implementation**:
+    - Index page with status filters
+    - Show page with assessment details
+    - Status timeline component for visual progress
+    - Assessment notes timeline for activity history
 
 ---
 
