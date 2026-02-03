@@ -82,7 +82,7 @@ export function AppSidebar() {
                 icon: Award,
             },
             {
-                title: 'Dikti - Reviewer Assignment',
+                title: 'Reviewer Assignment',
                 href: route('dikti.assessments.index'),
                 icon: UserCheck,
             },
