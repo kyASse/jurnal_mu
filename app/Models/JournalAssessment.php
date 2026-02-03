@@ -36,6 +36,14 @@ class JournalAssessment extends Model
         'percentage',
         'notes',
         'admin_notes',
+        // New journal metadata fields
+        'kategori_diusulkan',
+        'jumlah_editor',
+        'jumlah_reviewer',
+        'jumlah_author',
+        'jumlah_institusi_editor',
+        'jumlah_institusi_reviewer',
+        'jumlah_institusi_author',
     ];
 
     /**
@@ -52,6 +60,12 @@ class JournalAssessment extends Model
         'total_score' => 'decimal:2',
         'max_score' => 'decimal:2',
         'percentage' => 'decimal:2',
+        'jumlah_editor' => 'integer',
+        'jumlah_reviewer' => 'integer',
+        'jumlah_author' => 'integer',
+        'jumlah_institusi_editor' => 'integer',
+        'jumlah_institusi_reviewer' => 'integer',
+        'jumlah_institusi_author' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -111,6 +125,17 @@ class JournalAssessment extends Model
         return $this->hasMany(AssessmentIssue::class, 'journal_assessment_id')
             ->orderBy('display_order')
             ->orderBy('created_at');
+    }
+
+    /**
+     * Get all journal metadata entries for this assessment
+     */
+    public function journalMetadata()
+    {
+        return $this->hasMany(AssessmentJournalMetadata::class, 'journal_assessment_id')
+            ->orderBy('display_order')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc');
     }
 
     /**
