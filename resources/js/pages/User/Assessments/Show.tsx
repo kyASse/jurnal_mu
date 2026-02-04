@@ -9,7 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import ReviewerFeedback from '@/components/ReviewerFeedback';
+import JournalMetadataManager from '@/components/JournalMetadataManager';
 import AppLayout from '@/layouts/app-layout';
+import type { AssessmentJournalMetadata } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, CheckCircle, Download, Edit, FileText, Send, TrendingUp, XCircle } from 'lucide-react';
 
@@ -69,6 +71,14 @@ interface Assessment {
     reviewed_at: string | null;
     created_at: string;
     updated_at: string;
+    kategori_diusulkan?: string | null;
+    jumlah_editor?: number | null;
+    jumlah_reviewer?: number | null;
+    jumlah_author?: number | null;
+    jumlah_institusi_editor?: number | null;
+    jumlah_institusi_reviewer?: number | null;
+    jumlah_institusi_author?: number | null;
+    journalMetadata?: AssessmentJournalMetadata[];
 }
 
 interface Props {
@@ -207,7 +217,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                 {flash?.success && <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-800">{flash.success}</div>}
 
                 {/* Reviewer Feedback */}
-                <ReviewerFeedback assessment={assessment} />
+                <ReviewerFeedback assessment={assessment as any} />
 
                 {/* Summary Card */}
                 <Card>
@@ -265,6 +275,89 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Kategori yang Diusulkan */}
+                {assessment.kategori_diusulkan && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Kategori yang Diusulkan</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Badge variant="outline" className="text-lg px-4 py-2">
+                                {assessment.kategori_diusulkan}
+                            </Badge>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Aggregate Counts */}
+                {(assessment.jumlah_editor !== null ||
+                    assessment.jumlah_reviewer !== null ||
+                    assessment.jumlah_author !== null) && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Jumlah Total Kontributor</CardTitle>
+                            <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {assessment.jumlah_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_author}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_author}</div>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Journal Metadata */}
+                {assessment.journalMetadata && assessment.journalMetadata.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Data Terbitan Jurnal</CardTitle>
+                            <CardDescription>Informasi per terbitan (volume, nomor, tahun)</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <JournalMetadataManager
+                                metadata={assessment.journalMetadata}
+                                onChange={() => {}}
+                                readOnly={true}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Score Summary */}
                 {assessment.status !== 'draft' && (
