@@ -1,5 +1,4 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { JournalAssessment } from '@/types';
 import { AlertCircle, CheckCircle, Info } from 'lucide-react';
@@ -22,9 +21,16 @@ export default function ReviewerFeedback({ assessment }: ReviewerFeedbackProps) 
 
     const isApproved = assessment.status === 'reviewed';
     const isRevisionRequested = assessment.status === 'draft' && assessment.reviewed_at;
+    
+    const cardClassName = isApproved 
+        ? 'border-green-200 bg-green-50' 
+        : 'border-yellow-200 bg-yellow-50';
+    
+    const titleClassName = isApproved ? 'text-green-900' : 'text-yellow-900';
+    const alertVariant = isApproved ? 'default' : 'destructive';
 
     return (
-        <Card className={isApproved ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'}>
+        <Card className={cardClassName}>
             <CardHeader>
                 <div className="flex items-center gap-2">
                     {isApproved ? (
@@ -32,7 +38,7 @@ export default function ReviewerFeedback({ assessment }: ReviewerFeedbackProps) 
                     ) : (
                         <AlertCircle className="h-5 w-5 text-yellow-600" />
                     )}
-                    <CardTitle className={isApproved ? 'text-green-900' : 'text-yellow-900'}>
+                    <CardTitle className={titleClassName}>
                         {isApproved ? 'Assessment Approved' : 'Revision Requested'}
                     </CardTitle>
                 </div>
@@ -45,7 +51,7 @@ export default function ReviewerFeedback({ assessment }: ReviewerFeedbackProps) 
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Alert variant={isApproved ? 'default' : 'destructive'} className="bg-white">
+                <Alert variant={alertVariant} className="bg-white">
                     <Info className="h-4 w-4" />
                     <AlertTitle className="mb-2 font-semibold">Administrator's Feedback</AlertTitle>
                     <AlertDescription className="whitespace-pre-wrap text-sm leading-relaxed">

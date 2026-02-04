@@ -352,7 +352,10 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                                 {review.recommendation && (
                                                     <div>
                                                         <p className="mb-1 text-sm font-medium">Recommendation:</p>
-                                                        <Badge variant="outline" className="capitalize">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="inline-flex break-words whitespace-normal capitalize"
+                                                        >
                                                             {review.recommendation}
                                                         </Badge>
                                                     </div>
@@ -383,15 +386,22 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                             <div className="flex items-center justify-between rounded-lg border p-4">
                                                 <div>
                                                     <p className="font-semibold">Assessment Status</p>
-                                                    <Badge className="mt-1" variant={
-                                                        registration.assessment.status === 'draft' ? 'secondary' :
-                                                        registration.assessment.status === 'submitted' ? 'default' :
-                                                        'outline'
-                                                    }>
-                                                        {registration.assessment.status === 'draft' && 'Draft'}
-                                                        {registration.assessment.status === 'submitted' && 'Submitted - Pending Review'}
-                                                        {registration.assessment.status === 'reviewed' && 'Reviewed'}
-                                                    </Badge>
+                                                    {(() => {
+                                                        const status = registration.assessment.status;
+                                                        const variant =
+                                                            status === 'draft' ? 'secondary' :
+                                                            status === 'submitted' ? 'default' :
+                                                            'outline';
+                                                        const label =
+                                                            status === 'draft' ? 'Draft' :
+                                                            status === 'submitted' ? 'Submitted - Pending Review' :
+                                                            'Reviewed';
+                                                        return (
+                                                            <Badge className="mt-1" variant={variant}>
+                                                                {label}
+                                                            </Badge>
+                                                        );
+                                                    })()}
                                                 </div>
                                                 <div className="text-right text-sm text-muted-foreground">
                                                     {registration.assessment.updated_at && (
@@ -590,7 +600,8 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                         <AlertDialogCancel>Keep Registration</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleCancelRegistration}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className={`bg-destructive text-destructive-foreground
+                                hover:bg-destructive/90`}
                         >
                             Yes, Cancel Registration
                         </AlertDialogAction>
