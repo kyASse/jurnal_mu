@@ -302,6 +302,9 @@ export interface PembinaanRegistration {
     reviewed_at?: string;
     reviewed_by?: number;
     rejection_reason?: string;
+    supporting_document?: string; // Optional supporting document path
+    supporting_document_url?: string; // Download URL for supporting document
+    supporting_document_filename?: string; // Filename of supporting document
     pembinaan?: Pembinaan;
     journal?: Journal;
     user?: User;
