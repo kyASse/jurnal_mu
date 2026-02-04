@@ -581,7 +581,7 @@ export default function PembinaanShow({ registration, category }: Props) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-            */
+            */}
         </AppLayout>
     );
 }
