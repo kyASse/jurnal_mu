@@ -252,26 +252,33 @@ interface Note {
 ### 11. **Pembinaan Registration - Optional Document Upload**
 
 #### Upload Document Feature
-- [ ] **Upload dokumen pendukung (optional)** ⚠️ **NOT YET IMPLEMENTED**
+- [x] **Upload dokumen pendukung (optional)** ✅ **COMPLETED (Feb 4, 2026)**
   - Di halaman register pembinaan, user dapat upload dokumen
   - **Sifat**: Optional (tidak wajib)
   - **Jenis dokumen**: Proposal pembinaan, dokumen pendukung lainnya
   - **Format**: PDF, DOC, DOCX (max 5MB)
   - **Storage**: Laravel Storage → `storage/app/public/pembinaan_documents`
-  - **Status**: Migration for `supporting_document` field not found in `pembinaan_registrations` table
+  - **Implementation**:
+    - Migration: `2026_02_04_040009_add_supporting_document_to_pembinaan_registrations_table.php`
+    - Database field: `supporting_document` (nullable string)
+    - Model helper methods: `hasSupportingDocument()`, `getSupportingDocumentUrlAttribute()`, `getSupportingDocumentFilenameAttribute()`
+    - Controller validation: `'supporting_document' => 'nullable|file|mimes:pdf,doc,docx|max:5120'`
+    - Frontend: File input with upload/remove functionality in [Register.tsx](resources/js/pages/User/Pembinaan/Register.tsx)
+    - Display: Supporting document card in [Registration.tsx](resources/js/pages/User/Pembinaan/Registration.tsx) detail view
 
 #### Implementation
 ```php
 // Migration: add column to pembinaan_registrations table
 Schema::table('pembinaan_registrations', function (Blueprint $table) {
-    $table->string('supporting_document')->nullable()->after('journal_id');
+    $table->string('supporting_document')->nullable()->after('status')
+        ->comment('Path to optional supporting document (proposal, etc.)');
 });
 
 // Controller: Handle file upload
 if ($request->hasFile('supporting_document')) {
-    $path = $request->file('supporting_document')
-        ->store('pembinaan_documents', 'public');
-    $data['supporting_document'] = $path;
+    $file = $request->file('supporting_document');
+    $fileName = time().'_supporting_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.'.$file->getClientOriginalExtension();
+    $supportingDocumentPath = $file->storeAs('pembinaan_documents', $fileName, 'public');
 }
 ```
 
@@ -712,8 +719,8 @@ return (
 7. [x] Status timeline component at top right ✅
 8. [x] Admin Kampus view assessment results and feedback ✅
 
-### Phase 3 (Medium Priority - Week 2-3) ⚠️ **PARTIALLY COMPLETED**
-9. [ ] Supporting document upload in pembinaan registration ⚠️ **PENDING**
+### Phase 3 (Medium Priority - Week 2-3) ✅ **COMPLETED**
+9. [x] Supporting document upload in pembinaan registration ✅ **COMPLETED (Feb 4, 2026)**
 10. [x] Update "indexed journals" definition to Scopus-only ✅
 11. [x] Admin Kampus approval flow testing ✅
 
