@@ -461,6 +461,12 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                                     onClick={() => {
                                                         router.post(
                                                             route('user.pembinaan.registrations.create-assessment', registration.id),
+                                                            {},
+                                                            {
+                                                                onSuccess: () => {
+                                                                    router.reload({ only: ['registration'] });
+                                                                },
+                                                            },
                                                         );
                                                     }}
                                                 >
