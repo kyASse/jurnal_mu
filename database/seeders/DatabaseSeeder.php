@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             EssayQuestionSeeder::class,         // 8. Essay Questions (6 samples)
 
             JournalSeeder::class,           // 9. Journals (depends on: universities, users, scientific_fields)
+            AssessmentSeeder::class,        // 10. Assessments with Journal Metadata (depends on: journals, users, indicators)
         ]);
 
         $this->command->info('');
