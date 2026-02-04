@@ -1,6 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import AssessmentNotesTimeline from '@/components/AssessmentNotesTimeline';
+import StatusTimeline, { type TimelineStep } from '@/components/StatusTimeline';
+import JournalMetadataManager from '@/components/JournalMetadataManager';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, JournalAssessment } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -25,6 +28,36 @@ export default function AssessmentShow({ assessment }: Props) {
         { title: 'Detail', href: route('admin-kampus.assessments.show', assessment.id) },
     ];
 
+    // Build timeline steps
+    const timelineSteps: TimelineStep[] = [
+        {
+            label: 'Submitted by User',
+            status: assessment.submitted_at ? 'completed' : 'pending',
+            timestamp: assessment.submitted_at || undefined,
+        },
+        {
+            label: 'Approved by Admin Kampus',
+            status: assessment.admin_kampus_approved_at ? 'completed' : assessment.status === 'submitted' ? 'active' : 'pending',
+            timestamp: assessment.admin_kampus_approved_at || undefined,
+            note: assessment.admin_kampus_approval_notes || undefined,
+        },
+        {
+            label: 'Reviewer Assigned',
+            status: assessment.reviewer_id ? 'completed' : 'pending',
+            timestamp: assessment.assigned_at || undefined,
+            note: assessment.reviewer ? `Reviewer: ${assessment.reviewer.name}` : undefined,
+        },
+        {
+            label: 'In Review',
+            status: assessment.status === 'in_review' ? 'active' : assessment.status === 'reviewed' ? 'completed' : 'pending',
+        },
+        {
+            label: 'Review Completed',
+            status: assessment.status === 'reviewed' ? 'completed' : 'pending',
+            timestamp: assessment.reviewed_at || undefined,
+        },
+    ];
+
     const getStatusBadge = (status: string) => {
         const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
             draft: 'secondary',
@@ -45,7 +78,9 @@ export default function AssessmentShow({ assessment }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Assessment - ${assessment.journal.title}`} />
 
-            <div className="space-y-6">
+            <div className="flex gap-6">
+                {/* Main Content */}
+                <div className="flex-1 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -128,6 +163,89 @@ export default function AssessmentShow({ assessment }: Props) {
                     </CardContent>
                 </Card>
 
+                {/* Kategori yang Diusulkan */}
+                {assessment.kategori_diusulkan && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Kategori yang Diusulkan</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Badge variant="outline" className="text-lg px-4 py-2">
+                                {assessment.kategori_diusulkan}
+                            </Badge>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Aggregate Counts */}
+                {(assessment.jumlah_editor !== null ||
+                    assessment.jumlah_reviewer !== null ||
+                    assessment.jumlah_author !== null) && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Jumlah Total Kontributor</CardTitle>
+                            <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {assessment.jumlah_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_author}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_author}</div>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Journal Metadata */}
+                {assessment.journalMetadata && assessment.journalMetadata.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Data Terbitan Jurnal</CardTitle>
+                            <CardDescription>Informasi per terbitan (volume, nomor, tahun)</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <JournalMetadataManager
+                                metadata={assessment.journalMetadata}
+                                onChange={() => {}}
+                                readOnly={true}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Responses Summary */}
                 <Card>
                     <CardHeader>
@@ -156,7 +274,20 @@ export default function AssessmentShow({ assessment }: Props) {
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Assessment Notes Timeline */}
+                {assessment.assessmentNotes && assessment.assessmentNotes.length > 0 && (
+                    <AssessmentNotesTimeline notes={assessment.assessmentNotes} title="Assessment History" />
+                )}
             </div>
+
+            {/* Sidebar - Status Timeline */}
+            <div className="w-80">
+                <div className="sticky top-6">
+                    <StatusTimeline steps={timelineSteps} title="Assessment Progress" />
+                </div>
+            </div>
+        </div>
         </AppLayout>
     );
 }

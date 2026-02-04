@@ -249,4 +249,22 @@ class JournalAssessmentPolicy
         // Only Super Admin can force delete
         return $user->isSuperAdmin();
     }
+
+    /**
+     * Determine if the user can assign a reviewer to the assessment.
+     * 
+     * Rules:
+     * - Only Super Admin (acting as Dikti) can assign reviewers
+     * - Assessment must be approved by Admin Kampus first
+     */
+    public function assignReviewer(User $user, JournalAssessment $assessment): bool
+    {
+        // Only Super Admin (Dikti) can assign reviewers
+        if (!$user->isSuperAdmin()) {
+            return false;
+        }
+
+        // Assessment must be in approved_by_lppm status or already in review
+        return in_array($assessment->status, ['approved_by_lppm', 'in_review']);
+    }
 }

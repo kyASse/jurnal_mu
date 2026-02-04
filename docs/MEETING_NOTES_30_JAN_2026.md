@@ -293,15 +293,15 @@ ADD FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL;
 
 ## 📝 Implementation Priority
 
-### Phase 1 (High Priority - Week 1)
+### Phase 1 (High Priority - Week 1-2) - ✅ **COMPLETED (2 Feb 2026)**
 1. ✅ Admin Kampus Journal List: Filter improvements (Non-Sinta, remove redundant filters)
 2. ✅ Admin Kampus Journal List: Statistics dashboard di header - **COMPLETED (2 Feb 2026)**
 3. ✅ Pembinaan Navigation: Split into Akreditasi & Indeksasi sub-menus - **COMPLETED (2 Feb 2026)**
 
-### Phase 2 (Medium Priority - Week 2)
-4. ✅ Assessment: Multiple issues support
-5. ✅ Assessment: Save draft functionality
-6. ✅ Assessment: Display reviewer feedback to user
+### Phase 2 (Medium Priority - Week 2-3) - ✅ **IN PROGRESS**
+4. ✅ Assessment: Multiple issues support - **COMPLETED (2 Feb 2026)**
+5. ✅ Assessment: Save draft functionality - **COMPLETED (2 Feb 2026)**
+6. ⏳ Assessment: Display reviewer feedback to user - **PENDING**
 
 ### Phase 3 (Low Priority - Week 3)
 7. Reviewer: Assessment review interface

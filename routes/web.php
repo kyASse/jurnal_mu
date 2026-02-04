@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dikti\AssessmentController as DiktiAssessmentController;
 use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\ReviewerController as MainReviewerController;
 use App\Http\Controllers\SupportController;
@@ -214,6 +215,27 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Dikti Routes (Reviewer Assignment)
+    |--------------------------------------------------------------------------
+    */
+    // Dikti - Reviewer Assignment for Assessments
+    // NOTE: Routes are outside Super Admin middleware to be available in Ziggy for frontend
+    // Authorization is enforced in the DiktiAssessmentController via policies
+    Route::middleware(['auth'])->prefix('dikti')->name('dikti.')->group(function () {
+        Route::prefix('assessments')->name('assessments.')->group(function () {
+            Route::get('/', [DiktiAssessmentController::class, 'index'])
+                ->name('index');
+            Route::get('{assessment}', [DiktiAssessmentController::class, 'show'])
+                ->name('show');
+            Route::post('{assessment}/assign-reviewer', [DiktiAssessmentController::class, 'assignReviewer'])
+                ->name('assign-reviewer');
+            Route::post('{assessment}/remove-reviewer', [DiktiAssessmentController::class, 'removeReviewer'])
+                ->name('remove-reviewer');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | Admin Kampus Routes
     |--------------------------------------------------------------------------
     */
@@ -308,8 +330,22 @@ Route::middleware(['auth'])->group(function () {
                 ->name('destroy');
             Route::post('{assessment}/submit', [AssessmentController::class, 'submit'])
                 ->name('submit');
+            Route::post('{assessment}/save-draft', [AssessmentController::class, 'saveDraft'])
+                ->name('save-draft');
             Route::get('attachments/{attachment}', [AssessmentController::class, 'downloadAttachment'])
                 ->name('attachments.download');
+
+            // Assessment Issues Management
+            Route::prefix('{assessment}/issues')->name('issues.')->group(function () {
+                Route::post('/', [\App\Http\Controllers\User\AssessmentIssueController::class, 'store'])
+                    ->name('store');
+                Route::put('{issue}', [\App\Http\Controllers\User\AssessmentIssueController::class, 'update'])
+                    ->name('update');
+                Route::delete('{issue}', [\App\Http\Controllers\User\AssessmentIssueController::class, 'destroy'])
+                    ->name('destroy');
+                Route::post('reorder', [\App\Http\Controllers\User\AssessmentIssueController::class, 'reorder'])
+                    ->name('reorder');
+            });
         });
 
         // Pembinaan Registration (v1.1)
@@ -334,6 +370,10 @@ Route::middleware(['auth'])->group(function () {
                 ->name('registrations.upload');
             Route::get('attachments/{attachment}', [UserPembinaanController::class, 'downloadAttachment'])
                 ->name('attachments.download');
+
+            // Create assessment for pembinaan registration
+            Route::post('registrations/{registration}/create-assessment', [UserPembinaanController::class, 'createAssessment'])
+                ->name('registrations.create-assessment');
         });
     });
 

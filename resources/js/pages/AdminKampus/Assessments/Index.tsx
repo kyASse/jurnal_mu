@@ -23,12 +23,20 @@ interface Props {
     filters: {
         status?: string;
         search?: string;
+        period?: string;
+        year?: string;
+        approval_status?: string;
     };
+    availablePeriods?: string[];
+    availableYears?: number[];
 }
 
-export default function AssessmentsIndex({ assessments, filters }: Props) {
+export default function AssessmentsIndex({ assessments, filters, availablePeriods = [], availableYears = [] }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
+    const [period, setPeriod] = useState(filters.period || 'all');
+    const [year, setYear] = useState(filters.year || 'all');
+    const [approvalStatus, setApprovalStatus] = useState(filters.approval_status || 'all');
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
@@ -38,7 +46,13 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
     const debouncedSearch = useDebouncedCallback((value: string) => {
         router.get(
             route('admin-kampus.assessments.index'),
-            { search: value, status: status !== 'all' ? status : undefined },
+            {
+                search: value,
+                status: status !== 'all' ? status : undefined,
+                period: period !== 'all' ? period : undefined,
+                year: year !== 'all' ? year : undefined,
+                approval_status: approvalStatus !== 'all' ? approvalStatus : undefined,
+            },
             { preserveState: true, replace: true },
         );
     }, 500);
@@ -52,7 +66,58 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
         setStatus(value);
         router.get(
             route('admin-kampus.assessments.index'),
-            { status: value !== 'all' ? value : undefined, search },
+            {
+                status: value !== 'all' ? value : undefined,
+                search,
+                period: period !== 'all' ? period : undefined,
+                year: year !== 'all' ? year : undefined,
+                approval_status: approvalStatus !== 'all' ? approvalStatus : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
+
+    const handlePeriodChange = (value: string) => {
+        setPeriod(value);
+        router.get(
+            route('admin-kampus.assessments.index'),
+            {
+                period: value !== 'all' ? value : undefined,
+                status: status !== 'all' ? status : undefined,
+                search,
+                year: year !== 'all' ? year : undefined,
+                approval_status: approvalStatus !== 'all' ? approvalStatus : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
+
+    const handleYearChange = (value: string) => {
+        setYear(value);
+        router.get(
+            route('admin-kampus.assessments.index'),
+            {
+                year: value !== 'all' ? value : undefined,
+                status: status !== 'all' ? status : undefined,
+                search,
+                period: period !== 'all' ? period : undefined,
+                approval_status: approvalStatus !== 'all' ? approvalStatus : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
+    };
+
+    const handleApprovalStatusChange = (value: string) => {
+        setApprovalStatus(value);
+        router.get(
+            route('admin-kampus.assessments.index'),
+            {
+                approval_status: value !== 'all' ? value : undefined,
+                status: status !== 'all' ? status : undefined,
+                search,
+                period: period !== 'all' ? period : undefined,
+                year: year !== 'all' ? year : undefined,
+            },
             { preserveState: true, replace: true },
         );
     };
@@ -95,6 +160,7 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <div className="space-y-4">
+                            {/* First Row - Search and Status */}
                             <div className="flex flex-col gap-4 sm:flex-row">
                                 <div className="relative flex-1">
                                     <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
@@ -114,6 +180,49 @@ export default function AssessmentsIndex({ assessments, filters }: Props) {
                                         <SelectItem value="draft">Draft</SelectItem>
                                         <SelectItem value="submitted">Submitted</SelectItem>
                                         <SelectItem value="reviewed">Reviewed</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Second Row - Additional Filters */}
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                <Select value={period} onValueChange={handlePeriodChange}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Filter by period" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Periods</SelectItem>
+                                        {availablePeriods.map((p) => (
+                                            <SelectItem key={p} value={p}>
+                                                {p}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <Select value={year} onValueChange={handleYearChange}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Filter by year" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Years</SelectItem>
+                                        {availableYears.map((y) => (
+                                            <SelectItem key={y} value={y.toString()}>
+                                                {y}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <Select value={approvalStatus} onValueChange={handleApprovalStatusChange}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Approval status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Approval Status</SelectItem>
+                                        <SelectItem value="pending">Pending Approval</SelectItem>
+                                        <SelectItem value="approved">Approved</SelectItem>
+                                        <SelectItem value="rejected">Rejected</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

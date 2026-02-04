@@ -94,19 +94,23 @@ interface Props {
     statistics: JournalStatistics;
     filters: {
         search?: string;
-        // Deprecated: status and accreditation_grade no longer used
-        // status?: string;
         sinta_rank?: number;
         scientific_field_id?: number;
         indexation?: string;
-        // accreditation_grade?: string;
+        // Phase 2 filters
+        pembinaan_period?: string;
+        pembinaan_year?: string;
+        participation?: string;
+        approval_status?: string;
     };
     scientificFields: ScientificField[];
     sintaRanks: FilterOption[];
-    // Deprecated: Status and Dikti accreditation filters no longer used
-    // statusOptions: FilterOption[];
     indexationOptions: FilterOption[];
-    // accreditationGradeOptions: FilterOption[];
+    // Phase 2 filter options
+    pembinaanPeriods: FilterOption[];
+    pembinaanYears: FilterOption[];
+    participationOptions: FilterOption[];
+    approvalStatusOptions: FilterOption[];
 }
 
 export default function JournalsIndex({
@@ -115,19 +119,22 @@ export default function JournalsIndex({
     filters,
     scientificFields,
     sintaRanks,
-    // Deprecated: Status and Dikti accreditation options no longer used
-    // statusOptions,
     indexationOptions,
-    // accreditationGradeOptions,
+    pembinaanPeriods,
+    pembinaanYears,
+    participationOptions,
+    approvalStatusOptions,
 }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
-    // Deprecated: Status and Dikti accreditation filters no longer used
-    // const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank?.toString() || '');
     const [scientificFieldFilter, setScientificFieldFilter] = useState(filters.scientific_field_id?.toString() || '');
     const [indexationFilter, setIndexationFilter] = useState(filters.indexation || '');
-    // const [accreditationGradeFilter, setAccreditationGradeFilter] = useState(filters.accreditation_grade || '');
+    // Phase 2 filter states
+    const [pembinaanPeriodFilter, setPembinaanPeriodFilter] = useState(filters.pembinaan_period || '');
+    const [pembinaanYearFilter, setPembinaanYearFilter] = useState(filters.pembinaan_year || '');
+    const [participationFilter, setParticipationFilter] = useState(filters.participation || '');
+    const [approvalStatusFilter, setApprovalStatusFilter] = useState(filters.approval_status || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -135,12 +142,14 @@ export default function JournalsIndex({
             route('admin-kampus.journals.index'),
             {
                 search,
-                // Deprecated: status and accreditation_grade no longer used
-                // status: statusFilter,
                 sinta_rank: sintaRankFilter,
                 scientific_field_id: scientificFieldFilter,
                 indexation: indexationFilter,
-                // accreditation_grade: accreditationGradeFilter,
+                // Phase 2 filters
+                pembinaan_period: pembinaanPeriodFilter,
+                pembinaan_year: pembinaanYearFilter,
+                participation: participationFilter,
+                approval_status: approvalStatusFilter,
             },
             { preserveState: true },
         );
@@ -148,12 +157,14 @@ export default function JournalsIndex({
 
     const handleClearFilters = () => {
         setSearch('');
-        // Deprecated: Status and Dikti accreditation filters no longer used
-        // setStatusFilter('');
         setSintaRankFilter('');
         setScientificFieldFilter('');
         setIndexationFilter('');
-        // setAccreditationGradeFilter('');
+        // Phase 2 filters
+        setPembinaanPeriodFilter('');
+        setPembinaanYearFilter('');
+        setParticipationFilter('');
+        setApprovalStatusFilter('');
         router.get(route('admin-kampus.journals.index'));
     };
 
@@ -281,82 +292,102 @@ export default function JournalsIndex({
                                         ))}
                                     </SelectContent>
                                 </Select>
+
+                                <Select
+                                    value={indexationFilter || 'all'}
+                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Indexations" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Indexations</SelectItem>
+                                        {indexationOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
-                            {/* Filter Row 2 - New Filters */}
+                            {/* Filter Row 2 - Phase 2 Pembinaan & Approval Filters */}
+                            <div className="flex gap-4 flex-wrap">
+                                {/* Pembinaan Period Filter */}
+                                <Select
+                                    value={pembinaanPeriodFilter || 'all'}
+                                    onValueChange={(value) => setPembinaanPeriodFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Periods" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Periods</SelectItem>
+                                        {pembinaanPeriods.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Pembinaan Year Filter */}
+                                <Select
+                                    value={pembinaanYearFilter || 'all'}
+                                    onValueChange={(value) => setPembinaanYearFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-48">
+                                        <SelectValue placeholder="All Years" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Years</SelectItem>
+                                        {pembinaanYears.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Participation Filter */}
+                                <Select
+                                    value={participationFilter || 'all'}
+                                    onValueChange={(value) => setParticipationFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-56">
+                                        <SelectValue placeholder="All Participation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Participation</SelectItem>
+                                        {participationOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Approval Status Filter */}
+                                <Select
+                                    value={approvalStatusFilter || 'all'}
+                                    onValueChange={(value) => setApprovalStatusFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-56">
+                                        <SelectValue placeholder="All Approval Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Approval Status</SelectItem>
+                                        {approvalStatusOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Action Buttons */}
                             <div className="flex gap-4">
-                                {/* Indexation Filter */}
-                                <Select
-                                    value={indexationFilter || 'all'}
-                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-64">
-                                        <SelectValue placeholder="All Indexations" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Indexations</SelectItem>
-                                        {indexationOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Dikti Accreditation Filter - Deprecated */}
-                                {/* <Select
-                                    value={accreditationGradeFilter || 'all'}
-                                    onValueChange={(value) => setAccreditationGradeFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-64">
-                                        <SelectValue placeholder="All Dikti Accreditation" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Dikti Accreditation</SelectItem>
-                                        {accreditationGradeOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select> */}
-
-                                {/* Indexation Filter */}
-                                <Select
-                                    value={indexationFilter || 'all'}
-                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-64">
-                                        <SelectValue placeholder="All Indexations" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Indexations</SelectItem>
-                                        {indexationOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Deprecated: Dikti Accreditation Filter - No longer used */}
-                                {/* <Select
-                                    value={accreditationGradeFilter || 'all'}
-                                    onValueChange={(value) => setAccreditationGradeFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-64">
-                                        <SelectValue placeholder="All Dikti Accreditation" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Dikti Accreditation</SelectItem>
-                                        {accreditationGradeOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select> */}
-
                                 <Button type="submit">Search</Button>
                                 {hasActiveFilters && (
                                     <Button type="button" variant="outline" onClick={handleClearFilters}>
@@ -447,8 +478,8 @@ export default function JournalsIndex({
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {journal.latest_score !== null ? (
-                                                    <span className="font-semibold text-foreground">{journal.latest_score.toFixed(1)}%</span>
+                                                {journal.latest_score !== null && journal.latest_score !== undefined ? (
+                                                    <span className="font-semibold text-foreground">{Number(journal.latest_score).toFixed(1)}%</span>
                                                 ) : (
                                                     <span className="text-muted-foreground">-</span>
                                                 )}

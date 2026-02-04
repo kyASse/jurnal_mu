@@ -79,8 +79,10 @@ export default function PembinaanRegister({ program, journals, category }: Props
     ];
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const supportingDocInputRef = useRef<HTMLInputElement>(null);
     const [selectedJournal, setSelectedJournal] = useState<string>('');
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+    const [supportingDocument, setSupportingDocument] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [errors, setErrors] = useState<{ journal?: string; files?: string }>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -172,6 +174,33 @@ export default function PembinaanRegister({ program, journals, category }: Props
         setUploadedFiles(uploadedFiles.map((f) => (f.id === id ? { ...f, documentType } : f)));
     };
 
+    const handleSupportingDocumentSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type (PDF, DOC, DOCX)
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only PDF, DOC, and DOCX files are allowed for supporting documents');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > MAX_FILE_SIZE) {
+            alert(`File size exceeds ${formatFileSize(MAX_FILE_SIZE)}`);
+            return;
+        }
+
+        setSupportingDocument(file);
+    };
+
+    const removeSupportingDocument = () => {
+        setSupportingDocument(null);
+        if (supportingDocInputRef.current) {
+            supportingDocInputRef.current.value = '';
+        }
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -204,6 +233,11 @@ export default function PembinaanRegister({ program, journals, category }: Props
             formData.append(`attachments[${index}][file]`, uploadedFile.file);
             formData.append(`attachments[${index}][document_type]`, uploadedFile.documentType);
         });
+
+        // Add optional supporting document
+        if (supportingDocument) {
+            formData.append('supporting_document', supportingDocument);
+        }
 
         setIsSubmitting(true);
 
@@ -279,6 +313,69 @@ export default function PembinaanRegister({ program, journals, category }: Props
                                             </Select>
                                             {errors.journal && <p className="text-sm text-destructive">{errors.journal}</p>}
                                         </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Supporting Document Upload (Optional) */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <FileText className="h-5 w-5" />
+                                            Supporting Document (Optional)
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Upload a supporting document such as a proposal or additional materials (PDF, DOC, DOCX - max 5MB)
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {!supportingDocument ? (
+                                            <div className="space-y-2">
+                                                <Label htmlFor="supporting_document">Supporting Document</Label>
+                                                <div className="flex items-center gap-3">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => supportingDocInputRef.current?.click()}
+                                                        className="w-full"
+                                                    >
+                                                        <Upload className="mr-2 h-4 w-4" />
+                                                        Choose File
+                                                    </Button>
+                                                    <Input
+                                                        ref={supportingDocInputRef}
+                                                        id="supporting_document"
+                                                        type="file"
+                                                        accept=".pdf,.doc,.docx"
+                                                        onChange={handleSupportingDocumentSelect}
+                                                        className="hidden"
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Accepted formats: PDF, DOC, DOCX (Maximum size: 5MB)
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-3 rounded-lg border p-3">
+                                                <div className="flex h-12 w-12 items-center justify-center rounded bg-muted">
+                                                    <FileText className="h-6 w-6 text-muted-foreground" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="font-medium">{supportingDocument.name}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {formatFileSize(supportingDocument.size)}
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={removeSupportingDocument}
+                                                    className="text-destructive hover:text-destructive"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
 

@@ -234,4 +234,22 @@ class PembinaanRegistrationPolicy
     {
         return $this->view($user, $registration);
     }
+
+    /**
+     * Determine if the user can create an assessment for this registration.
+     */
+    public function createAssessment(User $user, PembinaanRegistration $registration): bool
+    {
+        // Only the user who registered can create assessment
+        if ($registration->user_id !== $user->id) {
+            return false;
+        }
+
+        // Registration must be approved
+        if ($registration->status !== 'approved') {
+            return false;
+        }
+
+        return true;
+    }
 }

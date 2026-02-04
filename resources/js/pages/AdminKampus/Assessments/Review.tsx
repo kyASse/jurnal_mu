@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import IssueCard from '@/components/IssueCard';
 import AppLayout from '@/layouts/app-layout';
 import type { AssessmentAttachment, AssessmentResponse, BreadcrumbItem, JournalAssessment } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -198,6 +199,28 @@ export default function AssessmentReview({ assessment }: Props) {
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Assessment Issues */}
+                {assessment.issues && assessment.issues.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-2">
+                                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                                <CardTitle>Issues Identified</CardTitle>
+                            </div>
+                            <CardDescription>
+                                The user has identified {assessment.issues.length} issue{assessment.issues.length !== 1 ? 's' : ''} during self-assessment
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-4">
+                                {assessment.issues.map((issue) => (
+                                    <IssueCard key={issue.id} issue={issue} readOnly />
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Review Actions */}
                 <Card>

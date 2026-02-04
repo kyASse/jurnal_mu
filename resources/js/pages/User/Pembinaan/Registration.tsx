@@ -38,7 +38,7 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PembinaanRegistration } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import {
     AlertCircle,
     ArrowLeft,
@@ -55,6 +55,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import ReviewerFeedback from '@/components/ReviewerFeedback';
 
 interface Props {
     registration: PembinaanRegistration;
@@ -351,7 +352,10 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                                 {review.recommendation && (
                                                     <div>
                                                         <p className="mb-1 text-sm font-medium">Recommendation:</p>
-                                                        <Badge variant="outline" className="capitalize">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="inline-flex break-words whitespace-normal capitalize"
+                                                        >
                                                             {review.recommendation}
                                                         </Badge>
                                                     </div>
@@ -362,6 +366,119 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                 </Card>
                             )}
                         </div>
+
+                        {/* Assessment Section */}
+                        {registration.status === 'approved' && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <BookOpen className="h-5 w-5" />
+                                        Self-Assessment
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Complete the self-assessment form to proceed with the coaching program
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {registration.assessment ? (
+                                        <div className="space-y-4">
+                                            {/* Assessment Status */}
+                                            <div className="flex items-center justify-between rounded-lg border p-4">
+                                                <div>
+                                                    <p className="font-semibold">Assessment Status</p>
+                                                    {(() => {
+                                                        const status = registration.assessment.status;
+                                                        const variant =
+                                                            status === 'draft' ? 'secondary' :
+                                                            status === 'submitted' ? 'default' :
+                                                            'outline';
+                                                        const label =
+                                                            status === 'draft' ? 'Draft' :
+                                                            status === 'submitted' ? 'Submitted - Pending Review' :
+                                                            'Reviewed';
+                                                        return (
+                                                            <Badge className="mt-1" variant={variant}>
+                                                                {label}
+                                                            </Badge>
+                                                        );
+                                                    })()}
+                                                </div>
+                                                <div className="text-right text-sm text-muted-foreground">
+                                                    {registration.assessment.updated_at && (
+                                                        <p>Last updated: {formatDate(registration.assessment.updated_at)}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Reviewer Feedback */}
+                                            {registration.assessment.status === 'reviewed' && (
+                                                <ReviewerFeedback assessment={registration.assessment} />
+                                            )}
+
+                                            {/* Action Buttons */}
+                                            <div className="flex gap-2 pt-2">
+                                                {registration.assessment.status === 'draft' && (
+                                                    <>
+                                                        <Button className="flex-1" asChild>
+                                                            <Link href={route('user.assessments.edit', registration.assessment.id)}>
+                                                                <FileText className="mr-2 h-4 w-4" />
+                                                                Continue Assessment
+                                                            </Link>
+                                                        </Button>
+                                                    </>
+                                                )}
+                                                {registration.assessment.status === 'submitted' && (
+                                                    <Button variant="outline" className="flex-1" asChild>
+                                                        <Link href={route('user.assessments.show', registration.assessment.id)}>
+                                                            <FileText className="mr-2 h-4 w-4" />
+                                                            View Submission
+                                                        </Link>
+                                                    </Button>
+                                                )}
+                                                {registration.assessment.status === 'reviewed' && (
+                                                    <>
+                                                        <Button variant="outline" className="flex-1" asChild>
+                                                            <Link href={route('user.assessments.show', registration.assessment.id)}>
+                                                                <FileText className="mr-2 h-4 w-4" />
+                                                                View Results
+                                                            </Link>
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4 text-center py-6">
+                                            <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
+                                            <div>
+                                                <p className="font-semibold">No Assessment Yet</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Start filling out the self-assessment form to proceed with the coaching program.
+                                                </p>
+                                            </div>
+                                            <Button asChild>
+                                                <button
+                                                    onClick={() => {
+                                                        router.post(
+                                                            route('user.pembinaan.registrations.create-assessment', registration.id),
+                                                            {},
+                                                            {
+                                                                onSuccess: () => {
+                                                                    router.reload({ only: ['registration'] });
+                                                                },
+                                                            },
+                                                        );
+                                                    }}
+                                                >
+                                                    <FileText className="mr-2 h-4 w-4" />
+                                                    Start Assessment
+                                                </button>
+                                            </Button>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
 
                         {/* Sidebar */}
                         <div className="space-y-6">
@@ -489,7 +606,8 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                         <AlertDialogCancel>Keep Registration</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleCancelRegistration}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className={`bg-destructive text-destructive-foreground
+                                hover:bg-destructive/90`}
                         >
                             Yes, Cancel Registration
                         </AlertDialogAction>

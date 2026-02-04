@@ -154,27 +154,91 @@ export interface AssessmentResponse {
     attachments?: AssessmentAttachment[];
 }
 
+export interface AssessmentIssue {
+    id: number;
+    journal_assessment_id: number;
+    title: string;
+    description: string;
+    category: 'editorial' | 'technical' | 'content_quality' | 'management';
+    priority: 'high' | 'medium' | 'low';
+    display_order: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AssessmentJournalMetadata {
+    id: number;
+    journal_assessment_id: number;
+    volume: string;
+    number: string;
+    year: number;
+    month: number;
+    url_issue?: string;
+    jumlah_negara_editor: number;
+    jumlah_institusi_editor: number;
+    jumlah_negara_reviewer: number;
+    jumlah_institusi_reviewer: number;
+    jumlah_negara_author?: number;
+    jumlah_institusi_author?: number;
+    display_order: number;
+    created_at: string;
+    updated_at: string;
+    // Computed attributes
+    month_name?: string;
+    issue_identifier?: string;
+}
+
 export interface JournalAssessment {
     id: number;
     journal_id: number;
     user_id: number;
+    pembinaan_registration_id?: number;
     assessment_date: string;
     period?: string;
     status: 'draft' | 'submitted' | 'reviewed';
     submitted_at?: string;
     reviewed_at?: string;
     reviewed_by?: number;
+    // Phase 2: Admin Kampus approval fields
+    admin_kampus_approved_by?: number;
+    admin_kampus_approved_at?: string;
+    admin_kampus_approval_notes?: string;
+    // Phase 3: Journal metadata aggregate fields
+    kategori_diusulkan?: string;
+    jumlah_editor?: number;
+    jumlah_reviewer?: number;
+    jumlah_author?: number;
+    jumlah_institusi_editor?: number;
+    jumlah_institusi_reviewer?: number;
+    jumlah_institusi_author?: number;
     total_score?: number;
     max_score?: number;
     percentage?: number;
-    notes?: string;
+    notes?: string; // Column: general notes text field
     admin_notes?: string;
     created_at: string;
     updated_at: string;
     journal: Journal;
     user: User;
     reviewer?: User;
+    admin_kampus_approver?: User; // Phase 2: Admin Kampus who approved
     responses?: AssessmentResponse[];
+    issues?: AssessmentIssue[];
+    journalMetadata?: AssessmentJournalMetadata[]; // Phase 3: Journal issue metadata
+    assessmentNotes?: AssessmentNote[]; // Phase 3: Timeline notes (relationship, renamed to avoid column conflict)
+}
+
+// Phase 2: Assessment Note for timeline
+export interface AssessmentNote {
+    id: number;
+    journal_assessment_id: number;
+    user_id: number;
+    author_role: string;
+    note_type: 'submission' | 'approval' | 'rejection' | 'review' | 'general';
+    content: string;
+    created_at: string;
+    updated_at: string;
+    user: User;
 }
 
 // Pagination types
@@ -233,14 +297,19 @@ export interface PembinaanRegistration {
     journal_id: number;
     user_id: number;
     status: 'pending' | 'approved' | 'rejected';
+    review_status?: 'menunggu_reviewer' | 'sedang_direview' | 'review_selesai' | 'ditolak'; // Phase 2
     registered_at: string;
     reviewed_at?: string;
     reviewed_by?: number;
     rejection_reason?: string;
+    supporting_document?: string; // Optional supporting document path
+    supporting_document_url?: string; // Download URL for supporting document
+    supporting_document_filename?: string; // Filename of supporting document
     pembinaan?: Pembinaan;
     journal?: Journal;
     user?: User;
     reviewer?: User;
+    assessment?: JournalAssessment;
     attachments?: PembinaanRegistrationAttachment[];
     reviews?: PembinaanReview[];
     reviewer_assignments?: ReviewerAssignment[];
@@ -314,6 +383,11 @@ export interface ScientificFieldStatistic {
 export interface JournalStatistics {
     totals: {
         total_journals: number;
+        /**
+         * Count of Scopus-indexed journals only
+         * Note: "Indexed" in this system specifically means Scopus indexation
+         * (as per meeting notes 02 Feb 2026)
+         */
         indexed_journals: number;
         sinta_journals: number;
         non_sinta_journals: number;

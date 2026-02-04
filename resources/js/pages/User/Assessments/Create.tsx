@@ -13,7 +13,10 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import ReviewerFeedback from '@/components/ReviewerFeedback';
+import JournalMetadataManager from '@/components/JournalMetadataManager';
 import AppLayout from '@/layouts/app-layout';
+import type { AssessmentJournalMetadata } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, CheckCircle, FileText, Save, Send, Upload, XCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -55,6 +58,14 @@ interface Assessment {
     period: string | null;
     notes: string | null;
     status: 'draft' | 'submitted' | 'reviewed';
+    kategori_diusulkan?: string;
+    jumlah_editor?: number;
+    jumlah_reviewer?: number;
+    jumlah_author?: number;
+    jumlah_institusi_editor?: number;
+    jumlah_institusi_reviewer?: number;
+    jumlah_institusi_author?: number;
+    journalMetadata?: AssessmentJournalMetadata[];
     responses: Array<{
         evaluation_indicator_id: number;
         answer_boolean?: boolean;
@@ -100,11 +111,33 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
               }))
             : [];
 
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { data, setData, post, put, processing, errors } = useForm<{
+        journal_id: string;
+        assessment_date: string;
+        period: string;
+        notes: string;
+        kategori_diusulkan: string;
+        jumlah_editor: number;
+        jumlah_reviewer: number;
+        jumlah_author: number;
+        jumlah_institusi_editor: number;
+        jumlah_institusi_reviewer: number;
+        jumlah_institusi_author: number;
+        journal_metadata: any;
+        responses: AssessmentResponse[];
+    }>({
         journal_id: assessment?.journal.id.toString() || '',
         assessment_date: assessment?.assessment_date || new Date().toISOString().split('T')[0],
         period: assessment?.period || '',
         notes: assessment?.notes || '',
+        kategori_diusulkan: assessment?.kategori_diusulkan || '',
+        jumlah_editor: assessment?.jumlah_editor || 0,
+        jumlah_reviewer: assessment?.jumlah_reviewer || 0,
+        jumlah_author: assessment?.jumlah_author || 0,
+        jumlah_institusi_editor: assessment?.jumlah_institusi_editor || 0,
+        jumlah_institusi_reviewer: assessment?.jumlah_institusi_reviewer || 0,
+        jumlah_institusi_author: assessment?.jumlah_institusi_author || 0,
+        journal_metadata: assessment?.journalMetadata || [],
         responses: initialResponses,
     });
 
@@ -306,6 +339,9 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                     </div>
                 )}
 
+                {/* Reviewer Feedback - Show if editing after revision request */}
+                {isEdit && assessment && <ReviewerFeedback assessment={assessment as any} />}
+
                 {/* Progress Bar */}
                 <Card>
                     <CardContent className="pt-6">
@@ -385,6 +421,141 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                 placeholder="Catatan tambahan untuk assessment ini..."
                             />
                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Kategori yang Diusulkan */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Kategori yang Diusulkan</CardTitle>
+                        <CardDescription>Pilih kategori yang ingin diusulkan untuk jurnal</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <Label htmlFor="kategori_diusulkan">Kategori</Label>
+                            <Select
+                                value={data.kategori_diusulkan as string}
+                                onValueChange={(value) => setData('kategori_diusulkan', value)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih kategori..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Sinta 1">Sinta 1</SelectItem>
+                                    <SelectItem value="Sinta 2">Sinta 2</SelectItem>
+                                    <SelectItem value="Sinta 3">Sinta 3</SelectItem>
+                                    <SelectItem value="Sinta 4">Sinta 4</SelectItem>
+                                    <SelectItem value="Sinta 5">Sinta 5</SelectItem>
+                                    <SelectItem value="Sinta 6">Sinta 6</SelectItem>
+                                    <SelectItem value="Scopus">Scopus</SelectItem>
+                                    <SelectItem value="Web of Science">Web of Science</SelectItem>
+                                    <SelectItem value="DOAJ">DOAJ</SelectItem>
+                                    <SelectItem value="Other International">Other International</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {errors.kategori_diusulkan && <p className="text-sm text-red-500">{errors.kategori_diusulkan}</p>}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Aggregate Counts */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Jumlah Total Kontributor</CardTitle>
+                        <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="jumlah_editor">Jumlah Editor</Label>
+                                <Input
+                                    id="jumlah_editor"
+                                    type="number"
+                                    min="0"
+                                    value={data.jumlah_editor as number || ''}
+                                    onChange={(e) => setData('jumlah_editor', parseInt(e.target.value) || 0)}
+                                />
+                                {errors.jumlah_editor && <p className="text-sm text-red-500">{errors.jumlah_editor}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="jumlah_reviewer">Jumlah Reviewer</Label>
+                                <Input
+                                    id="jumlah_reviewer"
+                                    type="number"
+                                    min="0"
+                                    value={data.jumlah_reviewer as number || ''}
+                                    onChange={(e) => setData('jumlah_reviewer', parseInt(e.target.value) || 0)}
+                                />
+                                {errors.jumlah_reviewer && <p className="text-sm text-red-500">{errors.jumlah_reviewer}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="jumlah_author">Jumlah Author</Label>
+                                <Input
+                                    id="jumlah_author"
+                                    type="number"
+                                    min="0"
+                                    value={data.jumlah_author as number || ''}
+                                    onChange={(e) => setData('jumlah_author', parseInt(e.target.value) || 0)}
+                                />
+                                {errors.jumlah_author && <p className="text-sm text-red-500">{errors.jumlah_author}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="jumlah_institusi_editor">Institusi Editor</Label>
+                                <Input
+                                    id="jumlah_institusi_editor"
+                                    type="number"
+                                    min="0"
+                                    value={data.jumlah_institusi_editor as number || ''}
+                                    onChange={(e) => setData('jumlah_institusi_editor', parseInt(e.target.value) || 0)}
+                                />
+                                {errors.jumlah_institusi_editor && <p className="text-sm text-red-500">{errors.jumlah_institusi_editor}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="jumlah_institusi_reviewer">Institusi Reviewer</Label>
+                                <Input
+                                    id="jumlah_institusi_reviewer"
+                                    type="number"
+                                    min="0"
+                                    value={data.jumlah_institusi_reviewer as number || ''}
+                                    onChange={(e) => setData('jumlah_institusi_reviewer', parseInt(e.target.value) || 0)}
+                                />
+                                {errors.jumlah_institusi_reviewer && <p className="text-sm text-red-500">{errors.jumlah_institusi_reviewer}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="jumlah_institusi_author">Institusi Author</Label>
+                                <Input
+                                    id="jumlah_institusi_author"
+                                    type="number"
+                                    min="0"
+                                    value={data.jumlah_institusi_author as number || ''}
+                                    onChange={(e) => setData('jumlah_institusi_author', parseInt(e.target.value) || 0)}
+                                />
+                                {errors.jumlah_institusi_author && <p className="text-sm text-red-500">{errors.jumlah_institusi_author}</p>}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Journal Metadata Manager */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Data Terbitan Jurnal</CardTitle>
+                        <CardDescription>Kelola informasi per terbitan (volume, nomor, tahun)</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <JournalMetadataManager
+                            metadata={data.journal_metadata}
+                            onChange={(metadata) => setData('journal_metadata', metadata)}
+                            readOnly={assessment?.status !== 'draft' && isEdit}
+                            aggregateCounts={{
+                                jumlah_editor: data.jumlah_editor as number,
+                                jumlah_reviewer: data.jumlah_reviewer as number,
+                                jumlah_author: data.jumlah_author as number,
+                                jumlah_institusi_editor: data.jumlah_institusi_editor as number,
+                                jumlah_institusi_reviewer: data.jumlah_institusi_reviewer as number,
+                                jumlah_institusi_author: data.jumlah_institusi_author as number,
+                            }}
+                        />
                     </CardContent>
                 </Card>
 
