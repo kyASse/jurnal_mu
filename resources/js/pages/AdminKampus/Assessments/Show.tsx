@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AssessmentNotesTimeline from '@/components/AssessmentNotesTimeline';
 import StatusTimeline, { type TimelineStep } from '@/components/StatusTimeline';
+import JournalMetadataManager from '@/components/JournalMetadataManager';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, JournalAssessment } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -161,6 +162,89 @@ export default function AssessmentShow({ assessment }: Props) {
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Kategori yang Diusulkan */}
+                {assessment.kategori_diusulkan && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Kategori yang Diusulkan</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Badge variant="outline" className="text-lg px-4 py-2">
+                                {assessment.kategori_diusulkan}
+                            </Badge>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Aggregate Counts */}
+                {(assessment.jumlah_editor !== null ||
+                    assessment.jumlah_reviewer !== null ||
+                    assessment.jumlah_author !== null) && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Jumlah Total Kontributor</CardTitle>
+                            <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {assessment.jumlah_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_author}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="text-sm text-muted-foreground mb-1">Institusi Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_author}</div>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Journal Metadata */}
+                {assessment.journalMetadata && assessment.journalMetadata.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Data Terbitan Jurnal</CardTitle>
+                            <CardDescription>Informasi per terbitan (volume, nomor, tahun)</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <JournalMetadataManager
+                                metadata={assessment.journalMetadata}
+                                onChange={() => {}}
+                                readOnly={true}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Responses Summary */}
                 <Card>
