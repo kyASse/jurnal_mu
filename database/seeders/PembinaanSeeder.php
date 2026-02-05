@@ -34,21 +34,22 @@ class PembinaanSeeder extends Seeder
 
         if (empty($journalIds) || empty($userIds)) {
             $this->command->warn('⚠️  Required data (journals or users) not found. Skipping pembinaan seeding.');
+
             return;
         }
 
         // Create Pembinaan Programs
         $programs = $this->createPrograms($templateIds, $superAdminId);
-        
+
         // Create Registrations
         $registrations = $this->createRegistrations($programs, $journalIds, $userIds);
-        
+
         // Create Attachments for Registrations
         $this->createAttachments($registrations, $userIds);
-        
+
         // Create Reviewer Assignments
         $assignments = $this->createReviewerAssignments($registrations, $userIds);
-        
+
         // Create Reviews
         $this->createReviews($assignments, $userIds);
 
@@ -115,7 +116,7 @@ class PembinaanSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        $this->command->info('     ✓ Created ' . count($programs) . ' programs');
+        $this->command->info('     ✓ Created '.count($programs).' programs');
 
         return $programs;
     }
@@ -144,6 +145,7 @@ class PembinaanSeeder extends Seeder
 
         if (count($availableJournals) < 3) {
             $this->command->warn('     ⚠️  Insufficient journals. Need at least 3 journals.');
+
             return $registrations;
         }
 
@@ -277,7 +279,7 @@ class PembinaanSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('     ✓ Created ' . count($registrations) . ' registrations');
+        $this->command->info('     ✓ Created '.count($registrations).' registrations');
 
         return $registrations;
     }
@@ -295,8 +297,8 @@ class PembinaanSeeder extends Seeder
             // All registrations have ISSN Certificate and Journal Cover
             PembinaanRegistrationAttachment::create([
                 'registration_id' => $registration->id,
-                'file_name' => 'ISSN_Certificate_' . $registration->journal_id . '.pdf',
-                'file_path' => 'pembinaan_attachments/' . now()->timestamp . '_issn_certificate.pdf',
+                'file_name' => 'ISSN_Certificate_'.$registration->journal_id.'.pdf',
+                'file_path' => 'pembinaan_attachments/'.now()->timestamp.'_issn_certificate.pdf',
                 'file_type' => 'application/pdf',
                 'file_size' => rand(200000, 500000),
                 'document_type' => 'ISSN Certificate',
@@ -309,8 +311,8 @@ class PembinaanSeeder extends Seeder
 
             PembinaanRegistrationAttachment::create([
                 'registration_id' => $registration->id,
-                'file_name' => 'Journal_Cover_' . $registration->journal_id . '.jpg',
-                'file_path' => 'pembinaan_attachments/' . now()->timestamp . '_journal_cover.jpg',
+                'file_name' => 'Journal_Cover_'.$registration->journal_id.'.jpg',
+                'file_path' => 'pembinaan_attachments/'.now()->timestamp.'_journal_cover.jpg',
                 'file_type' => 'image/jpeg',
                 'file_size' => rand(100000, 300000),
                 'document_type' => 'Journal Cover',
@@ -325,8 +327,8 @@ class PembinaanSeeder extends Seeder
             if ($registration->status === 'approved') {
                 PembinaanRegistrationAttachment::create([
                     'registration_id' => $registration->id,
-                    'file_name' => 'Accreditation_History_' . $registration->journal_id . '.pdf',
-                    'file_path' => 'pembinaan_attachments/' . now()->timestamp . '_accreditation_history.pdf',
+                    'file_name' => 'Accreditation_History_'.$registration->journal_id.'.pdf',
+                    'file_path' => 'pembinaan_attachments/'.now()->timestamp.'_accreditation_history.pdf',
                     'file_type' => 'application/pdf',
                     'file_size' => rand(300000, 800000),
                     'document_type' => 'Previous Accreditation',
@@ -339,7 +341,7 @@ class PembinaanSeeder extends Seeder
             }
         }
 
-        $this->command->info('     ✓ Created ' . $attachmentCount . ' attachments');
+        $this->command->info('     ✓ Created '.$attachmentCount.' attachments');
     }
 
     /**
@@ -350,12 +352,13 @@ class PembinaanSeeder extends Seeder
         $this->command->info('  → Creating reviewer assignments...');
 
         $assignments = [];
-        
+
         // Get reviewers (users with is_reviewer=true)
         $reviewerIds = DB::table('users')->where('is_reviewer', true)->pluck('id')->toArray();
-        
+
         if (empty($reviewerIds)) {
             $this->command->warn('     ⚠️  No reviewers found. Skipping reviewer assignments.');
+
             return $assignments;
         }
 
@@ -374,22 +377,22 @@ class PembinaanSeeder extends Seeder
             // Get appropriate admin for this registration's university
             $journal = DB::table('journals')->find($registration->journal_id);
             $universityCode = DB::table('universities')->find($journal->university_id)->code ?? 'UAD';
-            $adminEmail = 'admin.' . strtolower($universityCode) . '@ajm.ac.id';
+            $adminEmail = 'admin.'.strtolower($universityCode).'@ajm.ac.id';
             $assignedBy = $adminKampusIds[$adminEmail] ?? array_values($adminKampusIds)[0];
 
             // Assign reviewer (rotate through available reviewers)
             $reviewerId = $reviewerIds[$reviewerIndex % count($reviewerIds)];
-            
+
             // Determine status based on when registration was reviewed
             // Registrations were reviewed 35-40 days ago, so assignments should be completed
             $assignedAt = $registration->reviewed_at->copy()->addDays(2);
-            
+
             // Calculate how long ago the assignment was created
             $daysAgo = $assignedAt->diffInDays(now());
-            
+
             $status = 'assigned';
             $updatedAt = $assignedAt;
-            
+
             // If assigned more than 15 days ago, mark as completed
             if ($daysAgo >= 15) {
                 $status = 'completed';
@@ -412,7 +415,7 @@ class PembinaanSeeder extends Seeder
             $reviewerIndex++;
         }
 
-        $this->command->info('     ✓ Created ' . count($assignments) . ' reviewer assignments');
+        $this->command->info('     ✓ Created '.count($assignments).' reviewer assignments');
 
         return $assignments;
     }
@@ -429,22 +432,22 @@ class PembinaanSeeder extends Seeder
             [
                 'score' => 92.5,
                 'feedback' => 'Jurnal telah menunjukkan kualitas yang sangat baik dalam pengelolaan editorial dan publikasi artikel. Sistem peer review berjalan dengan baik dan konsisten. Editorial board memiliki keberagaman institusi yang memadai. Artikel yang dipublikasikan memiliki kualitas akademik yang tinggi dengan sitasi yang cukup baik.',
-                'recommendation' => 'Sangat layak untuk mendapatkan akreditasi SINTA 3. Disarankan untuk terus meningkatkan visibilitas internasional dengan menambahkan lebih banyak reviewer dari luar negeri dan memperluas cakupan indeksasi jurnal.'
+                'recommendation' => 'Sangat layak untuk mendapatkan akreditasi SINTA 3. Disarankan untuk terus meningkatkan visibilitas internasional dengan menambahkan lebih banyak reviewer dari luar negeri dan memperluas cakupan indeksasi jurnal.',
             ],
             [
                 'score' => 85.0,
                 'feedback' => 'Pengelolaan jurnal sudah baik dengan sistem OJS yang terkelola dengan baik. Proses peer review sudah berjalan sesuai standar. Namun masih ada beberapa area yang perlu ditingkatkan, terutama dalam hal keberagaman penulis dari berbagai institusi dan peningkatan impact factor jurnal.',
-                'recommendation' => 'Layak mendapatkan akreditasi SINTA 4. Untuk meningkat ke level yang lebih tinggi, disarankan untuk: 1) Meningkatkan publikasi artikel dari penulis internasional, 2) Memperluas jangkauan distribusi jurnal, 3) Meningkatkan kualitas website dan metadata artikel.'
+                'recommendation' => 'Layak mendapatkan akreditasi SINTA 4. Untuk meningkat ke level yang lebih tinggi, disarankan untuk: 1) Meningkatkan publikasi artikel dari penulis internasional, 2) Memperluas jangkauan distribusi jurnal, 3) Meningkatkan kualitas website dan metadata artikel.',
             ],
             [
                 'score' => 78.5,
                 'feedback' => 'Jurnal menunjukkan komitmen yang baik dalam publikasi berkala. Namun terdapat beberapa kelemahan dalam konsistensi penerbitan dan kualitas beberapa artikel. Sistem peer review perlu diperkuat dengan menambah jumlah reviewer dan meningkatkan proses blind review.',
-                'recommendation' => 'Layak untuk akreditasi SINTA 5 dengan catatan. Diperlukan perbaikan dalam: 1) Konsistensi jadwal penerbitan, 2) Peningkatan kualitas artikel melalui seleksi yang lebih ketat, 3) Penambahan reviewer ahli dari berbagai institusi.'
+                'recommendation' => 'Layak untuk akreditasi SINTA 5 dengan catatan. Diperlukan perbaikan dalam: 1) Konsistensi jadwal penerbitan, 2) Peningkatan kualitas artikel melalui seleksi yang lebih ketat, 3) Penambahan reviewer ahli dari berbagai institusi.',
             ],
             [
                 'score' => 65.0,
                 'feedback' => 'Jurnal masih dalam tahap pengembangan dan memerlukan banyak perbaikan. Sistem editorial masih perlu diperkuat, khususnya dalam hal proses review dan seleksi artikel. Website jurnal memerlukan perbaikan untuk meningkatkan user experience dan aksesibilitas.',
-                'recommendation' => 'Memerlukan pembinaan intensif sebelum dapat direkomendasikan untuk akreditasi yang lebih tinggi. Fokus perbaikan: 1) Penguatan tim editorial, 2) Implementasi sistem peer review yang lebih baik, 3) Peningkatan kualitas dan konsistensi publikasi, 4) Perbaikan website dan sistem manajemen jurnal.'
+                'recommendation' => 'Memerlukan pembinaan intensif sebelum dapat direkomendasikan untuk akreditasi yang lebih tinggi. Fokus perbaikan: 1) Penguatan tim editorial, 2) Implementasi sistem peer review yang lebih baik, 3) Peningkatan kualitas dan konsistensi publikasi, 4) Perbaikan website dan sistem manajemen jurnal.',
             ],
         ];
 
@@ -471,6 +474,6 @@ class PembinaanSeeder extends Seeder
             $feedbackIndex++;
         }
 
-        $this->command->info('     ✓ Created ' . $reviewCount . ' reviews');
+        $this->command->info('     ✓ Created '.$reviewCount.' reviews');
     }
 }

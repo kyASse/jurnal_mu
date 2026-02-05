@@ -232,6 +232,7 @@ class PembinaanRegistration extends Model
     {
         return $this->status === 'pending';
     }
+
     /**
      * Check if supporting document exists.
      */
@@ -263,6 +264,7 @@ class PembinaanRegistration extends Model
 
         return basename($this->supporting_document);
     }
+
     /**
      * Boot method to handle model events
      */

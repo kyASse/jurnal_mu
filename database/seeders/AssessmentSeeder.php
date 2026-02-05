@@ -29,6 +29,7 @@ class AssessmentSeeder extends Seeder
 
         if (empty($journalIds) || empty($userIds) || $indicators->isEmpty()) {
             $this->command->warn('⚠️  Required data (journals, users, or indicators) not found. Skipping assessment seeding.');
+
             return;
         }
 
@@ -41,7 +42,7 @@ class AssessmentSeeder extends Seeder
             'status' => 'submitted',
             'submitted_at' => '2026-01-20 10:30:00',
             'notes' => 'Assessment lengkap untuk periode Semester 2 2025. Jurnal telah memenuhi standar SINTA 4.',
-            
+
             // Journal metadata aggregate fields
             'kategori_diusulkan' => 'Sinta 3',
             'jumlah_editor' => 8,
@@ -103,7 +104,7 @@ class AssessmentSeeder extends Seeder
             'admin_kampus_approved_at' => '2025-12-20 09:15:00',
             'admin_kampus_approval_notes' => 'Assessment telah disetujui. Jurnal menunjukkan peningkatan kualitas yang signifikan.',
             'notes' => 'Assessment Q4 2025 dengan fokus pada peningkatan indeksasi internasional.',
-            
+
             // Journal metadata aggregate fields
             'kategori_diusulkan' => 'Terindeks Scopus',
             'jumlah_editor' => 10,
@@ -173,7 +174,7 @@ class AssessmentSeeder extends Seeder
             'period' => '2026-Semester 1',
             'status' => 'draft',
             'notes' => 'Assessment dalam proses. Data masih dikumpulkan.',
-            
+
             // Partial journal metadata (draft allows null values)
             'kategori_diusulkan' => 'Sinta 2',
             'jumlah_editor' => 6,
@@ -216,7 +217,7 @@ class AssessmentSeeder extends Seeder
             'status' => 'submitted',
             'submitted_at' => '2025-11-25 16:45:00',
             'notes' => 'Assessment Q3 2025 - tanpa metadata jurnal (untuk testing backward compatibility).',
-            
+
             // NO journal metadata fields (testing null values)
             'kategori_diusulkan' => null,
             'jumlah_editor' => null,
@@ -245,7 +246,7 @@ class AssessmentSeeder extends Seeder
      */
     private function createAssessment(array $data): ?JournalAssessment
     {
-        if (!$data['journal_id'] || !$data['user_id']) {
+        if (! $data['journal_id'] || ! $data['user_id']) {
             return null;
         }
 
@@ -268,9 +269,9 @@ class AssessmentSeeder extends Seeder
     /**
      * Create sample responses for an assessment
      *
-     * @param int $assessmentId The assessment ID
-     * @param \Illuminate\Database\Eloquent\Collection $indicators Collection of evaluation indicators
-     * @param int $completionRate Percentage of indicators to fill (0-100)
+     * @param  int  $assessmentId  The assessment ID
+     * @param  \Illuminate\Database\Eloquent\Collection  $indicators  Collection of evaluation indicators
+     * @param  int  $completionRate  Percentage of indicators to fill (0-100)
      */
     private function createSampleResponses(int $assessmentId, $indicators, int $completionRate): void
     {
@@ -292,14 +293,14 @@ class AssessmentSeeder extends Seeder
                     $responseData['answer_boolean'] = fake()->boolean(80); // 80% true
                     $responseData['score'] = $responseData['answer_boolean'] ? $indicator->weight : 0;
                     break;
-                
+
                 case 'scale':
                     $scale = fake()->numberBetween(1, 5);
                     $responseData['answer_scale'] = $scale;
                     // Score = (scale / 5) * weight
                     $responseData['score'] = ($scale / 5) * $indicator->weight;
                     break;
-                
+
                 case 'text':
                     $responseData['answer_text'] = fake()->paragraph();
                     // Text answers get full weight if answered
@@ -320,13 +321,13 @@ class AssessmentSeeder extends Seeder
     private function updateAssessmentScores(int $assessmentId): void
     {
         $assessment = JournalAssessment::with('responses.evaluationIndicator')->find($assessmentId);
-        
-        if (!$assessment) {
+
+        if (! $assessment) {
             return;
         }
 
         $totalScore = $assessment->responses->sum('score');
-        $maxScore = $assessment->responses->sum(fn($r) => $r->evaluationIndicator->weight);
+        $maxScore = $assessment->responses->sum(fn ($r) => $r->evaluationIndicator->weight);
         $percentage = $maxScore > 0 ? ($totalScore / $maxScore) * 100 : 0;
 
         $assessment->update([

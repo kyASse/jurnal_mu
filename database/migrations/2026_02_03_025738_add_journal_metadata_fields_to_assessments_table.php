@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('journal_assessments', function (Blueprint $table) {
             // Add kategori_diusulkan field (e.g., Sinta 1-6, Scopus, WoS, DOAJ)
             $table->string('kategori_diusulkan', 50)->nullable()->after('notes');
-            
+
             // Add aggregate counts at assessment level
             $table->unsignedInteger('jumlah_editor')->nullable()->after('kategori_diusulkan')
                 ->comment('Total number of editors across all issues');
@@ -22,7 +22,7 @@ return new class extends Migration
                 ->comment('Total number of reviewers across all issues');
             $table->unsignedInteger('jumlah_author')->nullable()->after('jumlah_reviewer')
                 ->comment('Total number of authors across all issues');
-            
+
             // Add aggregate institution counts for cross-validation consistency
             $table->unsignedInteger('jumlah_institusi_editor')->nullable()->after('jumlah_author')
                 ->comment('Total institutions with editors');

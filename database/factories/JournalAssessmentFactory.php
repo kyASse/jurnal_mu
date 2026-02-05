@@ -24,7 +24,7 @@ class JournalAssessmentFactory extends Factory
             'journal_id' => $journal->id,
             'user_id' => $journal->user_id, // Same user who owns the journal
             'assessment_date' => fake()->date(),
-            'period' => fake()->year() . '-Q' . fake()->numberBetween(1, 4),
+            'period' => fake()->year().'-Q'.fake()->numberBetween(1, 4),
             'status' => fake()->randomElement(['draft', 'submitted', 'reviewed']),
             'total_score' => fake()->numberBetween(70, 100),
             'max_score' => 100,

@@ -12,7 +12,7 @@ use Inertia\Response;
 
 /**
  * Dikti Assessment Controller
- * 
+ *
  * Handles reviewer assignment for assessments that have been approved by Admin Kampus (LPPM).
  * Only Dikti role can assign reviewers to assessments.
  */
@@ -25,16 +25,17 @@ class AssessmentController extends Controller
     {
         // Ensure only Super Admin can access Dikti routes
         $this->middleware(function ($request, $next) {
-            if (!$request->user() || !$request->user()->isSuperAdmin()) {
+            if (! $request->user() || ! $request->user()->isSuperAdmin()) {
                 abort(403, 'Unauthorized access to Dikti assessment management.');
             }
+
             return $next($request);
         });
     }
 
     /**
      * Display assessments pending reviewer assignment.
-     * 
+     *
      * @route GET /dikti/assessments
      */
     public function index(Request $request): Response
@@ -67,9 +68,9 @@ class AssessmentController extends Controller
                         $subQ->where('title', 'like', "%{$search}%")
                             ->orWhere('issn', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('journal.university', function ($subQ) use ($search) {
-                        $subQ->where('name', 'like', "%{$search}%");
-                    });
+                        ->orWhereHas('journal.university', function ($subQ) use ($search) {
+                            $subQ->where('name', 'like', "%{$search}%");
+                        });
                 });
             })
             ->orderBy('admin_kampus_approved_at', 'desc')
@@ -87,7 +88,7 @@ class AssessmentController extends Controller
 
     /**
      * Display assessment detail for reviewer assignment.
-     * 
+     *
      * @route GET /dikti/assessments/{assessment}
      */
     public function show(Request $request, JournalAssessment $assessment): Response
@@ -111,10 +112,10 @@ class AssessmentController extends Controller
         $availableReviewers = User::whereHas('roles', function ($query) {
             $query->where('name', 'Reviewer');
         })
-        ->where('is_active', true)
-        ->select('id', 'name', 'email', 'scientific_field_id')
-        ->with('scientificField:id,name')
-        ->get();
+            ->where('is_active', true)
+            ->select('id', 'name', 'email', 'scientific_field_id')
+            ->with('scientificField:id,name')
+            ->get();
 
         return Inertia::render('Dikti/Assessments/Show', [
             'assessment' => $assessment,
@@ -124,7 +125,7 @@ class AssessmentController extends Controller
 
     /**
      * Assign reviewer to assessment.
-     * 
+     *
      * @route POST /dikti/assessments/{assessment}/assign-reviewer
      */
     public function assignReviewer(Request $request, JournalAssessment $assessment): RedirectResponse
@@ -138,7 +139,7 @@ class AssessmentController extends Controller
 
         // Verify the selected user is a reviewer
         $reviewer = User::findOrFail($validated['reviewer_id']);
-        if (!$reviewer->hasRole('Reviewer')) {
+        if (! $reviewer->hasRole('Reviewer')) {
             return back()->withErrors(['reviewer_id' => 'Selected user is not a reviewer.']);
         }
 
@@ -155,7 +156,7 @@ class AssessmentController extends Controller
             'user_id' => $request->user()->id,
             'author_role' => 'Dikti',
             'note_type' => 'general',
-            'content' => "Reviewer ditugaskan: {$reviewer->name}. " . ($validated['assignment_notes'] ?? ''),
+            'content' => "Reviewer ditugaskan: {$reviewer->name}. ".($validated['assignment_notes'] ?? ''),
         ]);
 
         // TODO: Send notification to reviewer
@@ -168,7 +169,7 @@ class AssessmentController extends Controller
 
     /**
      * Remove reviewer assignment.
-     * 
+     *
      * @route POST /dikti/assessments/{assessment}/remove-reviewer
      */
     public function removeReviewer(Request $request, JournalAssessment $assessment): RedirectResponse
@@ -193,7 +194,7 @@ class AssessmentController extends Controller
             'user_id' => $request->user()->id,
             'author_role' => 'Dikti',
             'note_type' => 'general',
-            'content' => "Reviewer {$previousReviewerName} dihapus dari assignment. " . ($validated['removal_reason'] ?? ''),
+            'content' => "Reviewer {$previousReviewerName} dihapus dari assignment. ".($validated['removal_reason'] ?? ''),
         ]);
 
         return redirect()

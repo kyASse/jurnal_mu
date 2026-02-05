@@ -266,10 +266,10 @@ class UserSeeder extends Seeder
         DB::table('users')->insert($users);
 
         $this->command->info(count($users).' Users created successfully!');
-        
+
         // Mark some users as reviewers for Pembinaan system
         $this->markReviewers();
-        
+
         $this->command->info('');
         $this->command->info('📧 Login Credentials:');
         $this->command->info('Super Admin: superadmin@ajm.ac.id / password123');

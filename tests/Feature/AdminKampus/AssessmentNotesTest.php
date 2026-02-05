@@ -24,9 +24,13 @@ class AssessmentNotesTest extends TestCase
     use RefreshDatabase;
 
     protected University $university;
+
     protected User $adminKampus;
+
     protected User $user;
+
     protected Role $adminKampusRole;
+
     protected Role $userRole;
 
     protected function setUp(): void

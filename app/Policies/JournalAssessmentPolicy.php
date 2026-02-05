@@ -252,7 +252,7 @@ class JournalAssessmentPolicy
 
     /**
      * Determine if the user can assign a reviewer to the assessment.
-     * 
+     *
      * Rules:
      * - Only Super Admin (acting as Dikti) can assign reviewers
      * - Assessment must be approved by Admin Kampus first
@@ -260,7 +260,7 @@ class JournalAssessmentPolicy
     public function assignReviewer(User $user, JournalAssessment $assessment): bool
     {
         // Only Super Admin (Dikti) can assign reviewers
-        if (!$user->isSuperAdmin()) {
+        if (! $user->isSuperAdmin()) {
             return false;
         }
 

@@ -196,6 +196,7 @@ class Journal extends Model
                 $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
             });
     }
+
     /**
      * Scope to filter journals indexed in Scopus only
      * Note: "Indexed journals" in this system refers to Scopus-indexed journals only
@@ -209,13 +210,12 @@ class Journal extends Model
     /**
      * Check if the journal is indexed in Scopus
      * Note: "Indexed" in this system means Scopus-indexed specifically
-     * 
-     * @return bool
      */
     public function isIndexedInScopus(): bool
     {
         return isset($this->indexations['Scopus']);
     }
+
     /**
      * Scope to filter by Dikti accreditation grade
      */
