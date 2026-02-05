@@ -120,7 +120,7 @@ class AccreditationTemplateController extends Controller
         $template = AccreditationTemplate::create($request->validated());
 
         return redirect()
-            ->route('admin.templates.show', $template)
+            ->route('admin.templates.index')
             ->with('success', "Template '{$template->name}' berhasil dibuat.");
     }
 
@@ -203,7 +203,7 @@ class AccreditationTemplateController extends Controller
         $template->update($request->validated());
 
         return redirect()
-            ->route('admin.templates.show', $template)
+            ->route('admin.templates.index')
             ->with('success', "Template '{$template->name}' berhasil diperbarui.");
     }
 
@@ -248,7 +248,7 @@ class AccreditationTemplateController extends Controller
         $clonedTemplate = $template->cloneTemplate($request->new_name);
 
         return redirect()
-            ->route('admin.templates.show', $clonedTemplate)
+            ->route('admin.templates.index')
             ->with('success', "Template '{$clonedTemplate->name}' berhasil diduplikasi dari '{$template->name}'.");
     }
 
