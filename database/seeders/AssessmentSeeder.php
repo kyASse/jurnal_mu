@@ -8,9 +8,15 @@ use App\Models\EvaluationIndicator;
 use App\Models\JournalAssessment;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Faker\Factory as FakerFactory;
 
 class AssessmentSeeder extends Seeder
 {
+    /**
+     * Faker instance
+     */
+    private $faker;
+
     /**
      * Run the database seeds.
      *
@@ -20,6 +26,9 @@ class AssessmentSeeder extends Seeder
      */
     public function run(): void
     {
+        // Initialize Faker
+        $this->faker = FakerFactory::create('id_ID');
+
         $this->command->info('📊 Seeding Sample Assessments with Journal Metadata...');
 
         // Get required IDs
@@ -284,25 +293,25 @@ class AssessmentSeeder extends Seeder
             $responseData = [
                 'journal_assessment_id' => $assessmentId,
                 'evaluation_indicator_id' => $indicator->id,
-                'notes' => fake()->optional(0.3)->sentence(), // 30% chance of having notes
+                'notes' => $this->faker->optional(0.3)->sentence(), // 30% chance of having notes
             ];
 
             // Set response based on answer type
             switch ($indicator->answer_type) {
                 case 'boolean':
-                    $responseData['answer_boolean'] = fake()->boolean(80); // 80% true
+                    $responseData['answer_boolean'] = $this->faker->boolean(80); // 80% true
                     $responseData['score'] = $responseData['answer_boolean'] ? $indicator->weight : 0;
                     break;
 
                 case 'scale':
-                    $scale = fake()->numberBetween(1, 5);
+                    $scale = $this->faker->numberBetween(1, 5);
                     $responseData['answer_scale'] = $scale;
                     // Score = (scale / 5) * weight
                     $responseData['score'] = ($scale / 5) * $indicator->weight;
                     break;
 
                 case 'text':
-                    $responseData['answer_text'] = fake()->paragraph();
+                    $responseData['answer_text'] = $this->faker->paragraph();
                     // Text answers get full weight if answered
                     $responseData['score'] = $indicator->weight;
                     break;
