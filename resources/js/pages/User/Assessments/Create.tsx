@@ -5,6 +5,8 @@
  * @features Multi-step form, file upload, auto-save draft, score calculation
  * @route GET /user/assessments/create | GET /user/assessments/{id}/edit
  */
+import JournalMetadataManager from '@/components/JournalMetadataManager';
+import ReviewerFeedback from '@/components/ReviewerFeedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,8 +15,6 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import ReviewerFeedback from '@/components/ReviewerFeedback';
-import JournalMetadataManager from '@/components/JournalMetadataManager';
 import AppLayout from '@/layouts/app-layout';
 import type { AssessmentJournalMetadata } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
@@ -433,10 +433,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                     <CardContent>
                         <div className="space-y-2">
                             <Label htmlFor="kategori_diusulkan">Kategori</Label>
-                            <Select
-                                value={data.kategori_diusulkan as string}
-                                onValueChange={(value) => setData('kategori_diusulkan', value)}
-                            >
+                            <Select value={data.kategori_diusulkan as string} onValueChange={(value) => setData('kategori_diusulkan', value)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Pilih kategori..." />
                                 </SelectTrigger>
@@ -465,14 +462,14 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                         <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                             <div className="space-y-2">
                                 <Label htmlFor="jumlah_editor">Jumlah Editor</Label>
                                 <Input
                                     id="jumlah_editor"
                                     type="number"
                                     min="0"
-                                    value={data.jumlah_editor as number || ''}
+                                    value={(data.jumlah_editor as number) || ''}
                                     onChange={(e) => setData('jumlah_editor', parseInt(e.target.value) || 0)}
                                 />
                                 {errors.jumlah_editor && <p className="text-sm text-red-500">{errors.jumlah_editor}</p>}
@@ -483,7 +480,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                     id="jumlah_reviewer"
                                     type="number"
                                     min="0"
-                                    value={data.jumlah_reviewer as number || ''}
+                                    value={(data.jumlah_reviewer as number) || ''}
                                     onChange={(e) => setData('jumlah_reviewer', parseInt(e.target.value) || 0)}
                                 />
                                 {errors.jumlah_reviewer && <p className="text-sm text-red-500">{errors.jumlah_reviewer}</p>}
@@ -494,7 +491,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                     id="jumlah_author"
                                     type="number"
                                     min="0"
-                                    value={data.jumlah_author as number || ''}
+                                    value={(data.jumlah_author as number) || ''}
                                     onChange={(e) => setData('jumlah_author', parseInt(e.target.value) || 0)}
                                 />
                                 {errors.jumlah_author && <p className="text-sm text-red-500">{errors.jumlah_author}</p>}
@@ -505,7 +502,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                     id="jumlah_institusi_editor"
                                     type="number"
                                     min="0"
-                                    value={data.jumlah_institusi_editor as number || ''}
+                                    value={(data.jumlah_institusi_editor as number) || ''}
                                     onChange={(e) => setData('jumlah_institusi_editor', parseInt(e.target.value) || 0)}
                                 />
                                 {errors.jumlah_institusi_editor && <p className="text-sm text-red-500">{errors.jumlah_institusi_editor}</p>}
@@ -516,7 +513,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                     id="jumlah_institusi_reviewer"
                                     type="number"
                                     min="0"
-                                    value={data.jumlah_institusi_reviewer as number || ''}
+                                    value={(data.jumlah_institusi_reviewer as number) || ''}
                                     onChange={(e) => setData('jumlah_institusi_reviewer', parseInt(e.target.value) || 0)}
                                 />
                                 {errors.jumlah_institusi_reviewer && <p className="text-sm text-red-500">{errors.jumlah_institusi_reviewer}</p>}
@@ -527,7 +524,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                                     id="jumlah_institusi_author"
                                     type="number"
                                     min="0"
-                                    value={data.jumlah_institusi_author as number || ''}
+                                    value={(data.jumlah_institusi_author as number) || ''}
                                     onChange={(e) => setData('jumlah_institusi_author', parseInt(e.target.value) || 0)}
                                 />
                                 {errors.jumlah_institusi_author && <p className="text-sm text-red-500">{errors.jumlah_institusi_author}</p>}

@@ -1,24 +1,11 @@
-import { AssessmentJournalMetadata } from '@/types';
-import { useState, useEffect } from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AssessmentJournalMetadata } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface JournalMetadataFormDialogProps {
     open: boolean;
@@ -140,7 +127,10 @@ export default function JournalMetadataFormDialog({
             newErrors.jumlah_institusi_editor = `Cannot exceed total editor institutions (${aggregateCounts.jumlah_institusi_editor})`;
         }
 
-        if (aggregateCounts.jumlah_institusi_reviewer !== undefined && formData.jumlah_institusi_reviewer > aggregateCounts.jumlah_institusi_reviewer) {
+        if (
+            aggregateCounts.jumlah_institusi_reviewer !== undefined &&
+            formData.jumlah_institusi_reviewer > aggregateCounts.jumlah_institusi_reviewer
+        ) {
             newErrors.jumlah_institusi_reviewer = `Cannot exceed total reviewer institutions (${aggregateCounts.jumlah_institusi_reviewer})`;
         }
 
@@ -171,12 +161,10 @@ export default function JournalMetadataFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[700px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>
-                            {mode === 'edit' ? 'Edit Data Terbitan' : 'Tambah Data Terbitan'}
-                        </DialogTitle>
+                        <DialogTitle>{mode === 'edit' ? 'Edit Data Terbitan' : 'Tambah Data Terbitan'}</DialogTitle>
                         <DialogDescription>
                             {mode === 'edit'
                                 ? 'Update informasi terbitan jurnal di bawah ini.'
@@ -186,7 +174,7 @@ export default function JournalMetadataFormDialog({
 
                     <div className="space-y-4 py-4">
                         {/* Row 1: Volume, Number, Year, Month */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <div className="space-y-2">
                                 <Label htmlFor="volume">
                                     Volume <span className="text-destructive">*</span>
@@ -195,14 +183,10 @@ export default function JournalMetadataFormDialog({
                                     id="volume"
                                     placeholder="5"
                                     value={formData.volume}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, volume: e.target.value })
-                                    }
+                                    onChange={(e) => setFormData({ ...formData, volume: e.target.value })}
                                     className={errors.volume ? 'border-destructive' : ''}
                                 />
-                                {errors.volume && (
-                                    <span className="text-xs text-destructive">{errors.volume}</span>
-                                )}
+                                {errors.volume && <span className="text-xs text-destructive">{errors.volume}</span>}
                             </div>
 
                             <div className="space-y-2">
@@ -213,14 +197,10 @@ export default function JournalMetadataFormDialog({
                                     id="number"
                                     placeholder="2"
                                     value={formData.number}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, number: e.target.value })
-                                    }
+                                    onChange={(e) => setFormData({ ...formData, number: e.target.value })}
                                     className={errors.number ? 'border-destructive' : ''}
                                 />
-                                {errors.number && (
-                                    <span className="text-xs text-destructive">{errors.number}</span>
-                                )}
+                                {errors.number && <span className="text-xs text-destructive">{errors.number}</span>}
                             </div>
 
                             <div className="space-y-2">
@@ -233,14 +213,10 @@ export default function JournalMetadataFormDialog({
                                     min="1900"
                                     max={currentYear}
                                     value={formData.year}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, year: parseInt(e.target.value) || currentYear })
-                                    }
+                                    onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || currentYear })}
                                     className={errors.year ? 'border-destructive' : ''}
                                 />
-                                {errors.year && (
-                                    <span className="text-xs text-destructive">{errors.year}</span>
-                                )}
+                                {errors.year && <span className="text-xs text-destructive">{errors.year}</span>}
                             </div>
 
                             <div className="space-y-2">
@@ -249,9 +225,7 @@ export default function JournalMetadataFormDialog({
                                 </Label>
                                 <Select
                                     value={formData.month.toString()}
-                                    onValueChange={(value) =>
-                                        setFormData({ ...formData, month: parseInt(value) })
-                                    }
+                                    onValueChange={(value) => setFormData({ ...formData, month: parseInt(value) })}
                                 >
                                     <SelectTrigger id="month">
                                         <SelectValue />
@@ -270,22 +244,20 @@ export default function JournalMetadataFormDialog({
                         {/* URL Issue */}
                         <div className="space-y-2">
                             <Label htmlFor="url_issue">
-                                URL Terbitan <span className="text-muted-foreground text-xs">(Optional)</span>
+                                URL Terbitan <span className="text-xs text-muted-foreground">(Optional)</span>
                             </Label>
                             <Input
                                 id="url_issue"
                                 type="url"
                                 placeholder="https://journal.example.com/vol5no2"
                                 value={formData.url_issue}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, url_issue: e.target.value })
-                                }
+                                onChange={(e) => setFormData({ ...formData, url_issue: e.target.value })}
                             />
                         </div>
 
                         {/* Editor Metrics */}
-                        <div className="space-y-3 p-4 border rounded-lg">
-                            <h4 className="font-semibold text-sm">Metrik Editor</h4>
+                        <div className="space-y-3 rounded-lg border p-4">
+                            <h4 className="text-sm font-semibold">Metrik Editor</h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="jumlah_negara_editor">
@@ -296,14 +268,10 @@ export default function JournalMetadataFormDialog({
                                         type="number"
                                         min="0"
                                         value={formData.jumlah_negara_editor}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, jumlah_negara_editor: parseInt(e.target.value) || 0 })
-                                        }
+                                        onChange={(e) => setFormData({ ...formData, jumlah_negara_editor: parseInt(e.target.value) || 0 })}
                                         className={errors.jumlah_negara_editor ? 'border-destructive' : ''}
                                     />
-                                    {errors.jumlah_negara_editor && (
-                                        <span className="text-xs text-destructive">{errors.jumlah_negara_editor}</span>
-                                    )}
+                                    {errors.jumlah_negara_editor && <span className="text-xs text-destructive">{errors.jumlah_negara_editor}</span>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -315,9 +283,7 @@ export default function JournalMetadataFormDialog({
                                         type="number"
                                         min="0"
                                         value={formData.jumlah_institusi_editor}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, jumlah_institusi_editor: parseInt(e.target.value) || 0 })
-                                        }
+                                        onChange={(e) => setFormData({ ...formData, jumlah_institusi_editor: parseInt(e.target.value) || 0 })}
                                         className={errors.jumlah_institusi_editor ? 'border-destructive' : ''}
                                     />
                                     {errors.jumlah_institusi_editor && (
@@ -328,8 +294,8 @@ export default function JournalMetadataFormDialog({
                         </div>
 
                         {/* Reviewer Metrics */}
-                        <div className="space-y-3 p-4 border rounded-lg">
-                            <h4 className="font-semibold text-sm">Metrik Reviewer</h4>
+                        <div className="space-y-3 rounded-lg border p-4">
+                            <h4 className="text-sm font-semibold">Metrik Reviewer</h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="jumlah_negara_reviewer">
@@ -340,9 +306,7 @@ export default function JournalMetadataFormDialog({
                                         type="number"
                                         min="0"
                                         value={formData.jumlah_negara_reviewer}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, jumlah_negara_reviewer: parseInt(e.target.value) || 0 })
-                                        }
+                                        onChange={(e) => setFormData({ ...formData, jumlah_negara_reviewer: parseInt(e.target.value) || 0 })}
                                         className={errors.jumlah_negara_reviewer ? 'border-destructive' : ''}
                                     />
                                     {errors.jumlah_negara_reviewer && (
@@ -359,9 +323,7 @@ export default function JournalMetadataFormDialog({
                                         type="number"
                                         min="0"
                                         value={formData.jumlah_institusi_reviewer}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, jumlah_institusi_reviewer: parseInt(e.target.value) || 0 })
-                                        }
+                                        onChange={(e) => setFormData({ ...formData, jumlah_institusi_reviewer: parseInt(e.target.value) || 0 })}
                                         className={errors.jumlah_institusi_reviewer ? 'border-destructive' : ''}
                                     />
                                     {errors.jumlah_institusi_reviewer && (
@@ -372,24 +334,22 @@ export default function JournalMetadataFormDialog({
                         </div>
 
                         {/* Author Metrics (Optional) */}
-                        <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
-                            <h4 className="font-semibold text-sm">
-                                Metrik Author <span className="text-muted-foreground text-xs font-normal">(Optional)</span>
+                        <div className="space-y-3 rounded-lg border bg-muted/50 p-4">
+                            <h4 className="text-sm font-semibold">
+                                Metrik Author <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
                             </h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="jumlah_negara_author">
-                                        Jumlah Negara Author
-                                    </Label>
+                                    <Label htmlFor="jumlah_negara_author">Jumlah Negara Author</Label>
                                     <Input
                                         id="jumlah_negara_author"
                                         type="number"
                                         min="0"
                                         value={formData.jumlah_negara_author ?? ''}
                                         onChange={(e) =>
-                                            setFormData({ 
-                                                ...formData, 
-                                                jumlah_negara_author: e.target.value ? parseInt(e.target.value) : undefined 
+                                            setFormData({
+                                                ...formData,
+                                                jumlah_negara_author: e.target.value ? parseInt(e.target.value) : undefined,
                                             })
                                         }
                                         placeholder="Kosongkan jika tidak tersedia"
@@ -397,18 +357,16 @@ export default function JournalMetadataFormDialog({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="jumlah_institusi_author">
-                                        Jumlah Institusi Author
-                                    </Label>
+                                    <Label htmlFor="jumlah_institusi_author">Jumlah Institusi Author</Label>
                                     <Input
                                         id="jumlah_institusi_author"
                                         type="number"
                                         min="0"
                                         value={formData.jumlah_institusi_author ?? ''}
                                         onChange={(e) =>
-                                            setFormData({ 
-                                                ...formData, 
-                                                jumlah_institusi_author: e.target.value ? parseInt(e.target.value) : undefined 
+                                            setFormData({
+                                                ...formData,
+                                                jumlah_institusi_author: e.target.value ? parseInt(e.target.value) : undefined,
                                             })
                                         }
                                         placeholder="Kosongkan jika tidak tersedia"
@@ -419,12 +377,7 @@ export default function JournalMetadataFormDialog({
                     </div>
 
                     <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                            disabled={isSubmitting}
-                        >
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                             Cancel
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>

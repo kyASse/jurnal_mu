@@ -1,11 +1,11 @@
+import AssessmentNotesTimeline from '@/components/AssessmentNotesTimeline';
+import StatusTimeline, { type TimelineStep } from '@/components/StatusTimeline';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import AssessmentNotesTimeline from '@/components/AssessmentNotesTimeline';
-import StatusTimeline, { type TimelineStep } from '@/components/StatusTimeline';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, JournalAssessment, User } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';

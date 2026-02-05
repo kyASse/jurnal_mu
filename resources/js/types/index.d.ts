@@ -54,6 +54,7 @@ export interface User {
     avatar_url?: string;
     avatar?: string;
     is_reviewer?: boolean;
+    scientific_field?: ScientificField;
 }
 
 export interface University {
@@ -195,10 +196,12 @@ export interface JournalAssessment {
     pembinaan_registration_id?: number;
     assessment_date: string;
     period?: string;
-    status: 'draft' | 'submitted' | 'reviewed';
+    status: 'draft' | 'submitted' | 'reviewed' | 'in_review' | 'approved_by_lppm';
     submitted_at?: string;
     reviewed_at?: string;
     reviewed_by?: number;
+    reviewer_id?: number;
+    assigned_at?: string;
     // Phase 2: Admin Kampus approval fields
     admin_kampus_approved_by?: number;
     admin_kampus_approved_at?: string;

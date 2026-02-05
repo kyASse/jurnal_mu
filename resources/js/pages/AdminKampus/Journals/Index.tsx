@@ -121,7 +121,7 @@ export default function JournalsIndex({
     sintaRanks,
     indexationOptions,
     pembinaanPeriods,
-    pembinaanYears,
+    // pembinaanYears,
     participationOptions,
     approvalStatusOptions,
 }: Props) {
@@ -312,7 +312,7 @@ export default function JournalsIndex({
                             </div>
 
                             {/* Filter Row 2 - Phase 2 Pembinaan & Approval Filters */}
-                            <div className="flex gap-4 flex-wrap">
+                            <div className="flex flex-wrap gap-4">
                                 {/* Pembinaan Period Filter */}
                                 <Select
                                     value={pembinaanPeriodFilter || 'all'}
@@ -331,7 +331,7 @@ export default function JournalsIndex({
                                     </SelectContent>
                                 </Select>
 
-                                {/* Pembinaan Year Filter */}
+                                {/* Pembinaan Year Filter 
                                 <Select
                                     value={pembinaanYearFilter || 'all'}
                                     onValueChange={(value) => setPembinaanYearFilter(value === 'all' ? '' : value)}

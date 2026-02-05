@@ -5,11 +5,11 @@
  * @features View only, download attachments, submit button for drafts
  * @route GET /user/assessments/{id}
  */
+import JournalMetadataManager from '@/components/JournalMetadataManager';
+import ReviewerFeedback from '@/components/ReviewerFeedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import ReviewerFeedback from '@/components/ReviewerFeedback';
-import JournalMetadataManager from '@/components/JournalMetadataManager';
 import AppLayout from '@/layouts/app-layout';
 import type { AssessmentJournalMetadata } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
@@ -283,7 +283,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                             <CardTitle>Kategori yang Diusulkan</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <Badge variant="outline" className="text-lg px-4 py-2">
+                            <Badge variant="outline" className="px-4 py-2 text-lg">
                                 {assessment.kategori_diusulkan}
                             </Badge>
                         </CardContent>
@@ -291,49 +291,47 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                 )}
 
                 {/* Aggregate Counts */}
-                {(assessment.jumlah_editor !== null ||
-                    assessment.jumlah_reviewer !== null ||
-                    assessment.jumlah_author !== null) && (
+                {(assessment.jumlah_editor !== null || assessment.jumlah_reviewer !== null || assessment.jumlah_author !== null) && (
                     <Card>
                         <CardHeader>
                             <CardTitle>Jumlah Total Kontributor</CardTitle>
                             <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                                 {assessment.jumlah_editor !== null && (
                                     <div className="rounded-lg border p-4">
-                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Editor</div>
+                                        <div className="mb-1 text-sm text-muted-foreground">Jumlah Editor</div>
                                         <div className="text-2xl font-bold">{assessment.jumlah_editor}</div>
                                     </div>
                                 )}
                                 {assessment.jumlah_reviewer !== null && (
                                     <div className="rounded-lg border p-4">
-                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Reviewer</div>
+                                        <div className="mb-1 text-sm text-muted-foreground">Jumlah Reviewer</div>
                                         <div className="text-2xl font-bold">{assessment.jumlah_reviewer}</div>
                                     </div>
                                 )}
                                 {assessment.jumlah_author !== null && (
                                     <div className="rounded-lg border p-4">
-                                        <div className="text-sm text-muted-foreground mb-1">Jumlah Author</div>
+                                        <div className="mb-1 text-sm text-muted-foreground">Jumlah Author</div>
                                         <div className="text-2xl font-bold">{assessment.jumlah_author}</div>
                                     </div>
                                 )}
                                 {assessment.jumlah_institusi_editor !== null && (
                                     <div className="rounded-lg border p-4">
-                                        <div className="text-sm text-muted-foreground mb-1">Institusi Editor</div>
+                                        <div className="mb-1 text-sm text-muted-foreground">Institusi Editor</div>
                                         <div className="text-2xl font-bold">{assessment.jumlah_institusi_editor}</div>
                                     </div>
                                 )}
                                 {assessment.jumlah_institusi_reviewer !== null && (
                                     <div className="rounded-lg border p-4">
-                                        <div className="text-sm text-muted-foreground mb-1">Institusi Reviewer</div>
+                                        <div className="mb-1 text-sm text-muted-foreground">Institusi Reviewer</div>
                                         <div className="text-2xl font-bold">{assessment.jumlah_institusi_reviewer}</div>
                                     </div>
                                 )}
                                 {assessment.jumlah_institusi_author !== null && (
                                     <div className="rounded-lg border p-4">
-                                        <div className="text-sm text-muted-foreground mb-1">Institusi Author</div>
+                                        <div className="mb-1 text-sm text-muted-foreground">Institusi Author</div>
                                         <div className="text-2xl font-bold">{assessment.jumlah_institusi_author}</div>
                                     </div>
                                 )}
@@ -350,11 +348,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                             <CardDescription>Informasi per terbitan (volume, nomor, tahun)</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <JournalMetadataManager
-                                metadata={assessment.journalMetadata}
-                                onChange={() => {}}
-                                readOnly={true}
-                            />
+                            <JournalMetadataManager metadata={assessment.journalMetadata} onChange={() => {}} readOnly={true} />
                         </CardContent>
                     </Card>
                 )}

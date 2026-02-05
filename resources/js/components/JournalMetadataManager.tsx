@@ -1,10 +1,3 @@
-import { AssessmentJournalMetadata } from '@/types';
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, BookOpen } from 'lucide-react';
-import JournalMetadataCard from './JournalMetadataCard';
-import JournalMetadataFormDialog from './JournalMetadataFormDialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,6 +8,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AssessmentJournalMetadata } from '@/types';
+import { BookOpen, Plus } from 'lucide-react';
+import { useState } from 'react';
+import JournalMetadataCard from './JournalMetadataCard';
+import JournalMetadataFormDialog from './JournalMetadataFormDialog';
 
 interface JournalMetadataManagerProps {
     metadata: AssessmentJournalMetadata[];
@@ -30,12 +30,7 @@ interface JournalMetadataManagerProps {
     };
 }
 
-export default function JournalMetadataManager({
-    metadata = [],
-    onChange,
-    readOnly = false,
-    aggregateCounts = {},
-}: JournalMetadataManagerProps) {
+export default function JournalMetadataManager({ metadata = [], onChange, readOnly = false, aggregateCounts = {} }: JournalMetadataManagerProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [editingMetadata, setEditingMetadata] = useState<AssessmentJournalMetadata | null>(null);
@@ -43,10 +38,7 @@ export default function JournalMetadataManager({
     const [mode, setMode] = useState<'create' | 'edit'>('create');
 
     const handleAddMetadata = (
-        metadataData: Omit<
-            AssessmentJournalMetadata,
-            'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'
-        >
+        metadataData: Omit<AssessmentJournalMetadata, 'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'>,
     ) => {
         const newMetadata: AssessmentJournalMetadata = {
             ...metadataData,
@@ -61,10 +53,7 @@ export default function JournalMetadataManager({
     };
 
     const handleEditMetadata = (
-        metadataData: Omit<
-            AssessmentJournalMetadata,
-            'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'
-        >
+        metadataData: Omit<AssessmentJournalMetadata, 'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'>,
     ) => {
         if (!editingMetadata) return;
 
@@ -75,7 +64,7 @@ export default function JournalMetadataManager({
                       ...metadataData,
                       updated_at: new Date().toISOString(),
                   }
-                : item
+                : item,
         );
 
         onChange(updatedMetadata);
@@ -115,15 +104,13 @@ export default function JournalMetadataManager({
                     <div className="flex items-center justify-between">
                         <div>
                             <CardTitle>Data Terbitan Jurnal</CardTitle>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                {readOnly
-                                    ? 'Informasi terbitan jurnal yang dinilai'
-                                    : 'Tambahkan informasi terbitan jurnal (volume, nomor, tahun)'}
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                {readOnly ? 'Informasi terbitan jurnal yang dinilai' : 'Tambahkan informasi terbitan jurnal (volume, nomor, tahun)'}
                             </p>
                         </div>
                         {!readOnly && (
                             <Button onClick={openAddDialog} size="sm">
-                                <Plus className="w-4 h-4 mr-2" />
+                                <Plus className="mr-2 h-4 w-4" />
                                 Tambah Terbitan
                             </Button>
                         )}
@@ -131,21 +118,17 @@ export default function JournalMetadataManager({
                 </CardHeader>
                 <CardContent>
                     {metadata.length === 0 ? (
-                        <div className="text-center py-12">
-                            <BookOpen className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
-                            <p className="text-muted-foreground mb-2">
-                                {readOnly
-                                    ? 'Tidak ada data terbitan yang dicatat'
-                                    : 'Belum ada data terbitan jurnal'}
+                        <div className="py-12 text-center">
+                            <BookOpen className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+                            <p className="mb-2 text-muted-foreground">
+                                {readOnly ? 'Tidak ada data terbitan yang dicatat' : 'Belum ada data terbitan jurnal'}
                             </p>
                             {!readOnly && (
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Tambahkan minimal satu terbitan jurnal untuk assessment
-                                </p>
+                                <p className="mb-4 text-sm text-muted-foreground">Tambahkan minimal satu terbitan jurnal untuk assessment</p>
                             )}
                             {!readOnly && (
                                 <Button onClick={openAddDialog} variant="outline" size="sm">
-                                    <Plus className="w-4 h-4 mr-2" />
+                                    <Plus className="mr-2 h-4 w-4" />
                                     Tambah Terbitan Pertama
                                 </Button>
                             )}
@@ -165,10 +148,9 @@ export default function JournalMetadataManager({
                     )}
 
                     {!readOnly && metadata.length > 0 && (
-                        <div className="mt-4 pt-4 border-t">
+                        <div className="mt-4 border-t pt-4">
                             <p className="text-sm text-muted-foreground">
-                                Total: <span className="font-medium">{metadata.length}</span>{' '}
-                                {metadata.length === 1 ? 'terbitan' : 'terbitan'}
+                                Total: <span className="font-medium">{metadata.length}</span> {metadata.length === 1 ? 'terbitan' : 'terbitan'}
                             </p>
                         </div>
                     )}
@@ -191,8 +173,7 @@ export default function JournalMetadataManager({
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hapus Data Terbitan?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Data terbitan ini akan dihapus secara permanen. Tindakan ini tidak dapat
-                            dibatalkan.
+                            Data terbitan ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

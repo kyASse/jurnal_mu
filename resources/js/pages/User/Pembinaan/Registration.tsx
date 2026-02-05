@@ -21,6 +21,7 @@
  *
  * @author JurnalMU Team
  */
+import ReviewerFeedback from '@/components/ReviewerFeedback';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,7 +39,7 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PembinaanRegistration } from '@/types';
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     AlertCircle,
     ArrowLeft,
@@ -55,7 +56,6 @@ import {
     XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
-import ReviewerFeedback from '@/components/ReviewerFeedback';
 
 interface Props {
     registration: PembinaanRegistration;
@@ -352,10 +352,7 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                                 {review.recommendation && (
                                                     <div>
                                                         <p className="mb-1 text-sm font-medium">Recommendation:</p>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="inline-flex break-words whitespace-normal capitalize"
-                                                        >
+                                                        <Badge variant="outline" className="inline-flex break-words whitespace-normal capitalize">
                                                             {review.recommendation}
                                                         </Badge>
                                                     </div>
@@ -375,9 +372,7 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                         <BookOpen className="h-5 w-5" />
                                         Self-Assessment
                                     </CardTitle>
-                                    <CardDescription>
-                                        Complete the self-assessment form to proceed with the coaching program
-                                    </CardDescription>
+                                    <CardDescription>Complete the self-assessment form to proceed with the coaching program</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {registration.assessment ? (
@@ -389,13 +384,13 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                                     {(() => {
                                                         const status = registration.assessment.status;
                                                         const variant =
-                                                            status === 'draft' ? 'secondary' :
-                                                            status === 'submitted' ? 'default' :
-                                                            'outline';
+                                                            status === 'draft' ? 'secondary' : status === 'submitted' ? 'default' : 'outline';
                                                         const label =
-                                                            status === 'draft' ? 'Draft' :
-                                                            status === 'submitted' ? 'Submitted - Pending Review' :
-                                                            'Reviewed';
+                                                            status === 'draft'
+                                                                ? 'Draft'
+                                                                : status === 'submitted'
+                                                                  ? 'Submitted - Pending Review'
+                                                                  : 'Reviewed';
                                                         return (
                                                             <Badge className="mt-1" variant={variant}>
                                                                 {label}
@@ -448,7 +443,7 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="space-y-4 text-center py-6">
+                                        <div className="space-y-4 py-6 text-center">
                                             <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
                                             <div>
                                                 <p className="font-semibold">No Assessment Yet</p>
@@ -606,8 +601,7 @@ export default function PembinaanRegistrationShow({ registration, category }: Pr
                         <AlertDialogCancel>Keep Registration</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleCancelRegistration}
-                            className={`bg-destructive text-destructive-foreground
-                                hover:bg-destructive/90`}
+                            className={`bg-destructive text-destructive-foreground hover:bg-destructive/90`}
                         >
                             Yes, Cancel Registration
                         </AlertDialogAction>

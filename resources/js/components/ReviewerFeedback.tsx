@@ -21,11 +21,9 @@ export default function ReviewerFeedback({ assessment }: ReviewerFeedbackProps) 
 
     const isApproved = assessment.status === 'reviewed';
     const isRevisionRequested = assessment.status === 'draft' && assessment.reviewed_at;
-    
-    const cardClassName = isApproved 
-        ? 'border-green-200 bg-green-50' 
-        : 'border-yellow-200 bg-yellow-50';
-    
+
+    const cardClassName = isApproved ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50';
+
     const titleClassName = isApproved ? 'text-green-900' : 'text-yellow-900';
     const alertVariant = isApproved ? 'default' : 'destructive';
 
@@ -33,14 +31,8 @@ export default function ReviewerFeedback({ assessment }: ReviewerFeedbackProps) 
         <Card className={cardClassName}>
             <CardHeader>
                 <div className="flex items-center gap-2">
-                    {isApproved ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                    ) : (
-                        <AlertCircle className="h-5 w-5 text-yellow-600" />
-                    )}
-                    <CardTitle className={titleClassName}>
-                        {isApproved ? 'Assessment Approved' : 'Revision Requested'}
-                    </CardTitle>
+                    {isApproved ? <CheckCircle className="h-5 w-5 text-green-600" /> : <AlertCircle className="h-5 w-5 text-yellow-600" />}
+                    <CardTitle className={titleClassName}>{isApproved ? 'Assessment Approved' : 'Revision Requested'}</CardTitle>
                 </div>
                 <CardDescription>
                     <div className="flex items-center gap-2 pt-1">
@@ -54,9 +46,7 @@ export default function ReviewerFeedback({ assessment }: ReviewerFeedbackProps) 
                 <Alert variant={alertVariant} className="bg-white">
                     <Info className="h-4 w-4" />
                     <AlertTitle className="mb-2 font-semibold">Administrator's Feedback</AlertTitle>
-                    <AlertDescription className="whitespace-pre-wrap text-sm leading-relaxed">
-                        {assessment.admin_notes}
-                    </AlertDescription>
+                    <AlertDescription className="text-sm leading-relaxed whitespace-pre-wrap">{assessment.admin_notes}</AlertDescription>
                 </Alert>
 
                 {isRevisionRequested && (

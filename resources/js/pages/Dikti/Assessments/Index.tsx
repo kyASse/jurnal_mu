@@ -50,11 +50,7 @@ export default function DiktiAssessmentsIndex({ assessments, filters }: Props) {
 
     const handleStatusChange = (value: string) => {
         setStatus(value);
-        router.get(
-            route('dikti.assessments.index'),
-            { status: value !== 'all' ? value : undefined, search },
-            { preserveState: true, replace: true },
-        );
+        router.get(route('dikti.assessments.index'), { status: value !== 'all' ? value : undefined, search }, { preserveState: true, replace: true });
     };
 
     const getStatusBadge = (assessment: JournalAssessment) => {
@@ -91,7 +87,7 @@ export default function DiktiAssessmentsIndex({ assessments, filters }: Props) {
                         <div className="space-y-4">
                             <div className="flex flex-col gap-4 sm:flex-row">
                                 <div className="relative flex-1">
-                                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                     <Input
                                         placeholder="Search by journal title, ISSN, or university..."
                                         value={search}
@@ -146,9 +142,7 @@ export default function DiktiAssessmentsIndex({ assessments, filters }: Props) {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="text-sm">
-                                                    {assessment.journal.university?.name || '-'}
-                                                </div>
+                                                <div className="text-sm">{assessment.journal.university?.name || '-'}</div>
                                             </TableCell>
                                             <TableCell>{assessment.user.name}</TableCell>
                                             <TableCell>

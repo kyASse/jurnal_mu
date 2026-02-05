@@ -350,9 +350,7 @@ export default function PembinaanRegister({ program, journals, category }: Props
                                                         className="hidden"
                                                     />
                                                 </div>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Accepted formats: PDF, DOC, DOCX (Maximum size: 5MB)
-                                                </p>
+                                                <p className="text-xs text-muted-foreground">Accepted formats: PDF, DOC, DOCX (Maximum size: 5MB)</p>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-3 rounded-lg border p-3">
@@ -361,9 +359,7 @@ export default function PembinaanRegister({ program, journals, category }: Props
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="font-medium">{supportingDocument.name}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {formatFileSize(supportingDocument.size)}
-                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">{formatFileSize(supportingDocument.size)}</p>
                                                 </div>
                                                 <Button
                                                     type="button"

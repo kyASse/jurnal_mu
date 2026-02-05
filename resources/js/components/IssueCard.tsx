@@ -1,9 +1,9 @@
-import { AssessmentIssue } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { AssessmentIssue } from '@/types';
+import { AlertCircle, AlertTriangle, Edit, Info, Trash2 } from 'lucide-react';
 
 interface IssueCardProps {
     issue: AssessmentIssue;
@@ -49,18 +49,13 @@ const priorityConfig = {
     },
 };
 
-export default function IssueCard({
-    issue,
-    readOnly = false,
-    onEdit,
-    onDelete,
-}: IssueCardProps) {
+export default function IssueCard({ issue, readOnly = false, onEdit, onDelete }: IssueCardProps) {
     const category = categoryConfig[issue.category];
     const priority = priorityConfig[issue.priority];
     const PriorityIcon = priority.icon;
 
     return (
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="transition-shadow hover:shadow-md">
             <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 space-y-2">
@@ -68,36 +63,26 @@ export default function IssueCard({
                         <div className="flex items-start gap-2">
                             <PriorityIcon
                                 className={cn(
-                                    'w-5 h-5 mt-0.5 flex-shrink-0',
+                                    'mt-0.5 h-5 w-5 flex-shrink-0',
                                     priority.color.includes('red')
                                         ? 'text-red-600'
                                         : priority.color.includes('yellow')
-                                        ? 'text-yellow-600'
-                                        : 'text-gray-600'
+                                          ? 'text-yellow-600'
+                                          : 'text-gray-600',
                                 )}
                             />
-                            <h4 className="font-semibold text-base leading-tight">
-                                {issue.title}
-                            </h4>
+                            <h4 className="text-base leading-tight font-semibold">{issue.title}</h4>
                         </div>
 
                         {/* Description */}
-                        <p className="text-sm text-muted-foreground leading-relaxed pl-7">
-                            {issue.description}
-                        </p>
+                        <p className="pl-7 text-sm leading-relaxed text-muted-foreground">{issue.description}</p>
 
                         {/* Badges */}
                         <div className="flex items-center gap-2 pl-7">
-                            <Badge
-                                variant="outline"
-                                className={cn('text-xs', category.color)}
-                            >
+                            <Badge variant="outline" className={cn('text-xs', category.color)}>
                                 {category.label}
                             </Badge>
-                            <Badge
-                                variant="outline"
-                                className={cn('text-xs', priority.color)}
-                            >
+                            <Badge variant="outline" className={cn('text-xs', priority.color)}>
                                 {priority.label} Priority
                             </Badge>
                         </div>
@@ -105,26 +90,16 @@ export default function IssueCard({
 
                     {/* Actions */}
                     {!readOnly && (
-                        <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="flex flex-shrink-0 items-center gap-1">
                             {onEdit && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={onEdit}
-                                    className="h-8 w-8 p-0"
-                                >
-                                    <Edit className="w-4 h-4" />
+                                <Button variant="ghost" size="sm" onClick={onEdit} className="h-8 w-8 p-0">
+                                    <Edit className="h-4 w-4" />
                                     <span className="sr-only">Edit</span>
                                 </Button>
                             )}
                             {onDelete && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={onDelete}
-                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                >
-                                    <Trash2 className="w-4 h-4" />
+                                <Button variant="ghost" size="sm" onClick={onDelete} className="h-8 w-8 p-0 text-destructive hover:text-destructive">
+                                    <Trash2 className="h-4 w-4" />
                                     <span className="sr-only">Delete</span>
                                 </Button>
                             )}

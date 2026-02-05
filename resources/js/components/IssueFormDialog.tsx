@@ -1,25 +1,12 @@
-import { AssessmentIssue } from '@/types';
-import { useState, useEffect } from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { AssessmentIssue } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface IssueFormDialogProps {
     open: boolean;
@@ -29,13 +16,7 @@ interface IssueFormDialogProps {
     mode?: 'create' | 'edit';
 }
 
-export default function IssueFormDialog({
-    open,
-    onOpenChange,
-    onSave,
-    issue,
-    mode = 'create',
-}: IssueFormDialogProps) {
+export default function IssueFormDialog({ open, onOpenChange, onSave, issue, mode = 'create' }: IssueFormDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
@@ -108,13 +89,9 @@ export default function IssueFormDialog({
             <DialogContent className="sm:max-w-[600px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>
-                            {mode === 'edit' ? 'Edit Issue' : 'Add New Issue'}
-                        </DialogTitle>
+                        <DialogTitle>{mode === 'edit' ? 'Edit Issue' : 'Add New Issue'}</DialogTitle>
                         <DialogDescription>
-                            {mode === 'edit'
-                                ? 'Update the issue details below.'
-                                : 'Describe the problem or issue found in the journal.'}
+                            {mode === 'edit' ? 'Update the issue details below.' : 'Describe the problem or issue found in the journal.'}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -128,19 +105,13 @@ export default function IssueFormDialog({
                                 id="title"
                                 placeholder="e.g., Missing editorial board information"
                                 value={formData.title}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, title: e.target.value })
-                                }
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 maxLength={200}
                                 className={errors.title ? 'border-destructive' : ''}
                             />
                             <div className="flex justify-between text-xs">
-                                {errors.title && (
-                                    <span className="text-destructive">{errors.title}</span>
-                                )}
-                                <span className="ml-auto text-muted-foreground">
-                                    {formData.title.length}/200
-                                </span>
+                                {errors.title && <span className="text-destructive">{errors.title}</span>}
+                                <span className="ml-auto text-muted-foreground">{formData.title.length}/200</span>
                             </div>
                         </div>
 
@@ -153,22 +124,14 @@ export default function IssueFormDialog({
                                 id="description"
                                 placeholder="Provide detailed description of the issue..."
                                 value={formData.description}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, description: e.target.value })
-                                }
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows={4}
                                 maxLength={1000}
                                 className={errors.description ? 'border-destructive' : ''}
                             />
                             <div className="flex justify-between text-xs">
-                                {errors.description && (
-                                    <span className="text-destructive">
-                                        {errors.description}
-                                    </span>
-                                )}
-                                <span className="ml-auto text-muted-foreground">
-                                    {formData.description.length}/1000
-                                </span>
+                                {errors.description && <span className="text-destructive">{errors.description}</span>}
+                                <span className="ml-auto text-muted-foreground">{formData.description.length}/1000</span>
                             </div>
                         </div>
 
@@ -179,9 +142,7 @@ export default function IssueFormDialog({
                             </Label>
                             <Select
                                 value={formData.category}
-                                onValueChange={(value: AssessmentIssue['category']) =>
-                                    setFormData({ ...formData, category: value })
-                                }
+                                onValueChange={(value: AssessmentIssue['category']) => setFormData({ ...formData, category: value })}
                             >
                                 <SelectTrigger id="category">
                                     <SelectValue placeholder="Select category" />
@@ -189,9 +150,7 @@ export default function IssueFormDialog({
                                 <SelectContent>
                                     <SelectItem value="editorial">Editorial</SelectItem>
                                     <SelectItem value="technical">Technical</SelectItem>
-                                    <SelectItem value="content_quality">
-                                        Content Quality
-                                    </SelectItem>
+                                    <SelectItem value="content_quality">Content Quality</SelectItem>
                                     <SelectItem value="management">Management</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -204,9 +163,7 @@ export default function IssueFormDialog({
                             </Label>
                             <Select
                                 value={formData.priority}
-                                onValueChange={(value: AssessmentIssue['priority']) =>
-                                    setFormData({ ...formData, priority: value })
-                                }
+                                onValueChange={(value: AssessmentIssue['priority']) => setFormData({ ...formData, priority: value })}
                             >
                                 <SelectTrigger id="priority">
                                     <SelectValue placeholder="Select priority" />
@@ -221,18 +178,13 @@ export default function IssueFormDialog({
                     </div>
 
                     <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                            disabled={isSubmitting}
-                        >
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                             Cancel
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Saving...
                                 </>
                             ) : mode === 'edit' ? (

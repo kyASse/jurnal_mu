@@ -1,10 +1,3 @@
-import { AssessmentIssue } from '@/types';
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, FileText } from 'lucide-react';
-import IssueCard from './IssueCard';
-import IssueFormDialog from './IssueFormDialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,6 +8,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AssessmentIssue } from '@/types';
+import { FileText, Plus } from 'lucide-react';
+import { useState } from 'react';
+import IssueCard from './IssueCard';
+import IssueFormDialog from './IssueFormDialog';
 
 interface AssessmentIssueManagerProps {
     issues: AssessmentIssue[];
@@ -22,23 +22,14 @@ interface AssessmentIssueManagerProps {
     readOnly?: boolean;
 }
 
-export default function AssessmentIssueManager({
-    issues = [],
-    onChange,
-    readOnly = false,
-}: AssessmentIssueManagerProps) {
+export default function AssessmentIssueManager({ issues = [], onChange, readOnly = false }: AssessmentIssueManagerProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [editingIssue, setEditingIssue] = useState<AssessmentIssue | null>(null);
     const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
     const [mode, setMode] = useState<'create' | 'edit'>('create');
 
-    const handleAddIssue = (
-        issueData: Omit<
-            AssessmentIssue,
-            'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'
-        >
-    ) => {
+    const handleAddIssue = (issueData: Omit<AssessmentIssue, 'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'>) => {
         const newIssue: AssessmentIssue = {
             ...issueData,
             id: Date.now(), // Temporary ID for frontend
@@ -51,12 +42,7 @@ export default function AssessmentIssueManager({
         onChange([...issues, newIssue]);
     };
 
-    const handleEditIssue = (
-        issueData: Omit<
-            AssessmentIssue,
-            'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'
-        >
-    ) => {
+    const handleEditIssue = (issueData: Omit<AssessmentIssue, 'id' | 'journal_assessment_id' | 'created_at' | 'updated_at' | 'display_order'>) => {
         if (!editingIssue) return;
 
         const updatedIssues = issues.map((issue) =>
@@ -66,7 +52,7 @@ export default function AssessmentIssueManager({
                       ...issueData,
                       updated_at: new Date().toISOString(),
                   }
-                : issue
+                : issue,
         );
 
         onChange(updatedIssues);
@@ -106,15 +92,13 @@ export default function AssessmentIssueManager({
                     <div className="flex items-center justify-between">
                         <div>
                             <CardTitle>Catatan Masalah</CardTitle>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                {readOnly
-                                    ? 'Masalah yang ditemukan dalam assessment'
-                                    : 'Catat masalah atau kelemahan yang ditemukan pada jurnal'}
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                {readOnly ? 'Masalah yang ditemukan dalam assessment' : 'Catat masalah atau kelemahan yang ditemukan pada jurnal'}
                             </p>
                         </div>
                         {!readOnly && (
                             <Button onClick={openAddDialog} size="sm">
-                                <Plus className="w-4 h-4 mr-2" />
+                                <Plus className="mr-2 h-4 w-4" />
                                 Tambah Masalah
                             </Button>
                         )}
@@ -122,21 +106,15 @@ export default function AssessmentIssueManager({
                 </CardHeader>
                 <CardContent>
                     {issues.length === 0 ? (
-                        <div className="text-center py-12">
-                            <FileText className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
-                            <p className="text-muted-foreground mb-2">
-                                {readOnly
-                                    ? 'Tidak ada masalah yang dicatat'
-                                    : 'Belum ada masalah yang dicatat'}
+                        <div className="py-12 text-center">
+                            <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+                            <p className="mb-2 text-muted-foreground">
+                                {readOnly ? 'Tidak ada masalah yang dicatat' : 'Belum ada masalah yang dicatat'}
                             </p>
-                            {!readOnly && (
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Tambahkan masalah untuk dokumentasi lengkap
-                                </p>
-                            )}
+                            {!readOnly && <p className="mb-4 text-sm text-muted-foreground">Tambahkan masalah untuk dokumentasi lengkap</p>}
                             {!readOnly && (
                                 <Button onClick={openAddDialog} variant="outline" size="sm">
-                                    <Plus className="w-4 h-4 mr-2" />
+                                    <Plus className="mr-2 h-4 w-4" />
                                     Tambah Masalah Pertama
                                 </Button>
                             )}
@@ -156,10 +134,9 @@ export default function AssessmentIssueManager({
                     )}
 
                     {!readOnly && issues.length > 0 && (
-                        <div className="mt-4 pt-4 border-t">
+                        <div className="mt-4 border-t pt-4">
                             <p className="text-sm text-muted-foreground">
-                                Total: <span className="font-medium">{issues.length}</span>{' '}
-                                {issues.length === 1 ? 'masalah' : 'masalah'}
+                                Total: <span className="font-medium">{issues.length}</span> {issues.length === 1 ? 'masalah' : 'masalah'}
                             </p>
                         </div>
                     )}
@@ -180,17 +157,11 @@ export default function AssessmentIssueManager({
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hapus Issue?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Issue ini akan dihapus secara permanen. Tindakan ini tidak dapat
-                            dibatalkan.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Issue ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleDeleteIssue}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
+                        <AlertDialogAction onClick={handleDeleteIssue} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>

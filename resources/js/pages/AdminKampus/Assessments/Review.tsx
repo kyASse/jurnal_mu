@@ -1,9 +1,9 @@
+import IssueCard from '@/components/IssueCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import IssueCard from '@/components/IssueCard';
 import AppLayout from '@/layouts/app-layout';
 import type { AssessmentAttachment, AssessmentResponse, BreadcrumbItem, JournalAssessment } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
@@ -209,7 +209,8 @@ export default function AssessmentReview({ assessment }: Props) {
                                 <CardTitle>Issues Identified</CardTitle>
                             </div>
                             <CardDescription>
-                                The user has identified {assessment.issues.length} issue{assessment.issues.length !== 1 ? 's' : ''} during self-assessment
+                                The user has identified {assessment.issues.length} issue{assessment.issues.length !== 1 ? 's' : ''} during
+                                self-assessment
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

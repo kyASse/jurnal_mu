@@ -57,7 +57,9 @@ export default function Dashboard({ stats }: DashboardProps) {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Rata-rata Skor</p>
-                                <h3 className="mt-2 text-3xl font-bold">{stats.average_score !== null ? Number(stats.average_score).toFixed(1) : '0.0'}</h3>
+                                <h3 className="mt-2 text-3xl font-bold">
+                                    {stats.average_score !== null ? Number(stats.average_score).toFixed(1) : '0.0'}
+                                </h3>
                             </div>
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20">
                                 <TrendingUp className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
