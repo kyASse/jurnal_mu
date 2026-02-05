@@ -347,6 +347,24 @@ export default function JournalsIndex({
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
+                                </Select> */}
+
+                                {/* Indexation Filter */}
+                                <Select
+                                    value={indexationFilter || 'all'}
+                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Indexations" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Indexations</SelectItem>
+                                        {indexationOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
                                 </Select>
 
                                 {/* Participation Filter */}
