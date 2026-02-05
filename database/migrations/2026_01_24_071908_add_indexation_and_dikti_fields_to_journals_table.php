@@ -18,6 +18,9 @@ return new class extends Migration
             $table->date('accreditation_expiry_date')->nullable()->after('accreditation_issued_date');
 
             // Indexations (JSON format: {"Scopus": {"indexed_at": "2023-01-15"}, "WoS": {...}})
+            // NOTE: Multiple indexation platforms are stored here (Scopus, WoS, DOAJ, etc.)
+            // However, "indexed journals" statistics specifically count Scopus-indexed only
+            // (as per meeting notes 02 Feb 2026 - Scopus = "terindeks" definition)
             $table->json('indexations')->nullable()->after('accreditation_expiry_date');
 
             // SINTA indexed date

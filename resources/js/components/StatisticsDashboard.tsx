@@ -92,7 +92,7 @@ export default function StatisticsDashboard({ statistics }: StatisticsDashboardP
 
     const indexationChartSeries = [
         {
-            name: 'Jurnal Terindeks',
+            name: 'Jurnal per Platform',
             data: statistics.by_indexation.map((item) => item.count),
         },
     ];
@@ -116,7 +116,7 @@ export default function StatisticsDashboard({ statistics }: StatisticsDashboardP
         ],
         dataLabels: {
             enabled: true,
-            formatter: (val: number) => `${val.toFixed(1)}%`,
+            formatter: (val: number) => `${Number(val).toFixed(1)}%`,
             style: {
                 colors: [textColor],
             },
@@ -248,7 +248,7 @@ export default function StatisticsDashboard({ statistics }: StatisticsDashboardP
 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Jurnal Terindeks</CardTitle>
+                        <CardTitle className="text-sm font-medium">Jurnal Terindeks Scopus</CardTitle>
                         <BarChart3 className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>

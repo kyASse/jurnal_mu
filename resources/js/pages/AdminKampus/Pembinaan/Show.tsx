@@ -32,11 +32,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type PembinaanRegistration, type User } from '@/types';
+import { type BreadcrumbItem, type PembinaanRegistration } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Award, CalendarDays, Check, Download, FileText, Star, Trash2, UserPlus, X } from 'lucide-react';
 import { useState } from 'react';
@@ -71,11 +70,12 @@ export default function PembinaanShow({ registration, category }: Props) {
 
     const [showApproveDialog, setShowApproveDialog] = useState(false);
     const [showRejectDialog, setShowRejectDialog] = useState(false);
-    const [showAssignDialog, setShowAssignDialog] = useState(false);
+    // DEPRECATED: Assign reviewer functionality is now only available to Super Admin
+    // const [showAssignDialog, setShowAssignDialog] = useState(false);
+    // const [selectedReviewer, setSelectedReviewer] = useState('');
+    // const [reviewers, setReviewers] = useState<User[]>([]);
+    // const [loadingReviewers, setLoadingReviewers] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
-    const [selectedReviewer, setSelectedReviewer] = useState('');
-    const [reviewers, setReviewers] = useState<User[]>([]);
-    const [loadingReviewers, setLoadingReviewers] = useState(false);
 
     const handleApprove = () => {
         router.post(
@@ -117,42 +117,43 @@ export default function PembinaanShow({ registration, category }: Props) {
         );
     };
 
-    const loadReviewers = () => {
-        setLoadingReviewers(true);
-        fetch(route('admin-kampus.pembinaan.reviewers'))
-            .then((res) => res.json())
-            .then((data) => {
-                setReviewers(data);
-                setLoadingReviewers(false);
-            })
-            .catch(() => {
-                toast.error('Failed to load reviewers');
-                setLoadingReviewers(false);
-            });
-    };
+    // DEPRECATED: Assign reviewer functionality moved to Super Admin only
+    // const loadReviewers = () => {
+    //     setLoadingReviewers(true);
+    //     fetch(route('admin-kampus.pembinaan.reviewers'))
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             setReviewers(data);
+    //             setLoadingReviewers(false);
+    //         })
+    //         .catch(() => {
+    //             toast.error('Failed to load reviewers');
+    //             setLoadingReviewers(false);
+    //         });
+    // };
 
-    const handleAssignReviewer = () => {
-        if (!selectedReviewer) {
-            toast.error('Please select a reviewer');
-            return;
-        }
+    // const handleAssignReviewer = () => {
+    //     if (!selectedReviewer) {
+    //         toast.error('Please select a reviewer');
+    //         return;
+    //     }
 
-        router.post(
-            route('admin-kampus.pembinaan.registrations.assign-reviewer', registration.id),
-            { reviewer_id: selectedReviewer },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Reviewer assigned successfully');
-                    setShowAssignDialog(false);
-                    setSelectedReviewer('');
-                },
-                onError: () => {
-                    toast.error('Failed to assign reviewer');
-                },
-            },
-        );
-    };
+    //     router.post(
+    //         route('admin-kampus.pembinaan.registrations.assign-reviewer', registration.id),
+    //         { reviewer_id: selectedReviewer },
+    //         {
+    //             preserveScroll: true,
+    //             onSuccess: () => {
+    //                 toast.success('Reviewer assigned successfully');
+    //                 setShowAssignDialog(false);
+    //                 setSelectedReviewer('');
+    //             },
+    //             onError: () => {
+    //                 toast.error('Failed to assign reviewer');
+    //             },
+    //         },
+    //     );
+    // };
 
     const handleRemoveAssignment = (assignmentId: number) => {
         if (!confirm('Remove this reviewer assignment?')) return;
@@ -239,6 +240,7 @@ export default function PembinaanShow({ registration, category }: Props) {
                         </div>
                     )}
 
+                    {/* DEPRECATED: Assign reviewer only available to Super Admin
                     {registration.status === 'approved' && (
                         <Button
                             onClick={() => {
@@ -250,6 +252,7 @@ export default function PembinaanShow({ registration, category }: Props) {
                             Assign Reviewer
                         </Button>
                     )}
+                    */}
                 </div>
 
                 {/* Program & Journal Info */}
@@ -539,7 +542,7 @@ export default function PembinaanShow({ registration, category }: Props) {
                 </DialogContent>
             </Dialog>
 
-            {/* Assign Reviewer Dialog */}
+            {/* DEPRECATED: Assign reviewer dialog - only Super Admin can assign reviewers
             <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
                 <DialogContent>
                     <DialogHeader>
@@ -577,6 +580,7 @@ export default function PembinaanShow({ registration, category }: Props) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            */}
         </AppLayout>
     );
 }

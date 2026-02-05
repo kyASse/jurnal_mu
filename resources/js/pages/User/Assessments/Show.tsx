@@ -5,10 +5,13 @@
  * @features View only, download attachments, submit button for drafts
  * @route GET /user/assessments/{id}
  */
+import JournalMetadataManager from '@/components/JournalMetadataManager';
+import ReviewerFeedback from '@/components/ReviewerFeedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import type { AssessmentJournalMetadata } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, CheckCircle, Download, Edit, FileText, Send, TrendingUp, XCircle } from 'lucide-react';
 
@@ -68,6 +71,14 @@ interface Assessment {
     reviewed_at: string | null;
     created_at: string;
     updated_at: string;
+    kategori_diusulkan?: string | null;
+    jumlah_editor?: number | null;
+    jumlah_reviewer?: number | null;
+    jumlah_author?: number | null;
+    jumlah_institusi_editor?: number | null;
+    jumlah_institusi_reviewer?: number | null;
+    jumlah_institusi_author?: number | null;
+    journalMetadata?: AssessmentJournalMetadata[];
 }
 
 interface Props {
@@ -93,6 +104,20 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
         window.open(route('user.assessments.attachments.download', attachmentId), '_blank');
     };
 
+    // Helper function to safely convert percentage to number
+    const getPercentage = (value: any): number => {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') return parseFloat(value) || 0;
+        return 0;
+    };
+
+    // Helper function to safely convert score to number
+    const getScore = (value: any): number => {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') return parseFloat(value) || 0;
+        return 0;
+    };
+
     const getStatusBadge = () => {
         const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
             gray: 'secondary',
@@ -108,7 +133,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
     };
 
     const getGradeBadge = () => {
-        const percentage = assessment.percentage;
+        const percentage = getPercentage(assessment.percentage);
         if (percentage >= 90) return <Badge className="bg-green-500 px-6 py-2 text-2xl text-white">A</Badge>;
         if (percentage >= 80) return <Badge className="bg-blue-500 px-6 py-2 text-2xl text-white">B</Badge>;
         if (percentage >= 70) return <Badge className="bg-yellow-500 px-6 py-2 text-2xl text-white">C</Badge>;
@@ -191,6 +216,9 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                 {/* Flash Message */}
                 {flash?.success && <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-800">{flash.success}</div>}
 
+                {/* Reviewer Feedback */}
+                <ReviewerFeedback assessment={assessment as any} />
+
                 {/* Summary Card */}
                 <Card>
                     <CardHeader>
@@ -230,9 +258,9 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                                     <div className="space-y-2 text-center">
                                         <div className="text-sm text-muted-foreground">Nilai Akhir</div>
                                         {getGradeBadge()}
-                                        <div className="text-sm font-semibold">{assessment.percentage.toFixed(1)}%</div>
+                                        <div className="text-sm font-semibold">{getPercentage(assessment.percentage).toFixed(1)}%</div>
                                         <div className="text-xs text-muted-foreground">
-                                            {assessment.total_score.toFixed(2)} / {assessment.max_score.toFixed(2)} poin
+                                            {getScore(assessment.total_score).toFixed(2)} / {getScore(assessment.max_score).toFixed(2)} poin
                                         </div>
                                     </div>
                                 </div>
@@ -248,6 +276,83 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                     </CardContent>
                 </Card>
 
+                {/* Kategori yang Diusulkan */}
+                {assessment.kategori_diusulkan && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Kategori yang Diusulkan</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Badge variant="outline" className="px-4 py-2 text-lg">
+                                {assessment.kategori_diusulkan}
+                            </Badge>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Aggregate Counts */}
+                {(assessment.jumlah_editor !== null || assessment.jumlah_reviewer !== null || assessment.jumlah_author !== null) && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Jumlah Total Kontributor</CardTitle>
+                            <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                                {assessment.jumlah_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="mb-1 text-sm text-muted-foreground">Jumlah Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="mb-1 text-sm text-muted-foreground">Jumlah Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="mb-1 text-sm text-muted-foreground">Jumlah Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_author}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_editor !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="mb-1 text-sm text-muted-foreground">Institusi Editor</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_editor}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_reviewer !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="mb-1 text-sm text-muted-foreground">Institusi Reviewer</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_reviewer}</div>
+                                    </div>
+                                )}
+                                {assessment.jumlah_institusi_author !== null && (
+                                    <div className="rounded-lg border p-4">
+                                        <div className="mb-1 text-sm text-muted-foreground">Institusi Author</div>
+                                        <div className="text-2xl font-bold">{assessment.jumlah_institusi_author}</div>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Journal Metadata */}
+                {assessment.journalMetadata && assessment.journalMetadata.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Data Terbitan Jurnal</CardTitle>
+                            <CardDescription>Informasi per terbitan (volume, nomor, tahun)</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <JournalMetadataManager metadata={assessment.journalMetadata} onChange={() => {}} readOnly={true} />
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Score Summary */}
                 {assessment.status !== 'draft' && (
                     <Card>
@@ -258,9 +363,9 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 {Object.keys(responsesByCategory).map((category) => {
                                     const responses = responsesByCategory[category];
-                                    const totalScore = responses.reduce((sum, r) => sum + r.score, 0);
-                                    const maxScore = responses.reduce((sum, r) => sum + r.evaluation_indicator.weight, 0);
-                                    const percentage = (totalScore / maxScore) * 100;
+                                    const totalScore = responses.reduce((sum, r) => sum + getScore(r.score), 0);
+                                    const maxScore = responses.reduce((sum, r) => sum + getScore(r.evaluation_indicator.weight), 0);
+                                    const percentage = maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
 
                                     return (
                                         <div key={category} className="rounded-lg border p-4">
@@ -296,7 +401,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                                                     <Badge variant="outline">{response.evaluation_indicator.code}</Badge>
                                                     <Badge>{response.evaluation_indicator.weight} poin</Badge>
                                                     {assessment.status !== 'draft' && (
-                                                        <Badge variant="secondary">Skor: {response.score.toFixed(2)}</Badge>
+                                                        <Badge variant="secondary">Skor: {getScore(response.score).toFixed(2)}</Badge>
                                                     )}
                                                 </div>
                                                 <h4 className="font-semibold">

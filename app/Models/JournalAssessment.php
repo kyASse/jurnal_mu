@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class JournalAssessment extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -17,17 +18,32 @@ class JournalAssessment extends Model
     protected $fillable = [
         'journal_id',
         'user_id',
+        'pembinaan_registration_id',
+        'reviewer_id',
         'assessment_date',
         'period',
         'status',
         'submitted_at',
         'reviewed_at',
         'reviewed_by',
+        'admin_kampus_approved_by',
+        'admin_kampus_approved_at',
+        'admin_kampus_approval_notes',
+        'assigned_by',
+        'assigned_at',
         'total_score',
         'max_score',
         'percentage',
         'notes',
         'admin_notes',
+        // New journal metadata fields
+        'kategori_diusulkan',
+        'jumlah_editor',
+        'jumlah_reviewer',
+        'jumlah_author',
+        'jumlah_institusi_editor',
+        'jumlah_institusi_reviewer',
+        'jumlah_institusi_author',
     ];
 
     /**
@@ -39,9 +55,17 @@ class JournalAssessment extends Model
         'assessment_date' => 'date',
         'submitted_at' => 'datetime',
         'reviewed_at' => 'datetime',
+        'admin_kampus_approved_at' => 'datetime',
+        'assigned_at' => 'datetime',
         'total_score' => 'decimal:2',
         'max_score' => 'decimal:2',
         'percentage' => 'decimal:2',
+        'jumlah_editor' => 'integer',
+        'jumlah_reviewer' => 'integer',
+        'jumlah_author' => 'integer',
+        'jumlah_institusi_editor' => 'integer',
+        'jumlah_institusi_reviewer' => 'integer',
+        'jumlah_institusi_author' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -78,11 +102,68 @@ class JournalAssessment extends Model
     }
 
     /**
+     * Get the pembinaan registration this assessment belongs to
+     */
+    public function pembinaanRegistration()
+    {
+        return $this->belongsTo(PembinaanRegistration::class);
+    }
+
+    /**
      * Get all responses for this assessment
      */
     public function responses()
     {
         return $this->hasMany(AssessmentResponse::class);
+    }
+
+    /**
+     * Get all issues for this assessment
+     */
+    public function issues()
+    {
+        return $this->hasMany(AssessmentIssue::class, 'journal_assessment_id')
+            ->orderBy('display_order')
+            ->orderBy('created_at');
+    }
+
+    /**
+     * Get all journal metadata entries for this assessment
+     */
+    public function journalMetadata()
+    {
+        return $this->hasMany(AssessmentJournalMetadata::class, 'journal_assessment_id')
+            ->orderBy('display_order')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc');
+    }
+
+    /**
+     * Get the Admin Kampus who approved/rejected this assessment
+     */
+    public function adminKampusApprover()
+    {
+        return $this->belongsTo(User::class, 'admin_kampus_approved_by');
+    }
+
+    /**
+     * Get all notes for this assessment (timeline)
+     *
+     * Note: Named 'assessmentNotes' to avoid conflict with 'notes' column
+     */
+    public function assessmentNotes()
+    {
+        return $this->hasMany(AssessmentNote::class, 'journal_assessment_id')
+            ->with('user')
+            ->orderBy('created_at', 'asc');
+    }
+
+    /**
+     * Get the Dikti user who assigned the reviewer
+     */
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
     }
 
     /*

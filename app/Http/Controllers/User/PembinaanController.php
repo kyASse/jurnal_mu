@@ -10,6 +10,7 @@ use App\Models\PembinaanRegistrationAttachment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -128,6 +129,7 @@ class PembinaanController extends Controller
             'attachments' => 'required|array|min:1',
             'attachments.*.file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
             'attachments.*.document_type' => 'required|string|max:100',
+            'supporting_document' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // Optional 5MB max
         ]);
 
         // Authorize via policy (pass journal and pembinaan IDs; User is injected automatically)
@@ -137,6 +139,14 @@ class PembinaanController extends Controller
             $pembinaan->id,
         ]);
 
+        // Handle optional supporting document upload
+        $supportingDocumentPath = null;
+        if ($request->hasFile('supporting_document')) {
+            $file = $request->file('supporting_document');
+            $fileName = time().'_supporting_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.'.$file->getClientOriginalExtension();
+            $supportingDocumentPath = $file->storeAs('pembinaan_documents', $fileName, 'public');
+        }
+
         // Create registration
         $registration = PembinaanRegistration::create([
             'pembinaan_id' => $pembinaan->id,
@@ -144,6 +154,7 @@ class PembinaanController extends Controller
             'user_id' => $user->id,
             'status' => 'pending',
             'registered_at' => now(),
+            'supporting_document' => $supportingDocumentPath,
         ]);
 
         // Upload attachments
@@ -184,7 +195,11 @@ class PembinaanController extends Controller
             'reviewer.university',
             'attachments.uploader',
             'reviews.reviewer',
+            'assessment',
         ]);
+
+        // Append supporting document attributes
+        $registration->append(['supporting_document_url', 'supporting_document_filename']);
 
         return Inertia::render('User/Pembinaan/Registration', [
             'registration' => $registration,
@@ -258,5 +273,40 @@ class PembinaanController extends Controller
         }
 
         return Storage::disk('public')->download($attachment->file_path, $attachment->file_name);
+    }
+
+    /**
+     * Create assessment for a pembinaan registration.
+     */
+    public function createAssessment(Request $request, PembinaanRegistration $registration): RedirectResponse
+    {
+        $this->authorize('createAssessment', $registration);
+
+        // Validate registration is approved
+        if ($registration->status !== 'approved') {
+            return back()->with('error', 'Pembinaan belum disetujui. Hanya pembinaan yang disetujui dapat mengisi assessment.');
+        }
+
+        // Validate user owns this registration
+        if ($registration->user_id !== $request->user()->id) {
+            return back()->with('error', 'Anda tidak memiliki akses ke pembinaan ini.');
+        }
+
+        // Check if assessment already exists
+        if ($registration->assessment) {
+            return redirect()->route('user.assessments.edit', $registration->assessment->id)
+                ->with('info', 'Anda sudah memiliki assessment untuk pembinaan ini.');
+        }
+
+        // Create new assessment
+        $assessment = \App\Models\JournalAssessment::create([
+            'journal_id' => $registration->journal_id,
+            'user_id' => $request->user()->id,
+            'pembinaan_registration_id' => $registration->id,
+            'status' => 'draft',
+        ]);
+
+        return redirect()->route('user.assessments.edit', $assessment->id)
+            ->with('success', 'Assessment berhasil dibuat. Silakan isi form assessment.');
     }
 }

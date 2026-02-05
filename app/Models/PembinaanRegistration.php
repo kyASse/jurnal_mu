@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class PembinaanRegistration extends Model
 {
@@ -24,6 +25,7 @@ class PembinaanRegistration extends Model
         'reviewed_at',
         'reviewed_by',
         'rejection_reason',
+        'supporting_document',
         'updated_by',
         'deleted_by',
     ];
@@ -101,6 +103,14 @@ class PembinaanRegistration extends Model
     public function reviewerAssignments()
     {
         return $this->hasMany(ReviewerAssignment::class, 'registration_id');
+    }
+
+    /**
+     * Get the assessment linked to this registration
+     */
+    public function assessment()
+    {
+        return $this->hasOne(JournalAssessment::class, 'pembinaan_registration_id');
     }
 
     /*
@@ -221,6 +231,38 @@ class PembinaanRegistration extends Model
     public function canBeCancelled(): bool
     {
         return $this->status === 'pending';
+    }
+
+    /**
+     * Check if supporting document exists.
+     */
+    public function hasSupportingDocument(): bool
+    {
+        return ! empty($this->supporting_document) && Storage::disk('public')->exists($this->supporting_document);
+    }
+
+    /**
+     * Get supporting document download URL.
+     */
+    public function getSupportingDocumentUrlAttribute(): ?string
+    {
+        if (! $this->hasSupportingDocument()) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->supporting_document);
+    }
+
+    /**
+     * Get supporting document filename.
+     */
+    public function getSupportingDocumentFilenameAttribute(): ?string
+    {
+        if (empty($this->supporting_document)) {
+            return null;
+        }
+
+        return basename($this->supporting_document);
     }
 
     /**

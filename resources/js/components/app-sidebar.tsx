@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { ROLE_NAMES } from '@/constants/roles';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Award, BookOpen, BookType, Box, Building2, ClipboardList, FileText, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
+import { Award, BookOpen, BookType, Box, Building2, ClipboardList, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Common navigation items shared across all roles
@@ -81,6 +81,11 @@ export function AppSidebar() {
                 href: route('admin.pembinaan.index'),
                 icon: Award,
             },
+            {
+                title: 'Reviewer Assignment',
+                href: route('dikti.assessments.index'),
+                icon: UserCheck,
+            },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
@@ -105,11 +110,6 @@ export function AppSidebar() {
                     { title: 'Indeksasi', href: route('admin-kampus.pembinaan.indeksasi') },
                 ],
             },
-            {
-                title: 'Assessments',
-                href: route('admin-kampus.assessments.index'),
-                icon: FileText,
-            },
         ];
 
         // Add Reviewer menu only if user has reviewer role
@@ -133,11 +133,6 @@ export function AppSidebar() {
                 title: 'Jurnal',
                 href: route('user.jurnal.index'),
                 icon: BookOpen,
-            },
-            {
-                title: 'Assessments',
-                href: route('user.assessments.index'),
-                icon: FileText,
             },
             {
                 title: 'Pembinaan',

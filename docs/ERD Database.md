@@ -658,11 +658,18 @@ CREATE TABLE journal_assessments (
     assessment_date DATE NOT NULL DEFAULT CURRENT_DATE,
     period VARCHAR(20) NULL COMMENT 'Periode assessment, e.g., 2025-Q1',
     
-    -- Status
+    -- Status Flow: draft → submitted → reviewed (approved by Admin Kampus)
     status ENUM('draft', 'submitted', 'reviewed') DEFAULT 'draft',
-    submitted_at TIMESTAMP NULL,
-    reviewed_at TIMESTAMP NULL,
-    reviewed_by BIGINT UNSIGNED NULL COMMENT 'Admin yang review (untuk v1.1+)',
+    submitted_at TIMESTAMP NULL COMMENT 'When User submits assessment',
+    
+    -- Admin Kampus Approval (NEW Phase 3)
+    admin_kampus_approved_by BIGINT UNSIGNED NULL COMMENT 'Admin Kampus who approved/rejected',
+    admin_kampus_approved_at TIMESTAMP NULL COMMENT 'Approval/rejection timestamp',
+    admin_kampus_approval_notes TEXT NULL COMMENT 'Admin Kampus notes (approval or rejection reason)',
+    
+    -- Final Review (for future Dikti reviewer)
+    reviewed_at TIMESTAMP NULL COMMENT 'When reviewer completes review',
+    reviewed_by BIGINT UNSIGNED NULL COMMENT 'Dikti reviewer ID (untuk v1.1+)',
     
     -- Scoring
     total_score DECIMAL(5,2) DEFAULT 0.00 COMMENT 'Total skor (auto-calculated)',
@@ -670,8 +677,9 @@ CREATE TABLE journal_assessments (
     percentage DECIMAL(5,2) DEFAULT 0.00 COMMENT 'Persentase (total/max * 100)',
     
     -- Notes
-    notes TEXT NULL COMMENT 'Catatan dari User',
-    admin_notes TEXT NULL COMMENT 'Catatan dari Admin (untuk v1.1+)',
+    notes TEXT NULL COMMENT 'User self-assessment notes',
+    admin_notes TEXT NULL COMMENT 'Dikti reviewer notes (untuk v1.1+)',
+    -- admin_kampus_approval_notes moved to Admin Kampus Approval section above
     
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -687,7 +695,8 @@ CREATE TABLE journal_assessments (
     -- Foreign Keys
     FOREIGN KEY (journal_id) REFERENCES journals(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (admin_kampus_approved_by) REFERENCES users(id) ON DELETE SET NULL COMMENT 'Admin Kampus',
+    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL COMMENT 'Dikti Reviewer'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 

@@ -233,6 +233,9 @@ class AssessmentController extends Controller
             'journal',
             'responses.evaluationIndicator',
             'responses.attachments',
+            'issues',
+            'journalMetadata', // Load journal metadata
+            'pembinaanRegistration.pembinaan', // Load pembinaan for dynamic options
         ]);
 
         // Get evaluation indicators grouped by category
@@ -440,6 +443,147 @@ class AssessmentController extends Controller
             'text' => $weight, // Full weight for text answers (manual review needed)
             default => 0.00,
         };
+    }
+
+    /**
+     * Save assessment as draft (with issues and journal metadata)
+     *
+     * @route POST /user/assessments/{assessment}/save-draft
+     */
+    public function saveDraft(Request $request, JournalAssessment $assessment)
+    {
+        // Authorization
+        $this->authorize('update', $assessment);
+
+        if ($assessment->status !== 'draft') {
+            return back()->with('error', 'Hanya assessment dengan status draft yang dapat disimpan.');
+        }
+
+        $validated = $request->validate([
+            'responses' => 'nullable|array',
+            'responses.*.evaluation_indicator_id' => 'required|exists:evaluation_indicators,id',
+            'responses.*.answer_boolean' => 'nullable|boolean',
+            'responses.*.answer_scale' => 'nullable|integer|min:1|max:5',
+            'responses.*.answer_text' => 'nullable|string',
+            'responses.*.notes' => 'nullable|string',
+            // Assessment Issues
+            'issues' => 'nullable|array',
+            'issues.*.title' => 'required|string|max:200',
+            'issues.*.description' => 'required|string|max:1000',
+            'issues.*.category' => 'required|in:editorial,technical,content_quality,management',
+            'issues.*.priority' => 'required|in:high,medium,low',
+            // Journal Metadata Aggregate Fields (nullable for drafts)
+            'kategori_diusulkan' => 'nullable|string|max:50',
+            'jumlah_editor' => 'nullable|integer|min:0',
+            'jumlah_reviewer' => 'nullable|integer|min:0',
+            'jumlah_author' => 'nullable|integer|min:0',
+            'jumlah_institusi_editor' => 'nullable|integer|min:0',
+            'jumlah_institusi_reviewer' => 'nullable|integer|min:0',
+            'jumlah_institusi_author' => 'nullable|integer|min:0',
+            // Journal Metadata (repeatable)
+            'journal_metadata' => 'nullable|array',
+            'journal_metadata.*.volume' => 'required|string|max:20',
+            'journal_metadata.*.number' => 'required|string|max:20',
+            'journal_metadata.*.year' => 'required|integer|min:1900|max:'.date('Y'),
+            'journal_metadata.*.month' => 'required|integer|min:1|max:12',
+            'journal_metadata.*.url_issue' => 'nullable|url|max:500',
+            'journal_metadata.*.jumlah_negara_editor' => 'required|integer|min:0',
+            'journal_metadata.*.jumlah_institusi_editor' => 'required|integer|min:0',
+            'journal_metadata.*.jumlah_negara_reviewer' => 'required|integer|min:0',
+            'journal_metadata.*.jumlah_institusi_reviewer' => 'required|integer|min:0',
+            'journal_metadata.*.jumlah_negara_author' => 'nullable|integer|min:0',
+            'journal_metadata.*.jumlah_institusi_author' => 'nullable|integer|min:0',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update assessment aggregate fields
+            $assessment->update([
+                'kategori_diusulkan' => $validated['kategori_diusulkan'] ?? null,
+                'jumlah_editor' => $validated['jumlah_editor'] ?? null,
+                'jumlah_reviewer' => $validated['jumlah_reviewer'] ?? null,
+                'jumlah_author' => $validated['jumlah_author'] ?? null,
+                'jumlah_institusi_editor' => $validated['jumlah_institusi_editor'] ?? null,
+                'jumlah_institusi_reviewer' => $validated['jumlah_institusi_reviewer'] ?? null,
+                'jumlah_institusi_author' => $validated['jumlah_institusi_author'] ?? null,
+            ]);
+
+            // Save responses
+            if (! empty($validated['responses'])) {
+                foreach ($validated['responses'] as $responseData) {
+                    $indicator = EvaluationIndicator::find($responseData['evaluation_indicator_id']);
+                    $score = $this->calculateScore($indicator, $responseData);
+
+                    AssessmentResponse::updateOrCreate(
+                        [
+                            'journal_assessment_id' => $assessment->id,
+                            'evaluation_indicator_id' => $responseData['evaluation_indicator_id'],
+                        ],
+                        [
+                            'answer_boolean' => $responseData['answer_boolean'] ?? null,
+                            'answer_scale' => $responseData['answer_scale'] ?? null,
+                            'answer_text' => $responseData['answer_text'] ?? null,
+                            'score' => $score,
+                            'notes' => $responseData['notes'] ?? null,
+                        ]
+                    );
+                }
+            }
+
+            // Save issues
+            if (! empty($validated['issues'])) {
+                // Delete existing issues
+                $assessment->issues()->delete();
+
+                // Create new issues
+                foreach ($validated['issues'] as $index => $issueData) {
+                    $assessment->issues()->create([
+                        'title' => $issueData['title'],
+                        'description' => $issueData['description'],
+                        'category' => $issueData['category'],
+                        'priority' => $issueData['priority'],
+                        'display_order' => $index,
+                    ]);
+                }
+            }
+
+            // Save journal metadata
+            if (! empty($validated['journal_metadata'])) {
+                // Delete existing metadata
+                $assessment->journalMetadata()->delete();
+
+                // Create new metadata
+                foreach ($validated['journal_metadata'] as $index => $metadataData) {
+                    $assessment->journalMetadata()->create([
+                        'volume' => $metadataData['volume'],
+                        'number' => $metadataData['number'],
+                        'year' => $metadataData['year'],
+                        'month' => $metadataData['month'],
+                        'url_issue' => $metadataData['url_issue'] ?? null,
+                        'jumlah_negara_editor' => $metadataData['jumlah_negara_editor'],
+                        'jumlah_institusi_editor' => $metadataData['jumlah_institusi_editor'],
+                        'jumlah_negara_reviewer' => $metadataData['jumlah_negara_reviewer'],
+                        'jumlah_institusi_reviewer' => $metadataData['jumlah_institusi_reviewer'],
+                        'jumlah_negara_author' => $metadataData['jumlah_negara_author'] ?? null,
+                        'jumlah_institusi_author' => $metadataData['jumlah_institusi_author'] ?? null,
+                        'display_order' => $index,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return back()->with('success', 'Draft berhasil disimpan pada '.now()->format('H:i:s'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Failed to save draft', [
+                'assessment_id' => $assessment->id,
+                'user_id' => $request->user()->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Gagal menyimpan draft: '.$e->getMessage());
+        }
     }
 
     /**
