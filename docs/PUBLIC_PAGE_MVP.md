@@ -14,6 +14,12 @@ Dokumen ini menjelaskan MVP (Minimum Viable Product) untuk public page Jurnal_Mu
 - **Landing Page / Homepage** - 75% complete (missing: University section)
 - **Journal Listing Page** - 95% complete (missing: empty state messages)
 - **Journal Detail Page** - 100% complete (backend + frontend fully implemented)
+- **OAI-PMH Article Harvesting** - 100% complete (NEW - Feb 6, 2026)
+  - Article model with full Dublin Core metadata
+  - OAI-PMH Harvester service class
+  - Artisan command for manual/scheduled harvesting
+  - Articles display on journal detail page
+  - Logging and error handling
 - **Backend Controller** - 100% complete (PublicJournalController with index + show)
 - **Statistics & Featured Journals** - 100% complete
 - **Public Routing** - 100% complete
@@ -33,10 +39,11 @@ Dokumen ini menjelaskan MVP (Minimum Viable Product) untuk public page Jurnal_Mu
 - **University Section on Homepage** - 0% complete
 
 ### 📊 Overall Progress
-**Features Implemented: 9/13 (69%)**  
-**Backend Ready: 9/13 (69%)**  
+**Features Implemented: 10/13 (77%)**  
+**Backend Ready: 10/13 (77%)**  
 **Phase 3 Complete: Journal Detail Page ✅**  
-**Estimated Effort Remaining: 2-3 weeks**
+**Phase 3.5 Complete: OAI-PMH Article Harvesting ✅ (NEW)**  
+**Estimated Effort Remaining: 1-2 weeks**
 
 ---
 
@@ -819,20 +826,24 @@ public function incrementViewCount()
 - [ ] Advanced filters (language, indexing, year range)
 - [ ] Search suggestions/autocomplete
 - [ ] Saved searches
+- [x] **Article-level search** - IMPLEMENTED via OAI-PMH (title, abstract, authors, keywords)
 
 ### 11.2 Analytics Dashboard
 - [ ] Public statistics page
 - [ ] Trends & charts (jurnal growth over time)
 - [ ] Top journals by views
 - [ ] Comparison tools
+- [x] **Article statistics by year** - IMPLEMENTED (articlesByYear in controller)
 
 ### 11.3 Personalization
 - [ ] Bookmark/favorite journals (requires login)
 - [ ] Email alerts untuk jurnal baru
 - [ ] Recommended journals based on interest
+- [x] **Article metadata display** - IMPLEMENTED (authors, DOI, volume/issue)
 
 ### 11.4 Integration
-- [ ] Link to actual journal articles (if available)
+- [x] **Link to actual journal articles** - IMPLEMENTED via OAI-PMH harvesting
+- [x] **OAI-PMH Integration** - IMPLEMENTED (article harvesting with Dublin Core metadata)
 - [ ] Integration dengan SINTA API
 - [ ] Export data (CSV, Excel)
 - [ ] RSS feed untuk updates
