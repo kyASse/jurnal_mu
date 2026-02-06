@@ -141,7 +141,19 @@ class PublicJournalController extends Controller
         $journal->load([
             'university',
             'scientificField',
+            'articles' => function ($query) {
+                $query->recent()->take(20); // Get 20 most recent articles
+            },
         ]);
+
+        // Get article statistics by year
+        $articlesCount = $journal->articles()->count();
+        $articlesByYear = $journal->articles()
+            ->selectRaw('YEAR(publication_date) as year, COUNT(*) as count')
+            ->groupBy('year')
+            ->orderBy('year', 'desc')
+            ->limit(5)
+            ->get();
 
         return Inertia::render('Journals/Show', [
             'journal' => [
@@ -150,6 +162,7 @@ class PublicJournalController extends Controller
                 'issn' => $journal->issn,
                 'e_issn' => $journal->e_issn,
                 'url' => $journal->url,
+                'oai_pmh_url' => $journal->oai_pmh_url,
                 'cover_image_url' => $journal->cover_image_url,
                 'publisher' => $journal->publisher,
                 'frequency' => $journal->frequency,
@@ -185,7 +198,27 @@ class PublicJournalController extends Controller
                     'id' => $journal->scientificField->id,
                     'name' => $journal->scientificField->name,
                 ] : null,
+                // Articles
+                'articles' => $journal->articles->map(fn ($article) => [
+                    'id' => $article->id,
+                    'title' => $article->title,
+                    'abstract' => $article->abstract,
+                    'authors' => $article->authors,
+                    'authors_list' => $article->authors_list,
+                    'doi' => $article->doi,
+                    'doi_url' => $article->doi_url,
+                    'publication_date' => $article->publication_date,
+                    'volume' => $article->volume,
+                    'issue' => $article->issue,
+                    'volume_issue' => $article->volume_issue,
+                    'pages' => $article->pages,
+                    'article_url' => $article->article_url,
+                    'pdf_url' => $article->pdf_url,
+                    'google_scholar_url' => $article->google_scholar_url,
+                ]),
+                'articles_count' => $articlesCount,
             ],
+            'articlesByYear' => $articlesByYear,
         ]);
     }
 }
