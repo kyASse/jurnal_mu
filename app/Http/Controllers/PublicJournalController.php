@@ -150,17 +150,32 @@ class PublicJournalController extends Controller
                 'issn' => $journal->issn,
                 'e_issn' => $journal->e_issn,
                 'url' => $journal->url,
+                'cover_image_url' => $journal->cover_image_url,
                 'publisher' => $journal->publisher,
                 'frequency' => $journal->frequency,
                 'frequency_label' => $journal->frequency_label,
                 'first_published_year' => $journal->first_published_year,
                 'editor_in_chief' => $journal->editor_in_chief,
                 'email' => $journal->email,
+                'about' => $journal->about,
+                'scope' => $journal->scope,
+                // SINTA details
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
+                'sinta_score' => $journal->sinta_score,
+                'sinta_indexed_date' => $journal->sinta_indexed_date,
+                // Accreditation details
                 'accreditation_status' => $journal->accreditation_status,
                 'accreditation_status_label' => $journal->accreditation_status_label,
                 'accreditation_grade' => $journal->accreditation_grade,
+                'dikti_accreditation_number' => $journal->dikti_accreditation_number,
+                'dikti_accreditation_label' => $journal->dikti_accreditation_label,
+                'accreditation_expiry_date' => $journal->accreditation_expiry_date,
+                'accreditation_expiry_status' => $journal->accreditation_expiry_status,
+                // Indexation
+                'indexed_in' => $journal->indexed_in,
+                'indexation_labels' => $journal->indexation_labels,
+                // Relationships
                 'university' => [
                     'id' => $journal->university->id,
                     'name' => $journal->university->name,

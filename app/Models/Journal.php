@@ -36,6 +36,10 @@ class Journal extends Model
         'indexations',
         'editor_in_chief',
         'email',
+        'phone',
+        'cover_image_url',
+        'about',
+        'scope',
         'is_active',
     ];
 

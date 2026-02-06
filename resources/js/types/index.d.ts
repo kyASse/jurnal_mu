@@ -100,11 +100,37 @@ export interface Journal {
     issn: string;
     e_issn?: string;
     url?: string;
+    cover_image_url?: string;
+    publisher?: string;
+    frequency?: 'monthly' | 'bimonthly' | 'quarterly' | 'semiannually' | 'annually';
+    frequency_label?: string;
+    first_published_year?: number;
+    editor_in_chief?: string;
+    email?: string;
+    about?: string;
+    scope?: string;
+    // SINTA details
+    sinta_rank?: number | null;
+    sinta_rank_label?: string;
+    sinta_score?: number | null;
+    sinta_indexed_date?: string | null;
+    // Accreditation details
+    accreditation_status?: string;
+    accreditation_status_label?: string;
+    accreditation_grade?: string | null;
+    dikti_accreditation_number?: string | null;
+    dikti_accreditation_label?: string;
+    accreditation_expiry_date?: string | null;
+    accreditation_expiry_status?: 'valid' | 'expiring_soon' | 'expired' | 'none';
+    // Indexation
+    indexed_in?: string[];
+    indexation_labels?: string[];
+    // Relations
     university_id: number;
     user_id: number;
     scientific_field_id?: number;
     university: University;
-    user: User;
+    user?: User;
     scientific_field?: ScientificField;
     is_active: boolean;
     created_at: string;
