@@ -348,11 +348,13 @@ export default function JournalsIndex({
                                 {journals.data.map((journal) => (
                                     <JournalCard
                                         key={journal.id}
+                                        id={journal.id}
                                         title={journal.title}
                                         sinta_rank={journal.sinta_rank}
                                         issn={journal.issn}
                                         e_issn={journal.e_issn}
                                         university={journal.university.name}
+                                        external_url={journal.url}
                                     />
                                 ))}
                             </div>
