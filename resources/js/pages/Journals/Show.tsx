@@ -321,35 +321,53 @@ export default function JournalsShow() {
                         <div className="lg:col-span-1">
                             {/* Quick Actions */}
                             <div className="sticky top-20 space-y-4">
-                                {/* Visit Journal Website */}
-                                {journal.url && (
-                                    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-neutral-950">
-                                        <h3 className="mb-4 text-lg font-semibold text-foreground">Quick Access</h3>
-                                        <div className="space-y-3">
-                                            <a href={journal.url} target="_blank" rel="noopener noreferrer" className="block">
-                                                <Button className="w-full bg-[#079C4E] hover:bg-[#067d3e]">
-                                                    <Globe className="mr-2 h-4 w-4" />
-                                                    Visit Journal Website
-                                                    <ExternalLink className="ml-auto h-4 w-4" />
-                                                </Button>
-                                            </a>
+                                {/* Visit Journal / Quick Access */}
+                                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-neutral-950">
+                                    <h3 className="mb-4 text-lg font-semibold text-foreground">Quick Access</h3>
+                                    <div className="space-y-3">
+                                        {/* Visit Journal - Direct URL or MAJU UAD Search */}
+                                        {journal.url && (
+                                            <>
+                                                {/* If URL contains maju.uad.ac.id, link to MAJU UAD search */}
+                                                {journal.url.includes('maju.uad.ac.id') ? (
+                                                    <a
+                                                        href={`https://maju.uad.ac.id/beranda?s=${encodeURIComponent(journal.title)}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="block"
+                                                    >
+                                                        <Button className="w-full bg-[#079C4E] hover:bg-[#067d3e]">
+                                                            <Globe className="mr-2 h-4 w-4" />
+                                                            Visit on MAJU UAD
+                                                            <ExternalLink className="ml-auto h-4 w-4" />
+                                                        </Button>
+                                                    </a>
+                                                ) : (
+                                                    <a href={journal.url} target="_blank" rel="noopener noreferrer" className="block">
+                                                        <Button className="w-full bg-[#079C4E] hover:bg-[#067d3e]">
+                                                            <Globe className="mr-2 h-4 w-4" />
+                                                            Visit Journal Website
+                                                            <ExternalLink className="ml-auto h-4 w-4" />
+                                                        </Button>
+                                                    </a>
+                                                )}
+                                            </>
+                                        )}
 
-                                            {journal.sinta_rank && (
-                                                <a
-                                                    href={`https://sinta.kemdikbud.go.id/journals?search=${encodeURIComponent(journal.title)}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="block"
-                                                >
-                                                    <Button variant="outline" className="w-full">
-                                                        View on SINTA
-                                                        <ExternalLink className="ml-auto h-4 w-4" />
-                                                    </Button>
-                                                </a>
-                                            )}
-                                        </div>
+                                        {/* View on SINTA */}
+                                        <a
+                                            href={`https://sinta.kemdikbud.go.id/journals/?q=${encodeURIComponent(journal.title)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block"
+                                        >
+                                            <Button variant="outline" className="w-full">
+                                                View on SINTA
+                                                <ExternalLink className="ml-auto h-4 w-4" />
+                                            </Button>
+                                        </a>
                                     </div>
-                                )}
+                                </div>
 
                                 {/* Accreditation Info */}
                                 {journal.dikti_accreditation_label && (
