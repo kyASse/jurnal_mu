@@ -1,5 +1,0 @@
-# Ignore build outputs and dependencies
-build/
-public/build/
-node_modules/
-**/vendor/

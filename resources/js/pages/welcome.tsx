@@ -8,47 +8,31 @@ import { useState } from 'react';
 interface WelcomeProps extends SharedData {
     laravelVersion: string;
     phpVersion: string;
+    featuredJournals: Array<{
+        id: number;
+        title: string;
+        sinta_rank: number;
+        sinta_rank_label: string;
+        issn: string;
+        e_issn: string;
+        university: string;
+        cover_image_url?: string;
+        indexation_labels?: string[];
+    }>;
+    sintaStats: Record<number, number>;
+    totalUniversities: number;
+    totalJournals: number;
 }
 
 export default function Welcome() {
-    const { auth } = usePage<WelcomeProps>().props;
+    const { auth, featuredJournals, sintaStats } = usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Mock Data representing journals from the database
-    const featuredJournals = [
-        {
-            id: 1,
-            title: 'Jurnal Farmasi Indonesia (Pharmacological Sciences)',
-            sinta_rank: 2,
-            issn: '2302-1234',
-            e_issn: '2302-5678',
-            university: 'Univ. Muhammadiyah Surakarta',
-        },
-        {
-            id: 2,
-            title: 'Muhammadiyah International Journal of Economics',
-            sinta_rank: 3,
-            issn: '1411-1234',
-            e_issn: '2541-5678',
-            university: 'Univ. Muhammadiyah Malang',
-        },
-        {
-            id: 3,
-            title: 'Pedagogia: Jurnal Pendidikan',
-            sinta_rank: 2,
-            issn: '2089-1234',
-            e_issn: '2549-5678',
-            university: 'Univ. Muhammadiyah Sidoarjo',
-        },
-        {
-            id: 4,
-            title: 'Jurnal Hukum dan Keadilan (Law & Justice)',
-            sinta_rank: 4,
-            issn: '1234-5678',
-            e_issn: '9876-5432',
-            university: 'Univ. Muhammadiyah Yogyakarta',
-        },
-    ];
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            window.location.href = route('journals.index', { search: searchQuery });
+        }
+    };
 
     return (
         <>
@@ -133,8 +117,12 @@ export default function Welcome() {
                                     className="h-14 w-full rounded-full border-0 bg-white pr-4 pl-12 text-gray-900 placeholder:text-gray-500 focus:ring-4 focus:ring-[#FCEE1F]/50 sm:text-lg"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
-                                <Button className="absolute top-2 right-2 h-10 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57]">
+                                <Button
+                                    className="absolute top-2 right-2 h-10 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57]"
+                                    onClick={handleSearch}
+                                >
                                     Search
                                 </Button>
                             </div>
@@ -151,8 +139,9 @@ export default function Welcome() {
                     <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
                             {[1, 2, 3, 4, 5, 6].map((score) => (
-                                <div
+                                <Link
                                     key={score}
+                                    href={route('journals.index', { sinta_rank: score })}
                                     className="group cursor-pointer overflow-hidden rounded-xl border-b-4 bg-white p-4 shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl dark:bg-zinc-800"
                                     style={{ borderColor: score <= 2 ? '#E11A1F' : score <= 4 ? '#FCEE1F' : '#1A2A75' }}
                                 >
@@ -160,10 +149,10 @@ export default function Welcome() {
                                     <div className="flex items-end justify-between">
                                         <span className="text-2xl font-bold text-gray-900 dark:text-white">SINTA {score}</span>
                                         <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 transition-colors group-hover:bg-[#079C4E] group-hover:text-white dark:bg-zinc-700 dark:text-gray-300">
-                                            {10 + score * 5} Journals
+                                            {sintaStats[score] || 0} Journals
                                         </span>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </div>
@@ -189,11 +178,13 @@ export default function Welcome() {
                         {featuredJournals.map((journal) => (
                             <JournalCard
                                 key={journal.id}
+                                id={journal.id}
                                 title={journal.title}
                                 sinta_rank={journal.sinta_rank}
                                 issn={journal.issn}
                                 e_issn={journal.e_issn}
                                 university={journal.university}
+                                indexation_labels={journal.indexation_labels}
                             />
                         ))}
                     </div>
