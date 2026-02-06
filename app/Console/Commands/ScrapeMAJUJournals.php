@@ -29,7 +29,9 @@ class ScrapeMAJUJournals extends Command
     protected $description = 'Scrape journal data from maju.uad.ac.id for seeding';
 
     protected int $scrapedCount = 0;
+
     protected int $errorCount = 0;
+
     protected ?int $uadUniversityId = null;
 
     /**
@@ -38,12 +40,13 @@ class ScrapeMAJUJournals extends Command
     public function handle(): int
     {
         $this->info('Starting MAJU UAD Journal Scraper...');
-        
+
         // Get UAD university ID
         $this->uadUniversityId = University::where('name', 'like', '%Ahmad Dahlan%')->first()?->id;
-        
-        if (!$this->uadUniversityId) {
+
+        if (! $this->uadUniversityId) {
             $this->error('UAD University not found in database. Please seed universities first.');
+
             return Command::FAILURE;
         }
 
@@ -57,7 +60,7 @@ class ScrapeMAJUJournals extends Command
         // Step 1: Scrape journal list from all pages
         $this->info('Fetching journal list...');
         $journalUUIDs = $this->scrapeJournalList($limit);
-        
+
         $total = count($journalUUIDs);
         $this->info("Found {$total} journals to scrape");
 
@@ -68,23 +71,23 @@ class ScrapeMAJUJournals extends Command
         foreach ($journalUUIDs as $uuid) {
             try {
                 $journalData = $this->scrapeJournalDetail($uuid);
-                
-                if ($journalData && !$dryRun) {
+
+                if ($journalData && ! $dryRun) {
                     $this->saveJournal($journalData);
                     $this->scrapedCount++;
                 } elseif ($journalData && $dryRun) {
                     $this->scrapedCount++;
                 }
-                
+
                 // Rate limiting - be nice to the server
                 usleep(500000); // 0.5 second delay
-                
+
             } catch (\Exception $e) {
                 $this->errorCount++;
                 $this->newLine();
                 $this->error("Error scraping {$uuid}: {$e->getMessage()}");
             }
-            
+
             $progressBar->advance();
         }
 
@@ -111,25 +114,25 @@ class ScrapeMAJUJournals extends Command
     {
         $journalUUIDs = [];
         $page = 1;
-        
+
         while (true) {
             try {
                 $response = Http::timeout(15)
                     ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'])
-                    ->get("https://maju.uad.ac.id/beranda", ['page' => $page]);
+                    ->get('https://maju.uad.ac.id/beranda', ['page' => $page]);
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     break;
                 }
 
                 $html = $response->body();
-                $dom = new DOMDocument();
+                $dom = new DOMDocument;
                 @$dom->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
                 $xpath = new DOMXPath($dom);
 
                 // Find all "MORE DETAILS" links
                 $links = $xpath->query("//a[contains(@href, '/detail?jid=')]");
-                
+
                 if ($links->length === 0) {
                     break; // No more journals found
                 }
@@ -138,9 +141,9 @@ class ScrapeMAJUJournals extends Command
                     $href = $link->getAttribute('href');
                     if (preg_match('/jid=([a-f0-9\-]+)/', $href, $matches)) {
                         $uuid = $matches[1];
-                        if (!in_array($uuid, $journalUUIDs)) {
+                        if (! in_array($uuid, $journalUUIDs)) {
                             $journalUUIDs[] = $uuid;
-                            
+
                             // Check limit
                             if ($limit > 0 && count($journalUUIDs) >= $limit) {
                                 return $journalUUIDs;
@@ -151,7 +154,7 @@ class ScrapeMAJUJournals extends Command
 
                 $page++;
                 usleep(300000); // 0.3 second delay between pages
-                
+
             } catch (\Exception $e) {
                 $this->warn("Error fetching page {$page}: {$e->getMessage()}");
                 break;
@@ -168,14 +171,14 @@ class ScrapeMAJUJournals extends Command
     {
         $response = Http::timeout(15)
             ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'])
-            ->get("https://maju.uad.ac.id/detail", ['jid' => $uuid]);
+            ->get('https://maju.uad.ac.id/detail', ['jid' => $uuid]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return null;
         }
 
         $html = $response->body();
-        $dom = new DOMDocument();
+        $dom = new DOMDocument;
         @$dom->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
         $xpath = new DOMXPath($dom);
 
@@ -220,6 +223,7 @@ class ScrapeMAJUJournals extends Command
     protected function extractTitle(DOMXPath $xpath): ?string
     {
         $nodes = $xpath->query("//h3[contains(@class, 'title')] | //h3 | //h2[contains(@class, 'title')]");
+
         return $nodes->length > 0 ? trim($nodes->item(0)->textContent) : null;
     }
 
@@ -232,6 +236,7 @@ class ScrapeMAJUJournals extends Command
                 return $href;
             }
         }
+
         return null;
     }
 
@@ -240,23 +245,27 @@ class ScrapeMAJUJournals extends Command
         $nodes = $xpath->query("//img[contains(@src, '/covers/')]");
         if ($nodes->length > 0) {
             $src = $nodes->item(0)->getAttribute('src');
-            if (!Str::startsWith($src, 'http')) {
-                $src = 'https://maju.uad.ac.id' . $src;
+            if (! Str::startsWith($src, 'http')) {
+                $src = 'https://maju.uad.ac.id'.$src;
             }
+
             return $src;
         }
+
         return null;
     }
 
     protected function extractAbout(DOMXPath $xpath): ?string
     {
         $nodes = $xpath->query("//*[contains(text(), 'About the journal')]/following-sibling::* | //*[contains(text(), 'About')]/following-sibling::p");
+
         return $nodes->length > 0 ? trim($nodes->item(0)->textContent) : null;
     }
 
     protected function extractScope(DOMXPath $xpath): ?string
     {
         $nodes = $xpath->query("//*[contains(text(), 'Aims and Scope')]/following-sibling::* | //*[contains(text(), 'Scope')]/following-sibling::p");
+
         return $nodes->length > 0 ? trim($nodes->item(0)->textContent) : null;
     }
 
@@ -265,7 +274,7 @@ class ScrapeMAJUJournals extends Command
         $nodes = $xpath->query("//*[contains(text(), 'ISSN')]");
         foreach ($nodes as $node) {
             $text = $node->textContent;
-            
+
             // Pattern: "ISSN 1234-5678 (Print) | 9876-5432 (Online)"
             if (preg_match('/(\d{4}-\d{3}[\dXx])\s*\(Print\)/i', $text, $matches)) {
                 $data['issn'] = $matches[1];
@@ -281,11 +290,11 @@ class ScrapeMAJUJournals extends Command
         $nodes = $xpath->query("//*[contains(text(), 'Accreditation') or contains(text(), 'Sinta')]");
         foreach ($nodes as $node) {
             $text = $node->textContent;
-            
+
             if (preg_match('/Sinta\s*(\d)/i', $text, $matches)) {
                 $data['sinta_rank'] = (int) $matches[1];
                 $data['accreditation_status'] = 'Terakreditasi';
-                $data['accreditation_grade'] = 'S' . $matches[1];
+                $data['accreditation_grade'] = 'S'.$matches[1];
                 break;
             }
         }
@@ -294,28 +303,28 @@ class ScrapeMAJUJournals extends Command
     protected function extractContact(DOMXPath $xpath, array &$data): void
     {
         $contactSection = $xpath->query("//*[contains(text(), 'Contact')]");
-        
+
         if ($contactSection->length > 0) {
             $parent = $contactSection->item(0)->parentNode;
             $text = $parent->textContent;
-            
+
             // Extract email
             if (preg_match('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/', $text, $matches)) {
                 $data['email'] = $matches[1];
             }
-            
+
             // Extract editor name (usually before email)
             $lines = explode("\n", $text);
             foreach ($lines as $line) {
                 $line = trim($line);
-                if (!empty($line) && !Str::contains($line, ['Contact', 'Email', 'Phone', '@', 'http'])) {
+                if (! empty($line) && ! Str::contains($line, ['Contact', 'Email', 'Phone', '@', 'http'])) {
                     if (strlen($line) > 5 && strlen($line) < 100) {
                         $data['editor_in_chief'] = $line;
                         break;
                     }
                 }
             }
-            
+
             // Extract phone
             if (preg_match('/(\+?[\d\s\-()]{8,})/', $text, $matches)) {
                 $phone = preg_replace('/[^\d+]/', '', $matches[1]);
@@ -330,11 +339,11 @@ class ScrapeMAJUJournals extends Command
     {
         $indexations = [];
         $nodes = $xpath->query("//a[contains(@href, 'scopus') or contains(@href, 'doaj') or contains(@href, 'sinta') or contains(@href, 'scholar')]");
-        
+
         foreach ($nodes as $node) {
             $href = $node->getAttribute('href');
             $text = trim($node->textContent);
-            
+
             if (Str::contains(strtolower($href), 'scopus')) {
                 $indexations['Scopus'] = $href;
             } elseif (Str::contains(strtolower($href), 'doaj')) {
@@ -347,7 +356,7 @@ class ScrapeMAJUJournals extends Command
                 $indexations['Web of Science'] = $href;
             }
         }
-        
+
         return $indexations;
     }
 
@@ -369,8 +378,8 @@ class ScrapeMAJUJournals extends Command
             'Law' => ['law', 'hukum', 'legal'],
         ];
 
-        $searchText = strtolower($title . ' ' . $scope);
-        
+        $searchText = strtolower($title.' '.$scope);
+
         foreach ($keywords as $fieldName => $terms) {
             foreach ($terms as $term) {
                 if (Str::contains($searchText, strtolower($term))) {
@@ -418,4 +427,3 @@ class ScrapeMAJUJournals extends Command
         );
     }
 }
-

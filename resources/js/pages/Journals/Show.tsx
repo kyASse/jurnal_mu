@@ -5,22 +5,11 @@
  */
 
 import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { type Journal, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import {
-    ArrowLeft,
-    BookOpen,
-    Building2,
-    Calendar,
-    ExternalLink,
-    Globe,
-    GraduationCap,
-    Home,
-    Mail,
-    User,
-} from 'lucide-react';
+import { ArrowLeft, BookOpen, Building2, Calendar, ExternalLink, Globe, GraduationCap, Home, Mail, User } from 'lucide-react';
 
 interface JournalsShowProps extends SharedData {
     journal: Journal;
@@ -32,7 +21,10 @@ export default function JournalsShow() {
     return (
         <>
             <Head title={`${journal.title} | JurnalMu`}>
-                <meta name="description" content={journal.about || `View details about ${journal.title}, an academic journal published by ${journal.university.name}`} />
+                <meta
+                    name="description"
+                    content={journal.about || `View details about ${journal.title}, an academic journal published by ${journal.university.name}`}
+                />
                 <meta property="og:title" content={journal.title} />
                 <meta property="og:description" content={journal.about || `Academic journal from ${journal.university.name}`} />
                 {journal.cover_image_url && <meta property="og:image" content={journal.cover_image_url} />}
@@ -137,7 +129,11 @@ export default function JournalsShow() {
 
                                 {/* Badges */}
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <SintaBadge rank={journal.sinta_rank ?? null} indexed_date={journal.sinta_indexed_date ?? null} showDate={false} />
+                                    <SintaBadge
+                                        rank={journal.sinta_rank ?? null}
+                                        indexed_date={journal.sinta_indexed_date ?? null}
+                                        showDate={false}
+                                    />
                                     {journal.dikti_accreditation_number && (
                                         <AccreditationBadge
                                             number={journal.dikti_accreditation_number}
@@ -148,9 +144,9 @@ export default function JournalsShow() {
                                         />
                                     )}
                                     {journal.indexation_labels &&
-                                        journal.indexation_labels.slice(0, 5).map((label) => (
-                                            <IndexationBadge key={label} platform={label} showDate={false} variant="outline" />
-                                        ))}
+                                        journal.indexation_labels
+                                            .slice(0, 5)
+                                            .map((label) => <IndexationBadge key={label} platform={label} showDate={false} variant="outline" />)}
                                     {journal.indexation_labels && journal.indexation_labels.length > 5 && (
                                         <Badge variant="outline" className="text-xs">
                                             +{journal.indexation_labels.length - 5} more
@@ -169,7 +165,7 @@ export default function JournalsShow() {
                             {journal.about && (
                                 <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-neutral-950">
                                     <h2 className="mb-4 text-2xl font-bold text-foreground">About This Journal</h2>
-                                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                                    <div className="prose prose-sm dark:prose-invert max-w-none">
                                         <p className="text-muted-foreground">{journal.about}</p>
                                     </div>
                                 </div>
@@ -179,14 +175,14 @@ export default function JournalsShow() {
                             {journal.scope && (
                                 <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-neutral-950">
                                     <h2 className="mb-4 text-2xl font-bold text-foreground">Scope & Focus</h2>
-                                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                                    <div className="prose prose-sm dark:prose-invert max-w-none">
                                         <p className="text-muted-foreground">{journal.scope}</p>
                                     </div>
                                 </div>
                             )}
 
                             {/* Metadata Grid */}
-                            <div className="mb-8 grid gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-neutral-950 md:grid-cols-2">
+                            <div className="mb-8 grid gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:grid-cols-2 dark:border-gray-800 dark:bg-neutral-950">
                                 <h2 className="col-span-full text-2xl font-bold text-foreground">Journal Information</h2>
 
                                 {/* ISSN */}
@@ -406,9 +402,7 @@ export default function JournalsShow() {
                 {/* FOOTER */}
                 <footer className="border-t border-gray-200 bg-white py-8 dark:border-gray-800 dark:bg-neutral-950">
                     <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-                        <p className="text-sm text-muted-foreground">
-                            © 2026 JurnalMu - Muhammadiyah Journal Portal. All rights reserved.
-                        </p>
+                        <p className="text-sm text-muted-foreground">© 2026 JurnalMu - Muhammadiyah Journal Portal. All rights reserved.</p>
                     </div>
                 </footer>
             </div>

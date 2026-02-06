@@ -47,7 +47,7 @@ Route::get('/', function () {
         ->orderBy('sinta_rank')
         ->limit(4)
         ->get()
-        ->map(fn($journal) => [
+        ->map(fn ($journal) => [
             'id' => $journal->id,
             'title' => $journal->title,
             'sinta_rank' => $journal->sinta_rank,

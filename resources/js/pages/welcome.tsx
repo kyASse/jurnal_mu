@@ -178,12 +178,12 @@ export default function Welcome() {
                         {featuredJournals.map((journal) => (
                             <JournalCard
                                 key={journal.id}
+                                id={journal.id}
                                 title={journal.title}
                                 sinta_rank={journal.sinta_rank}
                                 issn={journal.issn}
                                 e_issn={journal.e_issn}
                                 university={journal.university}
-                                url={route('journals.show', journal.id)}
                                 indexation_labels={journal.indexation_labels}
                             />
                         ))}
