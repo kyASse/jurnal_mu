@@ -5,6 +5,7 @@ import { Link } from '@inertiajs/react';
 import { BookOpen } from 'lucide-react';
 
 interface JournalCardProps {
+    id: number; // Journal ID for internal routing
     title: string;
     issn?: string | null;
     e_issn?: string | null;
@@ -12,11 +13,12 @@ interface JournalCardProps {
     sinta_indexed_date?: string | null;
     indexation_labels?: string[];
     university?: string;
-    url?: string;
+    external_url?: string | null; // External journal website URL
     coverColor?: string; // Optional color for the card header pattern
 }
 
 export default function JournalCard({
+    id,
     title,
     issn,
     e_issn,
@@ -24,7 +26,7 @@ export default function JournalCard({
     sinta_indexed_date,
     indexation_labels = [],
     university = 'Universitas Muhammadiyah',
-    url = '#',
+    external_url = null,
     coverColor = 'bg-[#079C4E]', // Default to Official Green
 }: JournalCardProps) {
     // Display max 3 indexations, prioritizing Scopus, WoS, DOAJ
@@ -65,7 +67,7 @@ export default function JournalCard({
 
                 {/* Title */}
                 <h3 className="font-heading mb-2 line-clamp-2 text-xl leading-tight font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
-                    <Link href={url}>{title}</Link>
+                    <Link href={route('journals.show', id)}>{title}</Link>
                 </h3>
 
                 {/* ISSN Info */}
@@ -83,13 +85,15 @@ export default function JournalCard({
                 {/* Actions */}
                 <div className="mt-6 flex items-center gap-2">
                     <Button asChild className="w-full bg-[#079C4E] font-semibold text-white hover:bg-[#068a45]">
-                        <Link href={url}>View Journal</Link>
+                        <Link href={route('journals.show', id)}>View Journal</Link>
                     </Button>
-                    <Button asChild variant="outline" size="icon" className="shrink-0 border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10">
-                        <a href={`${url}/archive`} target="_blank" title="Archives">
-                            <BookOpen className="h-4 w-4" />
-                        </a>
-                    </Button>
+                    {external_url && (
+                        <Button asChild variant="outline" size="icon" className="shrink-0 border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10">
+                            <a href={external_url} target="_blank" rel="noopener noreferrer" title="Visit Journal Website">
+                                <BookOpen className="h-4 w-4" />
+                            </a>
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>
