@@ -7,12 +7,16 @@
 import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { type Journal, type SharedData } from '@/types';
+import { type Article, type Journal, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, BookOpen, Building2, Calendar, ExternalLink, Globe, GraduationCap, Home, Mail, User } from 'lucide-react';
 
 interface JournalsShowProps extends SharedData {
-    journal: Journal;
+    journal: Journal & {
+        articles?: Article[];
+        articles_count?: number;
+    };
+    articlesByYear?: Array<{ year: number; count: number }>;
 }
 
 export default function JournalsShow() {
@@ -313,6 +317,123 @@ export default function JournalsShow() {
                                             <IndexationBadge key={label} platform={label} showDate={false} />
                                         ))}
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Published Articles Section */}
+                            {journal.articles && journal.articles.length > 0 && (
+                                <div className="mb-8 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-neutral-950">
+                                    <div className="border-b border-gray-200 p-6 dark:border-gray-800">
+                                        <div className="flex items-center justify-between">
+                                            <h2 className="flex items-center gap-2 text-2xl font-bold text-foreground">
+                                                <BookOpen className="h-6 w-6 text-[#079C4E]" />
+                                                Published Articles
+                                            </h2>
+                                            <Badge variant="secondary" className="text-base">
+                                                {journal.articles_count || journal.articles.length} Articles
+                                            </Badge>
+                                        </div>
+                                        {journal.oai_pmh_url && (
+                                            <p className="mt-2 text-sm text-muted-foreground">
+                                                Articles harvested via OAI-PMH · Showing {journal.articles.length} most recent
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                                        {journal.articles.map((article) => (
+                                            <div key={article.id} className="p-6 transition-colors hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                                                <h3 className="mb-2 text-lg font-semibold text-foreground">{article.title}</h3>
+
+                                                {/* Authors */}
+                                                {article.authors_list && (
+                                                    <p className="mb-2 text-sm text-muted-foreground">{article.authors_list}</p>
+                                                )}
+
+                                                {/* Volume, Issue, Date */}
+                                                <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                                    {article.volume_issue && (
+                                                        <>
+                                                            <span className="font-medium">{article.volume_issue}</span>
+                                                            <span>·</span>
+                                                        </>
+                                                    )}
+                                                    {article.pages && (
+                                                        <>
+                                                            <span>pp. {article.pages}</span>
+                                                            <span>·</span>
+                                                        </>
+                                                    )}
+                                                    <span>
+                                                        {new Date(article.publication_date).toLocaleDateString('en-US', {
+                                                            year: 'numeric',
+                                                            month: 'long',
+                                                        })}
+                                                    </span>
+                                                </div>
+
+                                                {/* Abstract (truncated) */}
+                                                {article.abstract && (
+                                                    <p className="mb-3 line-clamp-3 text-sm text-foreground">{article.abstract}</p>
+                                                )}
+
+                                                {/* Action Links */}
+                                                <div className="flex flex-wrap gap-2">
+                                                    {article.article_url && (
+                                                        <a
+                                                            href={article.article_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-1 rounded-md bg-[#079C4E] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#067d3e]"
+                                                        >
+                                                            <ExternalLink className="h-3.5 w-3.5" />
+                                                            Full Text
+                                                        </a>
+                                                    )}
+                                                    {article.pdf_url && (
+                                                        <a
+                                                            href={article.pdf_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                                                        >
+                                                            <BookOpen className="h-3.5 w-3.5" />
+                                                            PDF
+                                                        </a>
+                                                    )}
+                                                    {article.doi_url && (
+                                                        <a
+                                                            href={article.doi_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                                                        >
+                                                            DOI: {article.doi}
+                                                        </a>
+                                                    )}
+                                                    <a
+                                                        href={article.google_scholar_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                                                    >
+                                                        Google Scholar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {journal.oai_pmh_url && (
+                                        <div className="border-t border-gray-200 p-4 text-center dark:border-gray-800">
+                                            <a
+                                                href={journal.oai_pmh_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-[#079C4E] hover:underline dark:text-[#0ab560]"
+                                            >
+                                                View OAI-PMH Endpoint →
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
