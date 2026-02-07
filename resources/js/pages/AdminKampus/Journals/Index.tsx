@@ -26,7 +26,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type JournalStatistics } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -208,6 +208,12 @@ export default function JournalsIndex({
                                 </h1>
                                 <p className="mt-1 text-muted-foreground">View and monitor journals from your university</p>
                             </div>
+                            <Link href={route('admin-kampus.journals.import')}>
+                                <Button>
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Import CSV
+                                </Button>
+                            </Link>
                         </div>
                     </div>
 
@@ -244,7 +250,7 @@ export default function JournalsIndex({
                             </div>
 
                             {/* Filter Row */}
-                            <div className="flex gap-4">
+                            <div className="flex flex-wrap gap-4">
                                 {/* Deprecated: Status Filter - No longer used */}
                                 {/* <Select value={statusFilter || 'all'} onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value)}>
                                     <SelectTrigger className="w-48">
@@ -293,6 +299,7 @@ export default function JournalsIndex({
                                     </SelectContent>
                                 </Select>
 
+                                {/* Indexation Filter */}
                                 <Select
                                     value={indexationFilter || 'all'}
                                     onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
@@ -348,24 +355,6 @@ export default function JournalsIndex({
                                         ))}
                                     </SelectContent>
                                 </Select> */}
-
-                                {/* Indexation Filter */}
-                                <Select
-                                    value={indexationFilter || 'all'}
-                                    onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-64">
-                                        <SelectValue placeholder="All Indexations" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Indexations</SelectItem>
-                                        {indexationOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
 
                                 {/* Participation Filter */}
                                 <Select
