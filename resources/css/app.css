@@ -49,6 +49,9 @@
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
 
+    --color-accent-red: var(--accent-red);
+    --color-accent-red-foreground: var(--accent-red-foreground);
+
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -102,6 +105,10 @@
     --accent: #fcee1f;
     --accent-foreground: #0f172a;
 
+    /* Accent Red for CTAs */
+    --accent-red: #dc2626;
+    --accent-red-foreground: #ffffff;
+
     --destructive: #ef4444;
     --destructive-foreground: #ffffff;
 
@@ -149,6 +156,9 @@
 
     --accent: #fcee1f;
     --accent-foreground: #020617;
+
+    --accent-red: #ef4444;
+    --accent-red-foreground: #ffffff;
 
     --destructive: #7f1d1d;
     --destructive-foreground: #f8fafc;

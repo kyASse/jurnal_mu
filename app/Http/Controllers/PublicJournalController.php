@@ -128,9 +128,9 @@ class PublicJournalController extends Controller
      *
      * @route GET /journals/{journal}
      *
-     * @features View public journal details
+     * @features View public journal details with article filtering and search
      */
-    public function show(Journal $journal): Response
+    public function show(Request $request, Journal $journal): Response
     {
         // Only show active journals to public
         if (! $journal->is_active) {
@@ -141,10 +141,77 @@ class PublicJournalController extends Controller
         $journal->load([
             'university',
             'scientificField',
-            'articles' => function ($query) {
-                $query->recent()->take(20); // Get 20 most recent articles
-            },
         ]);
+
+        // Start building the articles query
+        $articlesQuery = $journal->articles()
+            ->orderBy('publication_date', 'desc');
+
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $articlesQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('abstract', 'like', "%{$search}%")
+                    ->orWhere('authors', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply volume filter
+        if ($request->filled('volume')) {
+            $articlesQuery->where('volume', $request->volume);
+        }
+
+        // Apply issue filter
+        if ($request->filled('issue')) {
+            $articlesQuery->where('issue', $request->issue);
+        }
+
+        // Filter by Year
+        if ($request->filled('year_start')) {
+            $articlesQuery->whereYear('publication_date', '>=', $request->year_start);
+        }
+        if ($request->filled('year_end')) {
+            $articlesQuery->whereYear('publication_date', '<=', $request->year_end);
+        }
+
+        // Get paginated articles
+        $articles = $articlesQuery->paginate(10)
+            ->withQueryString()
+            ->through(fn ($article) => [
+                'id' => $article->id,
+                'title' => $article->title,
+                'abstract' => $article->abstract,
+                'authors' => $article->authors,
+                'authors_list' => $article->authors_list,
+                'doi' => $article->doi,
+                'doi_url' => $article->doi_url,
+                'publication_date' => $article->publication_date,
+                'volume' => $article->volume,
+                'issue' => $article->issue,
+                'volume_issue' => $article->volume_issue,
+                'pages' => $article->pages,
+                'article_url' => $article->article_url,
+                'pdf_url' => $article->pdf_url,
+                'google_scholar_url' => $article->google_scholar_url,
+            ]);
+
+        // Get issues list for sidebar
+        $issuesList = $journal->articles()
+            ->select('volume', 'issue')
+            ->selectRaw('MAX(publication_date) as date')
+            ->whereNotNull('volume')
+            ->groupBy('volume', 'issue')
+            ->orderBy('date', 'desc')
+            ->orderBy('volume', 'desc')
+            ->orderBy('issue', 'desc')
+            ->get()
+            ->map(fn ($item) => [
+                'volume' => $item->volume,
+                'issue' => $item->issue,
+                'label' => $item->issue ? "Vol {$item->volume}, No {$item->issue}" : "Vol {$item->volume}",
+                'year' => date('Y', strtotime($item->date)),
+            ]);
 
         // Get article statistics by year
         $articlesCount = $journal->articles()->count();
@@ -193,32 +260,19 @@ class PublicJournalController extends Controller
                     'id' => $journal->university->id,
                     'name' => $journal->university->name,
                     'code' => $journal->university->code,
+                    'address' => $journal->university->address,
+                    'city' => $journal->university->city,
                 ],
                 'scientific_field' => $journal->scientificField ? [
                     'id' => $journal->scientificField->id,
                     'name' => $journal->scientificField->name,
                 ] : null,
-                // Articles
-                'articles' => $journal->articles->map(fn ($article) => [
-                    'id' => $article->id,
-                    'title' => $article->title,
-                    'abstract' => $article->abstract,
-                    'authors' => $article->authors,
-                    'authors_list' => $article->authors_list,
-                    'doi' => $article->doi,
-                    'doi_url' => $article->doi_url,
-                    'publication_date' => $article->publication_date,
-                    'volume' => $article->volume,
-                    'issue' => $article->issue,
-                    'volume_issue' => $article->volume_issue,
-                    'pages' => $article->pages,
-                    'article_url' => $article->article_url,
-                    'pdf_url' => $article->pdf_url,
-                    'google_scholar_url' => $article->google_scholar_url,
-                ]),
                 'articles_count' => $articlesCount,
             ],
+            'articles' => $articles,
+            'issuesList' => $issuesList,
             'articlesByYear' => $articlesByYear,
+            'queries' => $request->all(),
         ]);
     }
 }
