@@ -9,6 +9,7 @@ use App\Models\JournalAssessment;
 use Faker\Factory as FakerFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Faker\Factory as FakerFactory;
 
 class AssessmentSeeder extends Seeder
 {
