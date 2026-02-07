@@ -288,6 +288,14 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.index');
         Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
             ->name('journals.show');
+        
+        // Import journals from CSV
+        Route::get('journals/import/template', [\App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
+            ->name('journals.import.template');
+        Route::get('journals/import/form', [\App\Http\Controllers\AdminKampus\JournalController::class, 'import'])
+            ->name('journals.import');
+        Route::post('journals/import/process', [\App\Http\Controllers\AdminKampus\JournalController::class, 'processImport'])
+            ->name('journals.import.process');
 
         // Reviewer Management (Placeholder)
         Route::get('reviewer', [ReviewerController::class, 'index'])
