@@ -1,0 +1,340 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Article;
+use App\Models\Journal;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class OAIPMHHarvester
+{
+    /**
+     * Harvest articles from a journal's OAI-PMH endpoint
+     *
+     * @param  Journal  $journal  The journal to harvest articles from
+     * @param  string|null  $fromDate  Optional start date for harvesting (format: YYYY-MM-DD)
+     * @return array Harvesting statistics
+     *
+     * @throws \Exception
+     */
+    public function harvest(Journal $journal, ?string $fromDate = null): array
+    {
+        if (! $journal->oai_pmh_url) {
+            throw new \Exception("Journal '{$journal->title}' does not have OAI-PMH URL configured");
+        }
+
+        $stats = [
+            'records_found' => 0,
+            'records_imported' => 0,
+            'records_updated' => 0,
+            'errors' => [],
+        ];
+
+        try {
+            $url = $this->buildListRecordsUrl($journal->oai_pmh_url, $fromDate);
+            $response = Http::timeout(30)->get($url);
+
+            if (! $response->successful()) {
+                throw new \Exception("Failed to harvest from OAI-PMH endpoint: HTTP {$response->status()}");
+            }
+
+            // Suppress XML errors and handle them gracefully
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($response->body());
+
+            if ($xml === false) {
+                $errors = libxml_get_errors();
+                libxml_clear_errors();
+                $errorMessage = 'Failed to parse XML response';
+                if (! empty($errors)) {
+                    $errorMessage .= ': '.$errors[0]->message;
+                }
+                throw new \Exception($errorMessage);
+            }
+
+            // Register OAI namespace
+            $xml->registerXPathNamespace('oai', 'http://www.openarchives.org/OAI/2.0/');
+            $xml->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+
+            // Extract records from XML
+            $records = $xml->xpath('//oai:record');
+
+            if (empty($records)) {
+                Log::info("No records found for journal: {$journal->title}");
+
+                return $stats;
+            }
+
+            $stats['records_found'] = count($records);
+
+            // Process each record
+            foreach ($records as $record) {
+                try {
+                    $this->processRecord($journal, $record, $stats);
+                } catch (\Exception $e) {
+                    $stats['errors'][] = $e->getMessage();
+                    Log::error("Error processing OAI record: {$e->getMessage()}");
+                }
+            }
+
+            // Log harvesting activity
+            DB::table('oai_harvesting_logs')->insert([
+                'journal_id' => $journal->id,
+                'harvested_at' => now(),
+                'records_found' => $stats['records_found'],
+                'records_imported' => $stats['records_imported'],
+                'status' => empty($stats['errors']) ? 'success' : 'partial',
+                'error_message' => empty($stats['errors']) ? null : implode('; ', $stats['errors']),
+            ]);
+
+            Log::info("Harvested {$stats['records_imported']} articles for journal: {$journal->title}");
+
+            return $stats;
+
+        } catch (\Exception $e) {
+            // Log failed harvesting
+            DB::table('oai_harvesting_logs')->insert([
+                'journal_id' => $journal->id,
+                'harvested_at' => now(),
+                'records_found' => $stats['records_found'],
+                'records_imported' => $stats['records_imported'],
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Process a single OAI-PMH record
+     */
+    protected function processRecord(Journal $journal, \SimpleXMLElement $record, array &$stats): void
+    {
+        // Register namespaces
+        $record->registerXPathNamespace('oai', 'http://www.openarchives.org/OAI/2.0/');
+        $record->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+
+        // Extract OAI header information
+        $header = $record->xpath('oai:header')[0] ?? null;
+        if (! $header) {
+            throw new \Exception('Missing OAI header in record');
+        }
+
+        $oaiIdentifier = (string) $header->identifier;
+        $oaiDatestamp = (string) $header->datestamp;
+        $oaiSet = isset($header->setSpec) ? (string) $header->setSpec : null;
+
+        // Extract Dublin Core metadata
+        $metadata = $record->xpath('oai:metadata/oai:dc/*');
+        if (empty($metadata)) {
+            throw new \Exception("No metadata found for record: {$oaiIdentifier}");
+        }
+
+        $dcData = $this->extractDublinCoreMetadata($metadata);
+
+        // Validate required fields
+        if (empty($dcData['title'])) {
+            throw new \Exception("Missing title for record: {$oaiIdentifier}");
+        }
+
+        // Check if article already exists
+        $article = Article::where('oai_identifier', $oaiIdentifier)->first();
+
+        $articleData = [
+            'journal_id' => $journal->id,
+            'oai_identifier' => $oaiIdentifier,
+            'oai_datestamp' => $oaiDatestamp,
+            'oai_set' => $oaiSet,
+            'title' => $dcData['title'],
+            'abstract' => $dcData['abstract'] ?? null,
+            'authors' => $dcData['authors'] ?? null,
+            'keywords' => $dcData['keywords'] ?? null,
+            'doi' => $dcData['doi'] ?? null,
+            'publication_date' => $dcData['date'] ?? now()->toDateString(),
+            'volume' => $dcData['volume'] ?? null,
+            'issue' => $dcData['issue'] ?? null,
+            'pages' => $dcData['pages'] ?? null,
+            'article_url' => $dcData['identifier'] ?? null,
+            'pdf_url' => $dcData['pdf_url'] ?? null,
+            'last_harvested_at' => now(),
+        ];
+
+        if ($article) {
+            // Update existing article
+            $article->update($articleData);
+            $stats['records_updated']++;
+        } else {
+            // Create new article
+            Article::create($articleData);
+            $stats['records_imported']++;
+        }
+    }
+
+    /**
+     * Extract Dublin Core metadata from XML elements
+     */
+    protected function extractDublinCoreMetadata(array $metadata): array
+    {
+        $data = [
+            'title' => null,
+            'abstract' => null,
+            'authors' => [],
+            'keywords' => [],
+            'doi' => null,
+            'date' => null,
+            'volume' => null,
+            'issue' => null,
+            'pages' => null,
+            'identifier' => null,
+            'pdf_url' => null,
+        ];
+
+        foreach ($metadata as $element) {
+            $name = $element->getName();
+            $value = trim((string) $element);
+
+            if (empty($value)) {
+                continue;
+            }
+
+            switch ($name) {
+                case 'title':
+                    if (! $data['title']) { // Take first title only
+                        $data['title'] = $value;
+                    }
+                    break;
+
+                case 'description':
+                    if (! $data['abstract']) { // Take first description as abstract
+                        $data['abstract'] = $value;
+                    }
+                    break;
+
+                case 'creator':
+                    $data['authors'][] = $value;
+                    break;
+
+                case 'subject':
+                    $data['keywords'][] = $value;
+                    break;
+
+                case 'date':
+                    if (! $data['date']) {
+                        // Try to parse date (formats: YYYY-MM-DD, YYYY-MM, YYYY)
+                        $data['date'] = $this->parseDate($value);
+                    }
+                    break;
+
+                case 'identifier':
+                    // Check if identifier is DOI
+                    if (stripos($value, 'doi') !== false || stripos($value, '10.') !== false) {
+                        $data['doi'] = $this->extractDoi($value);
+                    } elseif (filter_var($value, FILTER_VALIDATE_URL)) {
+                        // Store first URL as article identifier
+                        if (! $data['identifier']) {
+                            $data['identifier'] = $value;
+                        }
+                        // Check if URL ends with .pdf
+                        if (! $data['pdf_url'] && strtolower(substr($value, -4)) === '.pdf') {
+                            $data['pdf_url'] = $value;
+                        }
+                    }
+                    break;
+
+                case 'source':
+                    // Try to extract volume/issue/pages from source
+                    // Common formats: "Vol. 5 No. 1 (2024)", "5(1):10-20"
+                    $this->parseSourceInfo($value, $data);
+                    break;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Parse date from various formats
+     */
+    protected function parseDate(string $dateString): ?string
+    {
+        // Try ISO format first (YYYY-MM-DD)
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $dateString, $matches)) {
+            return $matches[0];
+        }
+
+        // Try YYYY-MM format
+        if (preg_match('/^(\d{4})-(\d{2})/', $dateString, $matches)) {
+            return $matches[0].'-01'; // Default to first day of month
+        }
+
+        // Try YYYY format
+        if (preg_match('/^(\d{4})/', $dateString, $matches)) {
+            return $matches[0].'-01-01'; // Default to first day of year
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract DOI from identifier string
+     */
+    protected function extractDoi(string $identifier): ?string
+    {
+        // Match DOI pattern: 10.XXXX/...
+        if (preg_match('/10\.\d{4,}\/[^\s]+/', $identifier, $matches)) {
+            return $matches[0];
+        }
+
+        return null;
+    }
+
+    /**
+     * Parse volume, issue, and pages from source string
+     */
+    protected function parseSourceInfo(string $source, array &$data): void
+    {
+        // Pattern: "Vol. 5 No. 1" or "Vol. 5, No. 1"
+        if (preg_match('/Vol\.\s*(\d+).*?No\.\s*(\d+)/i', $source, $matches)) {
+            $data['volume'] = $matches[1];
+            $data['issue'] = $matches[2];
+        }
+
+        // Pattern: "5(1)" or "5 (1)"
+        if (preg_match('/(\d+)\s*\((\d+)\)/', $source, $matches)) {
+            if (! $data['volume']) {
+                $data['volume'] = $matches[1];
+            }
+            if (! $data['issue']) {
+                $data['issue'] = $matches[2];
+            }
+        }
+
+        // Pattern: pages "10-20" or "pp. 10-20"
+        if (preg_match('/(?:pp?\.\s*)?(\d+)\s*[-–]\s*(\d+)/i', $source, $matches)) {
+            $data['pages'] = "{$matches[1]}-{$matches[2]}";
+        }
+    }
+
+    /**
+     * Build OAI-PMH ListRecords URL
+     */
+    protected function buildListRecordsUrl(string $baseUrl, ?string $fromDate = null): string
+    {
+        $params = [
+            'verb' => 'ListRecords',
+            'metadataPrefix' => 'oai_dc', // Dublin Core metadata format
+        ];
+
+        if ($fromDate) {
+            $params['from'] = $fromDate;
+        }
+
+        // Remove trailing slash from base URL
+        $baseUrl = rtrim($baseUrl, '/');
+
+        return $baseUrl.'?'.http_build_query($params);
+    }
+}

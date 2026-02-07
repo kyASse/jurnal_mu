@@ -22,6 +22,7 @@ class Journal extends Model
         'issn',
         'e_issn',
         'url',
+        'oai_pmh_url',
         'publisher',
         'frequency',
         'first_published_year',
@@ -105,6 +106,22 @@ class Journal extends Model
     public function latestAssessment()
     {
         return $this->hasOne(JournalAssessment::class)->latestOfMany();
+    }
+
+    /**
+     * Get all articles for this journal
+     */
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
+
+    /**
+     * Get recent articles for this journal
+     */
+    public function recentArticles(int $limit = 10)
+    {
+        return $this->articles()->recent()->limit($limit);
     }
 
     /*
