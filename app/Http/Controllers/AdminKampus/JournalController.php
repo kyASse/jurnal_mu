@@ -468,15 +468,15 @@ class JournalController extends Controller
 
         // Verify the selected user belongs to Admin Kampus's university
         $selectedUser = User::find($request->user_id);
-        
-        if (!$selectedUser || $selectedUser->university_id !== $authUser->university_id) {
+
+        if (! $selectedUser || $selectedUser->university_id !== $authUser->university_id) {
             return back()->withErrors([
                 'user_id' => 'Pengelola jurnal yang dipilih tidak valid atau bukan dari universitas Anda.',
             ]);
         }
 
         // Verify the user has "User" role
-        if (!$selectedUser->hasRole('User')) {
+        if (! $selectedUser->hasRole('User')) {
             return back()->withErrors([
                 'user_id' => 'Pengelola jurnal yang dipilih harus memiliki role "User".',
             ]);
@@ -517,9 +517,9 @@ class JournalController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return redirect()->route('admin-kampus.journals.import')
-                ->with('error', 'Terjadi kesalahan saat memproses file CSV: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat memproses file CSV: '.$e->getMessage());
         }
     }
 
@@ -542,7 +542,7 @@ class JournalController extends Controller
 
         $callback = function () {
             $file = fopen('php://output', 'w');
-            
+
             // Add BOM for UTF-8
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 

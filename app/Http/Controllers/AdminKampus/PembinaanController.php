@@ -166,12 +166,22 @@ class PembinaanController extends Controller
             $validated['reviewer_id'],
         ]);
 
+        $reviewer = User::findOrFail($validated['reviewer_id']);
+
+        // Check if reviewer is available
+        if (! $reviewer->isAvailableForAssignment()) {
+            return back()->with('error', 'Reviewer has reached maximum assignment capacity.');
+        }
+
         ReviewerAssignment::create([
             'reviewer_id' => $validated['reviewer_id'],
             'registration_id' => $registration->id,
             'assigned_by' => $request->user()->id,
             'status' => 'assigned',
         ]);
+
+        // Increment reviewer workload
+        $reviewer->incrementAssignments();
 
         // TODO: Send email notification to reviewer
 
@@ -189,26 +199,50 @@ class PembinaanController extends Controller
             return back()->with('error', 'Cannot remove completed assignment.');
         }
 
+        $reviewer = $assignment->reviewer;
+
         $assignment->delete();
+
+        // Decrement reviewer workload
+        if ($reviewer) {
+            $reviewer->decrementAssignments();
+        }
 
         return back()->with('success', 'Reviewer assignment removed.');
     }
 
     /**
      * Get available reviewers for assignment dropdown.
+     *
+     * Features load balancing (prioritize least-loaded reviewers)
+     * and optional expertise matching.
      */
     public function getReviewers(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
 
-        // Get users with Reviewer role from same university
-        $reviewers = User::whereHas('roles', function ($query) {
-            $query->where('name', 'Reviewer');
-        })
+        // Base query: reviewers from same university who are active and available
+        $query = User::reviewers()
             ->where('university_id', $user->university_id)
             ->where('is_active', true)
+            ->availableReviewers(); // Only those not at max capacity
+
+        // Optional: Filter by expertise if journal's scientific_field_id provided
+        if ($request->filled('scientific_field_id')) {
+            $query->withExpertise($request->scientific_field_id);
+        }
+
+        // Load balancing: Sort by current_assignments (least loaded first)
+        $reviewers = $query->orderBy('current_assignments', 'asc')
             ->orderBy('name')
-            ->get(['id', 'name', 'email']);
+            ->get(['id', 'name', 'email', 'current_assignments', 'max_assignments', 'reviewer_expertise']);
+
+        // Add computed fields for UI display
+        $reviewers->each(function ($reviewer) {
+            $reviewer->workload_percentage = $reviewer->getWorkloadPercentage();
+            $reviewer->is_available = $reviewer->isAvailableForAssignment();
+            $reviewer->available_slots = $reviewer->max_assignments - $reviewer->current_assignments;
+        });
 
         return response()->json($reviewers);
     }
