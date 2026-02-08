@@ -9,10 +9,11 @@ use App\Http\Controllers\Admin\EvaluationCategoryController;
 use App\Http\Controllers\Admin\EvaluationIndicatorController;
 use App\Http\Controllers\Admin\EvaluationSubCategoryController;
 use App\Http\Controllers\Admin\PembinaanController as AdminPembinaanController;
+use App\Http\Controllers\Admin\ReviewerController as AdminReviewerController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
 use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
-use App\Http\Controllers\AdminKampus\ReviewerController;
+use App\Http\Controllers\AdminKampus\ReviewerController as AdminKampusReviewerController;
 use App\Http\Controllers\AdminKampus\UserController as AdminKampusUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -214,9 +215,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
             ->name('users.toggle-active');
 
-        // Reviewer Management (v1.1 - Placeholder)
-        Route::get('reviewers', [\App\Http\Controllers\Admin\ReviewerController::class, 'index'])
-            ->name('reviewers.index');
+        // Reviewer Management (v1.1 - Full CRUD)
+        Route::resource('reviewers', AdminReviewerController::class);
+        Route::post('reviewers/{user}/toggle', [AdminReviewerController::class, 'toggle'])
+            ->name('reviewers.toggle');
+        Route::get('reviewers/{reviewer}/stats', [AdminReviewerController::class, 'stats'])
+            ->name('reviewers.stats');
 
         // View all journals (read-only for monitoring)
         Route::get('journals', [\App\Http\Controllers\Admin\JournalController::class, 'index'])
@@ -288,7 +292,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.index');
         Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
             ->name('journals.show');
-        
+
         // Import journals from CSV
         Route::get('journals/import/template', [\App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
             ->name('journals.import.template');
@@ -297,9 +301,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('journals/import/process', [\App\Http\Controllers\AdminKampus\JournalController::class, 'processImport'])
             ->name('journals.import.process');
 
-        // Reviewer Management (Placeholder)
-        Route::get('reviewer', [ReviewerController::class, 'index'])
-            ->name('reviewer.index');
+        // Reviewer Management (v1.1 - Full CRUD for university)
+        Route::resource('reviewers', AdminKampusReviewerController::class);
+        Route::post('reviewers/{user}/toggle', [AdminKampusReviewerController::class, 'toggle'])
+            ->name('reviewers.toggle');
+        Route::get('reviewers/{reviewer}/stats', [AdminKampusReviewerController::class, 'stats'])
+            ->name('reviewers.stats');
 
         // Pembinaan Registration Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
