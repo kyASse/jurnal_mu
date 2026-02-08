@@ -51,6 +51,7 @@ export interface User {
     role: Role;
     roles?: Role[]; // Multi-role support
     university_id?: number;
+    university?: University; // Relationship
     avatar_url?: string;
     avatar?: string;
     is_reviewer?: boolean;
