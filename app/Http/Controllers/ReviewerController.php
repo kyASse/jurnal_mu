@@ -131,6 +131,9 @@ class ReviewerController extends Controller
         // Update assignment status to completed
         $assignment->markCompleted();
 
+        // Decrement reviewer workload (assignment completed)
+        $user->decrementAssignments();
+
         // TODO: Send email notification to Admin Kampus and User
 
         return redirect()
