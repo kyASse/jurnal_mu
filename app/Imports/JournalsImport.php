@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Validator;
 class JournalsImport
 {
     protected int $universityId;
+
     protected int $userId;
+
     protected array $errors = [];
+
     protected int $successCount = 0;
+
     protected int $errorCount = 0;
 
     public function __construct(int $universityId, int $userId)
@@ -26,28 +30,28 @@ class JournalsImport
     public function import(string $filePath): void
     {
         $file = fopen($filePath, 'r');
-        
-        if (!$file) {
+
+        if (! $file) {
             throw new \Exception('Unable to open CSV file');
         }
 
         // Read header row
         $headers = fgetcsv($file);
-        
-        if (!$headers) {
+
+        if (! $headers) {
             fclose($file);
             throw new \Exception('CSV file is empty or invalid');
         }
 
         // Normalize headers (trim and lowercase)
-        $headers = array_map(fn($h) => trim(strtolower($h)), $headers);
+        $headers = array_map(fn ($h) => trim(strtolower($h)), $headers);
 
         $rowNumber = 1; // Start from 1 (header is row 0)
 
         // Process each data row
         while (($data = fgetcsv($file)) !== false) {
             $rowNumber++;
-            
+
             // Skip empty rows
             if (empty(array_filter($data))) {
                 continue;
@@ -55,13 +59,14 @@ class JournalsImport
 
             // Combine headers with data
             $row = array_combine($headers, $data);
-            
+
             if ($row === false) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'errors' => ['Jumlah kolom tidak sesuai dengan header'],
                 ];
                 $this->errorCount++;
+
                 continue;
             }
 
@@ -79,13 +84,14 @@ class JournalsImport
         try {
             // Validate the row data
             $validator = Validator::make($row, $this->rules(), $this->messages());
-            
+
             if ($validator->fails()) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'errors' => $validator->errors()->all(),
                 ];
                 $this->errorCount++;
+
                 return;
             }
 
@@ -98,21 +104,23 @@ class JournalsImport
                     'errors' => ['ISSN atau E-ISSN sudah terdaftar untuk universitas ini.'],
                 ];
                 $this->errorCount++;
+
                 return;
             }
 
             // Find scientific field by name if provided
             $scientificFieldId = null;
-            if (!empty($validated['scientific_field_name'])) {
-                $scientificField = ScientificField::where('name', 'like', '%' . $validated['scientific_field_name'] . '%')->first();
+            if (! empty($validated['scientific_field_name'])) {
+                $scientificField = ScientificField::where('name', 'like', '%'.$validated['scientific_field_name'].'%')->first();
                 if ($scientificField) {
                     $scientificFieldId = $scientificField->id;
                 } else {
                     $this->errors[] = [
                         'row' => $rowNumber,
-                        'errors' => ['Bidang ilmu "' . $validated['scientific_field_name'] . '" tidak ditemukan.'],
+                        'errors' => ['Bidang ilmu "'.$validated['scientific_field_name'].'" tidak ditemukan.'],
                     ];
                     $this->errorCount++;
+
                     return;
                 }
             }
@@ -140,7 +148,7 @@ class JournalsImport
             ];
 
             // Handle indexations (JSON array)
-            if (!empty($validated['indexations'])) {
+            if (! empty($validated['indexations'])) {
                 $indexations = $this->parseIndexations($validated['indexations']);
                 $journalData['indexations'] = $indexations;
             }
@@ -152,7 +160,7 @@ class JournalsImport
         } catch (\Exception $e) {
             $this->errors[] = [
                 'row' => $rowNumber,
-                'errors' => ['Error: ' . $e->getMessage()],
+                'errors' => ['Error: '.$e->getMessage()],
             ];
             $this->errorCount++;
         }
@@ -179,7 +187,7 @@ class JournalsImport
                 'regex:/^\d{4}-\d{4}$/',
             ],
             'scientific_field_name' => 'required|string|max:255',
-            'publication_year' => 'nullable|integer|min:1900|max:' . (now()->year + 1),
+            'publication_year' => 'nullable|integer|min:1900|max:'.(now()->year + 1),
             'sinta_rank' => 'nullable|integer|min:1|max:6',
             'accreditation_rank' => 'nullable|string|max:50',
             'accreditation_expiry_date' => 'nullable|date|date_format:Y-m-d',
@@ -220,14 +228,14 @@ class JournalsImport
     {
         $query = Journal::where('university_id', $this->universityId);
 
-        if (!empty($validated['issn'])) {
+        if (! empty($validated['issn'])) {
             $exists = (clone $query)->where('issn', $validated['issn'])->exists();
             if ($exists) {
                 return true;
             }
         }
 
-        if (!empty($validated['e_issn'])) {
+        if (! empty($validated['e_issn'])) {
             $exists = (clone $query)->where('e_issn', $validated['e_issn'])->exists();
             if ($exists) {
                 return true;
@@ -249,11 +257,11 @@ class JournalsImport
 
         foreach ($parts as $part) {
             $part = trim($part);
-            
+
             if (empty($part)) {
                 continue;
             }
-            
+
             // Match pattern: "IndexName (YYYY-MM-DD)"
             if (preg_match('/^(.+?)\s*\((\d{4}-\d{2}-\d{2})\)$/', $part, $matches)) {
                 $platformName = trim($matches[1]);
