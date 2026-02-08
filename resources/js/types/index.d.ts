@@ -54,7 +54,15 @@ export interface User {
     avatar_url?: string;
     avatar?: string;
     is_reviewer?: boolean;
+    reviewer_expertise?: number[]; // Array of scientific_field_id
+    reviewer_bio?: string;
+    max_assignments?: number;
+    current_assignments?: number;
     scientific_field?: ScientificField;
+    // Computed fields (from backend)
+    workload_percentage?: number;
+    is_available?: boolean;
+    available_slots?: number;
 }
 
 export interface University {
@@ -415,6 +423,17 @@ export interface ReviewerAssignment {
     assigner?: User;
     created_at?: string;
     updated_at?: string;
+}
+
+export interface ReviewerStats {
+    total_assignments: number;
+    active_assignments: number;
+    completed_assignments: number;
+    current_workload: number;
+    max_capacity: number;
+    workload_percentage: number;
+    total_reviews: number;
+    average_score: number;
 }
 
 // Journal Statistics types for Dashboard
