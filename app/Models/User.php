@@ -30,6 +30,10 @@ class User extends Authenticatable
         'scientific_field_id',
         'is_active',
         'is_reviewer',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'rejection_reason',
         'last_login_at',
         'email_verified_at',
     ];
@@ -54,6 +58,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'approved_at' => 'datetime',
             'is_active' => 'boolean',
             'is_reviewer' => 'boolean',
             'password' => 'hashed',
@@ -100,6 +105,14 @@ class User extends Authenticatable
     public function scientificField()
     {
         return $this->belongsTo(ScientificField::class);
+    }
+
+    /**
+     * Get the user who approved/rejected this user's registration
+     */
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     /**
@@ -164,6 +177,30 @@ class User extends Authenticatable
     public function scopeForUniversity($query, int $universityId)
     {
         return $query->where('university_id', $universityId);
+    }
+
+    /**
+     * Scope to get users pending approval
+     */
+    public function scopePendingApproval($query)
+    {
+        return $query->where('approval_status', 'pending');
+    }
+
+    /**
+     * Scope to get approved users
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    /**
+     * Scope to get rejected users
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('approval_status', 'rejected');
     }
 
     /**
