@@ -30,6 +30,10 @@ class User extends Authenticatable
         'scientific_field_id',
         'is_active',
         'is_reviewer',
+        'reviewer_expertise',
+        'reviewer_bio',
+        'max_assignments',
+        'current_assignments',
         'last_login_at',
         'email_verified_at',
     ];
@@ -56,6 +60,9 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'is_active' => 'boolean',
             'is_reviewer' => 'boolean',
+            'reviewer_expertise' => 'array',
+            'max_assignments' => 'integer',
+            'current_assignments' => 'integer',
             'password' => 'hashed',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
@@ -390,5 +397,155 @@ class User extends Authenticatable
         }
 
         return strtoupper(substr($this->name, 0, 2));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reviewer-Specific Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Scope to get only reviewers
+     */
+    public function scopeReviewers($query)
+    {
+        return $query->where('is_reviewer', true)
+            ->orWhereHas('roles', function ($q) {
+                $q->where('name', Role::REVIEWER);
+            });
+    }
+
+    /**
+     * Scope to get available reviewers (not overloaded)
+     */
+    public function scopeAvailableReviewers($query)
+    {
+        return $query->reviewers()
+            ->where('is_active', true)
+            ->whereColumn('current_assignments', '<', 'max_assignments');
+    }
+
+    /**
+     * Scope to filter reviewers by expertise
+     */
+    public function scopeWithExpertise($query, $scientificFieldId)
+    {
+        return $query->whereJsonContains('reviewer_expertise', $scientificFieldId);
+    }
+
+    /**
+     * Get reviewer assignments relationship
+     */
+    public function reviewerAssignments()
+    {
+        return $this->hasMany(ReviewerAssignment::class, 'reviewer_id');
+    }
+
+    /**
+     * Get active reviewer assignments
+     */
+    public function activeAssignments()
+    {
+        return $this->reviewerAssignments()
+            ->whereIn('status', ['assigned', 'in_progress']);
+    }
+
+    /**
+     * Get completed reviewer assignments
+     */
+    public function completedAssignments()
+    {
+        return $this->reviewerAssignments()
+            ->where('status', 'completed');
+    }
+
+    /**
+     * Get pembinaan reviews submitted by this reviewer
+     */
+    public function pembinaanReviews()
+    {
+        return $this->hasMany(PembinaanReview::class, 'reviewer_id');
+    }
+
+    /**
+     * Increment current assignments counter
+     */
+    public function incrementAssignments(): void
+    {
+        $this->increment('current_assignments');
+    }
+
+    /**
+     * Decrement current assignments counter
+     */
+    public function decrementAssignments(): void
+    {
+        $this->decrement('current_assignments');
+    }
+
+    /**
+     * Check if reviewer is available for new assignments
+     */
+    public function isAvailableForAssignment(): bool
+    {
+        if (! $this->is_active || ! $this->isReviewer()) {
+            return false;
+        }
+
+        return $this->current_assignments < $this->max_assignments;
+    }
+
+    /**
+     * Get workload percentage (0-100)
+     */
+    public function getWorkloadPercentage(): int
+    {
+        if ($this->max_assignments === 0) {
+            return 0;
+        }
+
+        return (int) (($this->current_assignments / $this->max_assignments) * 100);
+    }
+
+    /**
+     * Get expertise as ScientificField models
+     */
+    public function expertiseFields()
+    {
+        if (empty($this->reviewer_expertise)) {
+            return collect();
+        }
+
+        return ScientificField::whereIn('id', $this->reviewer_expertise)->get();
+    }
+
+    /**
+     * Check if reviewer has expertise in a specific field
+     */
+    public function hasExpertiseIn(int $scientificFieldId): bool
+    {
+        if (empty($this->reviewer_expertise)) {
+            return false;
+        }
+
+        return in_array($scientificFieldId, $this->reviewer_expertise);
+    }
+
+    /**
+     * Get reviewer statistics
+     */
+    public function getReviewerStats(): array
+    {
+        return [
+            'total_assignments' => $this->reviewerAssignments()->count(),
+            'active_assignments' => $this->activeAssignments()->count(),
+            'completed_assignments' => $this->completedAssignments()->count(),
+            'current_workload' => $this->current_assignments,
+            'max_capacity' => $this->max_assignments,
+            'workload_percentage' => $this->getWorkloadPercentage(),
+            'total_reviews' => $this->pembinaanReviews()->count(),
+            'average_score' => $this->pembinaanReviews()->avg('score') ?? 0,
+        ];
     }
 }
