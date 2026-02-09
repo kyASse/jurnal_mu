@@ -196,4 +196,43 @@ class UserPolicy
 
         return false;
     }
+
+    /**
+     * Determine if the user can view pending user approvals.
+     *
+     * Rules:
+     * - Admin Kampus: Can view pending users from their university
+     * - Super Admin: Can view pending LPPM registrations
+     */
+    public function approveUsers(User $user): bool
+    {
+        return $user->isSuperAdmin() || $user->isAdminKampus();
+    }
+
+    /**
+     * Determine if the user can approve/reject a specific user registration.
+     *
+     * Rules:
+     * - Super Admin: Can approve LPPM registrations (role_id is null)
+     * - Admin Kampus: Can approve User registrations from their university
+     */
+    public function approve(User $authUser, User $targetUser): bool
+    {
+        // Super Admin can approve LPPM registrations
+        // LPPM registrations have role_id = null (pending role assignment)
+        if ($authUser->isSuperAdmin()) {
+            // Can approve pending LPPM (no role assigned yet)
+            return $targetUser->role_id === null || $targetUser->role?->name === 'Admin Kampus';
+        }
+
+        // Admin Kampus can approve regular users from their university
+        if ($authUser->isAdminKampus()) {
+            return $authUser->university_id === $targetUser->university_id
+                && $targetUser->role_id !== null // Not LPPM (LPPM has null role_id)
+                && ! $targetUser->isSuperAdmin() // Never approve Super Admin
+                && ! $targetUser->isAdminKampus(); // Never approve other Admin Kampus
+        }
+
+        return false;
+    }
 }
