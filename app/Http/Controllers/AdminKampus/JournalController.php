@@ -611,4 +611,61 @@ class JournalController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    /**
+     * Reassign journal manager to another user.
+     *
+     * @route POST /admin-kampus/journals/{journal}/reassign
+     *
+     * @features Transfer journal ownership, audit log, notifications to both users
+     */
+    public function reassign(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('reassign', $journal);
+
+        $request->validate([
+            'new_user_id' => 'required|exists:users,id',
+            'reason' => 'nullable|string|max:500',
+        ], [
+            'new_user_id.required' => 'Manager baru harus dipilih.',
+            'new_user_id.exists' => 'User tidak ditemukan.',
+            'reason.max' => 'Alasan maksimal 500 karakter.',
+        ]);
+
+        // Ensure new user is from same university
+        $newUser = User::findOrFail($request->new_user_id);
+        if ($newUser->university_id !== auth()->user()->university_id) {
+            return back()->withErrors(['error' => 'User baru harus dari universitas yang sama.']);
+        }
+
+        // Prevent reassigning to the same user
+        if ($journal->user_id === $request->new_user_id) {
+            return back()->withErrors(['error' => 'Jurnal sudah dikelola oleh user ini.']);
+        }
+
+        $oldUserId = $journal->user_id;
+        $oldUser = $journal->user;
+
+        // Log reassignment to audit table
+        DB::table('journal_reassignments')->insert([
+            'journal_id' => $journal->id,
+            'from_user_id' => $oldUserId,
+            'to_user_id' => $request->new_user_id,
+            'reassigned_by' => auth()->id(),
+            'reason' => $request->reason,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Update journal ownership
+        $journal->update([
+            'user_id' => $request->new_user_id,
+        ]);
+
+        // TODO: Send JournalReassignedNotification to both users
+        // $oldUser->notify(new JournalReassignedNotification($journal, 'removed'));
+        // $newUser->notify(new JournalReassignedNotification($journal, 'assigned'));
+
+        return back()->with('success', "Jurnal \"{$journal->name}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
+    }
 }
