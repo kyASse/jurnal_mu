@@ -37,6 +37,12 @@ class UserController extends Controller
                     });
             });
 
+        // Filter by approval status (default: only show approved users in main table)
+        $approvalStatusFilter = $request->get('approval_status', 'approved');
+        if ($approvalStatusFilter && $approvalStatusFilter !== 'all') {
+            $query->where('approval_status', $approvalStatusFilter);
+        }
+
         // Apply search filter
         if ($request->filled('search')) {
             $query->search($request->search);
@@ -88,6 +94,8 @@ class UserController extends Controller
                     'position' => $user->position,
                     'avatar_url' => $user->avatar_url,
                     'is_active' => $user->is_active,
+                    'approval_status' => $user->approval_status,
+                    'rejection_reason' => $user->rejection_reason,
                     'roles' => $userRoles,
                     'journals_count' => $user->journals_count,
                     'last_login_at' => $user->last_login_at?->format('Y-m-d H:i:s'),
@@ -101,10 +109,44 @@ class UserController extends Controller
             ->orderBy('display_name')
             ->get(['id', 'name', 'display_name']);
 
+        // Get pending users (separate pagination)
+        $pendingQuery = User::query()
+            ->with(['role', 'university'])
+            ->forUniversity($authUser->university_id)
+            ->where('approval_status', 'pending');
+
+        // Apply search filter for pending users
+        if ($request->filled('pending_search')) {
+            $search = $request->pending_search;
+            $pendingQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $pendingUsers = $pendingQuery
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'pending_page')
+            ->withQueryString()
+            ->through(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role ? [
+                        'id' => $user->role->id,
+                        'name' => $user->role->name,
+                        'display_name' => $user->role->display_name,
+                    ] : null,
+                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
+
         return Inertia::render('AdminKampus/Users/Index', [
             'users' => $users,
+            'pendingUsers' => $pendingUsers,
             'roles' => $roles,
-            'filters' => $request->only(['search', 'is_active', 'role_id']),
+            'filters' => $request->only(['search', 'is_active', 'role_id', 'pending_search', 'approval_status']),
             'university' => [
                 'id' => $authUser->university->id,
                 'name' => $authUser->university->name,
