@@ -22,13 +22,23 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, Users as UsersIcon } from 'lucide-react';
-import { useState } from 'react';
+import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, Users as UsersIcon, CheckCircle, XCircle, Clock, UserPlus } from 'lucide-react';
+import { useState, FormEvent } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -49,6 +59,8 @@ interface User {
     position: string | null;
     avatar_url: string | null;
     is_active: boolean;
+    approval_status?: 'pending' | 'approved' | 'rejected'; // Approval workflow status
+    rejection_reason?: string | null; // Reason if rejected
     roles: Array<{
         id: number;
         name: string;
@@ -71,9 +83,33 @@ interface Role {
     display_name: string;
 }
 
+interface PendingUser {
+    id: number;
+    name: string;
+    email: string;
+    role?: {
+        id: number;
+        name: string;
+        display_name: string;
+    };
+    created_at: string;
+}
+
 interface Props {
     users: {
         data: User[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links: Array<{
+            url: string | null;
+            label: string;
+            active: boolean;
+        }>;
+    };
+    pendingUsers: {
+        data: PendingUser[];
         current_page: number;
         last_page: number;
         per_page: number;
@@ -90,18 +126,33 @@ interface Props {
         search: string;
         is_active: string;
         role_id: string;
+        pending_search: string;
+        approval_status: string;
     };
 }
 
-export default function UsersIndex({ users, university, roles, filters }: Props) {
+export default function UsersIndex({ users, pendingUsers, university, roles, filters }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
+    const [pendingSearch, setPendingSearch] = useState(filters.pending_search || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
     const [roleIdFilter, setRoleIdFilter] = useState(filters.role_id || '');
+    const [approvalStatusFilter, setApprovalStatusFilter] = useState(filters.approval_status || 'approved');
+    
+    // Rejection dialog state
+    const [selectedUser, setSelectedUser] = useState<PendingUser | null>(null);
+    const [showRejectDialog, setShowRejectDialog] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [processing, setProcessing] = useState(false);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter }, { preserveState: true });
+        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter, pending_search: pendingSearch, approval_status: approvalStatusFilter }, { preserveState: true });
+    };
+
+    const handlePendingSearch = (e: FormEvent) => {
+        e.preventDefault();
+        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter, pending_search: pendingSearch, approval_status: approvalStatusFilter }, { preserveState: true });
     };
 
     const handleDelete = (id: number, name: string) => {
@@ -114,11 +165,58 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
         router.post(route('admin-kampus.users.toggle-active', id));
     };
 
+    const handleApprove = (user: PendingUser) => {
+        if (confirm(`Setujui pendaftaran ${user.name}?`)) {
+            router.post(
+                route('admin-kampus.users.approve', user.id),
+                {},
+                {
+                    preserveScroll: true,
+                    onStart: () => setProcessing(true),
+                    onFinish: () => setProcessing(false),
+                }
+            );
+        }
+    };
+
+    const handleReject = (e: FormEvent) => {
+        e.preventDefault();
+        
+        if (!selectedUser || !rejectionReason.trim()) {
+            return;
+        }
+
+        router.post(
+            route('admin-kampus.users.reject', selectedUser.id),
+            { reason: rejectionReason },
+            {
+                preserveScroll: true,
+                onStart: () => setProcessing(true),
+                onSuccess: () => {
+                    setShowRejectDialog(false);
+                    setSelectedUser(null);
+                    setRejectionReason('');
+                },
+                onFinish: () => setProcessing(false),
+            }
+        );
+    };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="User Management" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex flex-col gap-4 rounded-xl p-4">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
@@ -183,10 +281,22 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                 </SelectContent>
                             </Select>
 
-                            {/* Status Filter */}
+                            {/* Approval Status Filter */}
+                            <Select value={approvalStatusFilter} onValueChange={(value) => setApprovalStatusFilter(value)}>
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="Approval Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="approved">Approved Only</SelectItem>
+                                    <SelectItem value="rejected">Rejected Only</SelectItem>
+                                    <SelectItem value="all">All Users</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* Active Status Filter */}
                             <Select value={isActiveFilter || 'all'} onValueChange={(value) => setIsActiveFilter(value === 'all' ? '' : value)}>
                                 <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="All Status" />
+                                    <SelectValue placeholder="Active Status" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Status</SelectItem>
@@ -196,7 +306,7 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                             </Select>
 
                             <Button type="submit">Search</Button>
-                            {(search || isActiveFilter || roleIdFilter) && (
+                            {(search || isActiveFilter || roleIdFilter || approvalStatusFilter !== 'approved') && (
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -204,6 +314,7 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                         setSearch('');
                                         setIsActiveFilter('');
                                         setRoleIdFilter('');
+                                        setApprovalStatusFilter('approved');
                                         router.get(route('admin-kampus.users.index'));
                                     }}
                                 >
@@ -214,7 +325,7 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
+                    <div className="overflow-x-auto rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -252,8 +363,20 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <div className="font-semibold text-foreground">{user.name}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-semibold text-foreground">{user.name}</span>
+                                                            {user.approval_status === 'rejected' && (
+                                                                <Badge variant="destructive" className="text-xs">
+                                                                    Rejected
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                         {user.position && <div className="text-sm text-muted-foreground">{user.position}</div>}
+                                                        {user.approval_status === 'rejected' && user.rejection_reason && (
+                                                            <div className="text-xs text-red-600 dark:text-red-400 mt-1 max-w-xs truncate" title={user.rejection_reason}>
+                                                                Reason: {user.rejection_reason}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -372,6 +495,218 @@ export default function UsersIndex({ users, university, roles, filters }: Props)
                     </div>
                 </div>
             </div>
+
+            {/* Pending User Approvals Section */}
+            <div className="flex flex-col gap-4 rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="flex items-center gap-2 text-2xl font-bold text-foreground">
+                                    <UserPlus className="h-7 w-7 text-orange-600 dark:text-orange-400" />
+                                    Pending User Approvals
+                                </h2>
+                                <p className="mt-1 text-muted-foreground">Approve or reject user registrations</p>
+                            </div>
+                            {pendingUsers.total > 0 && (
+                                <Badge variant="outline" className="text-lg px-4 py-2">
+                                    <Clock className="w-4 h-4 mr-2" />
+                                    {pendingUsers.total} Pending
+                                </Badge>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Search for Pending Users */}
+                    <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
+                        <form onSubmit={handlePendingSearch} className="flex gap-4">
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Search pending users by name or email..."
+                                        value={pendingSearch}
+                                        onChange={(e) => setPendingSearch(e.target.value)}
+                                        className="pl-10"
+                                    />
+                                </div>
+                            </div>
+                            <Button type="submit">Search</Button>
+                            {filters.pending_search && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setPendingSearch('');
+                                        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter, approval_status: approvalStatusFilter });
+                                    }}
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </form>
+                    </div>
+
+                    {/* Pending Users Table */}
+                    <div className="overflow-x-auto rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Role</TableHead>
+                                    <TableHead>Registration Date</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {pendingUsers.data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                                            No pending user registrations.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    pendingUsers.data.map((user) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell className="font-medium">{user.name}</TableCell>
+                                            <TableCell>{user.email}</TableCell>
+                                            <TableCell>
+                                                <Badge variant="outline">
+                                                    {user.role?.display_name || 'Pending'}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">
+                                                {formatDate(user.created_at)}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="default"
+                                                        onClick={() => handleApprove(user)}
+                                                        disabled={processing}
+                                                        title="Approve registration"
+                                                    >
+                                                        <CheckCircle className="h-4 w-4 mr-1" />
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        onClick={() => {
+                                                            setSelectedUser(user);
+                                                            setShowRejectDialog(true);
+                                                        }}
+                                                        disabled={processing}
+                                                        title="Reject registration"
+                                                    >
+                                                        <XCircle className="h-4 w-4 mr-1" />
+                                                        Reject
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+
+                        {/* Pagination for Pending Users */}
+                        {pendingUsers.last_page > 1 && (
+                            <div className="border-t border-sidebar-border/70 px-6 py-4 dark:border-sidebar-border">
+                                <div className="flex items-center justify-between">
+                                    <div className="text-sm text-muted-foreground">
+                                        Showing {(pendingUsers.current_page - 1) * pendingUsers.per_page + 1} to{' '}
+                                        {Math.min(pendingUsers.current_page * pendingUsers.per_page, pendingUsers.total)} of {pendingUsers.total} pending users
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {pendingUsers.links.map((link, index) => {
+                                            if (link.url === null) return null;
+
+                                            const isFirst = index === 0;
+                                            const isLast = index === pendingUsers.links.length - 1;
+
+                                            return (
+                                                <Link key={index} href={link.url} preserveState preserveScroll>
+                                                    <Button variant={link.active ? 'default' : 'outline'} size="sm" disabled={!link.url || processing}>
+                                                        {isFirst ? (
+                                                            <ChevronLeft className="h-4 w-4" />
+                                                        ) : isLast ? (
+                                                            <ChevronRight className="h-4 w-4" />
+                                                        ) : (
+                                                            <span>{link.label}</span>
+                                                        )}
+                                                    </Button>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Reject Dialog */}
+            <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+                <DialogContent>
+                    <form onSubmit={handleReject}>
+                        <DialogHeader>
+                            <DialogTitle>Reject User Registration</DialogTitle>
+                            <DialogDescription>
+                                Provide a reason for rejecting{' '}
+                                <span className="font-semibold">{selectedUser?.name}</span>'s registration.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="reason">
+                                    Rejection Reason <span className="text-destructive">*</span>
+                                </Label>
+                                <Textarea
+                                    id="reason"
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    placeholder="Explain why this registration is being rejected..."
+                                    rows={4}
+                                    required
+                                    minLength={10}
+                                    maxLength={500}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Minimum 10 characters. The user will receive an email with this reason.
+                                </p>
+                            </div>
+                        </div>
+
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    setShowRejectDialog(false);
+                                    setRejectionReason('');
+                                }}
+                                disabled={processing}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                variant="destructive"
+                                disabled={processing || rejectionReason.length < 10}
+                            >
+                                {processing ? 'Rejecting...' : 'Reject User'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }
