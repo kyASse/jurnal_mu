@@ -1,27 +1,45 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
+
+type University = {
+    id: number;
+    name: string;
+    short_name?: string;
+};
 
 type RegisterForm = {
     name: string;
     email: string;
     password: string;
     password_confirmation: string;
+    university_id: string;
+    role_type: 'user' | 'lppm';
     phone: string;
     position: string;
 };
 
-export default function Register() {
+interface Props {
+    universities: University[];
+}
+
+export default function Register({ universities }: Props) {
     const { data, setData, post, processing, errors } = useForm<RegisterForm>({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
+        university_id: '',
+        role_type: 'user',
         phone: '',
         position: '',
     });
+
+    const [roleType, setRoleType] = useState<'user' | 'lppm'>('user');
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -78,10 +96,81 @@ export default function Register() {
                                 {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
                             </div>
 
+                            {/* University Selection */}
+                            <div>
+                                <Label htmlFor="university">Universitas *</Label>
+                                <Select value={data.university_id} onValueChange={(value) => setData('university_id', value)}>
+                                    <SelectTrigger className="mt-2">
+                                        <SelectValue placeholder="Pilih Universitas" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {universities.map((uni) => (
+                                            <SelectItem key={uni.id} value={uni.id.toString()}>
+                                                {uni.short_name ? `${uni.short_name} - ${uni.name}` : uni.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.university_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.university_id}</p>}
+                            </div>
+
+                            {/* Role Type Selection */}
+                            <div>
+                                <Label>Daftar Sebagai *</Label>
+                                <RadioGroup
+                                    value={data.role_type}
+                                    onValueChange={(value: 'user' | 'lppm') => {
+                                        setData('role_type', value);
+                                        setRoleType(value);
+                                    }}
+                                    className="mt-2 space-y-3"
+                                >
+                                    <div className="flex items-start space-x-3 rounded-lg border p-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        <RadioGroupItem value="user" id="user" className="mt-0.5" />
+                                        <div className="flex-1">
+                                            <Label htmlFor="user" className="cursor-pointer font-medium">
+                                                Pengelola Jurnal (User)
+                                            </Label>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                Untuk pengelola jurnal yang akan mengelola data jurnal di universitas
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start space-x-3 rounded-lg border p-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        <RadioGroupItem value="lppm" id="lppm" className="mt-0.5" />
+                                        <div className="flex-1">
+                                            <Label htmlFor="lppm" className="cursor-pointer font-medium">
+                                                Admin LPPM
+                                            </Label>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                Untuk admin LPPM yang akan menyetujui pendaftaran user dan jurnal
+                                            </p>
+                                        </div>
+                                    </div>
+                                </RadioGroup>
+                                {errors.role_type && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.role_type}</p>}
+
+                                {/* Info based on role selection */}
+                                <div className="mt-2 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+                                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                                        {roleType === 'lppm'
+                                            ? '⚠️ Akun LPPM akan disetujui oleh Dikti (Super Admin)'
+                                            : 'ℹ️ Akun User akan disetujui oleh Admin LPPM universitas Anda'}
+                                    </p>
+                                </div>
+                            </div>
+
                             {/* Phone */}
                             <div>
                                 <Label htmlFor="phone">No. Telepon</Label>
-                                <Input id="phone" type="tel" value={data.phone} onChange={(e) => setData('phone', e.target.value)} className="mt-2" />
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    value={data.phone}
+                                    onChange={(e) => setData('phone', e.target.value)}
+                                    className="mt-2"
+                                    placeholder="08123456789"
+                                />
                                 {errors.phone && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>}
                             </div>
 
@@ -93,7 +182,7 @@ export default function Register() {
                                     value={data.position}
                                     onChange={(e) => setData('position', e.target.value)}
                                     className="mt-2"
-                                    placeholder="Dosen, Staf, dll"
+                                    placeholder="Dosen, Staf LPPM, dll"
                                 />
                                 {errors.position && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.position}</p>}
                             </div>
