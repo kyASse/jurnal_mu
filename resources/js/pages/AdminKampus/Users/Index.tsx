@@ -37,7 +37,7 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, Users as UsersIcon, CheckCircle, XCircle, Clock, UserPlus } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, Users as UsersIcon, CheckCircle, XCircle, Clock, UserPlus, RotateCcw, EyeOff } from 'lucide-react';
 import { useState, FormEvent } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -95,6 +95,20 @@ interface PendingUser {
     created_at: string;
 }
 
+interface RejectedUser {
+    id: number;
+    name: string;
+    email: string;
+    university: {
+        id: number;
+        name: string;
+        short_name: string;
+    } | null;
+    rejection_reason: string;
+    rejected_by: string;
+    rejected_at: string;
+}
+
 interface Props {
     users: {
         data: User[];
@@ -120,6 +134,18 @@ interface Props {
             active: boolean;
         }>;
     };
+    rejectedUsers: {
+        data: RejectedUser[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links: Array<{
+            url: string | null;
+            label: string;
+            active: boolean;
+        }>;
+    } | null;
     university: University;
     roles: Role[];
     filters: {
@@ -127,14 +153,17 @@ interface Props {
         is_active: string;
         role_id: string;
         pending_search: string;
+        rejected_search: string;
         approval_status: string;
+        show_rejected: boolean;
     };
 }
 
-export default function UsersIndex({ users, pendingUsers, university, roles, filters }: Props) {
+export default function UsersIndex({ users, pendingUsers, rejectedUsers, university, roles, filters }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [pendingSearch, setPendingSearch] = useState(filters.pending_search || '');
+    const [rejectedSearch, setRejectedSearch] = useState(filters.rejected_search || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
     const [roleIdFilter, setRoleIdFilter] = useState(filters.role_id || '');
     const [approvalStatusFilter, setApprovalStatusFilter] = useState(filters.approval_status || 'approved');
@@ -199,6 +228,36 @@ export default function UsersIndex({ users, pendingUsers, university, roles, fil
                 },
                 onFinish: () => setProcessing(false),
             }
+        );
+    };
+
+    const handleRevert = (user: RejectedUser) => {
+        if (confirm(`Revert rejection for ${user.name}? User akan kembali ke status pending.`)) {
+            router.post(
+                route('admin-kampus.users.revert', user.id),
+                {},
+                {
+                    preserveScroll: true,
+                    onStart: () => setProcessing(true),
+                    onFinish: () => setProcessing(false),
+                }
+            );
+        }
+    };
+
+    const toggleRejectedView = () => {
+        router.get(
+            route('admin-kampus.users.index'),
+            {
+                search,
+                is_active: isActiveFilter,
+                role_id: roleIdFilter,
+                pending_search: pendingSearch,
+                rejected_search: rejectedSearch,
+                approval_status: approvalStatusFilter,
+                show_rejected: !filters.show_rejected,
+            },
+            { preserveState: true }
         );
     };
 
@@ -650,6 +709,191 @@ export default function UsersIndex({ users, pendingUsers, university, roles, fil
                     </div>
                 </div>
             </div>
+
+            {/* Toggle Button for Rejected Users */}
+            <div className="flex justify-end px-4">
+                <Button
+                    variant={filters.show_rejected ? 'default' : 'outline'}
+                    onClick={toggleRejectedView}
+                    className="gap-2"
+                >
+                    {filters.show_rejected ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {filters.show_rejected ? 'Hide' : 'Show'} Rejected Users
+                    {rejectedUsers && <Badge variant="secondary" className="ml-2">{rejectedUsers.total}</Badge>}
+                </Button>
+            </div>
+
+            {/* Rejected Users Section (conditional) */}
+            {filters.show_rejected && rejectedUsers && (
+                <div className="flex flex-col gap-4 rounded-xl p-4">
+                    <div className="relative overflow-hidden rounded-xl border border-red-200 bg-red-50 p-6 dark:border-red-900 dark:bg-red-950/20">
+                        {/* Header */}
+                        <div className="mb-6">
+                            <h2 className="flex items-center gap-2 text-2xl font-bold text-red-700 dark:text-red-400">
+                                <XCircle className="h-7 w-7" />
+                                Rejected User Registrations
+                            </h2>
+                            <p className="mt-1 text-red-600 dark:text-red-400">
+                                View and revert rejected user registrations
+                            </p>
+                        </div>
+
+                        {/* Search for Rejected Users */}
+                        <div className="mb-6 rounded-lg border border-red-200 bg-white p-4 shadow-sm dark:border-red-900 dark:bg-neutral-950">
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                router.get(
+                                    route('admin-kampus.users.index'),
+                                    {
+                                        search,
+                                        is_active: isActiveFilter,
+                                        role_id: roleIdFilter,
+                                        pending_search: pendingSearch,
+                                        rejected_search: rejectedSearch,
+                                        approval_status: approvalStatusFilter,
+                                        show_rejected: true,
+                                    },
+                                    { preserveState: true },
+                                );
+                            }} className="flex gap-4">
+                                <div className="flex-1">
+                                    <div className="relative">
+                                        <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
+                                        <Input
+                                            type="text"
+                                            placeholder="Search rejected users by name or email..."
+                                            value={rejectedSearch}
+                                            onChange={(e) => setRejectedSearch(e.target.value)}
+                                            className="pl-10"
+                                        />
+                                    </div>
+                                </div>
+                                <Button type="submit">Search</Button>
+                                {filters.rejected_search && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => {
+                                            setRejectedSearch('');
+                                            router.get(
+                                                route('admin-kampus.users.index'),
+                                                {
+                                                    search,
+                                                    is_active: isActiveFilter,
+                                                    role_id: roleIdFilter,
+                                                    pending_search: pendingSearch,
+                                                    approval_status: approvalStatusFilter,
+                                                    show_rejected: true,
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        Clear
+                                    </Button>
+                                )}
+                            </form>
+                        </div>
+
+                        {/* Rejected Users Table */}
+                        <div className="overflow-x-auto rounded-lg border border-red-200 bg-white shadow-sm dark:border-red-900 dark:bg-neutral-950">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>University</TableHead>
+                                        <TableHead>Rejection Reason</TableHead>
+                                        <TableHead>Rejected By</TableHead>
+                                        <TableHead>Rejected At</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {rejectedUsers.data.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                                                No rejected user registrations.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        rejectedUsers.data.map((user) => (
+                                            <TableRow key={user.id}>
+                                                <TableCell className="font-medium">{user.name}</TableCell>
+                                                <TableCell>{user.email}</TableCell>
+                                                <TableCell>
+                                                    {user.university ? (
+                                                        <div>
+                                                            <div className="font-medium">{user.university.name}</div>
+                                                            <div className="text-xs text-muted-foreground">{user.university.short_name}</div>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="max-w-md">
+                                                    <p className="text-sm text-muted-foreground truncate" title={user.rejection_reason}>
+                                                        {user.rejection_reason}
+                                                    </p>
+                                                </TableCell>
+                                                <TableCell>{user.rejected_by}</TableCell>
+                                                <TableCell className="text-sm text-muted-foreground">
+                                                    {formatDate(user.rejected_at)}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => handleRevert(user)}
+                                                        disabled={processing}
+                                                        title="Revert rejection and move back to pending"
+                                                    >
+                                                        <RotateCcw className="h-4 w-4 mr-1" />
+                                                        Revert
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+
+                            {/* Pagination for Rejected Users */}
+                            {rejectedUsers.last_page > 1 && (
+                                <div className="border-t border-red-200 px-6 py-4 dark:border-red-900">
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-sm text-muted-foreground">
+                                            Showing {(rejectedUsers.current_page - 1) * rejectedUsers.per_page + 1} to{' '}
+                                            {Math.min(rejectedUsers.current_page * rejectedUsers.per_page, rejectedUsers.total)} of {rejectedUsers.total} rejected users
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {rejectedUsers.links.map((link, index) => {
+                                                if (link.url === null) return null;
+
+                                                const isFirst = index === 0;
+                                                const isLast = index === rejectedUsers.links.length - 1;
+
+                                                return (
+                                                    <Link key={index} href={link.url} preserveState preserveScroll>
+                                                        <Button variant={link.active ? 'default' : 'outline'} size="sm" disabled={!link.url || processing}>
+                                                            {isFirst ? (
+                                                                <ChevronLeft className="h-4 w-4" />
+                                                            ) : isLast ? (
+                                                                <ChevronRight className="h-4 w-4" />
+                                                            ) : (
+                                                                <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                                            )}
+                                                        </Button>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Reject Dialog */}
             <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
