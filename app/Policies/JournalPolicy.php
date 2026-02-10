@@ -215,4 +215,48 @@ class JournalPolicy
 
         return false;
     }
+
+    /**
+     * Determine if the user can approve/reject journal submissions.
+     *
+     * Rules:
+     * - Admin Kampus: Can approve journals from their university
+     * - Super Admin: Can approve any journal (for testing/oversight)
+     */
+    public function approve(User $user, Journal $journal): bool
+    {
+        // Super Admin can approve any journal
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        // Admin Kampus can approve journals from their university
+        if ($user->isAdminKampus()) {
+            return $user->university_id === $journal->university_id;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the user can reassign journal manager.
+     *
+     * Rules:
+     * - Admin Kampus: Can reassign journals within their university
+     * - Super Admin: Can reassign any journal
+     */
+    public function reassign(User $user, Journal $journal): bool
+    {
+        // Super Admin can reassign any journal
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        // Admin Kampus can reassign journals from their university
+        if ($user->isAdminKampus()) {
+            return $user->university_id === $journal->university_id;
+        }
+
+        return false;
+    }
 }
