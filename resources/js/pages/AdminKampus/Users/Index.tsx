@@ -231,7 +231,7 @@ export default function UsersIndex({ users, pendingUsers, university, roles, fil
                             <Link href={route('admin-kampus.users.create')}>
                                 <Button className="flex items-center gap-2">
                                     <Plus className="h-4 w-4" />
-                                    Add User
+                                    Create User
                                 </Button>
                             </Link>
                         </div>
