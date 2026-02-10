@@ -230,6 +230,9 @@ class UserController extends Controller
             'role_id' => $primaryRoleId,
             'is_active' => $validated['is_active'],
             'is_reviewer' => false, // Will be updated if Reviewer role is selected
+            'approval_status' => 'approved', // LPPM creates users directly (bypass approval)
+            'approved_by' => $authUser->id,
+            'approved_at' => now(),
         ]);
 
         // Attach all selected roles to the user
@@ -459,6 +462,7 @@ class UserController extends Controller
         return back()->with('success', "User {$status} successfully.");
     }
 
+
     /**
      * Ensure the user belongs to the admin's university and is not Super Admin.
      *
@@ -482,3 +486,7 @@ class UserController extends Controller
         }
     }
 }
+
+
+
+
