@@ -296,6 +296,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('approve');
             Route::post('{user}/reject', [UserApprovalController::class, 'reject'])
                 ->name('reject');
+            Route::post('{user}/revert', [UserApprovalController::class, 'revert'])
+                ->name('revert');
         });
 
         // Users (Pengelola Jurnal) Management
