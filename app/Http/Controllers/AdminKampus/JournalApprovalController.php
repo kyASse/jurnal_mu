@@ -12,6 +12,7 @@ use Inertia\Response;
  * Handle journal submission approval workflow for Admin Kampus.
  *
  * @route /admin-kampus/journals/pending
+ *
  * @features View pending journals, approve/reject submissions, send notifications
  */
 class JournalApprovalController extends Controller

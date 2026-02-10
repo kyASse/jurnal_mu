@@ -91,23 +91,32 @@
  */
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, ShieldCheck, Trash2, UserPlus, CheckCircle, XCircle, Clock, RotateCcw, EyeOff } from 'lucide-react';
+import {
+    BookOpen,
+    CheckCircle,
+    ChevronLeft,
+    ChevronRight,
+    Clock,
+    Edit,
+    Eye,
+    EyeOff,
+    Plus,
+    RotateCcw,
+    Search,
+    ShieldCheck,
+    Trash2,
+    UserPlus,
+    XCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -229,7 +238,7 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
     const [pendingLppmSearch, setPendingLppmSearch] = useState(filters.pending_lppm_search || '');
     const [rejectedLppmSearch, setRejectedLppmSearch] = useState(filters.rejected_lppm_search || '');
-    
+
     // LPPM Rejection dialog state
     const [selectedLppm, setSelectedLppm] = useState<PendingLppm | null>(null);
     const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -238,7 +247,11 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin.admin-kampus.index'), { search, university_id: universityId, is_active: isActiveFilter, pending_lppm_search: pendingLppmSearch }, { preserveState: true });
+        router.get(
+            route('admin.admin-kampus.index'),
+            { search, university_id: universityId, is_active: isActiveFilter, pending_lppm_search: pendingLppmSearch },
+            { preserveState: true },
+        );
     };
 
     const handleDelete = (id: number, name: string) => {
@@ -580,8 +593,8 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                 <p className="mt-1 text-muted-foreground">Approve or reject LPPM Admin registrations from universities</p>
                             </div>
                             {pendingLppm.total > 0 && (
-                                <Badge variant="outline" className="text-lg px-4 py-2">
-                                    <Clock className="w-4 h-4 mr-2" />
+                                <Badge variant="outline" className="px-4 py-2 text-lg">
+                                    <Clock className="mr-2 h-4 w-4" />
                                     {pendingLppm.total} Pending
                                 </Badge>
                             )}
@@ -610,7 +623,11 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                     variant="outline"
                                     onClick={() => {
                                         setPendingLppmSearch('');
-                                        router.get(route('admin.admin-kampus.index'), { search, university_id: universityId, is_active: isActiveFilter });
+                                        router.get(route('admin.admin-kampus.index'), {
+                                            search,
+                                            university_id: universityId,
+                                            is_active: isActiveFilter,
+                                        });
                                     }}
                                 >
                                     Clear
@@ -653,9 +670,7 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                                     <span className="text-muted-foreground">-</span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-sm text-muted-foreground">
-                                                {formatDate(lppm.created_at)}
-                                            </TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">{formatDate(lppm.created_at)}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Button
@@ -665,7 +680,7 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                                         disabled={processing}
                                                         title="Approve LPPM Admin registration"
                                                     >
-                                                        <CheckCircle className="h-4 w-4 mr-1" />
+                                                        <CheckCircle className="mr-1 h-4 w-4" />
                                                         Approve
                                                     </Button>
                                                     <Button
@@ -678,7 +693,7 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                                         disabled={processing}
                                                         title="Reject LPPM Admin registration"
                                                     >
-                                                        <XCircle className="h-4 w-4 mr-1" />
+                                                        <XCircle className="mr-1 h-4 w-4" />
                                                         Reject
                                                     </Button>
                                                 </div>
@@ -695,7 +710,8 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                 <div className="flex items-center justify-between">
                                     <div className="text-sm text-muted-foreground">
                                         Showing {(pendingLppm.current_page - 1) * pendingLppm.per_page + 1} to{' '}
-                                        {Math.min(pendingLppm.current_page * pendingLppm.per_page, pendingLppm.total)} of {pendingLppm.total} pending LPPM
+                                        {Math.min(pendingLppm.current_page * pendingLppm.per_page, pendingLppm.total)} of {pendingLppm.total} pending
+                                        LPPM
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {pendingLppm.links.map((link, index) => {
@@ -706,7 +722,11 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
 
                                             return (
                                                 <Link key={index} href={link.url} preserveState preserveScroll>
-                                                    <Button variant={link.active ? 'default' : 'outline'} size="sm" disabled={!link.url || processing}>
+                                                    <Button
+                                                        variant={link.active ? 'default' : 'outline'}
+                                                        size="sm"
+                                                        disabled={!link.url || processing}
+                                                    >
                                                         {isFirst ? (
                                                             <ChevronLeft className="h-4 w-4" />
                                                         ) : isLast ? (
@@ -728,14 +748,14 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
 
             {/* Toggle Button for Rejected LPPM */}
             <div className="flex justify-end px-4">
-                <Button
-                    variant={filters.show_rejected ? 'default' : 'outline'}
-                    onClick={toggleRejectedView}
-                    className="gap-2"
-                >
+                <Button variant={filters.show_rejected ? 'default' : 'outline'} onClick={toggleRejectedView} className="gap-2">
                     {filters.show_rejected ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     {filters.show_rejected ? 'Hide' : 'Show'} Rejected LPPM
-                    {rejectedLppm && <Badge variant="secondary" className="ml-2">{rejectedLppm.total}</Badge>}
+                    {rejectedLppm && (
+                        <Badge variant="secondary" className="ml-2">
+                            {rejectedLppm.total}
+                        </Badge>
+                    )}
                 </Button>
             </div>
 
@@ -749,28 +769,29 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                 <XCircle className="h-7 w-7" />
                                 Rejected LPPM Registrations
                             </h2>
-                            <p className="mt-1 text-red-600 dark:text-red-400">
-                                View and revert rejected LPPM registrations
-                            </p>
+                            <p className="mt-1 text-red-600 dark:text-red-400">View and revert rejected LPPM registrations</p>
                         </div>
 
                         {/* Search for Rejected LPPM */}
                         <div className="mb-6 rounded-lg border border-red-200 bg-white p-4 shadow-sm dark:border-red-900 dark:bg-neutral-950">
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                router.get(
-                                    route('admin.admin-kampus.index'),
-                                    {
-                                        search,
-                                        university_id: universityId,
-                                        is_active: isActiveFilter,
-                                        pending_lppm_search: pendingLppmSearch,
-                                        rejected_lppm_search: rejectedLppmSearch,
-                                        show_rejected: true,
-                                    },
-                                    { preserveState: true },
-                                );
-                            }} className="flex gap-4">
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    router.get(
+                                        route('admin.admin-kampus.index'),
+                                        {
+                                            search,
+                                            university_id: universityId,
+                                            is_active: isActiveFilter,
+                                            pending_lppm_search: pendingLppmSearch,
+                                            rejected_lppm_search: rejectedLppmSearch,
+                                            show_rejected: true,
+                                        },
+                                        { preserveState: true },
+                                    );
+                                }}
+                                className="flex gap-4"
+                            >
                                 <div className="flex-1">
                                     <div className="relative">
                                         <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
@@ -790,16 +811,13 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                         variant="outline"
                                         onClick={() => {
                                             setRejectedLppmSearch('');
-                                            router.get(
-                                                route('admin.admin-kampus.index'),
-                                                {
-                                                    search,
-                                                    university_id: universityId,
-                                                    is_active: isActiveFilter,
-                                                    pending_lppm_search: pendingLppmSearch,
-                                                    show_rejected: true,
-                                                },
-                                            );
+                                            router.get(route('admin.admin-kampus.index'), {
+                                                search,
+                                                university_id: universityId,
+                                                is_active: isActiveFilter,
+                                                pending_lppm_search: pendingLppmSearch,
+                                                show_rejected: true,
+                                            });
                                         }}
                                     >
                                         Clear
@@ -845,14 +863,12 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="max-w-md">
-                                                    <p className="text-sm text-muted-foreground truncate" title={lppm.rejection_reason}>
+                                                    <p className="truncate text-sm text-muted-foreground" title={lppm.rejection_reason}>
                                                         {lppm.rejection_reason}
                                                     </p>
                                                 </TableCell>
                                                 <TableCell>{lppm.rejected_by}</TableCell>
-                                                <TableCell className="text-sm text-muted-foreground">
-                                                    {formatDate(lppm.rejected_at)}
-                                                </TableCell>
+                                                <TableCell className="text-sm text-muted-foreground">{formatDate(lppm.rejected_at)}</TableCell>
                                                 <TableCell className="text-right">
                                                     <Button
                                                         size="sm"
@@ -861,7 +877,7 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                                         disabled={processing}
                                                         title="Revert rejection and move back to pending"
                                                     >
-                                                        <RotateCcw className="h-4 w-4 mr-1" />
+                                                        <RotateCcw className="mr-1 h-4 w-4" />
                                                         Revert
                                                     </Button>
                                                 </TableCell>
@@ -877,7 +893,8 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                                     <div className="flex items-center justify-between">
                                         <div className="text-sm text-muted-foreground">
                                             Showing {(rejectedLppm.current_page - 1) * rejectedLppm.per_page + 1} to{' '}
-                                            {Math.min(rejectedLppm.current_page * rejectedLppm.per_page, rejectedLppm.total)} of {rejectedLppm.total} rejected LPPM
+                                            {Math.min(rejectedLppm.current_page * rejectedLppm.per_page, rejectedLppm.total)} of {rejectedLppm.total}{' '}
+                                            rejected LPPM
                                         </div>
                                         <div className="flex items-center gap-2">
                                             {rejectedLppm.links.map((link, index) => {
@@ -888,7 +905,11 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
 
                                                 return (
                                                     <Link key={index} href={link.url} preserveState preserveScroll>
-                                                        <Button variant={link.active ? 'default' : 'outline'} size="sm" disabled={!link.url || processing}>
+                                                        <Button
+                                                            variant={link.active ? 'default' : 'outline'}
+                                                            size="sm"
+                                                            disabled={!link.url || processing}
+                                                        >
                                                             {isFirst ? (
                                                                 <ChevronLeft className="h-4 w-4" />
                                                             ) : isLast ? (
@@ -916,8 +937,7 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                         <DialogHeader>
                             <DialogTitle>Reject LPPM Admin Registration</DialogTitle>
                             <DialogDescription>
-                                Provide a reason for rejecting{' '}
-                                <span className="font-semibold">{selectedLppm?.name}</span>'s LPPM Admin registration.
+                                Provide a reason for rejecting <span className="font-semibold">{selectedLppm?.name}</span>'s LPPM Admin registration.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -954,11 +974,7 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                             >
                                 Cancel
                             </Button>
-                            <Button
-                                type="submit"
-                                variant="destructive"
-                                disabled={processing || rejectionReason.length < 10}
-                            >
+                            <Button type="submit" variant="destructive" disabled={processing || rejectionReason.length < 10}>
                                 {processing ? 'Rejecting...' : 'Reject LPPM Admin'}
                             </Button>
                         </DialogFooter>

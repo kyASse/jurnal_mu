@@ -215,7 +215,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         Route::post('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
             ->name('users.toggle-active');
-        
+
         // LPPM Admin Approval Routes
         Route::post('users/{user}/approve-lppm', [\App\Http\Controllers\Admin\LppmApprovalController::class, 'approve'])
             ->name('users.approve-lppm');
@@ -313,7 +313,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('approve');
             Route::post('{journal}/reject', [JournalApprovalController::class, 'reject'])
                 ->name('reject');
-            
+
             // Journal reassignment
             Route::post('{journal}/reassign', [\App\Http\Controllers\AdminKampus\JournalController::class, 'reassign'])
                 ->name('reassign');
@@ -324,7 +324,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.index');
         Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
             ->name('journals.show');
-        
+
         // Import journals from CSV
         Route::get('journals/import/template', [\App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
             ->name('journals.import.template');

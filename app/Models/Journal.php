@@ -190,7 +190,7 @@ class Journal extends Model
      */
     public function scopeByApprovalStatus($query, ?string $status)
     {
-        if (!$status) {
+        if (! $status) {
             return $query;
         }
 
@@ -359,6 +359,7 @@ class Journal extends Model
 
     /**
      * Scope to filter journals by assessment approval status
+     *
      * @deprecated Use scopeByAssessmentApprovalStatus instead
      */
     public function scopeByAssessmentApprovalStatus($query, ?string $status)

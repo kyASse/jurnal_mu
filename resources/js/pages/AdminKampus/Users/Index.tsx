@@ -21,24 +21,34 @@
  */
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Power, Search, Trash2, Users as UsersIcon, CheckCircle, XCircle, Clock, UserPlus, RotateCcw, EyeOff } from 'lucide-react';
-import { useState, FormEvent } from 'react';
+import {
+    BookOpen,
+    CheckCircle,
+    ChevronLeft,
+    ChevronRight,
+    Clock,
+    Edit,
+    Eye,
+    EyeOff,
+    Plus,
+    Power,
+    RotateCcw,
+    Search,
+    Trash2,
+    UserPlus,
+    Users as UsersIcon,
+    XCircle,
+} from 'lucide-react';
+import { FormEvent, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -167,7 +177,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
     const [roleIdFilter, setRoleIdFilter] = useState(filters.role_id || '');
     const [approvalStatusFilter, setApprovalStatusFilter] = useState(filters.approval_status || 'approved');
-    
+
     // Rejection dialog state
     const [selectedUser, setSelectedUser] = useState<PendingUser | null>(null);
     const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -176,12 +186,20 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter, pending_search: pendingSearch, approval_status: approvalStatusFilter }, { preserveState: true });
+        router.get(
+            route('admin-kampus.users.index'),
+            { search, is_active: isActiveFilter, role_id: roleIdFilter, pending_search: pendingSearch, approval_status: approvalStatusFilter },
+            { preserveState: true },
+        );
     };
 
     const handlePendingSearch = (e: FormEvent) => {
         e.preventDefault();
-        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter, pending_search: pendingSearch, approval_status: approvalStatusFilter }, { preserveState: true });
+        router.get(
+            route('admin-kampus.users.index'),
+            { search, is_active: isActiveFilter, role_id: roleIdFilter, pending_search: pendingSearch, approval_status: approvalStatusFilter },
+            { preserveState: true },
+        );
     };
 
     const handleDelete = (id: number, name: string) => {
@@ -203,14 +221,14 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                     preserveScroll: true,
                     onStart: () => setProcessing(true),
                     onFinish: () => setProcessing(false),
-                }
+                },
             );
         }
     };
 
     const handleReject = (e: FormEvent) => {
         e.preventDefault();
-        
+
         if (!selectedUser || !rejectionReason.trim()) {
             return;
         }
@@ -227,7 +245,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                     setRejectionReason('');
                 },
                 onFinish: () => setProcessing(false),
-            }
+            },
         );
     };
 
@@ -240,7 +258,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                     preserveScroll: true,
                     onStart: () => setProcessing(true),
                     onFinish: () => setProcessing(false),
-                }
+                },
             );
         }
     };
@@ -257,7 +275,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                 approval_status: approvalStatusFilter,
                 show_rejected: !filters.show_rejected,
             },
-            { preserveState: true }
+            { preserveState: true },
         );
     };
 
@@ -432,7 +450,10 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                                         </div>
                                                         {user.position && <div className="text-sm text-muted-foreground">{user.position}</div>}
                                                         {user.approval_status === 'rejected' && user.rejection_reason && (
-                                                            <div className="text-xs text-red-600 dark:text-red-400 mt-1 max-w-xs truncate" title={user.rejection_reason}>
+                                                            <div
+                                                                className="mt-1 max-w-xs truncate text-xs text-red-600 dark:text-red-400"
+                                                                title={user.rejection_reason}
+                                                            >
                                                                 Reason: {user.rejection_reason}
                                                             </div>
                                                         )}
@@ -569,8 +590,8 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                 <p className="mt-1 text-muted-foreground">Approve or reject user registrations</p>
                             </div>
                             {pendingUsers.total > 0 && (
-                                <Badge variant="outline" className="text-lg px-4 py-2">
-                                    <Clock className="w-4 h-4 mr-2" />
+                                <Badge variant="outline" className="px-4 py-2 text-lg">
+                                    <Clock className="mr-2 h-4 w-4" />
                                     {pendingUsers.total} Pending
                                 </Badge>
                             )}
@@ -599,7 +620,12 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                     variant="outline"
                                     onClick={() => {
                                         setPendingSearch('');
-                                        router.get(route('admin-kampus.users.index'), { search, is_active: isActiveFilter, role_id: roleIdFilter, approval_status: approvalStatusFilter });
+                                        router.get(route('admin-kampus.users.index'), {
+                                            search,
+                                            is_active: isActiveFilter,
+                                            role_id: roleIdFilter,
+                                            approval_status: approvalStatusFilter,
+                                        });
                                     }}
                                 >
                                     Clear
@@ -633,13 +659,9 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                             <TableCell className="font-medium">{user.name}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
-                                                <Badge variant="outline">
-                                                    {user.role?.display_name || 'Pending'}
-                                                </Badge>
+                                                <Badge variant="outline">{user.role?.display_name || 'Pending'}</Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-muted-foreground">
-                                                {formatDate(user.created_at)}
-                                            </TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">{formatDate(user.created_at)}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Button
@@ -649,7 +671,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                                         disabled={processing}
                                                         title="Approve registration"
                                                     >
-                                                        <CheckCircle className="h-4 w-4 mr-1" />
+                                                        <CheckCircle className="mr-1 h-4 w-4" />
                                                         Approve
                                                     </Button>
                                                     <Button
@@ -662,7 +684,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                                         disabled={processing}
                                                         title="Reject registration"
                                                     >
-                                                        <XCircle className="h-4 w-4 mr-1" />
+                                                        <XCircle className="mr-1 h-4 w-4" />
                                                         Reject
                                                     </Button>
                                                 </div>
@@ -679,7 +701,8 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                 <div className="flex items-center justify-between">
                                     <div className="text-sm text-muted-foreground">
                                         Showing {(pendingUsers.current_page - 1) * pendingUsers.per_page + 1} to{' '}
-                                        {Math.min(pendingUsers.current_page * pendingUsers.per_page, pendingUsers.total)} of {pendingUsers.total} pending users
+                                        {Math.min(pendingUsers.current_page * pendingUsers.per_page, pendingUsers.total)} of {pendingUsers.total}{' '}
+                                        pending users
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {pendingUsers.links.map((link, index) => {
@@ -690,7 +713,11 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
 
                                             return (
                                                 <Link key={index} href={link.url} preserveState preserveScroll>
-                                                    <Button variant={link.active ? 'default' : 'outline'} size="sm" disabled={!link.url || processing}>
+                                                    <Button
+                                                        variant={link.active ? 'default' : 'outline'}
+                                                        size="sm"
+                                                        disabled={!link.url || processing}
+                                                    >
                                                         {isFirst ? (
                                                             <ChevronLeft className="h-4 w-4" />
                                                         ) : isLast ? (
@@ -712,14 +739,14 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
 
             {/* Toggle Button for Rejected Users */}
             <div className="flex justify-end px-4">
-                <Button
-                    variant={filters.show_rejected ? 'default' : 'outline'}
-                    onClick={toggleRejectedView}
-                    className="gap-2"
-                >
+                <Button variant={filters.show_rejected ? 'default' : 'outline'} onClick={toggleRejectedView} className="gap-2">
                     {filters.show_rejected ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     {filters.show_rejected ? 'Hide' : 'Show'} Rejected Users
-                    {rejectedUsers && <Badge variant="secondary" className="ml-2">{rejectedUsers.total}</Badge>}
+                    {rejectedUsers && (
+                        <Badge variant="secondary" className="ml-2">
+                            {rejectedUsers.total}
+                        </Badge>
+                    )}
                 </Button>
             </div>
 
@@ -733,29 +760,30 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                 <XCircle className="h-7 w-7" />
                                 Rejected User Registrations
                             </h2>
-                            <p className="mt-1 text-red-600 dark:text-red-400">
-                                View and revert rejected user registrations
-                            </p>
+                            <p className="mt-1 text-red-600 dark:text-red-400">View and revert rejected user registrations</p>
                         </div>
 
                         {/* Search for Rejected Users */}
                         <div className="mb-6 rounded-lg border border-red-200 bg-white p-4 shadow-sm dark:border-red-900 dark:bg-neutral-950">
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                router.get(
-                                    route('admin-kampus.users.index'),
-                                    {
-                                        search,
-                                        is_active: isActiveFilter,
-                                        role_id: roleIdFilter,
-                                        pending_search: pendingSearch,
-                                        rejected_search: rejectedSearch,
-                                        approval_status: approvalStatusFilter,
-                                        show_rejected: true,
-                                    },
-                                    { preserveState: true },
-                                );
-                            }} className="flex gap-4">
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    router.get(
+                                        route('admin-kampus.users.index'),
+                                        {
+                                            search,
+                                            is_active: isActiveFilter,
+                                            role_id: roleIdFilter,
+                                            pending_search: pendingSearch,
+                                            rejected_search: rejectedSearch,
+                                            approval_status: approvalStatusFilter,
+                                            show_rejected: true,
+                                        },
+                                        { preserveState: true },
+                                    );
+                                }}
+                                className="flex gap-4"
+                            >
                                 <div className="flex-1">
                                     <div className="relative">
                                         <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
@@ -775,17 +803,14 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                         variant="outline"
                                         onClick={() => {
                                             setRejectedSearch('');
-                                            router.get(
-                                                route('admin-kampus.users.index'),
-                                                {
-                                                    search,
-                                                    is_active: isActiveFilter,
-                                                    role_id: roleIdFilter,
-                                                    pending_search: pendingSearch,
-                                                    approval_status: approvalStatusFilter,
-                                                    show_rejected: true,
-                                                },
-                                            );
+                                            router.get(route('admin-kampus.users.index'), {
+                                                search,
+                                                is_active: isActiveFilter,
+                                                role_id: roleIdFilter,
+                                                pending_search: pendingSearch,
+                                                approval_status: approvalStatusFilter,
+                                                show_rejected: true,
+                                            });
                                         }}
                                     >
                                         Clear
@@ -831,14 +856,12 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="max-w-md">
-                                                    <p className="text-sm text-muted-foreground truncate" title={user.rejection_reason}>
+                                                    <p className="truncate text-sm text-muted-foreground" title={user.rejection_reason}>
                                                         {user.rejection_reason}
                                                     </p>
                                                 </TableCell>
                                                 <TableCell>{user.rejected_by}</TableCell>
-                                                <TableCell className="text-sm text-muted-foreground">
-                                                    {formatDate(user.rejected_at)}
-                                                </TableCell>
+                                                <TableCell className="text-sm text-muted-foreground">{formatDate(user.rejected_at)}</TableCell>
                                                 <TableCell className="text-right">
                                                     <Button
                                                         size="sm"
@@ -847,7 +870,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                                         disabled={processing}
                                                         title="Revert rejection and move back to pending"
                                                     >
-                                                        <RotateCcw className="h-4 w-4 mr-1" />
+                                                        <RotateCcw className="mr-1 h-4 w-4" />
                                                         Revert
                                                     </Button>
                                                 </TableCell>
@@ -863,7 +886,8 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                                     <div className="flex items-center justify-between">
                                         <div className="text-sm text-muted-foreground">
                                             Showing {(rejectedUsers.current_page - 1) * rejectedUsers.per_page + 1} to{' '}
-                                            {Math.min(rejectedUsers.current_page * rejectedUsers.per_page, rejectedUsers.total)} of {rejectedUsers.total} rejected users
+                                            {Math.min(rejectedUsers.current_page * rejectedUsers.per_page, rejectedUsers.total)} of{' '}
+                                            {rejectedUsers.total} rejected users
                                         </div>
                                         <div className="flex items-center gap-2">
                                             {rejectedUsers.links.map((link, index) => {
@@ -874,7 +898,11 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
 
                                                 return (
                                                     <Link key={index} href={link.url} preserveState preserveScroll>
-                                                        <Button variant={link.active ? 'default' : 'outline'} size="sm" disabled={!link.url || processing}>
+                                                        <Button
+                                                            variant={link.active ? 'default' : 'outline'}
+                                                            size="sm"
+                                                            disabled={!link.url || processing}
+                                                        >
                                                             {isFirst ? (
                                                                 <ChevronLeft className="h-4 w-4" />
                                                             ) : isLast ? (
@@ -902,8 +930,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                         <DialogHeader>
                             <DialogTitle>Reject User Registration</DialogTitle>
                             <DialogDescription>
-                                Provide a reason for rejecting{' '}
-                                <span className="font-semibold">{selectedUser?.name}</span>'s registration.
+                                Provide a reason for rejecting <span className="font-semibold">{selectedUser?.name}</span>'s registration.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -940,11 +967,7 @@ export default function UsersIndex({ users, pendingUsers, rejectedUsers, univers
                             >
                                 Cancel
                             </Button>
-                            <Button
-                                type="submit"
-                                variant="destructive"
-                                disabled={processing || rejectionReason.length < 10}
-                            >
+                            <Button type="submit" variant="destructive" disabled={processing || rejectionReason.length < 10}>
                                 {processing ? 'Rejecting...' : 'Reject User'}
                             </Button>
                         </DialogFooter>

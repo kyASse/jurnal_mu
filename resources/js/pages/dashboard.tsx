@@ -29,7 +29,9 @@ export default function Dashboard({ stats }: DashboardProps) {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {/* Stats Cards */}
-                <div className={`grid auto-rows-min gap-4 ${isSuperAdmin && stats.pending_lppm_count !== undefined ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}>
+                <div
+                    className={`grid auto-rows-min gap-4 ${isSuperAdmin && stats.pending_lppm_count !== undefined ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}
+                >
                     {/* Total Journals */}
                     <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                         <div className="flex items-center justify-between">

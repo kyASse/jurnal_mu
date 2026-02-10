@@ -4,18 +4,18 @@
  * @features Upload CSV file, select journal manager, preview data, download template, batch import with validation
  */
 
-import { FormEventHandler, useRef, useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import AppLayout from '@/layouts/app-layout';
-import { AlertCircle, CheckCircle2, Download, Upload, Info, ArrowLeft } from 'lucide-react';
-import Papa from 'papaparse';
 import { BreadcrumbItem } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Download, Info, Upload } from 'lucide-react';
+import Papa from 'papaparse';
+import { FormEventHandler, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,7 +29,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Import',
         href: '/admin-kampus/journals/import',
-    }
+    },
 ];
 
 interface User {
@@ -79,7 +79,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        
+
         if (!file) {
             setSelectedFile(null);
             setPreviewData([]);
@@ -150,11 +150,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
         });
     };
 
-    const requiredColumns = [
-        'title',
-        'publisher',
-        'scientific_field_name',
-    ];
+    const requiredColumns = ['title', 'publisher', 'scientific_field_name'];
 
     const optionalColumns = [
         'issn',
@@ -178,7 +174,6 @@ export default function Import({ users, scientificFields, errors, flash }: Props
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
-
                     {/* Header */}
                     <div className="mb-6">
                         <Link href={route('admin-kampus.journals.index')}>
@@ -188,13 +183,11 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                             </Button>
                         </Link>
                         <h1 className="text-3xl font-bold text-foreground">Import Jurnal</h1>
-                        <p className="mt-1 text-muted-foreground">
-                            Unggah file CSV untuk menambahkan data jurnal secara massal ke dalam sistem.
-                        </p>
+                        <p className="mt-1 text-muted-foreground">Unggah file CSV untuk menambahkan data jurnal secara massal ke dalam sistem.</p>
                     </div>
 
                     {/* Flash Messages */}
-                    <div className="space-y-4 mb-6">
+                    <div className="mb-6 space-y-4">
                         {flash?.success && (
                             <Alert className="border-green-200 bg-green-50">
                                 <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -225,7 +218,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                 <AlertCircle className="h-4 w-4" />
                                 <AlertTitle>Detail Error Import</AlertTitle>
                                 <AlertDescription>
-                                    <div className="mt-2 space-y-2 max-h-60 overflow-y-auto">
+                                    <div className="mt-2 max-h-60 space-y-2 overflow-y-auto">
                                         {flash.import_errors.map((error, index) => (
                                             <div key={index} className="text-sm">
                                                 <strong>Baris {error.row}:</strong>
@@ -243,7 +236,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                     </div>
 
                     {/* Main Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {/* Import Form */}
                         <div className="lg:col-span-2">
                             <Card>
@@ -266,9 +259,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            {errors?.user_id && (
-                                                <p className="text-sm text-destructive">{errors.user_id}</p>
-                                            )}
+                                            {errors?.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
                                             <p className="text-sm text-muted-foreground">
                                                 Semua jurnal yang diimport akan ditugaskan ke pengelola ini.
                                             </p>
@@ -288,12 +279,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                                     onChange={handleFileChange}
                                                     className={errors?.csv_file || fileError ? 'border-destructive' : ''}
                                                 />
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={handleDownloadTemplate}
-                                                    className="shrink-0 gap-2"
-                                                >
+                                                <Button type="button" variant="outline" onClick={handleDownloadTemplate} className="shrink-0 gap-2">
                                                     <Download className="h-4 w-4" />
                                                     Download Template
                                                 </Button>
@@ -301,21 +287,22 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                             {(errors?.csv_file || fileError) && (
                                                 <p className="text-sm text-destructive">{errors?.csv_file || fileError}</p>
                                             )}
-                                            <p className="text-sm text-muted-foreground">
-                                                Maksimal ukuran file 5MB, dengan format CSV (.csv).
-                                            </p>
+                                            <p className="text-sm text-muted-foreground">Maksimal ukuran file 5MB, dengan format CSV (.csv).</p>
                                         </div>
 
                                         {/* CSV Preview */}
                                         {previewData.length > 0 && (
                                             <div className="space-y-2">
                                                 <Label>Preview Data (5 baris pertama)</Label>
-                                                <div className="border rounded-md overflow-x-auto">
+                                                <div className="overflow-x-auto rounded-md border">
                                                     <table className="w-full text-sm">
                                                         <thead className="bg-muted/50">
                                                             <tr>
                                                                 {Object.keys(previewData[0]).map((header) => (
-                                                                    <th key={header} className="px-3 py-2 text-left font-medium text-muted-foreground">
+                                                                    <th
+                                                                        key={header}
+                                                                        className="px-3 py-2 text-left font-medium text-muted-foreground"
+                                                                    >
                                                                         {header}
                                                                     </th>
                                                                 ))}
@@ -323,7 +310,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                                         </thead>
                                                         <tbody>
                                                             {previewData.map((row, index) => (
-                                                                <tr key={index} className="border-t hover:bg-muted/50 transition-colors">
+                                                                <tr key={index} className="border-t transition-colors hover:bg-muted/50">
                                                                     {Object.values(row).map((value, cellIndex) => (
                                                                         <td key={cellIndex} className="px-3 py-2">
                                                                             {value || '-'}
@@ -338,11 +325,11 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                         )}
 
                                         {/* Submit Button */}
-                                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                                        <div className="flex flex-col gap-3 pt-4 sm:flex-row">
                                             <Button
                                                 type="submit"
                                                 disabled={!selectedFile || !selectedUserId || isProcessing}
-                                                className="w-full sm:w-auto min-w-[150px]"
+                                                className="w-full min-w-[150px] sm:w-auto"
                                             >
                                                 {isProcessing ? (
                                                     <>
@@ -371,7 +358,6 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                             </Card>
                         </div>
 
-
                         {/* Guidelines */}
                         <div className="space-y-6">
                             {/* Format Guidelines */}
@@ -384,16 +370,16 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                 </CardHeader>
                                 <CardContent className="space-y-4 text-sm">
                                     <div>
-                                        <h4 className="font-medium mb-2">Kolom Wajib:</h4>
-                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                        <h4 className="mb-2 font-medium">Kolom Wajib:</h4>
+                                        <ul className="list-inside list-disc space-y-1 text-muted-foreground">
                                             {requiredColumns.map((col) => (
                                                 <li key={col}>{col}</li>
                                             ))}
                                         </ul>
                                     </div>
                                     <div>
-                                        <h4 className="font-medium mb-2">Kolom Opsional:</h4>
-                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                        <h4 className="mb-2 font-medium">Kolom Opsional:</h4>
+                                        <ul className="list-inside list-disc space-y-1 text-muted-foreground">
                                             {optionalColumns.map((col) => (
                                                 <li key={col}>{col}</li>
                                             ))}
@@ -421,7 +407,8 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                         <strong className="text-foreground">Indexations:</strong> Format: "Scopus (2020-01-15), DOAJ (2019-06-20)"
                                     </div>
                                     <div>
-                                        <strong className="text-foreground">Scientific Field:</strong> Harus sesuai dengan nama bidang ilmu yang ada di sistem
+                                        <strong className="text-foreground">Scientific Field:</strong> Harus sesuai dengan nama bidang ilmu yang ada
+                                        di sistem
                                     </div>
                                 </CardContent>
                             </Card>

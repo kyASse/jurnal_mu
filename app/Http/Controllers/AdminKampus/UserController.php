@@ -505,7 +505,6 @@ class UserController extends Controller
         return back()->with('success', "User {$status} successfully.");
     }
 
-
     /**
      * Ensure the user belongs to the admin's university and is not Super Admin.
      *
@@ -529,7 +528,3 @@ class UserController extends Controller
         }
     }
 }
-
-
-
-

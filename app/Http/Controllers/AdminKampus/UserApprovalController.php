@@ -12,6 +12,7 @@ use Inertia\Response;
  * Handle user registration approval workflow for Admin Kampus.
  *
  * @route /admin-kampus/users/pending
+ *
  * @features View pending users, approve/reject registrations, send notifications
  */
 class UserApprovalController extends Controller
@@ -150,7 +151,7 @@ class UserApprovalController extends Controller
         }
 
         // Only allow reverting approved or rejected users
-        if (!in_array($user->approval_status, ['approved', 'rejected'])) {
+        if (! in_array($user->approval_status, ['approved', 'rejected'])) {
             return back()->with('error', 'Hanya user yang sudah diapprove atau ditolak yang bisa di-revert.');
         }
 
