@@ -133,4 +133,53 @@ class UserApprovalController extends Controller
             ->route('admin-kampus.users.index')
             ->with('success', "User {$user->name} ditolak. Record disimpan untuk audit trail.");
     }
+
+    /**
+     * Revert user approval decision (approved/rejected → pending).
+     * Allows LPPM to correct mistakes or reconsider decisions.
+     *
+     * @route POST /admin-kampus/users/{user}/revert
+     */
+    public function revert(Request $request, User $user)
+    {
+        $this->authorize('approve', $user);
+
+        // Ensure LPPM can only revert users from their university
+        if ($user->university_id !== auth()->user()->university_id) {
+            abort(403, 'Unauthorized - User is not from your university');
+        }
+
+        // Only allow reverting approved or rejected users
+        if (!in_array($user->approval_status, ['approved', 'rejected'])) {
+            return back()->with('error', 'Hanya user yang sudah diapprove atau ditolak yang bisa di-revert.');
+        }
+
+        // If reverting approved user, deactivate
+        if ($user->approval_status === 'approved') {
+            $user->update([
+                'approval_status' => 'pending',
+                'is_active' => false,
+                'approved_by' => null,
+                'approved_at' => null,
+                'rejection_reason' => null,
+            ]);
+
+            return redirect()
+                ->route('admin-kampus.users.index')
+                ->with('success', "Approval {$user->name} berhasil di-revert. User kembali ke status pending.");
+        }
+
+        // If reverting rejected user, reset to pending
+        $user->update([
+            'approval_status' => 'pending',
+            'is_active' => false,
+            'approved_by' => null,
+            'approved_at' => null,
+            'rejection_reason' => null,
+        ]);
+
+        return redirect()
+            ->route('admin-kampus.users.index')
+            ->with('success', "Rejection {$user->name} berhasil di-revert. User kembali ke status pending.");
+    }
 }

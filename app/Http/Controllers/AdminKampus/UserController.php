@@ -142,11 +142,54 @@ class UserController extends Controller
                 ];
             });
 
+        // Get rejected users (separate pagination, only when toggled)
+        $rejectedUsers = null;
+        if ($request->boolean('show_rejected')) {
+            $rejectedQuery = User::query()
+                ->with(['role', 'university', 'approver:id,name'])
+                ->forUniversity($authUser->university_id)
+                ->where('approval_status', 'rejected');
+
+            // Apply search filter for rejected users
+            if ($request->filled('rejected_search')) {
+                $search = $request->rejected_search;
+                $rejectedQuery->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
+
+            // Sort by rejection date (most recent first)
+            $rejectedQuery->orderBy('approved_at', 'desc');
+
+            $rejectedUsers = $rejectedQuery->paginate(10, ['*'], 'rejected_page')
+                ->withQueryString()
+                ->through(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'university' => $user->university ? [
+                            'id' => $user->university->id,
+                            'name' => $user->university->name,
+                            'short_name' => $user->university->short_name,
+                        ] : null,
+                        'rejection_reason' => $user->rejection_reason,
+                        'rejected_by' => $user->approver?->name ?? 'Unknown',
+                        'rejected_at' => $user->approved_at?->format('Y-m-d H:i:s'),
+                    ];
+                });
+        }
+
         return Inertia::render('AdminKampus/Users/Index', [
             'users' => $users,
             'pendingUsers' => $pendingUsers,
+            'rejectedUsers' => $rejectedUsers,
             'roles' => $roles,
-            'filters' => $request->only(['search', 'is_active', 'role_id', 'pending_search', 'approval_status']),
+            'filters' => array_merge($request->only(['search', 'is_active', 'role_id', 'pending_search', 'approval_status']), [
+                'rejected_search' => $request->rejected_search,
+                'show_rejected' => $request->boolean('show_rejected'),
+            ]),
             'university' => [
                 'id' => $authUser->university->id,
                 'name' => $authUser->university->name,
