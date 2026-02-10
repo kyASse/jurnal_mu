@@ -2,121 +2,126 @@
 
 namespace Database\Seeders;
 
+use App\Models\University;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class UniversitySeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * Loads university data from database/PTMA.json file.
+     * Uses updateOrCreate to handle re-seeding gracefully.
+     *
+     * @return void
      */
     public function run(): void
     {
-        $universities = [
-            [
-                'code' => 'UAD',
-                'ptm_code' => '02104',
-                'name' => 'Universitas Ahmad Dahlan',
-                'short_name' => 'UAD',
-                'address' => 'Jl. Kapas No.9, Semaki, Kec. Umbulharjo',
-                'city' => 'Yogyakarta',
-                'province' => 'DI Yogyakarta',
-                'postal_code' => '55166',
-                'phone' => '0274-563515',
-                'email' => 'info@uad.ac.id',
-                'website' => 'https://uad.ac.id',
-                'logo_url' => 'https://upload.wikimedia.org/wikipedia/id/thumb/f/f8/Logo_Universitas_Ahmad_Dahlan.svg/1200px-Logo_Universitas_Ahmad_Dahlan.svg.png',
-                'accreditation_status' => 'Unggul',
-                'cluster' => 'Utama',
-                'profile_description' => 'Universitas Ahmad Dahlan adalah perguruan tinggi swasta di Yogyakarta yang berdiri sejak 1960 dibawah naungan Persyarikatan Muhammadiyah.',
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code' => 'UMY',
-                'ptm_code' => '02108',
-                'name' => 'Universitas Muhammadiyah Yogyakarta',
-                'short_name' => 'UMY',
-                'address' => 'Jl. Brawijaya, Tamantirto, Kasihan',
-                'city' => 'Bantul',
-                'province' => 'DI Yogyakarta',
-                'postal_code' => '55183',
-                'phone' => '0274-387656',
-                'email' => 'info@umy.ac.id',
-                'website' => 'https://umy.ac.id',
-                'logo_url' => 'https://upload.wikimedia.org/wikipedia/id/thumb/d/dd/Universitas_Muhammadiyah_Yogyakarta_logo.png/1200px-Universitas_Muhammadiyah_Yogyakarta_logo.png',
-                'accreditation_status' => 'Baik Sekali',
-                'cluster' => 'Utama',
-                'profile_description' => 'Universitas Muhammadiyah Yogyakarta adalah perguruan tinggi swasta yang terletak di Bantul, Yogyakarta dengan kampus yang luas dan modern.',
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code' => 'UMS',
-                'ptm_code' => '02305',
-                'name' => 'Universitas Muhammadiyah Surakarta',
-                'short_name' => 'UMS',
-                'address' => 'Jl. A. Yani Tromol Pos 1 Pabelan',
-                'city' => 'Surakarta',
-                'province' => 'Jawa Tengah',
-                'postal_code' => '57162',
-                'phone' => '0271-717417',
-                'email' => 'info@ums.ac.id',
-                'website' => 'https://ums.ac.id',
-                'logo_url' => 'https://upload.wikimedia.org/wikipedia/id/thumb/c/ce/Universitas_Muhammadiyah_Surakarta_logo.png/1200px-Universitas_Muhammadiyah_Surakarta_logo.png',
-                'accreditation_status' => 'Unggul',
-                'cluster' => 'Utama',
-                'profile_description' => 'Universitas Muhammadiyah Surakarta adalah salah satu universitas terkemuka di Jawa Tengah dengan berbagai program studi unggulan.',
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code' => 'UMM',
-                'ptm_code' => '03405',
-                'name' => 'Universitas Muhammadiyah Malang',
-                'short_name' => 'UMM',
-                'address' => 'Jl. Raya Tlogomas No.246',
-                'city' => 'Malang',
-                'province' => 'Jawa Timur',
-                'postal_code' => '65144',
-                'phone' => '0341-464318',
-                'email' => 'info@umm.ac.id',
-                'website' => 'https://umm.ac.id',
-                'logo_url' => 'https://upload.wikimedia.org/wikipedia/id/thumb/9/91/Universitas_Muhammadiyah_Malang_logo.png/1200px-Universitas_Muhammadiyah_Malang_logo.png',
-                'accreditation_status' => 'Unggul',
-                'cluster' => 'Mandiri',
-                'profile_description' => 'Universitas Muhammadiyah Malang merupakan salah satu universitas swasta terbesar di Indonesia dengan fasilitas lengkap dan modern.',
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code' => 'UNISMUH',
-                'ptm_code' => '08106',
-                'name' => 'Universitas Muhammadiyah Makassar',
-                'short_name' => 'UNISMUH Makassar',
-                'address' => 'Jl. Sultan Alauddin No.259',
-                'city' => 'Makassar',
-                'province' => 'Sulawesi Selatan',
-                'postal_code' => '90221',
-                'phone' => '0411-866972',
-                'email' => 'info@unismuh.ac.id',
-                'website' => 'https://unismuh.ac.id',
-                'logo_url' => 'https://upload.wikimedia.org/wikipedia/id/thumb/5/5f/Universitas_Muhammadiyah_Makassar_logo.png/1200px-Universitas_Muhammadiyah_Makassar_logo.png',
-                'accreditation_status' => 'Baik',
-                'cluster' => 'Madya',
-                'profile_description' => 'Universitas Muhammadiyah Makassar adalah perguruan tinggi terkemuka di Sulawesi Selatan dengan komitmen kuat pada pendidikan berkualitas.',
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+        // Load universities from JSON file
+        $jsonPath = database_path('PTMA.json');
+
+        if (! file_exists($jsonPath)) {
+            $this->command->error('PTMA.json file not found at: '.$jsonPath);
+
+            return;
+        }
+
+        $jsonContent = file_get_contents($jsonPath);
+        $universities = json_decode($jsonContent, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->command->error('Error parsing PTMA.json: '.json_last_error_msg());
+
+            return;
+        }
+
+        if (empty($universities) || ! is_array($universities)) {
+            $this->command->error('No valid university data found in PTMA.json');
+
+            return;
+        }
+
+        $this->command->info('Loading '.count($universities).' universities from PTMA.json...');
+        $this->command->newLine();
+
+        $successCount = 0;
+        $skippedCount = 0;
+        $skippedUniversities = [];
+
+        // Define code mappings for universities with codes > 20 characters
+        $codeMappings = [
+            'POLTEKKES_MUH_MAKASSAR' => 'POLKES_MUH_MKS',
+            'STIKES_MUH_LHOKSEUMAWE' => 'STIKES_MUH_LSM',
+            'STIKES_MUH_BOJONEGORO' => 'STIKES_MUH_BJN',
+            'STIT_INTERNASIONAL_BATAM' => 'STIT_INTL_BATAM',
+            'ISTK_AISYIYAH_KENDARI' => 'ISTK_ASY_KENDARI',
+            'POLTEKKES_AISYIYAH_BANTEN' => 'POLKES_ASY_BANTEN',
+            'POLTEK_AISYIYAH_PONTIANAK' => 'POLTEK_ASY_PTK',
+            'STIKES_AISYIYAH_PALEMBANG' => 'STIKES_ASY_PLG',
         ];
 
-        DB::table('universities')->insert($universities);
+        // Process each university with progress bar
+        $this->command->withProgressBar($universities, function ($data) use (&$successCount, &$skippedCount, &$skippedUniversities, $codeMappings) {
+            // Validate required fields
+            if (empty($data['code']) || empty($data['name'])) {
+                $skippedCount++;
+                $skippedUniversities[] = $data['name'] ?? $data['code'] ?? 'Unknown';
 
-        $this->command->info(count($universities).' Universities seeded successfully.');
+                return;
+            }
+
+            try {
+                // Fix codes that exceed 20 characters
+                if (isset($codeMappings[$data['code']])) {
+                    $data['code'] = $codeMappings[$data['code']];
+                }
+
+                // Ensure is_active has a boolean value (fix null values)
+                if (! isset($data['is_active']) || $data['is_active'] === null) {
+                    $data['is_active'] = true;
+                }
+
+                // Add timestamps to the data
+                $data['created_at'] = now();
+                $data['updated_at'] = now();
+
+                // Use updateOrCreate to handle duplicates gracefully
+                University::updateOrCreate(
+                    ['code' => $data['code']], // Unique identifier
+                    $data // All university data
+                );
+
+                $successCount++;
+            } catch (\Exception $e) {
+                $skippedCount++;
+                $skippedUniversities[] = $data['name'].' ('.$data['code'].')';
+                $this->command->newLine();
+                $this->command->warn('Skipped: '.$data['name'].' - '.$e->getMessage());
+            }
+        });
+
+        $this->command->newLine(2);
+
+        // Display summary
+        $this->command->info("✅ Successfully seeded {$successCount} universities.");
+
+        if ($skippedCount > 0) {
+            $this->command->warn("⚠️  Skipped {$skippedCount} universities due to validation errors or duplicates:");
+            foreach ($skippedUniversities as $skipped) {
+                $this->command->line("   - {$skipped}");
+            }
+        }
+
+        // Display data quality notice
+        $nullFieldCount = University::whereNull('address')
+            ->orWhereNull('city')
+            ->orWhereNull('website')
+            ->count();
+
+        if ($nullFieldCount > 0) {
+            $this->command->newLine();
+            $this->command->comment("ℹ️  Note: {$nullFieldCount} universities have incomplete data (missing address, city, or website).");
+            $this->command->comment('   These can be updated later by LPPM admins or via data migration.');
+        }
     }
 }
