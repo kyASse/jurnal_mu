@@ -3,7 +3,7 @@ import StatisticsDashboard from '@/components/StatisticsDashboard';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type JournalStatistics, type PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardCheck, TrendingUp, UserPlus } from 'lucide-react';
+import { BookOpen, CheckCircle, ClipboardCheck, TrendingUp, UserPlus, XCircle, Clock } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -12,12 +12,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface UniversityDistribution {
+    id: number;
+    name: string;
+    count: number;
+}
+
+interface JournalsByStatus {
+    pending: number;
+    approved: number;
+    rejected: number;
+}
+
 interface DashboardProps extends PageProps {
     stats: {
         total_journals: number;
         total_assessments: number;
         average_score: number;
         pending_lppm_count?: number;
+        universities_distribution?: UniversityDistribution[];
+        journals_by_status?: JournalsByStatus;
     };
     statistics: JournalStatistics;
 }
@@ -25,14 +39,21 @@ interface DashboardProps extends PageProps {
 export default function Dashboard({ stats, statistics }: DashboardProps) {
     const { auth } = usePage<PageProps>().props;
     const isSuperAdmin = auth.user?.role?.name === 'Super Admin';
+    const isUser = auth.user?.role?.name === 'User';
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {/* Stats Cards */}
+                {/* Stats Cards - Conditional Grid Based on Role */}
                 <div
-                    className={`grid auto-rows-min gap-4 ${isSuperAdmin && stats.pending_lppm_count !== undefined ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}
+                    className={`grid auto-rows-min gap-4 ${
+                        isSuperAdmin && stats.pending_lppm_count !== undefined
+                            ? 'md:grid-cols-3'
+                            : isUser && stats.journals_by_status
+                              ? 'md:grid-cols-4'
+                              : 'md:grid-cols-2'
+                    }`}
                 >
                     {/* Total Assessments */}
                     <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
@@ -79,7 +100,125 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                             </div>
                         </Link>
                     )}
+
+                    {/* User Role: Approval Status Breakdown */}
+                    {isUser && stats.journals_by_status && (
+                        <>
+                            {/* Pending Journals */}
+                            <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Jurnal Pending</p>
+                                        <h3 className="mt-2 text-3xl font-bold">
+                                            {stats.journals_by_status.pending}
+                                        </h3>
+                                    </div>
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20">
+                                        <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Approved Journals */}
+                            <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Jurnal Disetujui</p>
+                                        <h3 className="mt-2 text-3xl font-bold">
+                                            {stats.journals_by_status.approved}
+                                        </h3>
+                                    </div>
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+                                        <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Rejected Journals */}
+                            <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Jurnal Ditolak</p>
+                                        <h3 className="mt-2 text-3xl font-bold">
+                                            {stats.journals_by_status.rejected}
+                                        </h3>
+                                    </div>
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                                        <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
+
+                {/* University Distribution Table (Super Admin Only) */}
+                {isSuperAdmin && stats.universities_distribution && stats.universities_distribution.length > 0 && (
+                    <div className="mt-2 rounded-xl border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-neutral-950">
+                        <div className="flex items-center justify-between border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
+                            <div>
+                                <h3 className="text-lg font-semibold">Distribusi Jurnal per Universitas</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Top {Math.min(10, stats.universities_distribution.length)} universitas dengan jurnal
+                                    terbanyak
+                                </p>
+                            </div>
+                            {stats.universities_distribution.length > 10 && (
+                                <Link
+                                    href="/admin/universities"
+                                    className="text-sm font-medium text-primary hover:underline"
+                                >
+                                    Lihat Semua ({stats.universities_distribution.length})
+                                </Link>
+                            )}
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="border-b border-sidebar-border/70 dark:border-sidebar-border">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">
+                                            #
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">
+                                            Universitas
+                                        </th>
+                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">
+                                            Jumlah Jurnal
+                                        </th>
+                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">
+                                            Persentase
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-sidebar-border/70 dark:divide-sidebar-border">
+                                    {stats.universities_distribution.slice(0, 10).map((university, index) => {
+                                        const percentage =
+                                            stats.total_journals > 0
+                                                ? ((university.count / stats.total_journals) * 100).toFixed(1)
+                                                : '0.0';
+                                        return (
+                                            <tr
+                                                key={university.id}
+                                                className="transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
+                                            >
+                                                <td className="px-6 py-4 text-sm text-muted-foreground">
+                                                    {index + 1}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm font-medium">{university.name}</td>
+                                                <td className="px-6 py-4 text-right text-sm font-semibold">
+                                                    {university.count}
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-sm text-muted-foreground">
+                                                    {percentage}%
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
 
                 {/* Journal Statistics Visualization */}
                 {statistics && statistics.totals.total_journals > 0 && (
