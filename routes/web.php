@@ -215,6 +215,14 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         Route::post('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
             ->name('users.toggle-active');
+        
+        // LPPM Admin Approval Routes
+        Route::post('users/{user}/approve-lppm', [\App\Http\Controllers\Admin\LppmApprovalController::class, 'approve'])
+            ->name('users.approve-lppm');
+        Route::post('users/{user}/reject-lppm', [\App\Http\Controllers\Admin\LppmApprovalController::class, 'reject'])
+            ->name('users.reject-lppm');
+        Route::post('users/{user}/revert-lppm', [\App\Http\Controllers\Admin\LppmApprovalController::class, 'revert'])
+            ->name('users.revert-lppm');
 
         // Reviewer Management (v1.1 - Placeholder)
         Route::get('reviewers', [\App\Http\Controllers\Admin\ReviewerController::class, 'index'])
