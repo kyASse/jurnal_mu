@@ -140,31 +140,31 @@ Persiapan platform untuk **LAUNCH PRODUCTION** pada **Kamis, 12 Februari 2026** 
     - Add role-based scoping logic
 
 #### Dikti Dashboard - Aggregated Metrics
-- [ ] **Dikti Dashboard: System-Wide Statistics** ⚠️ **HIGH PRIORITY**
+- [x] **Dikti Dashboard: System-Wide Statistics** ✅ **IMPLEMENTED** (Feb 10, 2026)
   - Dikti melihat collective data dari **semua universities**
   - Metrics:
-    - Total journals across all universities
-    - Scopus-indexed journals (system-wide)
-    - SINTA-indexed journals (system-wide)
-    - Non-SINTA journals
-    - **Distribution by University** (chart/table)
+    - Total journals across all universities ✅
+    - Scopus-indexed journals (system-wide) ✅
+    - SINTA-indexed journals (system-wide) ✅
+    - Non-SINTA journals ✅
+    - **Distribution by University** (table with percentage) ✅
   - **Implementation**:
-    - Route: `GET /dikti/dashboard`
-    - Controller: `Dikti\DashboardController@index()`
-    - Query: Aggregate journals across all universities
-    - Component: `<SystemWideMetrics />` with charts
+    - Route: `GET /dashboard` (unified dashboard for all roles) ✅
+    - Controller: `DashboardController@index()` (role-based metrics) ✅
+    - Query: Aggregate journals across all universities with JOIN ✅
+    - Component: University distribution table with hover effects ✅
 
 #### User Dashboard - Simplified
-- [ ] **User Dashboard: Personal Journal View** 🔵 **MEDIUM PRIORITY**
+- [x] **User Dashboard: Personal Journal View** ✅ **IMPLEMENTED** (Feb 10, 2026)
   - User hanya melihat journals yang mereka manage
   - Simple metrics:
-    - Total journals saya
-    - Journals by status (pending, approved)
-    - Indexation status
+    - Total journals saya ✅
+    - Journals by status (pending, approved, rejected) ✅
+    - Indexation status ✅
   - **Implementation**:
-    - Scope: `Journal::where('user_id', auth()->id())`
-    - Simple card layout
-    - No complex charts (keep it minimal)
+    - Scope: `Journal::where('user_id', auth()->id())` ✅
+    - 4-column card layout with status breakdown ✅
+    - Color-coded cards: pending (amber), approved (green), rejected (red) ✅
 
 ---
 
