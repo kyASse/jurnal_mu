@@ -42,6 +42,15 @@ class DashboardController extends Controller
                 ->where('approval_status', 'pending')
                 ->count();
 
+            // Add university distribution (journal count by university)
+            $stats['universities_distribution'] = DB::table('journals')
+                ->join('universities', 'journals.university_id', '=', 'universities.id')
+                ->select('universities.id', 'universities.name', DB::raw('COUNT(*) as count'))
+                ->groupBy('universities.id', 'universities.name')
+                ->orderByDesc('count')
+                ->get()
+                ->toArray();
+
         } elseif ($user->role->name === 'Admin Kampus') {
             // Admin Kampus sees only their university data
             $stats['total_journals'] = DB::table('journals')
@@ -77,6 +86,22 @@ class DashboardController extends Controller
                 ->whereNotNull('journal_assessments.total_score')
                 ->avg('journal_assessments.total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
+
+            // Add journal breakdown by approval status for User
+            $stats['journals_by_status'] = [
+                'pending' => DB::table('journals')
+                    ->where('user_id', $user->id)
+                    ->where('approval_status', 'pending')
+                    ->count(),
+                'approved' => DB::table('journals')
+                    ->where('user_id', $user->id)
+                    ->where('approval_status', 'approved')
+                    ->count(),
+                'rejected' => DB::table('journals')
+                    ->where('user_id', $user->id)
+                    ->where('approval_status', 'rejected')
+                    ->count(),
+            ];
         }
 
         // Calculate journal statistics for visualization
