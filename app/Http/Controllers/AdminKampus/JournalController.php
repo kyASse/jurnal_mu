@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ImportJournalRequest;
+use App\Imports\JournalsImport;
 use App\Models\Journal;
+use App\Models\Role;
 use App\Models\ScientificField;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * JournalController - Admin Kampus
@@ -403,5 +410,262 @@ class JournalController extends Controller
                 ]),
             ],
         ]);
+    }
+
+    /**
+     * Show the import form with user selection.
+     *
+     * @route GET /admin-kampus/journals/import/form
+     *
+     * @features Display import form with user dropdown, CSV format guidelines
+     */
+    public function import(Request $request): Response
+    {
+        $this->authorize('create', Journal::class);
+
+        $authUser = $request->user();
+
+        // Get all active Users (role: User) from Admin Kampus's university
+        $users = User::query()
+            ->where('role_id', DB::table('roles')->where('name', Role::USER)->value('id'))
+            ->where('university_id', $authUser->university_id)
+            ->where('is_active', true)
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'label' => "{$user->name} ({$user->email})",
+            ]);
+
+        // Get scientific fields for reference
+        $scientificFields = ScientificField::query()
+            ->where('is_active', true)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('AdminKampus/Journals/Import', [
+            'users' => $users,
+            'scientificFields' => $scientificFields,
+        ]);
+    }
+
+    /**
+     * Process the CSV import and create journals.
+     *
+     * @route POST /admin-kampus/journals/import/process
+     *
+     * @features Upload CSV, validate data, batch create journals, error reporting
+     */
+    public function processImport(ImportJournalRequest $request): RedirectResponse
+    {
+        $this->authorize('create', Journal::class);
+
+        $authUser = $request->user();
+
+        // Verify the selected user belongs to Admin Kampus's university
+        $selectedUser = User::find($request->user_id);
+
+        if (! $selectedUser || $selectedUser->university_id !== $authUser->university_id) {
+            return back()->withErrors([
+                'user_id' => 'Pengelola jurnal yang dipilih tidak valid atau bukan dari universitas Anda.',
+            ]);
+        }
+
+        // Verify the user has "User" role
+        if (! $selectedUser->hasRole('User')) {
+            return back()->withErrors([
+                'user_id' => 'Pengelola jurnal yang dipilih harus memiliki role "User".',
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Get the uploaded file path
+            $file = $request->file('csv_file');
+            $filePath = $file->getRealPath();
+
+            // Process the CSV import
+            $import = new JournalsImport($authUser->university_id, $selectedUser->id);
+            $import->import($filePath);
+
+            $summary = $import->getSummary();
+
+            DB::commit();
+
+            // If all rows have errors, return with error
+            if ($summary['success_count'] === 0 && $summary['error_count'] > 0) {
+                return redirect()->route('admin-kampus.journals.import')
+                    ->with('error', 'Semua data gagal diimport. Silakan periksa format CSV Anda.')
+                    ->with('import_errors', $summary['errors']);
+            }
+
+            // If partial success (some errors), redirect with warning
+            if ($summary['error_count'] > 0) {
+                return redirect()->route('admin-kampus.journals.index')
+                    ->with('warning', "Import selesai dengan peringatan: {$summary['success_count']} jurnal berhasil diimport, {$summary['error_count']} baris gagal.")
+                    ->with('import_errors', $summary['errors']);
+            }
+
+            // All successful
+            return redirect()->route('admin-kampus.journals.index')
+                ->with('success', "Berhasil mengimport {$summary['success_count']} jurnal dari CSV.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->route('admin-kampus.journals.import')
+                ->with('error', 'Terjadi kesalahan saat memproses file CSV: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Download CSV template for journal import.
+     *
+     * @route GET /admin-kampus/journals/import/template
+     *
+     * @features Generate and download CSV template with headers and sample data
+     */
+    public function downloadTemplate(): StreamedResponse
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="template_import_jurnal.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+
+            // Add BOM for UTF-8
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // CSV Headers
+            fputcsv($file, [
+                'title',
+                'publisher',
+                'issn',
+                'e_issn',
+                'scientific_field_name',
+                'publication_year',
+                'sinta_rank',
+                'accreditation_rank',
+                'accreditation_expiry_date',
+                'url',
+                'ojs_url',
+                'email',
+                'phone',
+                'indexations',
+                'about',
+                'scope',
+            ]);
+
+            // Sample data row 1
+            fputcsv($file, [
+                'Jurnal Teknologi Informasi',
+                'Universitas Example',
+                '1234-5678',
+                '9876-5432',
+                'Teknik Informatika',
+                '2020',
+                '2',
+                'SINTA 2',
+                '2026-12-31',
+                'https://example.com/journal',
+                'https://ojs.example.com',
+                'editor@example.com',
+                '081234567890',
+                'Scopus (2020-01-15), DOAJ (2019-06-20)',
+                'Jurnal ini membahas tentang teknologi informasi dan komputer',
+                'Teknologi Informasi, Sistem Informasi, Rekayasa Perangkat Lunak',
+            ]);
+
+            // Sample data row 2
+            fputcsv($file, [
+                'Jurnal Ekonomi dan Bisnis',
+                'Universitas Example Press',
+                '2345-6789',
+                '',
+                'Manajemen',
+                '2019',
+                '',
+                '',
+                '',
+                'https://example.com/ekonomi',
+                '',
+                'ekonomi@example.com',
+                '',
+                'DOAJ (2019-03-10)',
+                'Jurnal membahas ekonomi dan bisnis',
+                'Ekonomi, Manajemen, Akuntansi',
+            ]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Reassign journal manager to another user.
+     *
+     * @route POST /admin-kampus/journals/{journal}/reassign
+     *
+     * @features Transfer journal ownership, audit log, notifications to both users
+     */
+    public function reassign(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('reassign', $journal);
+
+        $request->validate([
+            'new_user_id' => 'required|exists:users,id',
+            'reason' => 'nullable|string|max:500',
+        ], [
+            'new_user_id.required' => 'Manager baru harus dipilih.',
+            'new_user_id.exists' => 'User tidak ditemukan.',
+            'reason.max' => 'Alasan maksimal 500 karakter.',
+        ]);
+
+        // Ensure new user is from same university
+        $newUser = User::findOrFail($request->new_user_id);
+        if ($newUser->university_id !== auth()->user()->university_id) {
+            return back()->withErrors(['error' => 'User baru harus dari universitas yang sama.']);
+        }
+
+        // Prevent reassigning to the same user
+        if ($journal->user_id === $request->new_user_id) {
+            return back()->withErrors(['error' => 'Jurnal sudah dikelola oleh user ini.']);
+        }
+
+        $oldUserId = $journal->user_id;
+        $oldUser = $journal->user;
+
+        // Log reassignment to audit table
+        DB::table('journal_reassignments')->insert([
+            'journal_id' => $journal->id,
+            'from_user_id' => $oldUserId,
+            'to_user_id' => $request->new_user_id,
+            'reassigned_by' => auth()->id(),
+            'reason' => $request->reason,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Update journal ownership
+        $journal->update([
+            'user_id' => $request->new_user_id,
+        ]);
+
+        // TODO: Send JournalReassignedNotification to both users
+        // $oldUser->notify(new JournalReassignedNotification($journal, 'removed'));
+        // $newUser->notify(new JournalReassignedNotification($journal, 'assigned'));
+
+        return back()->with('success', "Jurnal \"{$journal->name}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
     }
 }

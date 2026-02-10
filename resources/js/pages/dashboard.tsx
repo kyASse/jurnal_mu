@@ -1,8 +1,8 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PageProps } from '@/types';
-import { Head } from '@inertiajs/react';
-import { BookOpen, ClipboardCheck, TrendingUp } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { BookOpen, ClipboardCheck, TrendingUp, UserPlus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,16 +16,22 @@ interface DashboardProps extends PageProps {
         total_journals: number;
         total_assessments: number;
         average_score: number;
+        pending_lppm_count?: number;
     };
 }
 
 export default function Dashboard({ stats }: DashboardProps) {
+    const { auth } = usePage<PageProps>().props;
+    const isSuperAdmin = auth.user?.role?.name === 'Super Admin';
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {/* Stats Cards */}
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                <div
+                    className={`grid auto-rows-min gap-4 ${isSuperAdmin && stats.pending_lppm_count !== undefined ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}
+                >
                     {/* Total Journals */}
                     <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                         <div className="flex items-center justify-between">
@@ -66,6 +72,24 @@ export default function Dashboard({ stats }: DashboardProps) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Pending LPPM Registrations (Super Admin Only) */}
+                    {isSuperAdmin && stats.pending_lppm_count !== undefined && (
+                        <Link href="/admin/admin-kampus" className="block">
+                            <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 transition-all hover:border-orange-500 hover:shadow-md dark:border-sidebar-border dark:bg-neutral-950 dark:hover:border-orange-400">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Pending LPPM</p>
+                                        <h3 className="mt-2 text-3xl font-bold">{stats.pending_lppm_count}</h3>
+                                        <p className="mt-1 text-xs text-muted-foreground">Click to review</p>
+                                    </div>
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
+                                        <UserPlus className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                                    </div>
+                                </div>
+                            </div>
+                        </Link>
+                    )}
                 </div>
 
                 {/* Content Area */}

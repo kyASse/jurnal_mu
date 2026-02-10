@@ -130,10 +130,33 @@ class ScrapeMAJUJournals extends Command
                 @$dom->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
                 $xpath = new DOMXPath($dom);
 
+                // Debug: Log response status and show a snippet of HTML
+                $this->info("Page {$page}: Response status {$response->status()}, body length: ".strlen($html));
+
+                // Show first 500 chars of HTML to understand structure
+                if ($page === 1) {
+                    $this->info('HTML snippet (first 500 chars):');
+                    $this->line(substr($html, 0, 500));
+                }
+
                 // Find all "MORE DETAILS" links
                 $links = $xpath->query("//a[contains(@href, '/detail?jid=')]");
 
+                // Debug: Show how many links found
+                $this->info("Page {$page}: Found {$links->length} detail links");
+
                 if ($links->length === 0) {
+                    // Debug: Try to find any links to see what's available
+                    $allLinks = $xpath->query('//a[@href]');
+                    $this->warn("No detail links found. Total links on page: {$allLinks->length}");
+
+                    if ($allLinks->length > 0 && $allLinks->length < 10) {
+                        $this->info('Sample hrefs:');
+                        for ($i = 0; $i < min(5, $allLinks->length); $i++) {
+                            $this->line('  - '.$allLinks->item($i)->getAttribute('href'));
+                        }
+                    }
+
                     break; // No more journals found
                 }
 

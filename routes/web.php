@@ -11,8 +11,10 @@ use App\Http\Controllers\Admin\EvaluationSubCategoryController;
 use App\Http\Controllers\Admin\PembinaanController as AdminPembinaanController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
+use App\Http\Controllers\AdminKampus\JournalApprovalController;
 use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
 use App\Http\Controllers\AdminKampus\ReviewerController;
+use App\Http\Controllers\AdminKampus\UserApprovalController;
 use App\Http\Controllers\AdminKampus\UserController as AdminKampusUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -214,6 +216,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
             ->name('users.toggle-active');
 
+        // LPPM Admin Approval Routes
+        Route::post('users/{user}/approve-lppm', [\App\Http\Controllers\Admin\LppmApprovalController::class, 'approve'])
+            ->name('users.approve-lppm');
+        Route::post('users/{user}/reject-lppm', [\App\Http\Controllers\Admin\LppmApprovalController::class, 'reject'])
+            ->name('users.reject-lppm');
+        Route::post('users/{user}/revert-lppm', [\App\Http\Controllers\Admin\LppmApprovalController::class, 'revert'])
+            ->name('users.revert-lppm');
+
         // Reviewer Management (v1.1 - Placeholder)
         Route::get('reviewers', [\App\Http\Controllers\Admin\ReviewerController::class, 'index'])
             ->name('reviewers.index');
@@ -278,16 +288,50 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::middleware(['role:'.Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
 
+        // User Approval Workflow (Two-Step Approval Phase 1)
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('pending', [UserApprovalController::class, 'index'])
+                ->name('pending');
+            Route::post('{user}/approve', [UserApprovalController::class, 'approve'])
+                ->name('approve');
+            Route::post('{user}/reject', [UserApprovalController::class, 'reject'])
+                ->name('reject');
+            Route::post('{user}/revert', [UserApprovalController::class, 'revert'])
+                ->name('revert');
+        });
+
         // Users (Pengelola Jurnal) Management
         Route::resource('users', AdminKampusUserController::class);
         Route::post('users/{user}/toggle-active', [AdminKampusUserController::class, 'toggleActive'])
             ->name('users.toggle-active');
+
+        // Journal Approval Workflow (Two-Step Approval Phase 2)
+        Route::prefix('journals')->name('journals.')->group(function () {
+            Route::get('pending', [JournalApprovalController::class, 'index'])
+                ->name('pending');
+            Route::post('{journal}/approve', [JournalApprovalController::class, 'approve'])
+                ->name('approve');
+            Route::post('{journal}/reject', [JournalApprovalController::class, 'reject'])
+                ->name('reject');
+
+            // Journal reassignment
+            Route::post('{journal}/reassign', [\App\Http\Controllers\AdminKampus\JournalController::class, 'reassign'])
+                ->name('reassign');
+        });
 
         // View journals from their university
         Route::get('journals', [\App\Http\Controllers\AdminKampus\JournalController::class, 'index'])
             ->name('journals.index');
         Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
             ->name('journals.show');
+
+        // Import journals from CSV
+        Route::get('journals/import/template', [\App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
+            ->name('journals.import.template');
+        Route::get('journals/import/form', [\App\Http\Controllers\AdminKampus\JournalController::class, 'import'])
+            ->name('journals.import');
+        Route::post('journals/import/process', [\App\Http\Controllers\AdminKampus\JournalController::class, 'processImport'])
+            ->name('journals.import.process');
 
         // Reviewer Management (Placeholder)
         Route::get('reviewer', [ReviewerController::class, 'index'])

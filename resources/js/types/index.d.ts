@@ -94,12 +94,39 @@ export interface ScientificField {
     name: string;
 }
 
+export interface Article {
+    id: number;
+    journal_id: number;
+    oai_identifier: string;
+    oai_datestamp: string;
+    oai_set?: string | null;
+    title: string;
+    abstract?: string | null;
+    authors?: string[] | null;
+    authors_list?: string;
+    keywords?: string[] | null;
+    doi?: string | null;
+    doi_url?: string | null;
+    publication_date: string;
+    volume?: string | null;
+    issue?: string | null;
+    volume_issue?: string | null;
+    pages?: string | null;
+    article_url?: string | null;
+    pdf_url?: string | null;
+    google_scholar_url?: string;
+    last_harvested_at?: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Journal {
     id: number;
     title: string;
     issn: string;
     e_issn?: string;
     url?: string;
+    oai_pmh_url?: string;
     cover_image_url?: string;
     publisher?: string;
     frequency?: 'monthly' | 'bimonthly' | 'quarterly' | 'semiannually' | 'annually';
@@ -132,6 +159,8 @@ export interface Journal {
     university: University;
     user?: User;
     scientific_field?: ScientificField;
+    articles?: Article[];
+    articles_count?: number;
     is_active: boolean;
     created_at: string;
     updated_at: string;

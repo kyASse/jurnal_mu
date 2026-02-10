@@ -34,6 +34,12 @@ class DashboardController extends Controller
                 ->avg('total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
 
+            // Add pending LPPM Admin registrations count
+            $stats['pending_lppm_count'] = DB::table('users')
+                ->whereNull('role_id')
+                ->where('approval_status', 'pending')
+                ->count();
+
         } elseif ($user->role->name === 'Admin Kampus') {
             // Admin Kampus sees only their university data
             $stats['total_journals'] = DB::table('journals')

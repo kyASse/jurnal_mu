@@ -22,6 +22,7 @@ class Journal extends Model
         'issn',
         'e_issn',
         'url',
+        'oai_pmh_url',
         'publisher',
         'frequency',
         'first_published_year',
@@ -41,6 +42,10 @@ class Journal extends Model
         'about',
         'scope',
         'is_active',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'rejection_reason',
     ];
 
     /**
@@ -54,6 +59,7 @@ class Journal extends Model
         'sinta_indexed_date' => 'date',
         'accreditation_issued_date' => 'date',
         'accreditation_expiry_date' => 'date',
+        'approved_at' => 'datetime',
         'indexations' => 'array',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
@@ -92,6 +98,22 @@ class Journal extends Model
     }
 
     /**
+     * Get the LPPM admin who approved/rejected this journal
+     */
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get all reassignment records for this journal
+     */
+    public function reassignments()
+    {
+        return $this->hasMany(JournalReassignment::class);
+    }
+
+    /**
      * Get all assessments for this journal
      */
     public function assessments()
@@ -107,6 +129,22 @@ class Journal extends Model
         return $this->hasOne(JournalAssessment::class)->latestOfMany();
     }
 
+    /**
+     * Get all articles for this journal
+     */
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
+
+    /**
+     * Get recent articles for this journal
+     */
+    public function recentArticles(int $limit = 10)
+    {
+        return $this->articles()->recent()->limit($limit);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
@@ -115,10 +153,48 @@ class Journal extends Model
 
     /**
      * Scope to get only active journals
+     * Updated to also filter by approval status (public visibility)
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', true)
+            ->where('approval_status', 'approved');
+    }
+
+    /**
+     * Scope to get journals pending approval
+     */
+    public function scopePendingApproval($query)
+    {
+        return $query->where('approval_status', 'pending');
+    }
+
+    /**
+     * Scope to get approved journals
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    /**
+     * Scope to get rejected journals
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('approval_status', 'rejected');
+    }
+
+    /**
+     * Scope to filter by approval status
+     */
+    public function scopeByApprovalStatus($query, ?string $status)
+    {
+        if (! $status) {
+            return $query;
+        }
+
+        return $query->where('approval_status', $status);
     }
 
     /**
@@ -283,8 +359,10 @@ class Journal extends Model
 
     /**
      * Scope to filter journals by assessment approval status
+     *
+     * @deprecated Use scopeByAssessmentApprovalStatus instead
      */
-    public function scopeByApprovalStatus($query, ?string $status)
+    public function scopeByAssessmentApprovalStatus($query, ?string $status)
     {
         if (! $status) {
             return $query;

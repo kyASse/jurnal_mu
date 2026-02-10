@@ -91,13 +91,32 @@
  */
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, ShieldCheck, Trash2 } from 'lucide-react';
+import {
+    BookOpen,
+    CheckCircle,
+    ChevronLeft,
+    ChevronRight,
+    Clock,
+    Edit,
+    Eye,
+    EyeOff,
+    Plus,
+    RotateCcw,
+    Search,
+    ShieldCheck,
+    Trash2,
+    UserPlus,
+    XCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -137,6 +156,33 @@ interface University {
     code: string;
 }
 
+interface PendingLppm {
+    id: number;
+    name: string;
+    email: string;
+    university: {
+        id: number;
+        name: string;
+        short_name: string;
+    } | null;
+    created_at: string;
+}
+
+interface RejectedLppm {
+    id: number;
+    name: string;
+    email: string;
+    university: {
+        id: number;
+        name: string;
+        short_name: string;
+    } | null;
+    rejection_reason: string;
+    rejected_by: string;
+    rejected_at: string;
+    created_at: string;
+}
+
 interface Props {
     adminKampus: {
         data: AdminKampus[];
@@ -150,29 +196,153 @@ interface Props {
             active: boolean;
         }>;
     };
+    pendingLppm: {
+        data: PendingLppm[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links: Array<{
+            url: string | null;
+            label: string;
+            active: boolean;
+        }>;
+    };
+    rejectedLppm: {
+        data: RejectedLppm[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links: Array<{
+            url: string | null;
+            label: string;
+            active: boolean;
+        }>;
+    } | null;
     universities: University[];
     filters: {
         search: string;
         university_id: string;
         is_active: string;
+        pending_lppm_search: string;
+        rejected_lppm_search: string;
+        show_rejected: boolean;
     };
 }
 
-export default function AdminKampusIndex({ adminKampus, universities, filters }: Props) {
+export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLppm, universities, filters }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [universityId, setUniversityId] = useState(filters.university_id || '');
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
+    const [pendingLppmSearch, setPendingLppmSearch] = useState(filters.pending_lppm_search || '');
+    const [rejectedLppmSearch, setRejectedLppmSearch] = useState(filters.rejected_lppm_search || '');
+
+    // LPPM Rejection dialog state
+    const [selectedLppm, setSelectedLppm] = useState<PendingLppm | null>(null);
+    const [showRejectDialog, setShowRejectDialog] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [processing, setProcessing] = useState(false);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin.admin-kampus.index'), { search, university_id: universityId, is_active: isActiveFilter }, { preserveState: true });
+        router.get(
+            route('admin.admin-kampus.index'),
+            { search, university_id: universityId, is_active: isActiveFilter, pending_lppm_search: pendingLppmSearch },
+            { preserveState: true },
+        );
     };
 
     const handleDelete = (id: number, name: string) => {
         if (confirm(`Apakah Anda yakin ingin menghapus ${name}?`)) {
             router.delete(route('admin.admin-kampus.destroy', id));
         }
+    };
+
+    const handlePendingLppmSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route('admin.admin-kampus.index'),
+            { search, university_id: universityId, is_active: isActiveFilter, pending_lppm_search: pendingLppmSearch },
+            { preserveState: true },
+        );
+    };
+
+    const handleApproveLppm = (lppm: PendingLppm) => {
+        if (confirm(`Setujui pendaftaran LPPM Admin ${lppm.name}?`)) {
+            router.post(
+                route('admin.users.approve-lppm', lppm.id),
+                {},
+                {
+                    preserveScroll: true,
+                    onStart: () => setProcessing(true),
+                    onFinish: () => setProcessing(false),
+                },
+            );
+        }
+    };
+
+    const handleRejectLppm = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!selectedLppm || !rejectionReason.trim()) {
+            return;
+        }
+
+        router.post(
+            route('admin.users.reject-lppm', selectedLppm.id),
+            { reason: rejectionReason },
+            {
+                preserveScroll: true,
+                onStart: () => setProcessing(true),
+                onSuccess: () => {
+                    setShowRejectDialog(false);
+                    setSelectedLppm(null);
+                    setRejectionReason('');
+                },
+                onFinish: () => setProcessing(false),
+            },
+        );
+    };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
+    const handleRevertLppm = (lppm: RejectedLppm) => {
+        if (confirm(`Revert rejection for ${lppm.name}? User akan kembali ke status pending.`)) {
+            setProcessing(true);
+            router.post(
+                route('admin.users.revert-lppm', lppm.id),
+                {},
+                {
+                    preserveScroll: true,
+                    onFinish: () => setProcessing(false),
+                },
+            );
+        }
+    };
+
+    const toggleRejectedView = () => {
+        router.get(
+            route('admin.admin-kampus.index'),
+            {
+                search,
+                university_id: universityId,
+                is_active: isActiveFilter,
+                pending_lppm_search: pendingLppmSearch,
+                rejected_lppm_search: rejectedLppmSearch,
+                show_rejected: !filters.show_rejected,
+            },
+            { preserveState: true },
+        );
     };
 
     return (
@@ -408,6 +578,409 @@ export default function AdminKampusIndex({ adminKampus, universities, filters }:
                     </div>
                 </div>
             </div>
+
+            {/* Pending LPPM Admin Registrations Section */}
+            <div className="flex flex-col gap-4 rounded-xl p-4">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="flex items-center gap-2 text-2xl font-bold text-foreground">
+                                    <UserPlus className="h-7 w-7 text-orange-600 dark:text-orange-400" />
+                                    Pending LPPM Admin Registrations
+                                </h2>
+                                <p className="mt-1 text-muted-foreground">Approve or reject LPPM Admin registrations from universities</p>
+                            </div>
+                            {pendingLppm.total > 0 && (
+                                <Badge variant="outline" className="px-4 py-2 text-lg">
+                                    <Clock className="mr-2 h-4 w-4" />
+                                    {pendingLppm.total} Pending
+                                </Badge>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Search for Pending LPPM */}
+                    <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
+                        <form onSubmit={handlePendingLppmSearch} className="flex gap-4">
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Search pending LPPM by name or email..."
+                                        value={pendingLppmSearch}
+                                        onChange={(e) => setPendingLppmSearch(e.target.value)}
+                                        className="pl-10"
+                                    />
+                                </div>
+                            </div>
+                            <Button type="submit">Search</Button>
+                            {filters.pending_lppm_search && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setPendingLppmSearch('');
+                                        router.get(route('admin.admin-kampus.index'), {
+                                            search,
+                                            university_id: universityId,
+                                            is_active: isActiveFilter,
+                                        });
+                                    }}
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </form>
+                    </div>
+
+                    {/* Pending LPPM Table */}
+                    <div className="overflow-x-auto rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>University</TableHead>
+                                    <TableHead>Registration Date</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {pendingLppm.data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                                            No pending LPPM Admin registrations.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    pendingLppm.data.map((lppm) => (
+                                        <TableRow key={lppm.id}>
+                                            <TableCell className="font-medium">{lppm.name}</TableCell>
+                                            <TableCell>{lppm.email}</TableCell>
+                                            <TableCell>
+                                                {lppm.university ? (
+                                                    <div>
+                                                        <div className="font-medium">{lppm.university.name}</div>
+                                                        <div className="text-sm text-muted-foreground">{lppm.university.short_name}</div>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">{formatDate(lppm.created_at)}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="default"
+                                                        onClick={() => handleApproveLppm(lppm)}
+                                                        disabled={processing}
+                                                        title="Approve LPPM Admin registration"
+                                                    >
+                                                        <CheckCircle className="mr-1 h-4 w-4" />
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        onClick={() => {
+                                                            setSelectedLppm(lppm);
+                                                            setShowRejectDialog(true);
+                                                        }}
+                                                        disabled={processing}
+                                                        title="Reject LPPM Admin registration"
+                                                    >
+                                                        <XCircle className="mr-1 h-4 w-4" />
+                                                        Reject
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+
+                        {/* Pagination for Pending LPPM */}
+                        {pendingLppm.last_page > 1 && (
+                            <div className="border-t border-sidebar-border/70 px-6 py-4 dark:border-sidebar-border">
+                                <div className="flex items-center justify-between">
+                                    <div className="text-sm text-muted-foreground">
+                                        Showing {(pendingLppm.current_page - 1) * pendingLppm.per_page + 1} to{' '}
+                                        {Math.min(pendingLppm.current_page * pendingLppm.per_page, pendingLppm.total)} of {pendingLppm.total} pending
+                                        LPPM
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {pendingLppm.links.map((link, index) => {
+                                            if (link.url === null) return null;
+
+                                            const isFirst = index === 0;
+                                            const isLast = index === pendingLppm.links.length - 1;
+
+                                            return (
+                                                <Link key={index} href={link.url} preserveState preserveScroll>
+                                                    <Button
+                                                        variant={link.active ? 'default' : 'outline'}
+                                                        size="sm"
+                                                        disabled={!link.url || processing}
+                                                    >
+                                                        {isFirst ? (
+                                                            <ChevronLeft className="h-4 w-4" />
+                                                        ) : isLast ? (
+                                                            <ChevronRight className="h-4 w-4" />
+                                                        ) : (
+                                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                                        )}
+                                                    </Button>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Toggle Button for Rejected LPPM */}
+            <div className="flex justify-end px-4">
+                <Button variant={filters.show_rejected ? 'default' : 'outline'} onClick={toggleRejectedView} className="gap-2">
+                    {filters.show_rejected ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {filters.show_rejected ? 'Hide' : 'Show'} Rejected LPPM
+                    {rejectedLppm && (
+                        <Badge variant="secondary" className="ml-2">
+                            {rejectedLppm.total}
+                        </Badge>
+                    )}
+                </Button>
+            </div>
+
+            {/* Rejected LPPM Section (conditional) */}
+            {filters.show_rejected && rejectedLppm && (
+                <div className="flex flex-col gap-4 rounded-xl p-4">
+                    <div className="relative overflow-hidden rounded-xl border border-red-200 bg-red-50 p-6 dark:border-red-900 dark:bg-red-950/20">
+                        {/* Header */}
+                        <div className="mb-6">
+                            <h2 className="flex items-center gap-2 text-2xl font-bold text-red-700 dark:text-red-400">
+                                <XCircle className="h-7 w-7" />
+                                Rejected LPPM Registrations
+                            </h2>
+                            <p className="mt-1 text-red-600 dark:text-red-400">View and revert rejected LPPM registrations</p>
+                        </div>
+
+                        {/* Search for Rejected LPPM */}
+                        <div className="mb-6 rounded-lg border border-red-200 bg-white p-4 shadow-sm dark:border-red-900 dark:bg-neutral-950">
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    router.get(
+                                        route('admin.admin-kampus.index'),
+                                        {
+                                            search,
+                                            university_id: universityId,
+                                            is_active: isActiveFilter,
+                                            pending_lppm_search: pendingLppmSearch,
+                                            rejected_lppm_search: rejectedLppmSearch,
+                                            show_rejected: true,
+                                        },
+                                        { preserveState: true },
+                                    );
+                                }}
+                                className="flex gap-4"
+                            >
+                                <div className="flex-1">
+                                    <div className="relative">
+                                        <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
+                                        <Input
+                                            type="text"
+                                            placeholder="Search rejected LPPM by name or email..."
+                                            value={rejectedLppmSearch}
+                                            onChange={(e) => setRejectedLppmSearch(e.target.value)}
+                                            className="pl-10"
+                                        />
+                                    </div>
+                                </div>
+                                <Button type="submit">Search</Button>
+                                {filters.rejected_lppm_search && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => {
+                                            setRejectedLppmSearch('');
+                                            router.get(route('admin.admin-kampus.index'), {
+                                                search,
+                                                university_id: universityId,
+                                                is_active: isActiveFilter,
+                                                pending_lppm_search: pendingLppmSearch,
+                                                show_rejected: true,
+                                            });
+                                        }}
+                                    >
+                                        Clear
+                                    </Button>
+                                )}
+                            </form>
+                        </div>
+
+                        {/* Rejected LPPM Table */}
+                        <div className="overflow-x-auto rounded-lg border border-red-200 bg-white shadow-sm dark:border-red-900 dark:bg-neutral-950">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>University</TableHead>
+                                        <TableHead>Rejection Reason</TableHead>
+                                        <TableHead>Rejected By</TableHead>
+                                        <TableHead>Rejected At</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {rejectedLppm.data.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                                                No rejected LPPM Admin registrations.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        rejectedLppm.data.map((lppm) => (
+                                            <TableRow key={lppm.id}>
+                                                <TableCell className="font-medium">{lppm.name}</TableCell>
+                                                <TableCell>{lppm.email}</TableCell>
+                                                <TableCell>
+                                                    {lppm.university ? (
+                                                        <div>
+                                                            <div className="font-medium">{lppm.university.name}</div>
+                                                            <div className="text-xs text-muted-foreground">{lppm.university.short_name}</div>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="max-w-md">
+                                                    <p className="truncate text-sm text-muted-foreground" title={lppm.rejection_reason}>
+                                                        {lppm.rejection_reason}
+                                                    </p>
+                                                </TableCell>
+                                                <TableCell>{lppm.rejected_by}</TableCell>
+                                                <TableCell className="text-sm text-muted-foreground">{formatDate(lppm.rejected_at)}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => handleRevertLppm(lppm)}
+                                                        disabled={processing}
+                                                        title="Revert rejection and move back to pending"
+                                                    >
+                                                        <RotateCcw className="mr-1 h-4 w-4" />
+                                                        Revert
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+
+                            {/* Pagination for Rejected LPPM */}
+                            {rejectedLppm.last_page > 1 && (
+                                <div className="border-t border-red-200 px-6 py-4 dark:border-red-900">
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-sm text-muted-foreground">
+                                            Showing {(rejectedLppm.current_page - 1) * rejectedLppm.per_page + 1} to{' '}
+                                            {Math.min(rejectedLppm.current_page * rejectedLppm.per_page, rejectedLppm.total)} of {rejectedLppm.total}{' '}
+                                            rejected LPPM
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {rejectedLppm.links.map((link, index) => {
+                                                if (link.url === null) return null;
+
+                                                const isFirst = index === 0;
+                                                const isLast = index === rejectedLppm.links.length - 1;
+
+                                                return (
+                                                    <Link key={index} href={link.url} preserveState preserveScroll>
+                                                        <Button
+                                                            variant={link.active ? 'default' : 'outline'}
+                                                            size="sm"
+                                                            disabled={!link.url || processing}
+                                                        >
+                                                            {isFirst ? (
+                                                                <ChevronLeft className="h-4 w-4" />
+                                                            ) : isLast ? (
+                                                                <ChevronRight className="h-4 w-4" />
+                                                            ) : (
+                                                                <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                                            )}
+                                                        </Button>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* LPPM Reject Dialog */}
+            <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+                <DialogContent>
+                    <form onSubmit={handleRejectLppm}>
+                        <DialogHeader>
+                            <DialogTitle>Reject LPPM Admin Registration</DialogTitle>
+                            <DialogDescription>
+                                Provide a reason for rejecting <span className="font-semibold">{selectedLppm?.name}</span>'s LPPM Admin registration.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="reason">
+                                    Rejection Reason <span className="text-destructive">*</span>
+                                </Label>
+                                <Textarea
+                                    id="reason"
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    placeholder="Explain why this LPPM registration is being rejected..."
+                                    rows={4}
+                                    required
+                                    minLength={10}
+                                    maxLength={500}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Minimum 10 characters. The applicant will receive an email with this reason.
+                                </p>
+                            </div>
+                        </div>
+
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    setShowRejectDialog(false);
+                                    setRejectionReason('');
+                                }}
+                                disabled={processing}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" variant="destructive" disabled={processing || rejectionReason.length < 10}>
+                                {processing ? 'Rejecting...' : 'Reject LPPM Admin'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }
