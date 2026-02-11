@@ -277,4 +277,74 @@ class PublicJournalController extends Controller
             'queries' => $request->all(),
         ]);
     }
+
+    /**
+     * Browse journals grouped by universities.
+     *
+     * @route GET /browse/universities
+     *
+     * @features Browse all universities with their approved journals, filter by university, pagination
+     */
+    public function browseUniversities(Request $request): Response
+    {
+        // Get university statistics (cached for 1 hour)
+        $universityStats = Cache::remember('browse.universities.stats', 3600, function () {
+            return University::where('is_active', true)
+                ->withCount([
+                    'journals' => function ($query) {
+                        $query->where('is_active', true)
+                            ->where('approval_status', 'approved');
+                    },
+                ])
+                ->having('journals_count', '>', 0)
+                ->orderBy('name')
+                ->get(['id', 'name', 'code', 'short_name']);
+        });
+
+        // If specific university selected, show its journals
+        $selectedUniversity = null;
+        $journals = null;
+
+        if ($request->filled('university_id')) {
+            $selectedUniversity = University::find($request->university_id);
+
+            if ($selectedUniversity) {
+                // Get journals for selected university with pagination
+                $journals = Journal::query()
+                    ->with(['scientificField'])
+                    ->where('university_id', $request->university_id)
+                    ->where('is_active', true)
+                    ->where('approval_status', 'approved')
+                    ->orderBy('title')
+                    ->paginate(12)
+                    ->withQueryString()
+                    ->through(fn ($journal) => [
+                        'id' => $journal->id,
+                        'title' => $journal->title,
+                        'issn' => $journal->issn,
+                        'e_issn' => $journal->e_issn,
+                        'url' => $journal->url,
+                        'scientific_field' => $journal->scientificField ? [
+                            'id' => $journal->scientificField->id,
+                            'name' => $journal->scientificField->name,
+                        ] : null,
+                        'sinta_rank' => $journal->sinta_rank,
+                        'sinta_rank_label' => $journal->sinta_rank_label,
+                        'is_indexed_in_scopus' => $journal->is_indexed_in_scopus,
+                    ]);
+            }
+        }
+
+        return Inertia::render('Browse/Universities', [
+            'universityStats' => $universityStats,
+            'selectedUniversity' => $selectedUniversity ? [
+                'id' => $selectedUniversity->id,
+                'name' => $selectedUniversity->name,
+                'code' => $selectedUniversity->code,
+                'short_name' => $selectedUniversity->short_name,
+            ] : null,
+            'journals' => $journals,
+            'filters' => $request->only(['university_id']),
+        ]);
+    }
 }

@@ -93,6 +93,10 @@ Route::get('/journals', [\App\Http\Controllers\PublicJournalController::class, '
 Route::get('/journals/{journal}', [\App\Http\Controllers\PublicJournalController::class, 'show'])
     ->name('journals.show');
 
+// Browse journals by university
+Route::get('/browse/universities', [\App\Http\Controllers\PublicJournalController::class, 'browseUniversities'])
+    ->name('browse.universities');
+
 /*
 |--------------------------------------------------------------------------
 | Guest Routes (Redirect jika sudah login)

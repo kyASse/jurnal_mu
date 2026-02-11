@@ -128,9 +128,9 @@ export default function Welcome() {
                             </div>
                             <div className="mt-4 flex justify-center gap-4 text-sm text-emerald-100">
                                 <span>Can't find what you're looking for?</span>
-                                <a href="#" className="font-semibold text-[#FCEE1F] hover:underline">
-                                    Browse Categories
-                                </a>
+                                <Link href={route('browse.universities')} className="font-semibold text-[#FCEE1F] hover:underline">
+                                    Browse by University
+                                </Link>
                             </div>
                         </div>
                     </div>
