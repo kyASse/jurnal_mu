@@ -6,6 +6,7 @@ use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -84,11 +85,12 @@ class PublicJournalController extends Controller
                 'sinta_rank_label' => $journal->sinta_rank_label,
             ]);
 
-        // Get filter options
-        $universities = University::select('id', 'name')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        // Get filter options (with cache)
+        $universities = Cache::remember('universities.active.list', 3600, function () {
+            return University::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'code']);
+        });
 
         $scientificFields = ScientificField::select('id', 'name')
             ->where('is_active', true)

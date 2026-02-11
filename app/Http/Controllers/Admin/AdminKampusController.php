@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
@@ -68,10 +69,86 @@ class AdminKampusController extends Controller
                 'created_at' => $admin->created_at->format('Y-m-d H:i:s'),
             ]);
 
-        // Get all universities for filter dropdown
-        $universities = University::query()
-            ->orderBy('name')
-            ->get(['id', 'name', 'short_name', 'code']);
+        // Get all universities for filter dropdown (with cache)
+        $universities = Cache::remember('universities.active.list', 3600, function () {
+            return University::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'short_name', 'code']);
+        });
+
+        // Query pending LPPM registrations (role_id is null and approval_status is pending)
+        $pendingLppmQuery = User::query()
+            ->whereNull('role_id')
+            ->where('approval_status', 'pending')
+            ->with(['university']);
+
+        // Search filter for pending LPPM
+        if ($request->filled('pending_lppm_search')) {
+            $search = $request->pending_lppm_search;
+            $pendingLppmQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Paginate pending LPPM separately with different query string
+        $pendingLppm = $pendingLppmQuery
+            ->orderBy('created_at', 'desc')
+            ->paginate(15, ['*'], 'lppm_page')
+            ->withQueryString()
+            ->through(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'university' => $user->university ? [
+                        'id' => $user->university->id,
+                        'name' => $user->university->name,
+                        'short_name' => $user->university->short_name,
+                    ] : null,
+                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
+
+        // Query rejected LPPM registrations (optional view)
+        $rejectedLppmQuery = User::query()
+            ->whereNull('role_id')
+            ->where('approval_status', 'rejected')
+            ->with(['university', 'approver']);
+
+        // Search filter for rejected LPPM
+        if ($request->filled('rejected_lppm_search')) {
+            $search = $request->rejected_lppm_search;
+            $rejectedLppmQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Only show rejected if explicitly requested (toggle in UI)
+        $rejectedLppm = null;
+        if ($request->boolean('show_rejected')) {
+            $rejectedLppm = $rejectedLppmQuery
+                ->orderBy('approved_at', 'desc')
+                ->paginate(15, ['*'], 'rejected_page')
+                ->withQueryString()
+                ->through(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'university' => $user->university ? [
+                            'id' => $user->university->id,
+                            'name' => $user->university->name,
+                            'short_name' => $user->university->short_name,
+                        ] : null,
+                        'rejection_reason' => $user->rejection_reason,
+                        'rejected_by' => $user->approver?->name,
+                        'rejected_at' => $user->approved_at?->format('Y-m-d H:i:s'),
+                        'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                    ];
+                });
+        }
 
         // Query pending LPPM registrations (role_id is null and approval_status is pending)
         $pendingLppmQuery = User::query()

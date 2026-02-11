@@ -8,6 +8,7 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -21,10 +22,12 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        // Get active universities for dropdown
-        $universities = University::where('is_active', true)
-            ->orderBy('name')
-            ->get(['id', 'name', 'short_name']);
+        // Get active universities for dropdown (with 1-hour cache)
+        $universities = Cache::remember('universities.active.registration', 3600, function () {
+            return University::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'short_name', 'code']);
+        });
 
         return Inertia::render('auth/register', [
             'universities' => $universities,

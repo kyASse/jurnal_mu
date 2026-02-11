@@ -2,13 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UniversityCombobox } from '@/components/ui/university-combobox';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 type University = {
     id: number;
     name: string;
+    code: string;
     short_name?: string;
 };
 
@@ -99,19 +100,15 @@ export default function Register({ universities }: Props) {
                             {/* University Selection */}
                             <div>
                                 <Label htmlFor="university">Universitas *</Label>
-                                <Select value={data.university_id} onValueChange={(value) => setData('university_id', value)}>
-                                    <SelectTrigger className="mt-2">
-                                        <SelectValue placeholder="Pilih Universitas" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {universities.map((uni) => (
-                                            <SelectItem key={uni.id} value={uni.id.toString()}>
-                                                {uni.short_name ? `${uni.short_name} - ${uni.name}` : uni.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.university_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.university_id}</p>}
+                                <div className="mt-2">
+                                    <UniversityCombobox
+                                        universities={universities}
+                                        value={data.university_id}
+                                        onValueChange={(value) => setData('university_id', value)}
+                                        placeholder="Pilih Universitas"
+                                        error={errors.university_id}
+                                    />
+                                </div>
                             </div>
 
                             {/* Role Type Selection */}
