@@ -63,7 +63,7 @@ class JournalController extends Controller
 
         Journal::create($validated);
 
-        return redirect()->route('journals.index')->with('success', 'Jurnal berhasil ditambahkan.');
+        return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil ditambahkan.');
     }
 
     /**
@@ -91,7 +91,7 @@ class JournalController extends Controller
 
         $journal->update($request->validated());
 
-        return redirect()->route('journals.index')->with('success', 'Data jurnal berhasil diperbarui.');
+        return redirect()->route('user.journals.index')->with('success', 'Data jurnal berhasil diperbarui.');
     }
 
     /**
@@ -103,7 +103,7 @@ class JournalController extends Controller
 
         $journal->delete();
 
-        return redirect()->route('journals.index')->with('success', 'Jurnal berhasil dihapus.');
+        return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil dihapus.');
     }
 
     /**
