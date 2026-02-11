@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AdminKampus;
 use App\Http\Controllers\Controller;
 use App\Models\Journal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -82,6 +83,9 @@ class JournalApprovalController extends Controller
             'rejection_reason' => null,
         ]);
 
+        // Invalidate university statistics cache
+        Cache::forget('browse.universities.stats');
+
         // TODO: Send JournalApprovedNotification
         // $journal->user->notify(new JournalApprovedNotification($journal));
 
@@ -123,6 +127,9 @@ class JournalApprovalController extends Controller
             'approved_at' => now(),
             'rejection_reason' => $request->reason,
         ]);
+
+        // Invalidate university statistics cache
+        Cache::forget('browse.universities.stats');
 
         // TODO: Send JournalRejectedNotification
         // $journal->user->notify(new JournalRejectedNotification($journal, $request->reason));
