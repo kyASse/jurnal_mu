@@ -208,7 +208,7 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                     <UniversityFilterCombobox
                                         universities={universities}
                                         value={universityFilter}
-                                        onChange={setUniversityFilter}
+                                        onValueChange={setUniversityFilter}
                                         className="h-12"
                                     />
 

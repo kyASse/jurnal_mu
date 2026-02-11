@@ -12,8 +12,6 @@ class UniversitySeeder extends Seeder
      *
      * Loads university data from database/PTMA.json file.
      * Uses updateOrCreate to handle re-seeding gracefully.
-     *
-     * @return void
      */
     public function run(): void
     {

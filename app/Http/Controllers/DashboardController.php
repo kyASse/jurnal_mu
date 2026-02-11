@@ -122,16 +122,19 @@ class DashboardController extends Controller
         // Generate cache key based on role and scope
         if ($user->role->name === 'Super Admin') {
             $cacheKey = 'dashboard_statistics_super_admin';
+
             return Cache::remember($cacheKey, 3600, function () {
                 return $this->calculateJournalStatistics(null, null);
             });
         } elseif ($user->role->name === 'Admin Kampus') {
             $cacheKey = "dashboard_statistics_university_{$user->university_id}";
+
             return Cache::remember($cacheKey, 3600, function () use ($user) {
                 return $this->calculateJournalStatistics($user->university_id, null);
             });
         } else {
             $cacheKey = "dashboard_statistics_user_{$user->id}";
+
             return Cache::remember($cacheKey, 3600, function () use ($user) {
                 return $this->calculateJournalStatistics(null, $user->id);
             });
@@ -140,9 +143,9 @@ class DashboardController extends Controller
 
     /**
      * Calculate journal statistics with optional filtering.
-     * 
-     * @param int|null $universityId Filter by university (for Admin Kampus)
-     * @param int|null $userId Filter by user (for regular users)
+     *
+     * @param  int|null  $universityId  Filter by university (for Admin Kampus)
+     * @param  int|null  $userId  Filter by user (for regular users)
      */
     private function calculateJournalStatistics(?int $universityId, ?int $userId): array
     {
@@ -244,9 +247,9 @@ class DashboardController extends Controller
     /**
      * Clear dashboard statistics cache.
      * Called when journals are created, updated, or deleted.
-     * 
-     * @param int|null $universityId Clear cache for specific university (null = clear all)
-     * @param int|null $userId Clear cache for specific user (null = clear all in scope)
+     *
+     * @param  int|null  $universityId  Clear cache for specific university (null = clear all)
+     * @param  int|null  $userId  Clear cache for specific user (null = clear all in scope)
      */
     public static function clearStatisticsCache(?int $universityId = null, ?int $userId = null): void
     {
