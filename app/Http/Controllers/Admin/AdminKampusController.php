@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
@@ -68,10 +69,12 @@ class AdminKampusController extends Controller
                 'created_at' => $admin->created_at->format('Y-m-d H:i:s'),
             ]);
 
-        // Get all universities for filter dropdown
-        $universities = University::query()
-            ->orderBy('name')
-            ->get(['id', 'name', 'short_name', 'code']);
+        // Get all universities for filter dropdown (with cache)
+        $universities = Cache::remember('universities.active.list', 3600, function () {
+            return University::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'short_name', 'code']);
+        });
 
         // Query pending LPPM registrations (role_id is null and approval_status is pending)
         $pendingLppmQuery = User::query()
