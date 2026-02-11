@@ -48,7 +48,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import { FormEventHandler } from 'react';
@@ -82,6 +84,13 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
         accreditation_expiry_date: '',
         accreditation_status: '',
         accreditation_grade: '',
+        // Contact & Additional Info
+        editor_in_chief: '',
+        email: '',
+        phone: '',
+        oai_pmh_url: '',
+        about: '',
+        scope: '',
         // Indexations
         indexations: [] as Array<{ platform: string; indexed_at: string }>,
     });
@@ -93,8 +102,14 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
 
     const currentYear = new Date().getFullYear();
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'My Journals', href: route('user.journals.index') },
+        { title: 'Create', href: route('user.journals.create') },
+    ];
+
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Journal" />
 
             <div className="py-6">
@@ -102,24 +117,24 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                     {/* Header */}
                     <div className="mb-6">
                         <Link href={route('user.journals.index')}>
-                            <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600">
+                            <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600 dark:hover:text-blue-400">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to My Journals
                             </Button>
                         </Link>
                         <div className="flex items-center gap-2">
-                            <BookOpen className="h-8 w-8 text-blue-600" />
-                            <h1 className="text-3xl font-bold text-gray-900">Register New Journal</h1>
+                            <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Register New Journal</h1>
                         </div>
-                        <p className="mt-1 ml-10 text-gray-600">Enter the details of the journal you manage</p>
+                        <p className="mt-1 ml-10 text-gray-600 dark:text-gray-400">Enter the details of the journal you manage</p>
                     </div>
 
                     {/* Form */}
-                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Basic Info */}
                             <div className="space-y-4">
-                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Journal Information</h3>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Journal Information</h3>
 
                                 <div>
                                     <Label htmlFor="title">
@@ -181,7 +196,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
 
                             {/* Classification */}
                             <div className="space-y-4">
-                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Classification & Metadata</h3>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Classification & Metadata</h3>
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
@@ -233,8 +248,8 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                             max={new Date().toISOString().split('T')[0]}
                                             className="mt-1"
                                         />
-                                        {errors.sinta_indexed_date && <p className="mt-1 text-sm text-red-600">{errors.sinta_indexed_date}</p>}
-                                        <p className="mt-1 text-xs text-gray-500">Tanggal jurnal terindeks di SINTA</p>
+                                        {errors.sinta_indexed_date && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.sinta_indexed_date}</p>}
+                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Tanggal jurnal terindeks di SINTA</p>
                                     </div>
                                 )}
 
@@ -290,7 +305,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
 
                             {/* Dikti Accreditation */}
                             <div className="space-y-4">
-                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Dikti Accreditation (Optional)</h3>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Dikti Accreditation (Optional)</h3>
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
@@ -376,10 +391,94 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                 )}
                             </div>
 
+                            {/* Contact & Additional Info */}
+                            <div className="space-y-4">
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Contact & Additional Information</h3>
+
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div>
+                                        <Label htmlFor="editor_in_chief">Editor-in-Chief</Label>
+                                        <Input
+                                            id="editor_in_chief"
+                                            value={data.editor_in_chief}
+                                            onChange={(e) => setData('editor_in_chief', e.target.value)}
+                                            placeholder="Dr. John Doe"
+                                            className="mt-1"
+                                        />
+                                        {errors.editor_in_chief && <p className="mt-1 text-sm text-red-600">{errors.editor_in_chief}</p>}
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="email">Journal Email</Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            value={data.email}
+                                            onChange={(e) => setData('email', e.target.value)}
+                                            placeholder="editor@journal.ac.id"
+                                            className="mt-1"
+                                        />
+                                        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="phone">Phone Number</Label>
+                                        <Input
+                                            id="phone"
+                                            value={data.phone}
+                                            onChange={(e) => setData('phone', e.target.value)}
+                                            placeholder="+62 274 123456"
+                                            className="mt-1"
+                                        />
+                                        {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="oai_pmh_url">OAI-PMH URL (Optional)</Label>
+                                        <Input
+                                            id="oai_pmh_url"
+                                            type="url"
+                                            value={data.oai_pmh_url}
+                                            onChange={(e) => setData('oai_pmh_url', e.target.value)}
+                                            placeholder="https://journal.ac.id/index.php/jite/oai"
+                                            className="mt-1"
+                                        />
+                                        <p className="mt-1 text-xs text-muted-foreground">For metadata harvesting and indexing</p>
+                                        {errors.oai_pmh_url && <p className="mt-1 text-sm text-red-600">{errors.oai_pmh_url}</p>}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="about">About Journal</Label>
+                                    <Textarea
+                                        id="about"
+                                        rows={4}
+                                        value={data.about}
+                                        onChange={(e) => setData('about', e.target.value)}
+                                        placeholder="Brief description of the journal..."
+                                        className="mt-1"
+                                    />
+                                    {errors.about && <p className="mt-1 text-sm text-red-600">{errors.about}</p>}
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="scope">Scope & Focus</Label>
+                                    <Textarea
+                                        id="scope"
+                                        rows={3}
+                                        value={data.scope}
+                                        onChange={(e) => setData('scope', e.target.value)}
+                                        placeholder="Research areas covered by the journal..."
+                                        className="mt-1"
+                                    />
+                                    {errors.scope && <p className="mt-1 text-sm text-red-600">{errors.scope}</p>}
+                                </div>
+                            </div>
+
                             {/* Indexations */}
                             <div className="space-y-4">
-                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Indexations (Optional)</h3>
-                                <p className="text-sm text-gray-600">Select databases where this journal is indexed</p>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Indexations (Optional)</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Select databases where this journal is indexed</p>
 
                                 <div className="space-y-3">
                                     {indexationOptions.map((option) => {
@@ -387,7 +486,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                         const selectedItem = data.indexations.find((i) => i.platform === option.value);
 
                                         return (
-                                            <div key={option.value} className="rounded-md border p-4">
+                                            <div key={option.value} className="rounded-md border p-4 dark:border-gray-700">
                                                 <div className="flex items-start gap-3">
                                                     <input
                                                         type="checkbox"
@@ -414,7 +513,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                                         </Label>
                                                         {isSelected && (
                                                             <div className="mt-2">
-                                                                <Label className="text-xs text-gray-600">Indexed Date</Label>
+                                                                <Label className="text-xs text-gray-600 dark:text-gray-400">Indexed Date</Label>
                                                                 <Input
                                                                     type="date"
                                                                     value={selectedItem?.indexed_at || ''}
@@ -442,7 +541,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                 {errors.indexations && <p className="mt-1 text-sm text-red-600">{errors.indexations}</p>}
                             </div>
 
-                            <div className="flex items-center justify-end gap-4 border-t pt-4">
+                            <div className="flex items-center justify-end gap-4 border-t pt-4 dark:border-gray-700">
                                 <Link href={route('user.journals.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
