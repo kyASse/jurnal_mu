@@ -108,7 +108,7 @@ export default function JournalsIndex({ journals }: Props) {
 
     const handleDelete = (id: number, title: string) => {
         if (confirm(`Are you sure you want to delete ${title}?`)) {
-            router.delete(route('journals.destroy', id));
+            router.delete(route('user.journals.destroy', id));
         }
     };
 
@@ -128,7 +128,7 @@ export default function JournalsIndex({ journals }: Props) {
                                 </h1>
                                 <p className="mt-1 text-gray-600">Manage journals that you are responsible for</p>
                             </div>
-                            <Link href={route('journals.create')}>
+                            <Link href={route('user.journals.create')}>
                                 <Button className="flex items-center gap-2">
                                     <Plus className="h-4 w-4" />
                                     Add New Journal
@@ -193,7 +193,7 @@ export default function JournalsIndex({ journals }: Props) {
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Link href={route('journals.edit', journal.id)}>
+                                                    <Link href={route('user.journals.edit', journal.id)}>
                                                         <Button variant="ghost" size="sm">
                                                             <Edit className="h-4 w-4" />
                                                         </Button>

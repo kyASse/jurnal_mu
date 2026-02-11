@@ -88,7 +88,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('journals.store'));
+        post(route('user.journals.store'));
     };
 
     const currentYear = new Date().getFullYear();
@@ -101,7 +101,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6">
-                        <Link href={route('journals.index')}>
+                        <Link href={route('user.journals.index')}>
                             <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to My Journals
@@ -443,7 +443,7 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                             </div>
 
                             <div className="flex items-center justify-end gap-4 border-t pt-4">
-                                <Link href={route('journals.index')}>
+                                <Link href={route('user.journals.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>

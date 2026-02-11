@@ -127,7 +127,7 @@ export default function JournalsEdit({ journal, scientificFields, indexationOpti
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('journals.update', journal.id));
+        put(route('user.journals.update', journal.id));
     };
 
     const currentYear = new Date().getFullYear();
@@ -140,7 +140,7 @@ export default function JournalsEdit({ journal, scientificFields, indexationOpti
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6">
-                        <Link href={route('journals.index')}>
+                        <Link href={route('user.journals.index')}>
                             <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to My Journals
@@ -482,7 +482,7 @@ export default function JournalsEdit({ journal, scientificFields, indexationOpti
                             </div>
 
                             <div className="flex items-center justify-end gap-4 border-t pt-4">
-                                <Link href={route('journals.index')}>
+                                <Link href={route('user.journals.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>
