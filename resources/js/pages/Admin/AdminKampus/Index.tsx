@@ -97,6 +97,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
@@ -400,19 +401,13 @@ export default function AdminKampusIndex({ adminKampus, pendingLppm, rejectedLpp
                             </div>
 
                             {/* University Filter */}
-                            <Select value={universityId || 'all'} onValueChange={(value) => setUniversityId(value === 'all' ? '' : value)}>
-                                <SelectTrigger className="w-64">
-                                    <SelectValue placeholder="All Universities" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Universities</SelectItem>
-                                    {universities.map((uni) => (
-                                        <SelectItem key={uni.id} value={uni.id.toString()}>
-                                            {uni.code} - {uni.short_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <UniversityFilterCombobox
+                                universities={universities}
+                                value={universityId || 'all'}
+                                onValueChange={(value) => setUniversityId(value === 'all' ? '' : value)}
+                                placeholder="All Universities"
+                                className="w-64"
+                            />
 
                             {/* Status Filter */}
                             <Select value={isActiveFilter || 'all'} onValueChange={(value) => setIsActiveFilter(value === 'all' ? '' : value)}>

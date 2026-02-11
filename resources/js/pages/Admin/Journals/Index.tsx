@@ -21,6 +21,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -71,6 +72,8 @@ interface Journal {
 interface University {
     id: number;
     name: string;
+    code: string;
+    short_name?: string;
 }
 
 interface ScientificField {
@@ -233,22 +236,12 @@ export default function JournalsIndex({
                             {/* Filter Row 1 */}
                             <div className="flex gap-4">
                                 {/* University Filter - Super Admin Only */}
-                                <Select
-                                    value={universityFilter || 'all'}
-                                    onValueChange={(value) => setUniversityFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-64">
-                                        <SelectValue placeholder="All Universities" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Universities</SelectItem>
-                                        {universities.map((university) => (
-                                            <SelectItem key={university.id} value={university.id.toString()}>
-                                                {university.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <UniversityFilterCombobox
+                                    universities={universities}
+                                    value={universityFilter}
+                                    onValueChange={setUniversityFilter}
+                                    className="h-12"
+                                />
 
                                 {/* Scientific Field Filter */}
                                 <Select

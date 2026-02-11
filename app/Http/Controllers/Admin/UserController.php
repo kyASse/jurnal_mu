@@ -8,6 +8,7 @@ use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
@@ -104,10 +105,12 @@ class UserController extends Controller
                 ];
             });
 
-        // Get all universities for filter dropdown
-        $universities = University::query()
-            ->orderBy('name')
-            ->get(['id', 'name', 'short_name', 'code']);
+        // Get all universities for filter dropdown (with cache)
+        $universities = Cache::remember('universities.active.list', 3600, function () {
+            return University::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'short_name', 'code']);
+        });
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
@@ -123,11 +126,12 @@ class UserController extends Controller
     {
         $this->authorize('manage-users');
 
-        // Get all active universities
-        $universities = University::query()
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get(['id', 'name', 'short_name', 'code']);
+        // Get all active universities (with cache)
+        $universities = Cache::remember('universities.active.list', 3600, function () {
+            return University::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'short_name', 'code']);
+        });
 
         // Get assignable roles (not Super Admin)
         $roles = Role::query()

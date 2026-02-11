@@ -94,6 +94,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -262,19 +263,13 @@ export default function UsersIndex({ users, universities, filters }: Props) {
                             </div>
 
                             {/* University Filter */}
-                            <Select value={universityId || 'all'} onValueChange={(value) => setUniversityId(value === 'all' ? '' : value)}>
-                                <SelectTrigger className="w-64">
-                                    <SelectValue placeholder="All Universities" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Universities</SelectItem>
-                                    {universities.map((uni) => (
-                                        <SelectItem key={uni.id} value={uni.id.toString()}>
-                                            {uni.code} - {uni.short_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <UniversityFilterCombobox
+                                universities={universities}
+                                value={universityId}
+                                onValueChange={setUniversityId}
+                                placeholder="All Universities"
+                                className="w-64"
+                            />
 
                             {/* Status Filter */}
                             <Select value={isActiveFilter || 'all'} onValueChange={(value) => setIsActiveFilter(value === 'all' ? '' : value)}>
