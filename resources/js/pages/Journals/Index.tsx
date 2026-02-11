@@ -20,6 +20,7 @@ import JournalCard from '@/components/journal-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
 import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, ChevronLeft, ChevronRight, Home, Search } from 'lucide-react';
@@ -204,22 +205,12 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                 {/* Filters */}
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
                                     {/* University Filter */}
-                                    <Select
-                                        value={universityFilter || 'all'}
-                                        onValueChange={(value) => setUniversityFilter(value === 'all' ? '' : value)}
-                                    >
-                                        <SelectTrigger className="h-12">
-                                            <SelectValue placeholder="All Universities" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">All Universities</SelectItem>
-                                            {universities.map((university) => (
-                                                <SelectItem key={university.id} value={university.id.toString()}>
-                                                    {university.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <UniversityFilterCombobox
+                                        universities={universities}
+                                        value={universityFilter}
+                                        onChange={setUniversityFilter}
+                                        className="h-12"
+                                    />
 
                                     {/* Scientific Field Filter */}
                                     <Select
