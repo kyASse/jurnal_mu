@@ -49,6 +49,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UniversityCombobox } from '@/components/ui/university-combobox';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -249,20 +250,16 @@ export default function UsersCreate({ universities, roles, scientificFields }: P
                                 <Label htmlFor="university_id">
                                     University <span className="text-red-500">*</span>
                                 </Label>
-                                <Select value={data.university_id.toString()} onValueChange={(value) => setData('university_id', value)}>
-                                    <SelectTrigger className="mt-2">
-                                        <SelectValue placeholder="Select University" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {universities.map((uni) => (
-                                            <SelectItem key={uni.id} value={uni.id.toString()}>
-                                                {uni.code} - {uni.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.university_id && <p className="mt-1 text-sm text-red-600">{errors.university_id}</p>}
-                                <p className="mt-1 text-sm text-muted-foreground">This user will manage journals for this university</p>
+                                <div className="mt-2">
+                                    <UniversityCombobox
+                                        universities={universities}
+                                        value={data.university_id.toString()}
+                                        onValueChange={(value) => setData('university_id', value)}
+                                        placeholder="Select University"
+                                        error={errors.university_id}
+                                    />
+                                    <p className="mt-1 text-sm text-muted-foreground">This user will manage journals for this university</p>
+                                </div>
                             </div>
 
                             {/* Scientific Field */}
