@@ -121,23 +121,23 @@ Persiapan platform untuk **LAUNCH PRODUCTION** pada **Kamis, 12 Februari 2026** 
 
 #### Relocate Journal Metrics from "Jurnal" Tab to Main Dashboard
 
-- [ ] **Move Visualization Section to Dashboard** ⚠️ **HIGH PRIORITY**
-  - Currently: Visualization di `/journals` page (Jurnal tab)
-  - **New Location**: Main dashboard (`/dashboard`)
+- [x] **Move Visualization Section to Dashboard** ✅ **IMPLEMENTED** (Feb 11, 2026)
+  - ✅ Visualization moved from `/journals` to `/dashboard`
+  - ✅ Main dashboard now shows key metrics
   - Display key metrics:
-    - Total Journals
-    - Journals Terindeks Scopus
-    - Journals Terindeks SINTA
-    - Journals Non-SINTA
-  - Accessible to **all user roles** with different scope:
-    - **User**: Hanya journal yang mereka manage
-    - **LPPM**: Semua journal di university mereka
-    - **Dikti**: Aggregated data dari semua universities
+    - ✅ Total Journals
+    - ✅ Journals Terindeks Scopus
+    - ✅ Journals Terindeks SINTA
+    - ✅ Journals Non-SINTA
+  - ✅ Accessible to **all user roles** with different scope:
+    - ✅ **User**: Only journals they manage with status breakdown
+    - ✅ **LPPM**: All journals in their university
+    - ✅ **Dikti**: Aggregated data from all universities
   - **Implementation**:
-    - Controller: `DashboardController@index()` - return journal statistics
-    - Component: `<JournalMetricsCard />` - reusable metrics display
-    - Move existing visualization code from Journals page
-    - Add role-based scoping logic
+    - ✅ Controller: `DashboardController@index()` with journal statistics and caching
+    - ✅ Component: `<StatisticsDashboard />` - comprehensive metrics visualization
+    - ✅ Existing visualization integrated into Dashboard
+    - ✅ Role-based scoping logic fully implemented
 
 #### Dikti Dashboard - Aggregated Metrics
 - [x] **Dikti Dashboard: System-Wide Statistics** ✅ **IMPLEMENTED** (Feb 10, 2026)
@@ -244,18 +244,19 @@ Persiapan platform untuk **LAUNCH PRODUCTION** pada **Kamis, 12 Februari 2026** 
 
 #### Public Browse Feature for Journal Discovery
 
-- [ ] **Browse Journals by University** 🔵 **MEDIUM PRIORITY**
-  - Public page: Browse journals grouped by university
-  - Filter by university from dropdown
+- [x] **Browse Journals by University** ✅ **IMPLEMENTED** (Feb 11, 2026)
+  - ✅ Public page: Browse journals grouped by university
+  - ✅ Filter by university from searchable dropdown
   - Display:
-    - University name
-    - Total journals
-    - List of journals (name, ISSN, indexation status)
+    - ✅ University name, code, short name
+    - ✅ Total journals count per university
+    - ✅ List of journals (title, ISSN, indexation status, scientific field)
   - **Implementation**:
-    - Route: `GET /browse/universities` - Public route
-    - Controller: `PublicController@browseUniversities()`
-    - Query: Group journals by university, only show approved journals
-    - Component: `<UniversityBrowser />` with filtering
+    - ✅ Route: `GET /browse/universities` - Public route
+    - ✅ Controller: `PublicJournalController@browseUniversities()`
+    - ✅ Query: Group journals by university, only show approved journals
+    - ✅ Component: `Browse/Universities.tsx` with filtering and pagination
+    - ✅ Features: Expandable view, journal cards, statistics caching
 
 ---
 
@@ -1084,28 +1085,29 @@ export default function JournalReassignDialog({
 
 #### Day 1 - Sunday, Feb 9 (Today Evening Follow-up)
 - [x] Database migrations (user/journal approval fields, reassignment table) ✅
-- [ ] University seeder (waiting for 21 universities list from ADTRAINING) ⏳
+- [x] University seeder (waiting for 21 universities list from ADTRAINING) ✅
 - [x] Registration form with university dropdown ✅
 - [x] User approval flow (LPPM approve users) ✅
 
 #### Day 2 - Monday, Feb 10
 - [x] Journal approval flow (LPPM approve journals) ✅
-- [ ] Dashboard redesign (move visualizations, role-based metrics) ⏳ Phase 5
+- [x] Dashboard redesign (move visualizations, role-based metrics) ✅
 - [x] LPPM direct user registration ✅
 - [x] Journal reassignment feature (backend) ✅
 - [ ] Journal reassignment feature (frontend) ⏳ Phase 5
 
 #### Day 3 - Tuesday, Feb 11
-- [ ] Dikti dashboard (system-wide metrics) ⏳
-- [ ] Browse by university (public page) ⏳
+- [x] Dikti dashboard (system-wide metrics) ✅
+- [x] Browse by university (public page) ✅
+- [x] Dashboard redesign (move visualizations) ✅
 - [x] Testing all approval flows ✅
 - [x] Bug fixes and polish ✅
 
-#### Day 4 - Wednesday, Feb 12 (Morning)
-- [ ] Final testing
-- [ ] Production deployment
-- [ ] Data verification
-- [ ] **LAUNCH at Thursday presentation**
+#### Day 4 - Wednesday, Feb 12 (Morning) - TODAY
+- [ ] Final testing ⏳
+- [ ] Production deployment ⏳
+- [ ] Data verification ⏳
+- [ ] **LAUNCH at Thursday presentation** 🎯
 
 ---
 
@@ -1145,9 +1147,10 @@ These features are explicitly deferred and will NOT be in Thursday launch:
 - [x] ✅ LPPM can approve/reject user registrations
 - [x] ✅ Approved users can submit journals
 - [x] ✅ LPPM can approve/reject journal submissions
-- [x] ✅ LPPM can reassign journal managers (backend)
-- [ ] ⏳ Dashboard displays key metrics (role-based) - Needs migration from Journals page
-- [ ] ⏳ Public browse by university works - Pending implementation
+- [x] ✅ LPPM can reassign journal managers (backend implemented)
+- [x] ✅ Dashboard displays key metrics (role-based) - COMPLETED Feb 11
+- [x] ✅ Public browse by university works - COMPLETED Feb 11
+- [ ] ⏳ Journal reassignment frontend (dialog UI) - Optional for launch
 
 ### Data Requirements
 - [x] ✅ 21 universities seeded in database (seeder ready)
@@ -1354,14 +1357,14 @@ class JournalPolicy
 ## ✅ Action Items Summary
 
 ### Akyas (Developer)
-- [x] Implement user registration with university selection
-- [x] Implement LPPM approval for users
-- [x] Implement journal submission with approval
-- [x] Build journal reassignment feature
-- [x] Redesign dashboard with metrics
-- [x] Create browse by university page
-- [x] Deploy to production by Wednesday
-- [x] Prepare for Thursday launch
+- [x] Implement user registration with university selection ✅
+- [x] Implement LPPM approval for users ✅
+- [x] Implement journal submission with approval ✅
+- [x] Build journal reassignment feature (backend) ✅
+- [x] Redesign dashboard with metrics ✅ (Feb 11)
+- [x] Create browse by university page ✅ (Feb 11)
+- [ ] Deploy to production by Wednesday ⏳ (TODAY)
+- [ ] Prepare for Thursday launch ⏳
 
 ### ADTRAINING
 - [x] Send list of 21 universities to Akyas (URGENT)
