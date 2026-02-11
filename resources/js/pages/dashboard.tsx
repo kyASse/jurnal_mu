@@ -1,9 +1,9 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import StatisticsDashboard from '@/components/StatisticsDashboard';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type JournalStatistics, type PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BookOpen, CheckCircle, ClipboardCheck, TrendingUp, UserPlus, XCircle, Clock } from 'lucide-react';
+import { BookOpen, CheckCircle, ClipboardCheck, Clock, TrendingUp, UserPlus, XCircle } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -109,9 +109,7 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-muted-foreground">Jurnal Pending</p>
-                                        <h3 className="mt-2 text-3xl font-bold">
-                                            {stats.journals_by_status.pending}
-                                        </h3>
+                                        <h3 className="mt-2 text-3xl font-bold">{stats.journals_by_status.pending}</h3>
                                     </div>
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20">
                                         <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
@@ -124,9 +122,7 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-muted-foreground">Jurnal Disetujui</p>
-                                        <h3 className="mt-2 text-3xl font-bold">
-                                            {stats.journals_by_status.approved}
-                                        </h3>
+                                        <h3 className="mt-2 text-3xl font-bold">{stats.journals_by_status.approved}</h3>
                                     </div>
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
                                         <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -139,9 +135,7 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-muted-foreground">Jurnal Ditolak</p>
-                                        <h3 className="mt-2 text-3xl font-bold">
-                                            {stats.journals_by_status.rejected}
-                                        </h3>
+                                        <h3 className="mt-2 text-3xl font-bold">{stats.journals_by_status.rejected}</h3>
                                     </div>
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
                                         <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
@@ -159,15 +153,11 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                             <div>
                                 <h3 className="text-lg font-semibold">Distribusi Jurnal per Universitas</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Top {Math.min(10, stats.universities_distribution.length)} universitas dengan jurnal
-                                    terbanyak
+                                    Top {Math.min(10, stats.universities_distribution.length)} universitas dengan jurnal terbanyak
                                 </p>
                             </div>
                             {stats.universities_distribution.length > 10 && (
-                                <Link
-                                    href="/admin/universities"
-                                    className="text-sm font-medium text-primary hover:underline"
-                                >
+                                <Link href="/admin/universities" className="text-sm font-medium text-primary hover:underline">
                                     Lihat Semua ({stats.universities_distribution.length})
                                 </Link>
                             )}
@@ -176,41 +166,22 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                             <table className="w-full">
                                 <thead className="border-b border-sidebar-border/70 dark:border-sidebar-border">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">
-                                            #
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">
-                                            Universitas
-                                        </th>
-                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">
-                                            Jumlah Jurnal
-                                        </th>
-                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">
-                                            Persentase
-                                        </th>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">#</th>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">Universitas</th>
+                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">Jumlah Jurnal</th>
+                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">Persentase</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-sidebar-border/70 dark:divide-sidebar-border">
                                     {stats.universities_distribution.slice(0, 10).map((university, index) => {
                                         const percentage =
-                                            stats.total_journals > 0
-                                                ? ((university.count / stats.total_journals) * 100).toFixed(1)
-                                                : '0.0';
+                                            stats.total_journals > 0 ? ((university.count / stats.total_journals) * 100).toFixed(1) : '0.0';
                                         return (
-                                            <tr
-                                                key={university.id}
-                                                className="transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
-                                            >
-                                                <td className="px-6 py-4 text-sm text-muted-foreground">
-                                                    {index + 1}
-                                                </td>
+                                            <tr key={university.id} className="transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
+                                                <td className="px-6 py-4 text-sm text-muted-foreground">{index + 1}</td>
                                                 <td className="px-6 py-4 text-sm font-medium">{university.name}</td>
-                                                <td className="px-6 py-4 text-right text-sm font-semibold">
-                                                    {university.count}
-                                                </td>
-                                                <td className="px-6 py-4 text-right text-sm text-muted-foreground">
-                                                    {percentage}%
-                                                </td>
+                                                <td className="px-6 py-4 text-right text-sm font-semibold">{university.count}</td>
+                                                <td className="px-6 py-4 text-right text-sm text-muted-foreground">{percentage}%</td>
                                             </tr>
                                         );
                                     })}

@@ -22,15 +22,16 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-export type University = {
+// Flexible University type for filter component - only requires essential properties
+export type UniversityOption = {
     id: number;
     name: string;
-    code: string;
+    code?: string;
     short_name?: string;
 };
 
 interface UniversityFilterComboboxProps {
-    universities: University[];
+    universities: UniversityOption[];
     value: string; // Selected university ID as string or 'all'
     onValueChange: (value: string) => void;
     placeholder?: string;
@@ -50,8 +51,8 @@ export function UniversityFilterCombobox({
     const selectedUniversity = value === 'all' || !value ? null : universities.find((uni) => uni.id.toString() === value);
 
     // Format display text
-    const getDisplayText = (uni: University) => {
-        return `${uni.code} - ${uni.short_name || uni.name}`;
+    const getDisplayText = (uni: UniversityOption) => {
+        return uni.code ? `${uni.code} - ${uni.short_name || uni.name}` : uni.name;
     };
 
     return (
