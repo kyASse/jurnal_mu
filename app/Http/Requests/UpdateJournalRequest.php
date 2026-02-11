@@ -64,6 +64,12 @@ class UpdateJournalRequest extends FormRequest
             // Contact
             'editor_in_chief' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+
+            // Additional Info
+            'oai_pmh_url' => 'nullable|url|max:500',
+            'about' => 'nullable|string|max:1000',
+            'scope' => 'nullable|string|max:1000',
         ];
     }
 
