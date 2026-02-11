@@ -390,12 +390,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('profil', [ProfilController::class, 'index'])
             ->name('profil.index');
 
-        // Jurnal (Placeholder)
-        Route::get('jurnal', [JurnalController::class, 'index'])
-            ->name('jurnal.index');
-
-        // Journals Management (existing feature - keep for backward compatibility)
-        Route::resource('journals', UserJournalController::class);
+        // Journals Management
+        Route::resource('journals', UserJournalController::class)
+            ->names([
+                'index'   => 'journals.index',
+                'create'  => 'journals.create',
+                'store'   => 'journals.store',
+                'show'    => 'journals.show',
+                'edit'    => 'journals.edit',
+                'update'  => 'journals.update',
+                'destroy' => 'journals.destroy',
+            ]);
 
         // Assessments Management
         Route::prefix('assessments')->name('assessments.')->group(function () {
