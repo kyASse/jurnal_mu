@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { type Article, type Journal, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronRight, Download, Globe, Mail, MapPin, Search, User } from 'lucide-react';
+import { BookOpen, ChevronRight, Download, Globe, Mail, MapPin, Search, Target, User } from 'lucide-react';
 import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 
@@ -109,11 +109,15 @@ export default function JournalsShow() {
                 <nav className="fixed top-0 z-50 w-full border-b border-primary/20 bg-primary text-white shadow-sm backdrop-blur-md transition-all dark:border-primary/30 dark:bg-primary">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-primary shadow-sm">
-                                <BookOpen className="h-6 w-6" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
+                                <img 
+                                    src="logo_dark.png" 
+                                    alt="Majelis Diktilitbang" 
+                                    className="h-8 w-8 object-contain"
+                                />
                             </div>
                             <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
-                                JurnalMu
+                                Journal MU
                             </span>
                         </Link>
                         <div className="flex items-center gap-4">
@@ -325,6 +329,34 @@ export default function JournalsShow() {
                                 </a>
                             </div>
                         </div>
+
+                        {/* Description & Scope Section */}
+                        {(journal.about || journal.scope) && (
+                            <div className="mb-6 grid gap-6 md:grid-cols-2">
+                                {journal.about && (
+                                    <div className="rounded-xl border bg-card p-6 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
+                                        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-foreground">
+                                            <BookOpen className="h-5 w-5 text-primary" />
+                                            About Journal
+                                        </h2>
+                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                                            {journal.about}
+                                        </p>
+                                    </div>
+                                )}
+                                {journal.scope && (
+                                    <div className="rounded-xl border bg-card p-6 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
+                                        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-foreground">
+                                            <Target className="h-5 w-5 text-primary" />
+                                            Scope and Focus
+                                        </h2>
+                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                                            {journal.scope}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Search Bar */}
                         <div className="mb-6 flex gap-2">
