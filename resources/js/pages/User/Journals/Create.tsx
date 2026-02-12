@@ -60,30 +60,29 @@ interface Props {
         id: number;
         name: string;
     }>;
+    sintaRankOptions: Record<string, string>;
     indexationOptions: Array<{
         value: string;
         label: string;
     }>;
 }
 
-export default function JournalsCreate({ scientificFields, indexationOptions }: Props) {
+export default function JournalsCreate({ scientificFields, sintaRankOptions, indexationOptions }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         issn: '',
         e_issn: '',
         url: '',
         scientific_field_id: '',
-        sinta_rank: '',
-        sinta_indexed_date: '',
+        sinta_rank: 'non_sinta',
         frequency: '',
         publisher: '',
         first_published_year: '',
-        // Dikti Accreditation
-        dikti_accreditation_number: '',
-        accreditation_issued_date: '',
-        accreditation_expiry_date: '',
-        accreditation_status: '',
-        accreditation_grade: '',
+        // Accreditation (shown conditionally when sinta_rank !== non_sinta)
+        accreditation_start_year: '',
+        accreditation_end_year: '',
+        accreditation_sk_number: '',
+        accreditation_sk_date: '',
         // Contact & Additional Info
         editor_in_chief: '',
         email: '',
@@ -165,13 +164,16 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="e_issn">E-ISSN (Online)</Label>
+                                        <Label htmlFor="e_issn">
+                                            E-ISSN (Online) <span className="text-red-500">*</span>
+                                        </Label>
                                         <Input
                                             id="e_issn"
                                             value={data.e_issn}
                                             onChange={(e) => setData('e_issn', e.target.value)}
                                             placeholder="xxxx-xxxx"
                                             className="mt-1"
+                                            required
                                         />
                                         {errors.e_issn && <p className="mt-1 text-sm text-red-600">{errors.e_issn}</p>}
                                     </div>
@@ -219,37 +221,81 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                     </div>
 
                                     <div>
-                                        <Label>SINTA Rank</Label>
+                                        <Label>
+                                            Peringkat Akreditasi <span className="text-red-500">*</span>
+                                        </Label>
                                         <Select value={data.sinta_rank} onValueChange={(val) => setData('sinta_rank', val)}>
                                             <SelectTrigger className="mt-1">
-                                                <SelectValue placeholder="Select Rank (Optional)" />
+                                                <SelectValue placeholder="Pilih Peringkat" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="1">SINTA 1</SelectItem>
-                                                <SelectItem value="2">SINTA 2</SelectItem>
-                                                <SelectItem value="3">SINTA 3</SelectItem>
-                                                <SelectItem value="4">SINTA 4</SelectItem>
-                                                <SelectItem value="5">SINTA 5</SelectItem>
-                                                <SelectItem value="6">SINTA 6</SelectItem>
+                                                {Object.entries(sintaRankOptions).map(([value, label]) => (
+                                                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         {errors.sinta_rank && <p className="mt-1 text-sm text-red-600">{errors.sinta_rank}</p>}
                                     </div>
                                 </div>
 
-                                {data.sinta_rank && (
-                                    <div>
-                                        <Label htmlFor="sinta_indexed_date">SINTA Indexed Date</Label>
-                                        <Input
-                                            id="sinta_indexed_date"
-                                            type="date"
-                                            value={data.sinta_indexed_date}
-                                            onChange={(e) => setData('sinta_indexed_date', e.target.value)}
-                                            max={new Date().toISOString().split('T')[0]}
-                                            className="mt-1"
-                                        />
-                                        {errors.sinta_indexed_date && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.sinta_indexed_date}</p>}
-                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Tanggal jurnal terindeks di SINTA</p>
+                                {data.sinta_rank && data.sinta_rank !== 'non_sinta' && (
+                                    <div className="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+                                        <h4 className="mb-3 text-sm font-semibold text-blue-800 dark:text-blue-200">Detail Akreditasi</h4>
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div>
+                                                <Label htmlFor="accreditation_start_year">Tahun Mulai Akreditasi</Label>
+                                                <Input
+                                                    id="accreditation_start_year"
+                                                    type="number"
+                                                    min="1900"
+                                                    max={currentYear + 5}
+                                                    value={data.accreditation_start_year}
+                                                    onChange={(e) => setData('accreditation_start_year', e.target.value)}
+                                                    placeholder="e.g. 2024"
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_start_year && <p className="mt-1 text-sm text-red-600">{errors.accreditation_start_year}</p>}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="accreditation_end_year">Tahun Berakhir Akreditasi</Label>
+                                                <Input
+                                                    id="accreditation_end_year"
+                                                    type="number"
+                                                    min="1900"
+                                                    max={currentYear + 10}
+                                                    value={data.accreditation_end_year}
+                                                    onChange={(e) => setData('accreditation_end_year', e.target.value)}
+                                                    placeholder="e.g. 2029"
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_end_year && <p className="mt-1 text-sm text-red-600">{errors.accreditation_end_year}</p>}
+                                            </div>
+                                        </div>
+                                        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div>
+                                                <Label htmlFor="accreditation_sk_number">Nomor SK</Label>
+                                                <Input
+                                                    id="accreditation_sk_number"
+                                                    value={data.accreditation_sk_number}
+                                                    onChange={(e) => setData('accreditation_sk_number', e.target.value)}
+                                                    placeholder="e.g. 105/E/KPT/2024"
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_sk_number && <p className="mt-1 text-sm text-red-600">{errors.accreditation_sk_number}</p>}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="accreditation_sk_date">Tanggal SK</Label>
+                                                <Input
+                                                    id="accreditation_sk_date"
+                                                    type="date"
+                                                    value={data.accreditation_sk_date}
+                                                    onChange={(e) => setData('accreditation_sk_date', e.target.value)}
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_sk_date && <p className="mt-1 text-sm text-red-600">{errors.accreditation_sk_date}</p>}
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 
@@ -303,94 +349,6 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                 </div>
                             </div>
 
-                            {/* Dikti Accreditation */}
-                            <div className="space-y-4">
-                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Dikti Accreditation (Optional)</h3>
-
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                    <div>
-                                        <Label htmlFor="accreditation_status">Accreditation Status</Label>
-                                        <Select value={data.accreditation_status} onValueChange={(val) => setData('accreditation_status', val)}>
-                                            <SelectTrigger className="mt-1">
-                                                <SelectValue placeholder="Select Status" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Terakreditasi">Terakreditasi</SelectItem>
-                                                <SelectItem value="Dalam Proses">Dalam Proses</SelectItem>
-                                                <SelectItem value="Belum Terakreditasi">Belum Terakreditasi</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.accreditation_status && <p className="mt-1 text-sm text-red-600">{errors.accreditation_status}</p>}
-                                    </div>
-
-                                    <div>
-                                        <Label htmlFor="accreditation_grade">Accreditation Grade</Label>
-                                        <Select value={data.accreditation_grade} onValueChange={(val) => setData('accreditation_grade', val)}>
-                                            <SelectTrigger className="mt-1">
-                                                <SelectValue placeholder="Select Grade" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="S1">S1 (Sangat Baik)</SelectItem>
-                                                <SelectItem value="S2">S2 (Baik Sekali)</SelectItem>
-                                                <SelectItem value="S3">S3 (Baik)</SelectItem>
-                                                <SelectItem value="S4">S4 (Cukup)</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.accreditation_grade && <p className="mt-1 text-sm text-red-600">{errors.accreditation_grade}</p>}
-                                    </div>
-                                </div>
-
-                                {data.accreditation_status === 'Terakreditasi' && (
-                                    <>
-                                        <div>
-                                            <Label htmlFor="dikti_accreditation_number">Accreditation Number</Label>
-                                            <Input
-                                                id="dikti_accreditation_number"
-                                                value={data.dikti_accreditation_number}
-                                                onChange={(e) => setData('dikti_accreditation_number', e.target.value)}
-                                                placeholder="e.g. 105/E/KPT/2023"
-                                                className="mt-1"
-                                            />
-                                            {errors.dikti_accreditation_number && (
-                                                <p className="mt-1 text-sm text-red-600">{errors.dikti_accreditation_number}</p>
-                                            )}
-                                        </div>
-
-                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                            <div>
-                                                <Label htmlFor="accreditation_issued_date">Issued Date</Label>
-                                                <Input
-                                                    id="accreditation_issued_date"
-                                                    type="date"
-                                                    value={data.accreditation_issued_date}
-                                                    onChange={(e) => setData('accreditation_issued_date', e.target.value)}
-                                                    max={new Date().toISOString().split('T')[0]}
-                                                    className="mt-1"
-                                                />
-                                                {errors.accreditation_issued_date && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_issued_date}</p>
-                                                )}
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="accreditation_expiry_date">Expiry Date</Label>
-                                                <Input
-                                                    id="accreditation_expiry_date"
-                                                    type="date"
-                                                    value={data.accreditation_expiry_date}
-                                                    onChange={(e) => setData('accreditation_expiry_date', e.target.value)}
-                                                    min={data.accreditation_issued_date || undefined}
-                                                    className="mt-1"
-                                                />
-                                                {errors.accreditation_expiry_date && (
-                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_expiry_date}</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-
                             {/* Contact & Additional Info */}
                             <div className="space-y-4">
                                 <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Contact & Additional Information</h3>
@@ -434,7 +392,9 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="oai_pmh_url">OAI-PMH URL (Optional)</Label>
+                                        <Label htmlFor="oai_pmh_url">
+                                            OAI-PMH URL <span className="text-red-500">*</span>
+                                        </Label>
                                         <Input
                                             id="oai_pmh_url"
                                             type="url"
@@ -442,8 +402,9 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                             onChange={(e) => setData('oai_pmh_url', e.target.value)}
                                             placeholder="https://journal.ac.id/index.php/jite/oai"
                                             className="mt-1"
+                                            required
                                         />
-                                        <p className="mt-1 text-xs text-muted-foreground">For metadata harvesting and indexing</p>
+                                        <p className="mt-1 text-xs text-muted-foreground">Wajib diisi untuk harvesting dan indeksasi metadata</p>
                                         {errors.oai_pmh_url && <p className="mt-1 text-sm text-red-600">{errors.oai_pmh_url}</p>}
                                     </div>
                                 </div>
@@ -457,7 +418,9 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                         onChange={(e) => setData('about', e.target.value)}
                                         placeholder="Brief description of the journal..."
                                         className="mt-1"
+                                        maxLength={1000}
                                     />
+                                    <p className="mt-1 text-xs text-muted-foreground">{data.about.length}/1000 characters</p>
                                     {errors.about && <p className="mt-1 text-sm text-red-600">{errors.about}</p>}
                                 </div>
 
@@ -470,7 +433,9 @@ export default function JournalsCreate({ scientificFields, indexationOptions }: 
                                         onChange={(e) => setData('scope', e.target.value)}
                                         placeholder="Research areas covered by the journal..."
                                         className="mt-1"
+                                        maxLength={1000}
                                     />
+                                    <p className="mt-1 text-xs text-muted-foreground">{data.scope.length}/1000 characters</p>
                                     {errors.scope && <p className="mt-1 text-sm text-red-600">{errors.scope}</p>}
                                 </div>
                             </div>
