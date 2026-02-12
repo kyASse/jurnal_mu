@@ -9,8 +9,7 @@ interface JournalCardProps {
     title: string;
     issn?: string | null;
     e_issn?: string | null;
-    sinta_rank: number | null;
-    sinta_indexed_date?: string | null;
+    sinta_rank: string | null;
     indexation_labels?: string[];
     university?: string;
     external_url?: string | null; // External journal website URL
@@ -23,7 +22,6 @@ export default function JournalCard({
     issn,
     e_issn,
     sinta_rank,
-    sinta_indexed_date,
     indexation_labels = [],
     university = 'Universitas Muhammadiyah',
     external_url = null,
@@ -52,7 +50,7 @@ export default function JournalCard({
             <div className="flex flex-1 flex-col p-5">
                 {/* Badges Row */}
                 <div className="mb-3 flex flex-wrap items-start gap-2">
-                    <SintaBadge rank={sinta_rank} indexed_date={sinta_indexed_date} />
+                    <SintaBadge rank={sinta_rank} />
 
                     {displayIndexations.map((label) => (
                         <IndexationBadge key={label} platform={label} variant="default" />

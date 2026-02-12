@@ -1,56 +1,11 @@
 /**
- * JournalsEdit Component
+ * JournalsCreate Component for Admin Kampus
  *
  * @description
- * The editing interface for existing journals. Pre-populates all form fields
- * with current journal data and allows users to update information such as
- * ISSN, titles, and classification details.
+ * A form page allowing Admin Kampus to register a new journal into the system.
+ * Includes user assignment dropdown to select the journal owner.
  *
- * @component
- *
- * @interface Journal
- * @property {number} id - Journal ID
- * @property {string} title - Journal Title
- * @property {string} issn - ISSN
- * @property {string} e_issn - E-ISSN
- * @property {string} url - URL
- * @property {number} scientific_field_id - Foreign key for scientific field
- * @property {number|null} sinta_rank - SINTA Rank
- * @property {string} frequency - Publication frequency
- * @property {string} publisher - Publisher name
- * @property {number|null} first_published_year - Year of first publication
- *
- * @interface Props
- * @property {Journal} journal - The existing journal data to edit
- * @property {Array} scientificFields - List of available scientific fields
- *
- * @param {Props} props - Component props
- * @param {Journal} props.journal - Current journal data
- * @param {Array} props.scientificFields - Reference data for dropdowns
- *
- * @returns {JSX.Element} The rendered Edit Journal page
- *
- * @example
- * ```tsx
- * <JournalsEdit journal={journalData} scientificFields={fieldsList} />
- * ```
- *
- * @features
- * - Data pre-filling
- * - PUT request handling for updates
- * - Validation error display
- * - Navigation back to index
- *
- * @route PUT /journals/{id}
- *
- * @requires @inertiajs/react
- * @requires @/layouts/app-layout
- * @requires @/components/ui/button
- * @requires @/components/ui/select
- * @requires lucide-react
- *
- * @author JurnalMU Team
- * @filepath /resources/js/pages/User/Journals/Edit.tsx
+ * @route POST /admin-kampus/journals
  */
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -63,35 +18,13 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-interface Journal {
+interface UniversityUser {
     id: number;
-    title: string;
-    issn: string;
-    e_issn: string;
-    url: string;
-    scientific_field_id: number;
-    sinta_rank: string;
-    frequency: string;
-    publisher: string;
-    first_published_year: number | null;
-    // Accreditation
-    accreditation_start_year?: number | null;
-    accreditation_end_year?: number | null;
-    accreditation_sk_number?: string | null;
-    accreditation_sk_date?: string | null;
-    // Contact & Additional Info
-    editor_in_chief?: string | null;
-    email?: string | null;
-    phone?: string | null;
-    oai_pmh_url?: string | null;
-    about?: string | null;
-    scope?: string | null;
-    // Indexations
-    indexations?: Record<string, { indexed_at: string }> | null;
+    name: string;
+    email: string;
 }
 
 interface Props {
-    journal: Journal;
     scientificFields: Array<{
         id: number;
         name: string;
@@ -101,81 +34,99 @@ interface Props {
         value: string;
         label: string;
     }>;
+    universityUsers: UniversityUser[];
 }
 
-export default function JournalsEdit({ journal, scientificFields, sintaRankOptions, indexationOptions }: Props) {
-    // Transform existing indexations from object to array format
-    const existingIndexations = journal.indexations
-        ? Object.entries(journal.indexations).map(([platform, data]) => ({
-            platform,
-            indexed_at: data.indexed_at || '',
-        }))
-        : [];
-
-    const { data, setData, put, processing, errors } = useForm({
-        title: journal.title || '',
-        issn: journal.issn || '',
-        e_issn: journal.e_issn || '',
-        url: journal.url || '',
-        scientific_field_id: journal.scientific_field_id ? journal.scientific_field_id.toString() : '',
-        sinta_rank: journal.sinta_rank || 'non_sinta',
-        frequency: journal.frequency || '',
-        publisher: journal.publisher || '',
-        first_published_year: journal.first_published_year || '',
-        // Accreditation
-        accreditation_start_year: journal.accreditation_start_year?.toString() || '',
-        accreditation_end_year: journal.accreditation_end_year?.toString() || '',
-        accreditation_sk_number: journal.accreditation_sk_number || '',
-        accreditation_sk_date: journal.accreditation_sk_date || '',
+export default function JournalsCreate({ scientificFields, sintaRankOptions, indexationOptions, universityUsers }: Props) {
+    const { data, setData, post, processing, errors } = useForm({
+        title: '',
+        issn: '',
+        e_issn: '',
+        url: '',
+        scientific_field_id: '',
+        sinta_rank: 'non_sinta',
+        frequency: '',
+        publisher: '',
+        first_published_year: '',
+        user_id: '',
+        // Accreditation (shown conditionally when sinta_rank !== non_sinta)
+        accreditation_start_year: '',
+        accreditation_end_year: '',
+        accreditation_sk_number: '',
+        accreditation_sk_date: '',
         // Contact & Additional Info
-        editor_in_chief: journal.editor_in_chief || '',
-        email: journal.email || '',
-        phone: journal.phone || '',
-        oai_pmh_url: journal.oai_pmh_url || '',
-        about: journal.about || '',
-        scope: journal.scope || '',
+        editor_in_chief: '',
+        email: '',
+        phone: '',
+        oai_pmh_url: '',
+        about: '',
+        scope: '',
         // Indexations
-        indexations: existingIndexations as Array<{ platform: string; indexed_at: string }>,
+        indexations: [] as Array<{ platform: string; indexed_at: string }>,
     });
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('user.journals.update', journal.id));
+        post(route('admin-kampus.journals.store'));
     };
 
     const currentYear = new Date().getFullYear();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'My Journals', href: route('user.journals.index') },
-        { title: journal.title, href: route('user.journals.show', journal.id) },
-        { title: 'Edit', href: route('user.journals.edit', journal.id) },
+        { title: 'Journals', href: route('admin-kampus.journals.index') },
+        { title: 'Create', href: route('admin-kampus.journals.create') },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit Journal" />
+            <Head title="Create Journal" />
 
             <div className="py-6">
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6">
-                        <Link href={route('user.journals.index')}>
+                        <Link href={route('admin-kampus.journals.index')}>
                             <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600 dark:hover:text-blue-400">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
-                                Back to My Journals
+                                Back to Journals Management
                             </Button>
                         </Link>
                         <div className="flex items-center gap-2">
                             <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Edit Journal</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Register New Journal</h1>
                         </div>
-                        <p className="mt-1 ml-10 text-gray-600 dark:text-gray-400">Update the journal information</p>
+                        <p className="mt-1 ml-10 text-gray-600 dark:text-gray-400">Enter the details of the journal to register</p>
                     </div>
 
                     {/* Form */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Journal Owner */}
+                            <div className="space-y-4">
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Journal Owner</h3>
+
+                                <div>
+                                    <Label>
+                                        Assign to User (Pengelola Jurnal)
+                                    </Label>
+                                    <Select value={data.user_id} onValueChange={(val) => setData('user_id', val)}>
+                                        <SelectTrigger className="mt-1">
+                                            <SelectValue placeholder="Select user (leave empty for self)" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {universityUsers.map((user) => (
+                                                <SelectItem key={user.id} value={user.id.toString()}>
+                                                    {user.name} ({user.email})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="mt-1 text-xs text-muted-foreground">Jika tidak dipilih, jurnal akan ditugaskan ke Anda</p>
+                                    {errors.user_id && <p className="mt-1 text-sm text-red-600">{errors.user_id}</p>}
+                                </div>
+                            </div>
+
                             {/* Basic Info */}
                             <div className="space-y-4">
                                 <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Journal Information</h3>
@@ -371,7 +322,7 @@ export default function JournalsEdit({ journal, scientificFields, sintaRankOptio
                                             id="first_published_year"
                                             type="number"
                                             min="1900"
-                                            max={currentYear + 1}
+                                            max={currentYear}
                                             value={data.first_published_year}
                                             onChange={(e) => setData('first_published_year', e.target.value)}
                                             placeholder="e.g. 2010"
@@ -393,7 +344,6 @@ export default function JournalsEdit({ journal, scientificFields, sintaRankOptio
                                     {errors.publisher && <p className="mt-1 text-sm text-red-600">{errors.publisher}</p>}
                                 </div>
                             </div>
-
 
                             {/* Contact & Additional Info */}
                             <div className="space-y-4">
@@ -553,13 +503,13 @@ export default function JournalsEdit({ journal, scientificFields, sintaRankOptio
                             </div>
 
                             <div className="flex items-center justify-end gap-4 border-t pt-4 dark:border-gray-700">
-                                <Link href={route('user.journals.index')}>
+                                <Link href={route('admin-kampus.journals.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>
                                 </Link>
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Saving...' : 'Update Journal'}
+                                    {processing ? 'Saving...' : 'Save Journal'}
                                 </Button>
                             </div>
                         </form>

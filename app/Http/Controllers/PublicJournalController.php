@@ -57,17 +57,13 @@ class PublicJournalController extends Controller
             $query->byIndexation($request->indexation);
         }
 
-        // Apply Dikti accreditation filter
-        if ($request->filled('accreditation_grade')) {
-            $query->byAccreditationGrade($request->accreditation_grade);
-        }
 
         // Paginate results
         $journals = $query
             ->orderBy('title')
             ->paginate(12)
             ->withQueryString()
-            ->through(fn ($journal) => [
+            ->through(fn($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -97,31 +93,22 @@ class PublicJournalController extends Controller
             ->orderBy('name')
             ->get();
 
-        $sintaRanks = collect([
-            ['value' => 1, 'label' => 'SINTA 1'],
-            ['value' => 2, 'label' => 'SINTA 2'],
-            ['value' => 3, 'label' => 'SINTA 3'],
-            ['value' => 4, 'label' => 'SINTA 4'],
-            ['value' => 5, 'label' => 'SINTA 5'],
-            ['value' => 6, 'label' => 'SINTA 6'],
-        ]);
+        $sintaRanks = collect(Journal::getSintaRankOptions())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
 
         $indexationOptions = collect(Journal::getIndexationPlatforms())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
-        $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
-            ->values();
 
         return Inertia::render('Journals/Index', [
             'journals' => $journals,
-            'filters' => $request->only(['search', 'university_id', 'sinta_rank', 'scientific_field_id', 'indexation', 'accreditation_grade']),
+            'filters' => $request->only(['search', 'university_id', 'sinta_rank', 'scientific_field_id', 'indexation']),
             'universities' => $universities,
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
             'indexationOptions' => $indexationOptions,
-            'accreditationGradeOptions' => $accreditationGradeOptions,
         ]);
     }
 
@@ -135,7 +122,7 @@ class PublicJournalController extends Controller
     public function show(Request $request, Journal $journal): Response
     {
         // Only show active journals to public
-        if (! $journal->is_active) {
+        if (!$journal->is_active) {
             abort(404);
         }
 
@@ -180,7 +167,7 @@ class PublicJournalController extends Controller
         // Get paginated articles
         $articles = $articlesQuery->paginate(10)
             ->withQueryString()
-            ->through(fn ($article) => [
+            ->through(fn($article) => [
                 'id' => $article->id,
                 'title' => $article->title,
                 'abstract' => $article->abstract,
@@ -208,7 +195,7 @@ class PublicJournalController extends Controller
             ->orderBy('volume', 'desc')
             ->orderBy('issue', 'desc')
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn($item) => [
                 'volume' => $item->volume,
                 'issue' => $item->issue,
                 'label' => $item->issue ? "Vol {$item->volume}, No {$item->issue}" : "Vol {$item->volume}",
@@ -244,15 +231,12 @@ class PublicJournalController extends Controller
                 // SINTA details
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
-                'sinta_score' => $journal->sinta_score,
-                'sinta_indexed_date' => $journal->sinta_indexed_date,
-                // Accreditation details
-                'accreditation_status' => $journal->accreditation_status,
-                'accreditation_status_label' => $journal->accreditation_status_label,
-                'accreditation_grade' => $journal->accreditation_grade,
-                'dikti_accreditation_number' => $journal->dikti_accreditation_number,
-                'dikti_accreditation_label' => $journal->dikti_accreditation_label,
-                'accreditation_expiry_date' => $journal->accreditation_expiry_date,
+                // Accreditation details (merged)
+                'accreditation_label' => $journal->accreditation_label,
+                'accreditation_start_year' => $journal->accreditation_start_year,
+                'accreditation_end_year' => $journal->accreditation_end_year,
+                'accreditation_sk_number' => $journal->accreditation_sk_number,
+                'accreditation_sk_date' => $journal->accreditation_sk_date?->format('Y-m-d'),
                 'accreditation_expiry_status' => $journal->accreditation_expiry_status,
                 // Indexation
                 'indexed_in' => $journal->indexed_in,
@@ -275,6 +259,76 @@ class PublicJournalController extends Controller
             'issuesList' => $issuesList,
             'articlesByYear' => $articlesByYear,
             'queries' => $request->all(),
+        ]);
+    }
+
+    /**
+     * Browse journals grouped by universities.
+     *
+     * @route GET /browse/universities
+     *
+     * @features Browse all universities with their approved journals, filter by university, pagination
+     */
+    public function browseUniversities(Request $request): Response
+    {
+        // Get university statistics (cached for 1 hour)
+        $universityStats = Cache::remember('browse.universities.stats', 3600, function () {
+            return University::where('is_active', true)
+                ->withCount([
+                    'journals' => function ($query) {
+                        $query->where('is_active', true)
+                            ->where('approval_status', 'approved');
+                    },
+                ])
+                ->having('journals_count', '>', 0)
+                ->orderBy('name')
+                ->get(['id', 'name', 'code', 'short_name']);
+        });
+
+        // If specific university selected, show its journals
+        $selectedUniversity = null;
+        $journals = null;
+
+        if ($request->filled('university_id')) {
+            $selectedUniversity = University::find($request->university_id);
+
+            if ($selectedUniversity) {
+                // Get journals for selected university with pagination
+                $journals = Journal::query()
+                    ->with(['scientificField'])
+                    ->where('university_id', $request->university_id)
+                    ->where('is_active', true)
+                    ->where('approval_status', 'approved')
+                    ->orderBy('title')
+                    ->paginate(12)
+                    ->withQueryString()
+                    ->through(fn($journal) => [
+                        'id' => $journal->id,
+                        'title' => $journal->title,
+                        'issn' => $journal->issn,
+                        'e_issn' => $journal->e_issn,
+                        'url' => $journal->url,
+                        'scientific_field' => $journal->scientificField ? [
+                            'id' => $journal->scientificField->id,
+                            'name' => $journal->scientificField->name,
+                        ] : null,
+                        'sinta_rank' => $journal->sinta_rank,
+                        'sinta_rank_label' => $journal->sinta_rank_label,
+                        'is_indexed_in_scopus' => $journal->is_indexed_in_scopus,
+                    ]);
+            }
+        }
+
+        return Inertia::render('Browse/Universities', [
+            'universityStats' => $universityStats,
+            'selectedUniversity' => $selectedUniversity ? [
+                'id' => $selectedUniversity->id,
+                'name' => $selectedUniversity->name,
+                'code' => $selectedUniversity->code,
+                'short_name' => $selectedUniversity->short_name,
+            ] : null,
+            'journals' => $journals,
+            'filters' => $request->only(['university_id']),
         ]);
     }
 }

@@ -131,7 +131,7 @@ export function AppSidebar() {
             },
             {
                 title: 'Jurnal',
-                href: route('user.jurnal.index'),
+                href: route('user.journals.index'),
                 icon: BookOpen,
             },
             {

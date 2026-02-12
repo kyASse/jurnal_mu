@@ -65,19 +65,13 @@ interface Journal {
     editor_in_chief: string | null;
     email: string | null;
     // SINTA
-    sinta_rank: number | null;
+    sinta_rank: string | null;
     sinta_rank_label: string;
-    sinta_indexed_date?: string | null;
-    // Dikti Accreditation
-    accreditation_status: string | null;
-    accreditation_status_label: string;
-    accreditation_grade: string | null;
-    dikti_accreditation_number?: string | null;
-    dikti_accreditation_label?: string;
-    accreditation_issued_date?: string | null;
-    accreditation_expiry_date?: string | null;
-    is_accreditation_expired?: boolean;
-    accreditation_expiry_status?: 'valid' | 'expiring_soon' | 'expired' | 'none';
+    // Accreditation
+    accreditation_start_year?: number | null;
+    accreditation_end_year?: number | null;
+    accreditation_sk_number?: string | null;
+    accreditation_sk_date?: string | null;
     // Indexations
     indexations?: Record<string, { indexed_at: string }> | null;
     indexation_labels?: string[];
@@ -162,13 +156,13 @@ export default function JournalShow({ journal }: Props) {
                                         ) : (
                                             <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400">Inactive</Badge>
                                         )}
-                                        <SintaBadge rank={journal.sinta_rank} indexed_date={journal.sinta_indexed_date} />
-                                        {journal.dikti_accreditation_number && (
+                                        <SintaBadge rank={journal.sinta_rank} />
+                                        {journal.accreditation_sk_number && (
                                             <AccreditationBadge
-                                                number={journal.dikti_accreditation_number}
-                                                grade={journal.accreditation_grade}
-                                                expiry_status={journal.accreditation_expiry_status}
-                                                expiry_date={journal.accreditation_expiry_date}
+                                                sk_number={journal.accreditation_sk_number}
+                                                start_year={journal.accreditation_start_year}
+                                                end_year={journal.accreditation_end_year}
+                                                sinta_rank_label={journal.sinta_rank_label}
                                             />
                                         )}
                                         {journal.indexation_labels &&
@@ -326,8 +320,8 @@ export default function JournalShow({ journal }: Props) {
                         </div>
                     </div>
 
-                    {/* Assessments Table */}
-                    <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
+                    {/* Assessments Table - Hidden for launch */}
+                    {/* <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
                         <div className="border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
                             <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
                                 <TrendingUp className="h-5 w-5" />
@@ -383,7 +377,7 @@ export default function JournalShow({ journal }: Props) {
                                 )}
                             </TableBody>
                         </Table>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </AppLayout>

@@ -44,7 +44,7 @@ class ScrapeMAJUJournals extends Command
         // Get UAD university ID
         $this->uadUniversityId = University::where('name', 'like', '%Ahmad Dahlan%')->first()?->id;
 
-        if (! $this->uadUniversityId) {
+        if (!$this->uadUniversityId) {
             $this->error('UAD University not found in database. Please seed universities first.');
 
             return Command::FAILURE;
@@ -72,7 +72,7 @@ class ScrapeMAJUJournals extends Command
             try {
                 $journalData = $this->scrapeJournalDetail($uuid);
 
-                if ($journalData && ! $dryRun) {
+                if ($journalData && !$dryRun) {
                     $this->saveJournal($journalData);
                     $this->scrapedCount++;
                 } elseif ($journalData && $dryRun) {
@@ -121,7 +121,7 @@ class ScrapeMAJUJournals extends Command
                     ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'])
                     ->get('https://maju.uad.ac.id/beranda', ['page' => $page]);
 
-                if (! $response->successful()) {
+                if (!$response->successful()) {
                     break;
                 }
 
@@ -131,7 +131,7 @@ class ScrapeMAJUJournals extends Command
                 $xpath = new DOMXPath($dom);
 
                 // Debug: Log response status and show a snippet of HTML
-                $this->info("Page {$page}: Response status {$response->status()}, body length: ".strlen($html));
+                $this->info("Page {$page}: Response status {$response->status()}, body length: " . strlen($html));
 
                 // Show first 500 chars of HTML to understand structure
                 if ($page === 1) {
@@ -153,7 +153,7 @@ class ScrapeMAJUJournals extends Command
                     if ($allLinks->length > 0 && $allLinks->length < 10) {
                         $this->info('Sample hrefs:');
                         for ($i = 0; $i < min(5, $allLinks->length); $i++) {
-                            $this->line('  - '.$allLinks->item($i)->getAttribute('href'));
+                            $this->line('  - ' . $allLinks->item($i)->getAttribute('href'));
                         }
                     }
 
@@ -164,7 +164,7 @@ class ScrapeMAJUJournals extends Command
                     $href = $link->getAttribute('href');
                     if (preg_match('/jid=([a-f0-9\-]+)/', $href, $matches)) {
                         $uuid = $matches[1];
-                        if (! in_array($uuid, $journalUUIDs)) {
+                        if (!in_array($uuid, $journalUUIDs)) {
                             $journalUUIDs[] = $uuid;
 
                             // Check limit
@@ -196,7 +196,7 @@ class ScrapeMAJUJournals extends Command
             ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'])
             ->get('https://maju.uad.ac.id/detail', ['jid' => $uuid]);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             return null;
         }
 
@@ -211,9 +211,7 @@ class ScrapeMAJUJournals extends Command
             'url' => $this->extractURL($xpath),
             'issn' => null,
             'e_issn' => null,
-            'sinta_rank' => null,
-            'accreditation_status' => null,
-            'accreditation_grade' => null,
+            'sinta_rank' => 'non_sinta',
             'publisher' => 'Universitas Ahmad Dahlan',
             'editor_in_chief' => null,
             'email' => null,
@@ -268,8 +266,8 @@ class ScrapeMAJUJournals extends Command
         $nodes = $xpath->query("//img[contains(@src, '/covers/')]");
         if ($nodes->length > 0) {
             $src = $nodes->item(0)->getAttribute('src');
-            if (! Str::startsWith($src, 'http')) {
-                $src = 'https://maju.uad.ac.id'.$src;
+            if (!Str::startsWith($src, 'http')) {
+                $src = 'https://maju.uad.ac.id' . $src;
             }
 
             return $src;
@@ -315,9 +313,8 @@ class ScrapeMAJUJournals extends Command
             $text = $node->textContent;
 
             if (preg_match('/Sinta\s*(\d)/i', $text, $matches)) {
-                $data['sinta_rank'] = (int) $matches[1];
-                $data['accreditation_status'] = 'Terakreditasi';
-                $data['accreditation_grade'] = 'S'.$matches[1];
+                $rank = (int) $matches[1];
+                $data['sinta_rank'] = 'sinta_' . $rank;
                 break;
             }
         }
@@ -340,7 +337,7 @@ class ScrapeMAJUJournals extends Command
             $lines = explode("\n", $text);
             foreach ($lines as $line) {
                 $line = trim($line);
-                if (! empty($line) && ! Str::contains($line, ['Contact', 'Email', 'Phone', '@', 'http'])) {
+                if (!empty($line) && !Str::contains($line, ['Contact', 'Email', 'Phone', '@', 'http'])) {
                     if (strlen($line) > 5 && strlen($line) < 100) {
                         $data['editor_in_chief'] = $line;
                         break;
@@ -401,7 +398,7 @@ class ScrapeMAJUJournals extends Command
             'Law' => ['law', 'hukum', 'legal'],
         ];
 
-        $searchText = strtolower($title.' '.$scope);
+        $searchText = strtolower($title . ' ' . $scope);
 
         foreach ($keywords as $fieldName => $terms) {
             foreach ($terms as $term) {
@@ -430,10 +427,9 @@ class ScrapeMAJUJournals extends Command
             [
                 'url' => $data['url'],
                 'issn' => $data['issn'],
-                'e_issn' => $data['e_issn'],
+                'e_issn' => $data['e_issn'] ?? '',
                 'sinta_rank' => $data['sinta_rank'],
-                'accreditation_status' => $data['accreditation_status'],
-                'accreditation_grade' => $data['accreditation_grade'],
+                'oai_pmh_url' => '',
                 'publisher' => $data['publisher'],
                 'editor_in_chief' => $data['editor_in_chief'],
                 'email' => $data['email'],
@@ -446,6 +442,7 @@ class ScrapeMAJUJournals extends Command
                 'scientific_field_id' => $data['scientific_field_id'],
                 'user_id' => $adminKampus?->id,
                 'is_active' => true,
+                'approval_status' => 'pending',
             ]
         );
     }

@@ -122,6 +122,9 @@ class JournalPolicy
 
     /**
      * Determine if the user can delete the journal.
+     *
+     * Journals with approval_status = 'approved' cannot be deleted
+     * (they are considered verified and in use).
      */
     public function delete(User $user, Journal $journal): bool
     {
@@ -131,23 +134,23 @@ class JournalPolicy
         }
 
         // Admin Kampus can delete journals from their university
-        // BUT not if it has submitted assessments
+        // BUT not if the journal has been approved
         if ($user->isAdminKampus()) {
             if ($user->university_id !== $journal->university_id) {
                 return false;
             }
 
-            return ! $journal->hasSubmittedAssessment();
+            return $journal->approval_status !== 'approved';
         }
 
         // User can delete their own journals
-        // BUT not if it has submitted assessments
+        // BUT not if the journal has been approved
         if ($user->isUser()) {
             if ($user->id !== $journal->user_id) {
                 return false;
             }
 
-            return ! $journal->hasSubmittedAssessment();
+            return $journal->approval_status !== 'approved';
         }
 
         return false;
