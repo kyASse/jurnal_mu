@@ -58,7 +58,7 @@ Form terlalu kompleks dan membingungkan, terutama di bagian akreditasi dan indek
 
 #### Solutions Implemented
 
-- [x] **Merge Accreditation Fields** ✅ **CRITICAL**
+- [x] **Merge Accreditation Fields** ✅ **CRITICAL** — DONE
   - **Before**: Accreditation Grade (dropdown) + Sinta Rank (separate field)
   - **After**: Single "Accreditation" dropdown with options: Sinta 1, Sinta 2, Sinta 3, Sinta 4, Sinta 5, Sinta 6, Non-Sinta
   - **Rationale**: Sinta Rank IS the accreditation in Indonesian context
@@ -67,7 +67,7 @@ Form terlalu kompleks dan membingungkan, terutama di bagian akreditasi dan indek
     - ✅ Form: Replace two dropdowns with single "Accreditation" field
     - ✅ Values: `sinta_1`, `sinta_2`, `sinta_3`, `sinta_4`, `sinta_5`, `sinta_6`, `non_sinta`
 
-- [x] **Sinta Accreditation Period** ✅ **CRITICAL**
+- [x] **Sinta Accreditation Period** ✅ **CRITICAL** — DONE
   - **New Fields**: 
     - `accreditation_start_year` (INTEGER) - Tahun mulai berlaku Sinta
     - `accreditation_end_year` (INTEGER) - Tahun berakhir berlaku Sinta
@@ -78,9 +78,9 @@ Form terlalu kompleks dan membingungkan, terutama di bagian akreditasi dan indek
     - ✅ Migration: Add `accreditation_start_year`, `accreditation_end_year` INTEGER fields
     - ✅ Form: Conditional fields appear after selecting Sinta 1-6
     - ✅ Validation: End year must be >= Start year
-    - ⏳ Frontend: Conditional rendering in journal form
+    - ✅ Frontend: Conditional rendering in journal form (Create.tsx & Edit.tsx)
 
-- [x] **SK (Surat Keputusan) Fields - Optional** ✅ **NICE TO HAVE**
+- [x] **SK (Surat Keputusan) Fields - Optional** ✅ **NICE TO HAVE** — DONE
   - **New Fields**:
     - `accreditation_sk_number` (VARCHAR 100, NULLABLE)
     - `accreditation_sk_date` (DATE, NULLABLE)
@@ -88,7 +88,7 @@ Form terlalu kompleks dan membingungkan, terutama di bagian akreditasi dan indek
   - **Display**: Only if Sinta 1-6 is selected
   - **Implementation**:
     - ✅ Migration: Add nullable SK fields
-    - ⏳ Form: Optional text input for SK number and date picker
+    - ✅ Form: Optional text input for SK number and date picker in Create.tsx & Edit.tsx
 
 - [x] **Mandatory OAI-PMH URL** ✅ **CRITICAL**
   - **Field**: `oai_endpoint` - Change from NULLABLE to **REQUIRED**
@@ -119,23 +119,23 @@ Form terlalu kompleks dan membingungkan, terutama di bagian akreditasi dan indek
     - ✅ Update journal form dropdown
     - ✅ Change label to "Indexing" in frontend
 
-- [x] **Character Limits for Text Fields** ✅ **IMPORTANT**
+- [x] **Character Limits for Text Fields** ✅ **IMPORTANT** — DONE
   - **About Journal**: Limit to 1000 characters (~150-200 words)
   - **Scope and Focus**: Limit to 1000 characters
   - **Purpose**: Prevent UI clutter on public journal detail page
   - **Display**: Show character counter in form
   - **Implementation**:
     - ✅ Backend: Add validation rules in JournalRequest
-    - ⏳ Frontend: Add character counter with live update
+    - ✅ Frontend: Character counter with live update in Create.tsx & Edit.tsx (maxLength={1000})
 
-- [x] **Cover Image Upload** ✅ **FUTURE ENHANCEMENT**
+- [ ] **Cover Image Upload** ⏳ **FUTURE ENHANCEMENT** — PARTIAL (migration only)
   - **New Field**: `cover_image` (VARCHAR 255, NULLABLE)
   - **Purpose**: Display journal cover in public view
   - **File Type**: JPG, PNG (max 2MB)
   - **Implementation**:
-    - ⏳ Migration: Add `cover_image` field
-    - ⏳ Form: File upload component
-    - ⏳ Storage: Store in `storage/app/public/journal-covers/`
+    - ✅ Migration: Add `cover_image` field (done in simplify_accreditation_fields migration)
+    - ⏳ Form: File upload component — NOT YET IMPLEMENTED
+    - ⏳ Storage: Store in `storage/app/public/journal-covers/` — NOT YET IMPLEMENTED
 
 - [ ] **Scientific Field - Multi-Select (DEFERRED)** ⚠️ **FUTURE**
   - **Current**: Single select dropdown
@@ -154,7 +154,7 @@ LPPM dashboard menampilkan kolom yang membingungkan (Score, All Participants) ya
 
 #### Solutions Implemented
 
-- [x] **Simplified Journal List Table** ✅ **CRITICAL**
+- [x] **Simplified Journal List Table** ✅ **CRITICAL** — DONE
   - **Remove Columns**:
     - ❌ `score` - Assessment score (moved to Pembinaan module)
     - ❌ `all_periods` - Assessment periods (moved to Pembinaan)
@@ -172,14 +172,14 @@ LPPM dashboard menampilkan kolom yang membingungkan (Score, All Participants) ya
   - **Implementation**:
     - ✅ Remove score-related queries from `JournalController@index()`
     - ✅ Add indexing relationship eager loading
-    - ⏳ Frontend: Update table columns in `AdminKampus/Journals/Index.tsx`
+    - ✅ Frontend: Table columns updated in `AdminKampus/Journals/Index.tsx`
 
-- [x] **Enhanced Action Buttons** ✅ **CRITICAL**
+- [x] **Enhanced Action Buttons** ✅ **CRITICAL** — DONE
   - **New Actions**:
     - 👁️ **View** - View journal details
     - ✏️ **Edit** - Edit journal data (always available)
     - ✅ **Approve** - Approve pending journal
-    - ❌ **Reject** - Reject with reason (min 10 chars, max 500)
+    - ❌ **Reject** - Reject with reason (min 10 chars, max 1000)
     - 🗑️ **Delete** - Remove journal (conditional)
   - **Delete Button Logic**:
     - ✅ **Show Delete**: For pending & rejected journals
@@ -187,28 +187,29 @@ LPPM dashboard menampilkan kolom yang membingungkan (Score, All Participants) ya
     - **Rationale**: Prevent accidental deletion of published data
   - **Implementation**:
     - ✅ Backend: Policy checks in `JournalPolicy@delete()`
-    - ⏳ Frontend: Conditional rendering in action column
-    - ⏳ Dialog: Rejection reason textarea with validation
+    - ✅ Frontend: DropdownMenu with conditional rendering in action column
+    - ✅ Dialog: Rejection reason textarea with validation (min 10, max 1000 chars)
 
-- [x] **Add New Journal Button** ✅ **IMPORTANT**
-  - **Location**: Top of journal list table
-  - **Action**: Navigate to `/admin-kampus/journals/create`
+- [x] **Add New Journal Button** ✅ **IMPORTANT** — DONE
+  - **Location**: Top of journal list table (next to Import CSV)
+  - **Action**: Navigate to `/user/journals/create`
   - **Use Case**: LPPM can create journals directly (bypass user submission)
   - **Implementation**:
     - ✅ Route already exists
-    - ⏳ Frontend: Add button to `AdminKampus/Journals/Index.tsx`
+    - ✅ Frontend: Button added to `AdminKampus/Journals/Index.tsx`
 
-- [x] **Journal Reassignment Feature** ✅ **CRITICAL**
+- [x] **Journal Reassignment Feature** ✅ **CRITICAL** — DONE
   - **Use Case**: After CSV import, LPPM needs to reassign journals from themselves to respective editors
   - **Scenario**: LPPM imports 50 journals → all assigned to LPPM → reassign to 50 different editors
-  - **Location**: Edit journal page
+  - **Location**: Journal list page (via DropdownMenu per row)
   - **Field**: "Change Manager" dropdown (show users from same university)
   - **Audit**: Log reassignment in `journal_reassignments` table
   - **Implementation**:
     - ✅ Migration: `journal_reassignments` table created (Feb 8)
     - ✅ Backend: `JournalController@reassign()` method
-    - ⏳ Frontend: Reassignment dialog in Edit page
-    - ⏳ Validation: Ensure new manager is from same university
+    - ✅ Frontend: Reassignment dialog in `AdminKampus/Journals/Index.tsx` (Dialog with user selector)
+    - ✅ Validation: Ensure new manager is from same university
+    - ✅ Backend: `universityUsers` passed to frontend for user selection
 
 ---
 
@@ -270,7 +271,7 @@ Importing CSV dengan field yang tidak ada di database (e.g., Scientific Field ti
   - **Implementation**:
     - ✅ Update template file in `storage/app/templates/journal_import_template.csv`
     - ✅ Update `JournalImport` class mapping
-    - ⏳ Update download template route
+    - ✅ Update download template route
 
 ---
 
@@ -287,14 +288,14 @@ Dikti Super Admin perlu approve LPPM registrations. Meeting membahas workflow ap
     - **Reject**: Requires reason (10-500 chars), sets `rejection_reason`
   - **Implementation**: Already completed in previous iteration
 
-- [x] **Revert to Pending** ✅ **NEW REQUIREMENT**
+- [ ] **Revert to Pending** ⏳ **NEW REQUIREMENT** — NOT YET IMPLEMENTED
   - **Use Case**: Dikti accidentally rejects an LPPM, wants to undo
   - **Action**: Change status from `rejected` back to `pending`
   - **Button**: "Revert to Pending" appears for rejected users
   - **Implementation**:
-    - ✅ Route: `POST /admin/users/{user}/revert-to-pending`
-    - ✅ Controller: `Admin\LppmApprovalController@revertToPending()`
-    - ⏳ Frontend: Add button in rejected user card
+    - ⏳ Route: `POST /admin/users/{user}/revert-to-pending` — NOT YET CREATED
+    - ⏳ Controller: `Admin\LppmApprovalController@revertToPending()` — NOT YET CREATED
+    - ⏳ Frontend: Add button in rejected user card — NOT YET IMPLEMENTED
 
 ---
 
@@ -303,27 +304,26 @@ Dikti Super Admin perlu approve LPPM registrations. Meeting membahas workflow ap
 #### Problem Statement
 Homepage terlalu cluttered, ada elemen yang belum siap untuk production.
 
-- [x] **Hide Sinta Distribution Chart** ✅ **IMPORTANT**
+- [x] **Hide Sinta Distribution Chart** ✅ **IMPORTANT** — DONE
   - **Current**: Displays Sinta rank distribution (Sinta 1: 5, Sinta 2: 11, etc.)
   - **Issue**: Chart layout not finalized, data might be confusing for first launch
   - **Action**: Temporarily hide the chart section
   - **Future**: Re-enable after finalizing design
   - **Implementation**:
-    - ⏳ Frontend: Add `hidden` class to Sinta chart section in `resources/js/pages/Home.tsx`
+    - ✅ Frontend: Sinta chart section commented out in `resources/js/pages/welcome.tsx`
 
-- [x] **Fix Browse Button Link** ✅ **IMPORTANT**
-  - **Current**: "Browse" button is not functional
-  - **New Target**: Link to `/browse/universities` (View All Journals page)
-  - **Rationale**: Users expect Browse to show all journals
+- [x] **Fix Browse Button Link** ✅ **IMPORTANT** — DONE
+  - **Current**: "Browse" button links to `/browse/universities`
+  - **Status**: Already correctly implemented — verified working
   - **Implementation**:
     - ✅ Route already exists (implemented Feb 11)
-    - ⏳ Frontend: Update `<Link>` href in homepage
+    - ✅ Frontend: `<Link>` href already set to `route('browse.universities')` in homepage
 
-- [x] **Layout Spacing Fix** ✅ **NICE TO HAVE**
+- [x] **Layout Spacing Fix** ✅ **NICE TO HAVE** — DONE
   - **Issue**: Some sections are too close to bottom, causing cramped appearance
   - **Action**: Add proper spacing between sections
   - **Implementation**:
-    - ⏳ Frontend: Adjust margin/padding in homepage sections
+    - ✅ Frontend: Adjusted margin/padding in homepage sections (py-16 → py-20)
 
 ---
 
@@ -331,7 +331,7 @@ Homepage terlalu cluttered, ada elemen yang belum siap untuk production.
 
 #### Enhancement: Display Journal Description
 
-- [x] **Show About & Scope** ✅ **IMPLEMENTED**
+- [x] **Show About & Scope** ✅ **IMPLEMENTED** — DONE
   - **Location**: Above article search section
   - **Fields Displayed**:
     - About Journal (max 1000 chars)
@@ -340,7 +340,7 @@ Homepage terlalu cluttered, ada elemen yang belum siap untuk production.
   - **Character Limit Rationale**: Prevent excessive scrolling
   - **Implementation**:
     - ✅ Backend: Already returns data in `PublicJournalController@show()`
-    - ⏳ Frontend: Add description section in journal detail page
+    - ✅ Frontend: Description section displayed in journal detail page
 
 - [x] **Cover Image Display** ✅ **FUTURE**
   - **Location**: Top of journal detail page (hero section)
@@ -876,16 +876,16 @@ export default function ReassignJournalDialog({ open, journal, users, onClose }:
 ### 🔴 **CRITICAL - Must Complete by 7:00 AM Check-in** (Feb 12, 2026)
 
 #### Tonight (Feb 11 - Evening Work)
-- [x] Database migrations (accreditation fields, OAI/E-ISSN mandatory) ⏳
-- [x] Update JournalController (remove assessment queries) ⏳
-- [x] Update JournalImport (CSV strategy changes) ⏳
-- [x] Update journal form validation (character limits) ⏳
+- [x] Database migrations (accreditation fields, OAI/E-ISSN mandatory) ✅
+- [x] Update JournalController (remove assessment queries) ✅
+- [x] Update JournalImport (CSV strategy changes) ✅
+- [x] Update journal form validation (character limits) ✅
 
 #### Early Morning (Feb 12 - Before 7 AM)
-- [ ] Frontend: Journal form with merged accreditation field ⏳
-- [ ] Frontend: LPPM journal list (remove columns, add actions) ⏳
-- [ ] Frontend: Reassignment dialog ⏳
-- [ ] Frontend: Homepage cleanup (hide Sinta chart, fix Browse link) ⏳
+- [x] Frontend: Journal form with merged accreditation field ✅
+- [x] Frontend: LPPM journal list (remove columns, add actions) ✅
+- [x] Frontend: Reassignment dialog ✅
+- [x] Frontend: Homepage cleanup (hide Sinta chart, fix Browse link) ✅
 
 #### Morning Check-in (7:00 AM - Feb 12)
 - [ ] Test complete journal submission flow ⏳
@@ -906,11 +906,11 @@ export default function ReassignJournalDialog({ open, journal, users, onClose }:
 
 These can be deferred to post-launch if time runs out:
 
-- [ ] Cover image upload feature
-- [ ] SK number and SK date fields
-- [ ] Character counter animation in textareas
+- [ ] Cover image upload feature (migration done, frontend NOT done)
+- [x] SK number and SK date fields ✅ (implemented in Create.tsx & Edit.tsx)
+- [x] Character counter animation in textareas ✅ (live counter with maxLength)
 - [ ] Enhanced error messages with examples
-- [ ] Journal detail page description display
+- [x] Journal detail page description display ✅ (about & scope shown in Show.tsx)
 
 ---
 
@@ -923,7 +923,7 @@ These can be deferred to post-launch if time runs out:
 - [x] ✅ Delete button hidden for approved journals
 - [x] ✅ CSV import works with new template (generic data only)
 - [x] ✅ LPPM can reassign journal managers
-- [ ] ⏳ Homepage is clean (Sinta chart hidden, Browse works)
+- [x] ✅ Homepage is clean (Sinta chart hidden, Browse works)
 
 ### Data Requirements
 - [x] ✅ Updated CSV template available for download
@@ -1143,4 +1143,5 @@ public function delete(User $user, Journal $journal): bool
 **Focus**: Final System Refinement for Launch  
 **Deadline**: Thursday, February 12, 2026 at 1:00 PM  
 **Next Check-in**: Thursday Morning, 7:00 AM  
-**Status**: CRITICAL PATH - 16 hours to launch
+**Status**: ✅ DEVELOPMENT COMPLETE — Pending testing, demo data & deployment  
+**Last Updated**: 12 Februari 2026, 06:12 WIB
