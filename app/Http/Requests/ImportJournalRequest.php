@@ -28,10 +28,6 @@ class ImportJournalRequest extends FormRequest
                 'mimes:csv,txt',
                 'max:5120', // 5MB max
             ],
-            'user_id' => [
-                'required',
-                'exists:users,id',
-            ],
         ];
     }
 
@@ -47,21 +43,6 @@ class ImportJournalRequest extends FormRequest
             'csv_file.file' => 'File yang diunggah harus berupa file valid.',
             'csv_file.mimes' => 'File harus berformat CSV (.csv atau .txt).',
             'csv_file.max' => 'Ukuran file maksimal 5MB.',
-            'user_id.required' => 'Pengelola jurnal harus dipilih.',
-            'user_id.exists' => 'Pengelola jurnal tidak valid.',
         ];
-    }
-
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation(): void
-    {
-        // Ensure user_id is an integer
-        if ($this->has('user_id')) {
-            $this->merge([
-                'user_id' => (int) $this->user_id,
-            ]);
-        }
     }
 }
