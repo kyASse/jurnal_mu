@@ -2,30 +2,32 @@
  * JournalsIndex Component for Admin Kampus
  *
  * @description
- * A comprehensive list view page for viewing journals within the admin's university.
- * This component provides filtering, searching, pagination for journal management and monitoring.
+ * Journal management page for LPPM (Admin Kampus) with approve/reject workflow,
+ * reassignment, filtering, and CSV import capabilities.
  *
  * @features
  * - Search by title, ISSN, or e-ISSN
- * - Filter by assessment status (Draft/Submitted/Reviewed)
- * - Filter by SINTA rank (1-6)
- * - Filter by scientific field
- * - Paginated results with navigation
- * - View journal details (coming in next iteration)
- * - Display assessment status and score
- * - Flash messages for feedback
+ * - Filter by SINTA rank, scientific field, indexation, approval status
+ * - Approve/Reject journals with reason
+ * - Delete pending/rejected journals
+ * - Reassign journal manager
+ * - Add new journal / Import CSV
  *
  * @route GET /admin-kampus/journals
  */
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search, Upload } from 'lucide-react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { BookOpen, Check, ChevronLeft, ChevronRight, ExternalLink, Eye, MoreHorizontal, Pencil, Plus, RefreshCw, Search, Trash2, Upload, X } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -41,6 +43,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Journal {
     id: number;
+    name: string;
     title: string;
     issn: string | null;
     e_issn: string | null;
@@ -58,13 +61,20 @@ interface Journal {
         id: number;
         name: string;
     } | null;
-    sinta_rank: number | null;
+    sinta_rank: string | null;
     sinta_rank_label: string;
     is_active: boolean;
-    assessment_status: string | null;
-    assessment_status_label: string;
-    latest_score: number | null;
+    approval_status: string | null;
+    approval_status_label: string;
+    rejection_reason: string | null;
+    indexation_labels: string[];
     created_at: string;
+}
+
+interface UniversityUser {
+    id: number;
+    name: string;
+    email: string;
 }
 
 interface ScientificField {
@@ -92,7 +102,7 @@ interface Props {
     };
     filters: {
         search?: string;
-        sinta_rank?: number;
+        sinta_rank?: string;
         scientific_field_id?: number;
         indexation?: string;
         // Phase 2 filters
@@ -109,6 +119,7 @@ interface Props {
     pembinaanYears: FilterOption[];
     participationOptions: FilterOption[];
     approvalStatusOptions: FilterOption[];
+    universityUsers?: UniversityUser[];
 }
 
 export default function JournalsIndex({
@@ -121,10 +132,11 @@ export default function JournalsIndex({
     // pembinaanYears,
     participationOptions,
     approvalStatusOptions,
+    universityUsers = [],
 }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
-    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank?.toString() || '');
+    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank || '');
     const [scientificFieldFilter, setScientificFieldFilter] = useState(filters.scientific_field_id?.toString() || '');
     const [indexationFilter, setIndexationFilter] = useState(filters.indexation || '');
     // Phase 2 filter states
@@ -132,6 +144,75 @@ export default function JournalsIndex({
     const [pembinaanYearFilter, setPembinaanYearFilter] = useState(filters.pembinaan_year || '');
     const [participationFilter, setParticipationFilter] = useState(filters.participation || '');
     const [approvalStatusFilter, setApprovalStatusFilter] = useState(filters.approval_status || '');
+
+    // Action dialog states
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [rejectingJournal, setRejectingJournal] = useState<Journal | null>(null);
+    const [reassignDialogOpen, setReassignDialogOpen] = useState(false);
+    const [reassigningJournal, setReassigningJournal] = useState<Journal | null>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deletingJournal, setDeletingJournal] = useState<Journal | null>(null);
+
+    const rejectForm = useForm({ reason: '' });
+    const reassignForm = useForm({ new_user_id: '', reason: '' });
+
+    const handleApprove = (journal: Journal) => {
+        if (confirm(`Approve journal "${journal.title}"?`)) {
+            router.post(route('admin-kampus.journals.approve', journal.id), {}, {
+                preserveScroll: true,
+            });
+        }
+    };
+
+    const handleReject = (journal: Journal) => {
+        setRejectingJournal(journal);
+        rejectForm.reset();
+        setRejectDialogOpen(true);
+    };
+
+    const submitReject = () => {
+        if (!rejectingJournal) return;
+        rejectForm.post(route('admin-kampus.journals.reject', rejectingJournal.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setRejectDialogOpen(false);
+                setRejectingJournal(null);
+            },
+        });
+    };
+
+    const handleDelete = (journal: Journal) => {
+        setDeletingJournal(journal);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (!deletingJournal) return;
+        router.delete(route('admin-kampus.journals.destroy', deletingJournal.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDeleteDialogOpen(false);
+                setDeletingJournal(null);
+            },
+        });
+    };
+
+    const handleReassign = (journal: Journal) => {
+        setReassigningJournal(journal);
+        reassignForm.reset();
+        setReassignDialogOpen(true);
+    };
+
+    const submitReassign = () => {
+        if (!reassigningJournal) return;
+        reassignForm.post(route('admin-kampus.journals.reassign', reassigningJournal.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setReassignDialogOpen(false);
+                setReassigningJournal(null);
+            },
+        });
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -165,24 +246,25 @@ export default function JournalsIndex({
         router.get(route('admin-kampus.journals.index'));
     };
 
-    const getStatusBadgeColor = (status: string | null) => {
+    const getApprovalStatusBadge = (status: string | null) => {
         switch (status) {
-            case 'draft':
-                return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
-            case 'submitted':
-                return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
-            case 'reviewed':
-                return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+            case 'approved':
+                return { color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400', label: 'Approved' };
+            case 'rejected':
+                return { color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400', label: 'Rejected' };
+            case 'pending':
+                return { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400', label: 'Pending' };
             default:
-                return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
+                return { color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400', label: 'Unknown' };
         }
     };
 
-    const getSintaRankColor = (rank: number | null) => {
-        if (!rank) return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
+    const getSintaRankColor = (rank: string | null) => {
+        if (!rank || rank === 'non_sinta') return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
 
-        if (rank <= 2) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
-        if (rank <= 4) return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+        const numRank = parseInt(rank.replace('sinta_', ''));
+        if (numRank <= 2) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+        if (numRank <= 4) return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
     };
 
@@ -205,12 +287,20 @@ export default function JournalsIndex({
                                 </h1>
                                 <p className="mt-1 text-muted-foreground">View and monitor journals from your university</p>
                             </div>
-                            <Link href={route('admin-kampus.journals.import')}>
-                                <Button>
-                                    <Upload className="mr-2 h-4 w-4" />
-                                    Import CSV
-                                </Button>
-                            </Link>
+                            <div className="flex items-center gap-2">
+                                <Link href={route('admin-kampus.journals.import')}>
+                                    <Button variant="outline">
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Import CSV
+                                    </Button>
+                                </Link>
+                                <Link href={route('admin-kampus.journals.create')}>
+                                    <Button>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add New Journal
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
 
@@ -308,63 +398,6 @@ export default function JournalsIndex({
                                         ))}
                                     </SelectContent>
                                 </Select>
-                            </div>
-
-                            {/* Filter Row 2 - Phase 2 Pembinaan & Approval Filters */}
-                            <div className="flex flex-wrap gap-4">
-                                {/* Pembinaan Period Filter */}
-                                <Select
-                                    value={pembinaanPeriodFilter || 'all'}
-                                    onValueChange={(value) => setPembinaanPeriodFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-64">
-                                        <SelectValue placeholder="All Periods" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Periods</SelectItem>
-                                        {pembinaanPeriods.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Pembinaan Year Filter 
-                                <Select
-                                    value={pembinaanYearFilter || 'all'}
-                                    onValueChange={(value) => setPembinaanYearFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-48">
-                                        <SelectValue placeholder="All Years" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Years</SelectItem>
-                                        {pembinaanYears.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select> */}
-
-                                {/* Participation Filter */}
-                                <Select
-                                    value={participationFilter || 'all'}
-                                    onValueChange={(value) => setParticipationFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-56">
-                                        <SelectValue placeholder="All Participation" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Participation</SelectItem>
-                                        {participationOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
 
                                 {/* Approval Status Filter */}
                                 <Select
@@ -384,6 +417,65 @@ export default function JournalsIndex({
                                     </SelectContent>
                                 </Select>
                             </div>
+
+                            {/* Filter Row 2 - Phase 2 Pembinaan & Approval Filters */}
+                            {/* <div className="flex flex-wrap gap-4"> */}
+                            {/* Pembinaan Period Filter */}
+                            {/* <Select
+                                    value={pembinaanPeriodFilter || 'all'}
+                                    onValueChange={(value) => setPembinaanPeriodFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-64">
+                                        <SelectValue placeholder="All Periods" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Periods</SelectItem>
+                                        {pembinaanPeriods.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select> */}
+
+                            {/* Pembinaan Year Filter 
+                                <Select
+                                    value={pembinaanYearFilter || 'all'}
+                                    onValueChange={(value) => setPembinaanYearFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-48">
+                                        <SelectValue placeholder="All Years" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Years</SelectItem>
+                                        {pembinaanYears.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select> */}
+
+                            {/* Participation Filter */}
+                            {/* <Select
+                                    value={participationFilter || 'all'}
+                                    onValueChange={(value) => setParticipationFilter(value === 'all' ? '' : value)}
+                                >
+                                    <SelectTrigger className="w-56">
+                                        <SelectValue placeholder="All Participation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Participation</SelectItem>
+                                        {participationOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value.toString()}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                
+                            </div> */}
 
                             {/* Action Buttons */}
                             <div className="flex gap-4">
@@ -413,8 +505,8 @@ export default function JournalsIndex({
                                     <TableHead>Pengelola</TableHead>
                                     <TableHead>Scientific Field</TableHead>
                                     <TableHead className="text-center">SINTA Rank</TableHead>
-                                    <TableHead className="text-center">Assessment Status</TableHead>
-                                    <TableHead className="text-center">Score</TableHead>
+                                    <TableHead className="text-center">Approval Status</TableHead>
+                                    <TableHead>Indexations</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -472,25 +564,72 @@ export default function JournalsIndex({
                                                 <Badge className={getSintaRankColor(journal.sinta_rank)}>{journal.sinta_rank_label}</Badge>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <Badge className={getStatusBadgeColor(journal.assessment_status)}>
-                                                    {journal.assessment_status_label}
-                                                </Badge>
+                                                {(() => {
+                                                    const badge = getApprovalStatusBadge(journal.approval_status);
+                                                    return <Badge className={badge.color}>{badge.label}</Badge>;
+                                                })()}
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                {journal.latest_score !== null && journal.latest_score !== undefined ? (
-                                                    <span className="font-semibold text-foreground">{Number(journal.latest_score).toFixed(1)}%</span>
-                                                ) : (
-                                                    <span className="text-muted-foreground">-</span>
-                                                )}
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {journal.indexation_labels && journal.indexation_labels.length > 0 ? (
+                                                        journal.indexation_labels.map((label, idx) => (
+                                                            <Badge key={idx} variant="outline" className="text-xs">
+                                                                {label}
+                                                            </Badge>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Link href={route('admin-kampus.journals.show', journal.id)}>
-                                                        <Button variant="ghost" size="sm" title="View Details">
-                                                            <Eye className="h-4 w-4" />
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="sm">
+                                                            <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
-                                                    </Link>
-                                                </div>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={() => router.visit(route('admin-kampus.journals.show', journal.id))}>
+                                                            <Eye className="mr-2 h-4 w-4" />
+                                                            View Details
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => router.visit(route('admin-kampus.journals.edit', journal.id))}>
+                                                            <Pencil className="mr-2 h-4 w-4" />
+                                                            Edit
+                                                        </DropdownMenuItem>
+
+                                                        {journal.approval_status === 'pending' && (
+                                                            <>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem onClick={() => handleApprove(journal)} className="text-green-600 dark:text-green-400">
+                                                                    <Check className="mr-2 h-4 w-4" />
+                                                                    Approve
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleReject(journal)} className="text-red-600 dark:text-red-400">
+                                                                    <X className="mr-2 h-4 w-4" />
+                                                                    Reject
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
+
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem onClick={() => handleReassign(journal)}>
+                                                            <RefreshCw className="mr-2 h-4 w-4" />
+                                                            Reassign Manager
+                                                        </DropdownMenuItem>
+
+                                                        {journal.approval_status !== 'approved' && (
+                                                            <>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem onClick={() => handleDelete(journal)} className="text-red-600 dark:text-red-400">
+                                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                                    Delete
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -551,6 +690,117 @@ export default function JournalsIndex({
                         </div>
                     )}
                 </div>
+
+                {/* Reject Reason Dialog */}
+                <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Reject Journal</DialogTitle>
+                            <DialogDescription>
+                                Provide a reason for rejecting "{rejectingJournal?.title}". The journal manager will be notified.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div>
+                                <Label htmlFor="reject-reason">Reason for Rejection</Label>
+                                <Textarea
+                                    id="reject-reason"
+                                    rows={4}
+                                    value={rejectForm.data.reason}
+                                    onChange={(e) => rejectForm.setData('reason', e.target.value)}
+                                    placeholder="Minimum 10 characters..."
+                                    className="mt-1"
+                                />
+                                <p className="mt-1 text-xs text-muted-foreground">{rejectForm.data.reason.length}/1000 characters (min 10)</p>
+                                {rejectForm.errors.reason && <p className="mt-1 text-sm text-red-600">{rejectForm.errors.reason}</p>}
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
+                            <Button
+                                variant="destructive"
+                                onClick={submitReject}
+                                disabled={rejectForm.processing || rejectForm.data.reason.length < 10}
+                            >
+                                Reject Journal
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Delete Confirmation Dialog */}
+                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Journal</DialogTitle>
+                            <DialogDescription>
+                                Are you sure you want to delete "{deletingJournal?.title}"? This action cannot be undone.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                            <Button variant="destructive" onClick={confirmDelete}>Delete Journal</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Reassign Manager Dialog */}
+                <Dialog open={reassignDialogOpen} onOpenChange={setReassignDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Reassign Journal Manager</DialogTitle>
+                            <DialogDescription>
+                                Transfer "{reassigningJournal?.title}" to another manager in your university.
+                                Current manager: {reassigningJournal?.user.name}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div>
+                                <Label htmlFor="new-manager">New Manager</Label>
+                                <Select
+                                    value={reassignForm.data.new_user_id}
+                                    onValueChange={(value) => reassignForm.setData('new_user_id', value)}
+                                >
+                                    <SelectTrigger className="mt-1">
+                                        <SelectValue placeholder="Select new manager..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {universityUsers
+                                            .filter((u) => u.id !== reassigningJournal?.user.id)
+                                            .map((user) => (
+                                                <SelectItem key={user.id} value={user.id.toString()}>
+                                                    {user.name} ({user.email})
+                                                </SelectItem>
+                                            ))}
+                                    </SelectContent>
+                                </Select>
+                                {reassignForm.errors.new_user_id && <p className="mt-1 text-sm text-red-600">{reassignForm.errors.new_user_id}</p>}
+                            </div>
+                            <div>
+                                <Label htmlFor="reassign-reason">Reason (Optional)</Label>
+                                <Textarea
+                                    id="reassign-reason"
+                                    rows={3}
+                                    value={reassignForm.data.reason}
+                                    onChange={(e) => reassignForm.setData('reason', e.target.value)}
+                                    placeholder="Why are you reassigning this journal?"
+                                    className="mt-1"
+                                    maxLength={500}
+                                />
+                                <p className="mt-1 text-xs text-muted-foreground">{reassignForm.data.reason.length}/500 characters</p>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setReassignDialogOpen(false)}>Cancel</Button>
+                            <Button
+                                onClick={submitReassign}
+                                disabled={reassignForm.processing || !reassignForm.data.new_user_id}
+                            >
+                                Reassign Journal
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AppLayout>
     );
