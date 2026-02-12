@@ -4,6 +4,8 @@ namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ImportJournalRequest;
+use App\Http\Requests\StoreJournalRequest;
+use App\Http\Requests\UpdateJournalRequest;
 use App\Imports\JournalsImport;
 use App\Models\Journal;
 use App\Models\Role;
@@ -11,6 +13,7 @@ use App\Models\ScientificField;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -100,7 +103,7 @@ class JournalController extends Controller
             ->orderBy('title')
             ->paginate(10)
             ->withQueryString()
-            ->through(fn ($journal) => [
+            ->through(fn($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -122,9 +125,8 @@ class JournalController extends Controller
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
                 'is_active' => $journal->is_active,
-                'assessment_status' => $journal->latestAssessment?->status ?? null,
-                'assessment_status_label' => $journal->latestAssessment?->status_label ?? 'Belum Ada',
-                'latest_score' => $journal->latestAssessment?->percentage ?? null,
+                'approval_status' => $journal->approval_status,
+                'indexation_labels' => $journal->indexation_labels,
                 'created_at' => $journal->created_at->format('Y-m-d'),
             ]);
 
@@ -134,15 +136,9 @@ class JournalController extends Controller
             ->orderBy('name')
             ->get();
 
-        $sintaRanks = collect([
-            ['value' => 'non_sinta', 'label' => 'Non Sinta'],
-            ['value' => 1, 'label' => 'SINTA 1'],
-            ['value' => 2, 'label' => 'SINTA 2'],
-            ['value' => 3, 'label' => 'SINTA 3'],
-            ['value' => 4, 'label' => 'SINTA 4'],
-            ['value' => 5, 'label' => 'SINTA 5'],
-            ['value' => 6, 'label' => 'SINTA 6'],
-        ]);
+        $sintaRanks = collect(Journal::getSintaRankOptions())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
 
         // Deprecated: Status filter is no longer used in Admin Kampus Journals
         // $statusOptions = collect([
@@ -152,7 +148,7 @@ class JournalController extends Controller
         // ]);
 
         $indexationOptions = collect(Journal::getIndexationPlatforms())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
         // Deprecated: Dikti Accreditation Grade filter is no longer used in Admin Kampus Journals
@@ -161,11 +157,7 @@ class JournalController extends Controller
         //     ->values();
 
         $indexationOptions = collect(Journal::getIndexationPlatforms())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
-            ->values();
-
-        $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
         // Phase 2: Get pembinaan periods and years for filters
@@ -174,7 +166,7 @@ class JournalController extends Controller
             ->distinct()
             ->orderBy('name')
             ->pluck('name')
-            ->map(fn ($name) => ['value' => $name, 'label' => $name])
+            ->map(fn($name) => ['value' => $name, 'label' => $name])
             ->values();
 
         $pembinaanYears = \App\Models\PembinaanRegistration::query()
@@ -182,7 +174,7 @@ class JournalController extends Controller
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
-            ->map(fn ($year) => ['value' => (string) $year, 'label' => (string) $year])
+            ->map(fn($year) => ['value' => (string) $year, 'label' => (string) $year])
             ->values();
 
         $participationOptions = collect([
@@ -195,6 +187,12 @@ class JournalController extends Controller
             ['value' => 'pending', 'label' => 'Menunggu Approval'],
             ['value' => 'rejected', 'label' => 'Ditolak'],
         ]);
+
+        // Get users from same university for reassignment
+        $universityUsers = User::where('university_id', auth()->user()->university_id)
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('AdminKampus/Journals/Index', [
             'journals' => $journals,
@@ -216,9 +214,7 @@ class JournalController extends Controller
             'pembinaanYears' => $pembinaanYears,
             'participationOptions' => $participationOptions,
             'approvalStatusOptions' => $approvalStatusOptions,
-            // Deprecated filters - no longer passed to frontend
-            // 'statusOptions' => $statusOptions,
-            // 'accreditationGradeOptions' => $accreditationGradeOptions,
+            'universityUsers' => $universityUsers,
         ]);
     }
 
@@ -238,8 +234,8 @@ class JournalController extends Controller
 
         // Calculate totals
         // Note: "Indexed journals" means Scopus-indexed only (as per meeting notes 02 Feb 2026)
-        $indexedJournals = $journals->filter(fn ($j) => isset($j->indexations['Scopus']))->count();
-        $sintaJournals = $journals->filter(fn ($j) => $j->sinta_rank !== null)->count();
+        $indexedJournals = $journals->filter(fn($j) => isset($j->indexations['Scopus']))->count();
+        $sintaJournals = $journals->filter(fn($j) => $j->sinta_rank !== null)->count();
         $nonSintaJournals = $totalJournals - $sintaJournals;
 
         // Aggregate by indexation
@@ -253,7 +249,7 @@ class JournalController extends Controller
         }
 
         $byIndexation = collect($indexationCounts)
-            ->map(fn ($count, $name) => [
+            ->map(fn($count, $name) => [
                 'name' => $name,
                 'count' => $count,
                 'percentage' => $totalJournals > 0 ? round(($count / $totalJournals) * 100, 1) : 0,
@@ -286,7 +282,7 @@ class JournalController extends Controller
         }
 
         // Aggregate by scientific field
-        $fieldGroups = $journals->filter(fn ($j) => $j->scientificField !== null)
+        $fieldGroups = $journals->filter(fn($j) => $j->scientificField !== null)
             ->groupBy('scientific_field_id');
 
         $byScientificField = $fieldGroups->map(function ($group) use ($totalJournals) {
@@ -353,20 +349,15 @@ class JournalController extends Controller
                 'editor_in_chief' => $journal->editor_in_chief,
                 'email' => $journal->email,
 
-                // SINTA
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
-                'sinta_indexed_date' => $journal->sinta_indexed_date?->format('Y-m-d'),
 
-                // Dikti Accreditation
-                'accreditation_status' => $journal->accreditation_status,
-                'accreditation_status_label' => $journal->accreditation_status_label,
-                'accreditation_grade' => $journal->accreditation_grade,
-                'dikti_accreditation_number' => $journal->dikti_accreditation_number,
-                'dikti_accreditation_label' => $journal->dikti_accreditation_label,
-                'accreditation_issued_date' => $journal->accreditation_issued_date?->format('Y-m-d'),
-                'accreditation_expiry_date' => $journal->accreditation_expiry_date?->format('Y-m-d'),
-                'is_accreditation_expired' => $journal->is_accreditation_expired,
+                // Accreditation (merged)
+                'accreditation_label' => $journal->accreditation_label,
+                'accreditation_start_year' => $journal->accreditation_start_year,
+                'accreditation_end_year' => $journal->accreditation_end_year,
+                'accreditation_sk_number' => $journal->accreditation_sk_number,
+                'accreditation_sk_date' => $journal->accreditation_sk_date?->format('Y-m-d'),
                 'accreditation_expiry_status' => $journal->accreditation_expiry_status,
 
                 // Indexations
@@ -390,7 +381,7 @@ class JournalController extends Controller
                     'id' => $journal->scientificField->id,
                     'name' => $journal->scientificField->name,
                 ] : null,
-                'assessments' => $journal->assessments->map(fn ($assessment) => [
+                'assessments' => $journal->assessments->map(fn($assessment) => [
                     'id' => $assessment->id,
                     'assessment_date' => $assessment->assessment_date,
                     'period' => $assessment->period,
@@ -413,6 +404,143 @@ class JournalController extends Controller
     }
 
     /**
+     * Show the form for creating a new journal.
+     *
+     * @route GET /admin-kampus/journals/create
+     *
+     * @features Journal creation form with user assignment
+     */
+    public function create(): Response
+    {
+        $this->authorize('create', Journal::class);
+
+        $authUser = Auth::user();
+
+        $scientificFields = ScientificField::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        // Get users from same university for owner assignment
+        $universityUsers = User::query()
+            ->where('role_id', DB::table('roles')->where('name', Role::USER)->value('id'))
+            ->where('university_id', $authUser->university_id)
+            ->where('is_active', true)
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('AdminKampus/Journals/Create', [
+            'scientificFields' => $scientificFields,
+            'sintaRankOptions' => Journal::getSintaRankOptions(),
+            'indexationOptions' => $this->getIndexationOptions(),
+            'universityUsers' => $universityUsers,
+        ]);
+    }
+
+    /**
+     * Store a newly created journal.
+     *
+     * @route POST /admin-kampus/journals
+     *
+     * @features Create journal with user assignment, scoped to admin's university
+     */
+    public function store(StoreJournalRequest $request): RedirectResponse
+    {
+        $this->authorize('create', Journal::class);
+
+        $authUser = Auth::user();
+
+        $validated = $request->validated();
+        $validated['university_id'] = $authUser->university_id;
+
+        // If user_id is provided, use it; otherwise default to the admin user
+        if ($request->filled('user_id')) {
+            // Verify user belongs to same university
+            $targetUser = User::where('id', $request->user_id)
+                ->where('university_id', $authUser->university_id)
+                ->firstOrFail();
+            $validated['user_id'] = $targetUser->id;
+        } else {
+            $validated['user_id'] = $authUser->id;
+        }
+
+        Journal::create($validated);
+
+        return redirect()->route('admin-kampus.journals.index')
+            ->with('success', 'Jurnal berhasil ditambahkan.');
+    }
+
+    /**
+     * Show the form for editing an existing journal.
+     *
+     * @route GET /admin-kampus/journals/{journal}/edit
+     *
+     * @features Edit journal form with pre-populated data
+     */
+    public function edit(Journal $journal): Response
+    {
+        $this->authorize('update', $journal);
+
+        $scientificFields = ScientificField::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('AdminKampus/Journals/Edit', [
+            'journal' => $journal,
+            'scientificFields' => $scientificFields,
+            'sintaRankOptions' => Journal::getSintaRankOptions(),
+            'indexationOptions' => $this->getIndexationOptions(),
+        ]);
+    }
+
+    /**
+     * Update the specified journal.
+     *
+     * @route PUT /admin-kampus/journals/{journal}
+     *
+     * @features Update journal data
+     */
+    public function update(UpdateJournalRequest $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        $journal->update($request->validated());
+
+        return redirect()->route('admin-kampus.journals.index')
+            ->with('success', 'Data jurnal berhasil diperbarui.');
+    }
+
+    /**
+     * Delete the specified journal.
+     *
+     * @route DELETE /admin-kampus/journals/{journal}
+     *
+     * @features Delete journal (only non-approved)
+     */
+    public function destroy(Journal $journal): RedirectResponse
+    {
+        $this->authorize('delete', $journal);
+
+        $journal->delete();
+
+        return redirect()->route('admin-kampus.journals.index')
+            ->with('success', 'Jurnal berhasil dihapus.');
+    }
+
+    /**
+     * Get available indexation platforms
+     */
+    private function getIndexationOptions(): array
+    {
+        return collect(Journal::getIndexationPlatforms())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values()
+            ->toArray();
+    }
+
+    /**
      * Show the import form with user selection.
      *
      * @route GET /admin-kampus/journals/import/form
@@ -425,21 +553,6 @@ class JournalController extends Controller
 
         $authUser = $request->user();
 
-        // Get all active Users (role: User) from Admin Kampus's university
-        $users = User::query()
-            ->where('role_id', DB::table('roles')->where('name', Role::USER)->value('id'))
-            ->where('university_id', $authUser->university_id)
-            ->where('is_active', true)
-            ->select('id', 'name', 'email')
-            ->orderBy('name')
-            ->get()
-            ->map(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'label' => "{$user->name} ({$user->email})",
-            ]);
-
         // Get scientific fields for reference
         $scientificFields = ScientificField::query()
             ->where('is_active', true)
@@ -448,7 +561,6 @@ class JournalController extends Controller
             ->get();
 
         return Inertia::render('AdminKampus/Journals/Import', [
-            'users' => $users,
             'scientificFields' => $scientificFields,
         ]);
     }
@@ -466,22 +578,6 @@ class JournalController extends Controller
 
         $authUser = $request->user();
 
-        // Verify the selected user belongs to Admin Kampus's university
-        $selectedUser = User::find($request->user_id);
-
-        if (! $selectedUser || $selectedUser->university_id !== $authUser->university_id) {
-            return back()->withErrors([
-                'user_id' => 'Pengelola jurnal yang dipilih tidak valid atau bukan dari universitas Anda.',
-            ]);
-        }
-
-        // Verify the user has "User" role
-        if (! $selectedUser->hasRole('User')) {
-            return back()->withErrors([
-                'user_id' => 'Pengelola jurnal yang dipilih harus memiliki role "User".',
-            ]);
-        }
-
         try {
             DB::beginTransaction();
 
@@ -489,8 +585,8 @@ class JournalController extends Controller
             $file = $request->file('csv_file');
             $filePath = $file->getRealPath();
 
-            // Process the CSV import
-            $import = new JournalsImport($authUser->university_id, $selectedUser->id);
+            // Process the CSV import - auto-assign to current LPPM user
+            $import = new JournalsImport($authUser->university_id, $authUser->id);
             $import->import($filePath);
 
             $summary = $import->getSummary();
@@ -519,7 +615,7 @@ class JournalController extends Controller
             DB::rollBack();
 
             return redirect()->route('admin-kampus.journals.import')
-                ->with('error', 'Terjadi kesalahan saat memproses file CSV: '.$e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat memproses file CSV: ' . $e->getMessage());
         }
     }
 
@@ -544,7 +640,7 @@ class JournalController extends Controller
             $file = fopen('php://output', 'w');
 
             // Add BOM for UTF-8
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             // CSV Headers
             fputcsv($file, [
@@ -552,18 +648,12 @@ class JournalController extends Controller
                 'publisher',
                 'issn',
                 'e_issn',
-                'scientific_field_name',
                 'publication_year',
                 'sinta_rank',
-                'accreditation_rank',
-                'accreditation_expiry_date',
                 'url',
-                'ojs_url',
+                'oai_url',
                 'email',
                 'phone',
-                'indexations',
-                'about',
-                'scope',
             ]);
 
             // Sample data row 1
@@ -572,18 +662,12 @@ class JournalController extends Controller
                 'Universitas Example',
                 '1234-5678',
                 '9876-5432',
-                'Teknik Informatika',
                 '2020',
                 '2',
-                'SINTA 2',
-                '2026-12-31',
                 'https://example.com/journal',
-                'https://ojs.example.com',
+                'https://ojs.example.com/index.php/jti/oai',
                 'editor@example.com',
                 '081234567890',
-                'Scopus (2020-01-15), DOAJ (2019-06-20)',
-                'Jurnal ini membahas tentang teknologi informasi dan komputer',
-                'Teknologi Informasi, Sistem Informasi, Rekayasa Perangkat Lunak',
             ]);
 
             // Sample data row 2
@@ -591,19 +675,13 @@ class JournalController extends Controller
                 'Jurnal Ekonomi dan Bisnis',
                 'Universitas Example Press',
                 '2345-6789',
-                '',
-                'Manajemen',
+                '8765-4321',
                 '2019',
                 '',
-                '',
-                '',
                 'https://example.com/ekonomi',
-                '',
+                'https://ojs.example.com/index.php/jeb/oai',
                 'ekonomi@example.com',
                 '',
-                'DOAJ (2019-03-10)',
-                'Jurnal membahas ekonomi dan bisnis',
-                'Ekonomi, Manajemen, Akuntansi',
             ]);
 
             fclose($file);
