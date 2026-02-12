@@ -22,7 +22,7 @@ class JournalController extends Controller
         $user = Auth::user();
 
         $query = Journal::where('user_id', $user->id)
-            ->with(['scientificField', 'university', 'latestAssessment']);
+            ->with(['scientificField', 'university']);
 
         // Search
         if ($search = $request->input('search')) {
@@ -67,6 +67,7 @@ class JournalController extends Controller
 
         return Inertia::render('User/Journals/Create', [
             'scientificFields' => $scientificFields,
+            'sintaRankOptions' => Journal::getSintaRankOptions(),
             'indexationOptions' => $this->getIndexationOptions(),
         ]);
     }
@@ -80,7 +81,7 @@ class JournalController extends Controller
         $user = Auth::user();
 
         // Ensure user has a university assigned
-        if (! $user->university_id) {
+        if (!$user->university_id) {
             return back()->withErrors(['university_id' => 'Anda belum terdaftar di kampus manapun. Hubungi Admin Kampus.']);
         }
 
@@ -103,8 +104,8 @@ class JournalController extends Controller
         $journal->load([
             'scientificField',
             'university',
-            'assessments' => fn ($q) => $q->latest()->limit(10),
-            'articles' => fn ($q) => $q->latest()->limit(10),
+            'assessments' => fn($q) => $q->latest()->limit(10),
+            'articles' => fn($q) => $q->latest()->limit(10),
         ]);
 
         return Inertia::render('User/Journals/Show', [
@@ -129,6 +130,7 @@ class JournalController extends Controller
         return Inertia::render('User/Journals/Edit', [
             'journal' => $journal,
             'scientificFields' => $scientificFields,
+            'sintaRankOptions' => Journal::getSintaRankOptions(),
             'indexationOptions' => $this->getIndexationOptions(),
         ]);
     }
@@ -162,15 +164,9 @@ class JournalController extends Controller
      */
     private function getIndexationOptions(): array
     {
-        return [
-            ['value' => 'Scopus', 'label' => 'Scopus'],
-            ['value' => 'WoS', 'label' => 'Web of Science (WoS)'],
-            ['value' => 'DOAJ', 'label' => 'DOAJ (Directory of Open Access Journals)'],
-            ['value' => 'Copernicus', 'label' => 'Copernicus'],
-            ['value' => 'Google Scholar', 'label' => 'Google Scholar'],
-            ['value' => 'Garuda', 'label' => 'Garuda (Ristekdikti)'],
-            ['value' => 'Dimensions', 'label' => 'Dimensions'],
-            ['value' => 'BASE', 'label' => 'BASE (Bielefeld Academic Search Engine)'],
-        ];
+        return collect(Journal::getIndexationPlatforms())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values()
+            ->toArray();
     }
 }
