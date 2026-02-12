@@ -200,10 +200,11 @@ export default function JournalShow({ journal, statistics }: Props) {
                         <Tabs defaultValue="details" className="w-full">
                             <TabsList>
                                 <TabsTrigger value="details">Details</TabsTrigger>
-                                <TabsTrigger value="assessments">
+                                {/* Assessment tab hidden for launch - will be re-enabled post-launch */}
+                                {/* <TabsTrigger value="assessments">
                                     Assessments
                                     {statistics.total_assessments > 0 && <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs dark:bg-blue-900/30 dark:text-blue-400">{statistics.total_assessments}</span>}
-                                </TabsTrigger>
+                                </TabsTrigger> */}
                                 <TabsTrigger value="articles">
                                     Articles
                                     {statistics.total_articles > 0 && <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs dark:bg-blue-900/30 dark:text-blue-400">{statistics.total_articles}</span>}
@@ -347,8 +348,8 @@ export default function JournalShow({ journal, statistics }: Props) {
                                 </div>
                             </TabsContent>
 
-                            {/* Assessments Tab */}
-                            <TabsContent value="assessments" className="space-y-4">
+                            {/* Assessments Tab - Hidden for launch */}
+                            {/* <TabsContent value="assessments" className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-semibold">Assessment History</h3>
                                     <Link href={route('user.assessments.create', { journal_id: journal.id })}>
@@ -412,7 +413,7 @@ export default function JournalShow({ journal, statistics }: Props) {
                                         </TableBody>
                                     </Table>
                                 )}
-                            </TabsContent>
+                            </TabsContent> */}
 
                             {/* Articles Tab */}
                             <TabsContent value="articles" className="space-y-4">

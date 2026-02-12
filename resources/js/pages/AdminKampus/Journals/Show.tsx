@@ -320,8 +320,8 @@ export default function JournalShow({ journal }: Props) {
                         </div>
                     </div>
 
-                    {/* Assessments Table */}
-                    <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
+                    {/* Assessments Table - Hidden for launch */}
+                    {/* <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
                         <div className="border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
                             <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
                                 <TrendingUp className="h-5 w-5" />
@@ -377,7 +377,7 @@ export default function JournalShow({ journal }: Props) {
                                 )}
                             </TableBody>
                         </Table>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </AppLayout>
