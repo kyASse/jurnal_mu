@@ -50,11 +50,15 @@ export default function Welcome() {
                 <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#079C4E] text-white backdrop-blur-md transition-all">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#079C4E]">
-                                <BookOpen className="h-6 w-6" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+                                <img 
+                                    src="logo_dark.png" 
+                                    alt="Majelis Diktilitbang" 
+                                    className="h-8 w-8 object-contain"
+                                />
                             </div>
                             <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
-                                JurnalMu
+                                Journal MU
                             </span>
                         </div>
 

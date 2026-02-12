@@ -56,8 +56,8 @@ export default function Register({ universities }: Props) {
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <Link href="/">
-                            <h1 className="text-3xl font-bold text-green-600 dark:text-green-300">Asistensi Jurnal Muhammadiyah</h1>
-                            <p className="mt-2 text-gray-600 dark:text-gray-300">Platform Manajemen Jurnal Ilmiah PTM</p>
+                            <h1 className="text-3xl font-bold text-green-600 dark:text-green-300">Journal MU</h1>
+                            <p className="mt-2 text-gray-600 dark:text-gray-300">Platform Manajemen Jurnal Ilmiah PTMA</p>
                         </Link>
                     </div>
 
