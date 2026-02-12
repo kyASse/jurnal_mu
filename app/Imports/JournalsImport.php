@@ -3,9 +3,19 @@
 namespace App\Imports;
 
 use App\Models\Journal;
-use App\Models\ScientificField;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * CSV Import for Journals
+ *
+ * Simplified CSV format per Meeting Notes 11 Feb 2026:
+ * - Generic fields only (title, publisher, issn, e_issn, url, oai_url, etc.)
+ * - No scientific_field_name (assigned later by user)
+ * - No indexations in CSV (managed via UI)
+ * - sinta_rank mapped from integer to string enum
+ * - Auto-assigns to LPPM user who performs import
+ * - Sets approval_status to 'pending'
+ */
 class JournalsImport
 {
     protected int $universityId;
@@ -31,20 +41,26 @@ class JournalsImport
     {
         $file = fopen($filePath, 'r');
 
-        if (! $file) {
+        if (!$file) {
             throw new \Exception('Unable to open CSV file');
         }
 
         // Read header row
         $headers = fgetcsv($file);
 
-        if (! $headers) {
+        if (!$headers) {
             fclose($file);
             throw new \Exception('CSV file is empty or invalid');
         }
 
-        // Normalize headers (trim and lowercase)
-        $headers = array_map(fn ($h) => trim(strtolower($h)), $headers);
+        // Normalize headers (trim and lowercase, strip BOM)
+        $headers = array_map(function ($h) {
+            $h = trim($h);
+            // Remove BOM if present
+            $h = preg_replace('/^\xEF\xBB\xBF/', '', $h);
+
+            return strtolower($h);
+        }, $headers);
 
         $rowNumber = 1; // Start from 1 (header is row 0)
 
@@ -58,6 +74,16 @@ class JournalsImport
             }
 
             // Combine headers with data
+            if (count($headers) !== count($data)) {
+                $this->errors[] = [
+                    'row' => $rowNumber,
+                    'errors' => ['Jumlah kolom tidak sesuai dengan header'],
+                ];
+                $this->errorCount++;
+
+                continue;
+            }
+
             $row = array_combine($headers, $data);
 
             if ($row === false) {
@@ -108,50 +134,26 @@ class JournalsImport
                 return;
             }
 
-            // Find scientific field by name if provided
-            $scientificFieldId = null;
-            if (! empty($validated['scientific_field_name'])) {
-                $scientificField = ScientificField::where('name', 'like', '%'.$validated['scientific_field_name'].'%')->first();
-                if ($scientificField) {
-                    $scientificFieldId = $scientificField->id;
-                } else {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'errors' => ['Bidang ilmu "'.$validated['scientific_field_name'].'" tidak ditemukan.'],
-                    ];
-                    $this->errorCount++;
-
-                    return;
-                }
-            }
+            // Map sinta_rank from integer to string enum
+            $sintaRank = $this->mapSintaRank($validated['sinta_rank'] ?? null);
 
             // Prepare journal data
             $journalData = [
                 'title' => $validated['title'],
                 'issn' => $validated['issn'] ?? null,
-                'e_issn' => $validated['e_issn'] ?? null,
+                'e_issn' => $validated['e_issn'],
                 'publisher' => $validated['publisher'],
-                'publication_year' => $validated['publication_year'] ?? null,
-                'sinta_rank' => $validated['sinta_rank'] ?? null,
-                'accreditation_rank' => $validated['accreditation_rank'] ?? null,
-                'accreditation_expiry_date' => $validated['accreditation_expiry_date'] ?? null,
+                'first_published_year' => $validated['publication_year'] ?? null,
+                'sinta_rank' => $sintaRank,
                 'url' => $validated['url'] ?? null,
-                'ojs_url' => $validated['ojs_url'] ?? null,
+                'oai_pmh_url' => $validated['oai_url'] ?? '',
                 'email' => $validated['email'] ?? null,
                 'phone' => $validated['phone'] ?? null,
-                'about' => $validated['about'] ?? null,
-                'scope' => $validated['scope'] ?? null,
                 'university_id' => $this->universityId,
                 'user_id' => $this->userId,
-                'scientific_field_id' => $scientificFieldId,
                 'is_active' => true,
+                'approval_status' => 'pending',
             ];
-
-            // Handle indexations (JSON array)
-            if (! empty($validated['indexations'])) {
-                $indexations = $this->parseIndexations($validated['indexations']);
-                $journalData['indexations'] = $indexations;
-            }
 
             // Create the journal
             Journal::create($journalData);
@@ -160,10 +162,28 @@ class JournalsImport
         } catch (\Exception $e) {
             $this->errors[] = [
                 'row' => $rowNumber,
-                'errors' => ['Error: '.$e->getMessage()],
+                'errors' => ['Error: ' . $e->getMessage()],
             ];
             $this->errorCount++;
         }
+    }
+
+    /**
+     * Map sinta_rank from CSV integer value to string enum
+     */
+    protected function mapSintaRank($value): string
+    {
+        if (empty($value)) {
+            return 'non_sinta';
+        }
+
+        $intVal = (int) $value;
+
+        if ($intVal >= 1 && $intVal <= 6) {
+            return 'sinta_' . $intVal;
+        }
+
+        return 'non_sinta';
     }
 
     /**
@@ -181,23 +201,17 @@ class JournalsImport
                 'regex:/^\d{4}-\d{4}$/',
             ],
             'e_issn' => [
-                'nullable',
+                'required',
                 'string',
                 'max:20',
                 'regex:/^\d{4}-\d{4}$/',
             ],
-            'scientific_field_name' => 'required|string|max:255',
-            'publication_year' => 'nullable|integer|min:1900|max:'.(now()->year + 1),
+            'publication_year' => 'nullable|integer|min:1900|max:' . (now()->year + 1),
             'sinta_rank' => 'nullable|integer|min:1|max:6',
-            'accreditation_rank' => 'nullable|string|max:50',
-            'accreditation_expiry_date' => 'nullable|date|date_format:Y-m-d',
-            'url' => 'nullable|url|max:255',
-            'ojs_url' => 'nullable|url|max:255',
+            'url' => 'nullable|url|max:500',
+            'oai_url' => 'nullable|url|max:500',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
-            'about' => 'nullable|string',
-            'scope' => 'nullable|string',
-            'indexations' => 'nullable|string',
         ];
     }
 
@@ -209,15 +223,14 @@ class JournalsImport
         return [
             'title.required' => 'Judul jurnal wajib diisi.',
             'publisher.required' => 'Penerbit wajib diisi.',
-            'scientific_field_name.required' => 'Bidang ilmu wajib diisi.',
+            'e_issn.required' => 'E-ISSN wajib diisi.',
             'issn.regex' => 'Format ISSN harus: 1234-5678',
             'e_issn.regex' => 'Format E-ISSN harus: 1234-5678',
             'publication_year.integer' => 'Tahun terbit harus berupa angka.',
             'sinta_rank.integer' => 'Ranking SINTA harus berupa angka 1-6.',
             'url.url' => 'URL tidak valid.',
-            'ojs_url.url' => 'URL OJS tidak valid.',
+            'oai_url.url' => 'URL OAI-PMH tidak valid.',
             'email.email' => 'Format email tidak valid.',
-            'accreditation_expiry_date.date_format' => 'Format tanggal harus: YYYY-MM-DD',
         ];
     }
 
@@ -228,14 +241,14 @@ class JournalsImport
     {
         $query = Journal::where('university_id', $this->universityId);
 
-        if (! empty($validated['issn'])) {
+        if (!empty($validated['issn'])) {
             $exists = (clone $query)->where('issn', $validated['issn'])->exists();
             if ($exists) {
                 return true;
             }
         }
 
-        if (! empty($validated['e_issn'])) {
+        if (!empty($validated['e_issn'])) {
             $exists = (clone $query)->where('e_issn', $validated['e_issn'])->exists();
             if ($exists) {
                 return true;
@@ -243,37 +256,6 @@ class JournalsImport
         }
 
         return false;
-    }
-
-    /**
-     * Parse indexations string to associative array
-     * Expected format: "Scopus (2020-01-01), WoS (2021-05-15)" or "DOAJ, Google Scholar"
-     * Returns: ['Scopus' => '2020-01-01', 'WoS' => '2021-05-15']
-     */
-    protected function parseIndexations(string $indexations): array
-    {
-        $result = [];
-        $parts = explode(',', $indexations);
-
-        foreach ($parts as $part) {
-            $part = trim($part);
-
-            if (empty($part)) {
-                continue;
-            }
-
-            // Match pattern: "IndexName (YYYY-MM-DD)"
-            if (preg_match('/^(.+?)\s*\((\d{4}-\d{2}-\d{2})\)$/', $part, $matches)) {
-                $platformName = trim($matches[1]);
-                $indexedDate = $matches[2];
-                $result[$platformName] = $indexedDate;
-            } else {
-                // If no date, use platform name as key with current date as value
-                $result[$part] = now()->format('Y-m-d');
-            }
-        }
-
-        return $result;
     }
 
     /**
