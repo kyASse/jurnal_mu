@@ -31,7 +31,7 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'Journal MU') }}</title>
 
         <link rel="icon" href="logo_dark.png" type="image/png">
         <link rel="apple-touch-icon" href="logo_dark.png">
