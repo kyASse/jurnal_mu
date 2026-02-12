@@ -71,6 +71,16 @@ class JournalAssessment extends Model
         'deleted_at' => 'datetime',
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'status_label',
+        'grade',
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -201,7 +211,7 @@ class JournalAssessment extends Model
      */
     public function scopeByStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -301,7 +311,7 @@ class JournalAssessment extends Model
         $this->max_score = $this->responses()
             ->with('evaluationIndicator')
             ->get()
-            ->sum(fn ($response) => $response->evaluationIndicator->weight);
+            ->sum(fn($response) => $response->evaluationIndicator->weight);
 
         $this->percentage = $this->max_score > 0
             ? ($this->total_score / $this->max_score) * 100

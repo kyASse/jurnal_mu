@@ -1,7 +1,7 @@
 /**
  * @description Admin Kampus - Import Journals from CSV
  * @route GET /admin-kampus/journals/import/form
- * @features Upload CSV file, select journal manager, preview data, download template, batch import with validation
+ * @features Upload CSV file, auto-assign to current admin, preview data, download template, batch import with validation
  */
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -9,10 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react'; // Add usePage import
 import { AlertCircle, ArrowLeft, CheckCircle2, Download, Info, Upload } from 'lucide-react';
 import Papa from 'papaparse';
 import { FormEventHandler, useRef, useState } from 'react';
@@ -32,24 +31,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    label: string;
-}
-
-interface ScientificField {
-    id: number;
-    name: string;
-}
-
 interface Props {
-    users: User[];
-    scientificFields: ScientificField[];
+    // scientificFields are still passed if needed for reference, or can be optional
     errors?: {
         csv_file?: string;
-        user_id?: string;
     };
     flash?: {
         success?: string;
@@ -66,9 +51,9 @@ interface CsvRow {
     [key: string]: string;
 }
 
-export default function Import({ users, scientificFields, errors, flash }: Props) {
+export default function Import({ errors, flash }: Props) {
+    const { auth } = usePage().props as any; // Get auth user info
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [previewData, setPreviewData] = useState<CsvRow[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [fileError, setFileError] = useState<string>('');
@@ -133,15 +118,10 @@ export default function Import({ users, scientificFields, errors, flash }: Props
             return;
         }
 
-        if (!selectedUserId) {
-            return;
-        }
-
         setIsProcessing(true);
 
         const formData = new FormData();
         formData.append('csv_file', selectedFile);
-        formData.append('user_id', selectedUserId);
 
         router.post(route('admin-kampus.journals.import.process'), formData, {
             forceFormData: true,
@@ -150,22 +130,16 @@ export default function Import({ users, scientificFields, errors, flash }: Props
         });
     };
 
-    const requiredColumns = ['title', 'publisher', 'scientific_field_name'];
+    const requiredColumns = ['title', 'publisher', 'e_issn'];
 
     const optionalColumns = [
         'issn',
-        'e_issn',
         'publication_year',
         'sinta_rank',
-        'accreditation_rank',
-        'accreditation_expiry_date',
         'url',
-        'ojs_url',
+        'oai_url',
         'email',
         'phone',
-        'indexations',
-        'about',
-        'scope',
     ];
 
     return (
@@ -242,28 +216,15 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                             <Card>
                                 <CardContent className="pt-6">
                                     <form onSubmit={handleSubmit} className="space-y-6">
-                                        {/* User Selection */}
-                                        <div className="space-y-2">
-                                            <Label htmlFor="user_id">
-                                                Pengelola Jurnal <span className="text-destructive">*</span>
-                                            </Label>
-                                            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                                                <SelectTrigger id="user_id" className={errors?.user_id ? 'border-destructive' : ''}>
-                                                    <SelectValue placeholder="Pilih pengelola jurnal" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {users.map((user) => (
-                                                        <SelectItem key={user.id} value={user.id.toString()}>
-                                                            {user.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            {errors?.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
-                                            <p className="text-sm text-muted-foreground">
-                                                Semua jurnal yang diimport akan ditugaskan ke pengelola ini.
-                                            </p>
-                                        </div>
+
+                                        {/* Auto-Assign Info */}
+                                        <Alert>
+                                            <Info className="h-4 w-4" />
+                                            <AlertTitle>Informasi Pengelola</AlertTitle>
+                                            <AlertDescription>
+                                                Semua jurnal yang diimport akan ditugaskan kepada Anda (<strong>{auth.user.name}</strong>) sebagai pengelola awal. Anda dapat menugaskan ulang jurnal ke pengelola lain setelah import selesai.
+                                            </AlertDescription>
+                                        </Alert>
 
                                         {/* File Upload */}
                                         <div className="space-y-2">
@@ -328,7 +289,7 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                         <div className="flex flex-col gap-3 pt-4 sm:flex-row">
                                             <Button
                                                 type="submit"
-                                                disabled={!selectedFile || !selectedUserId || isProcessing}
+                                                disabled={!selectedFile || isProcessing}
                                                 className="w-full min-w-[150px] sm:w-auto"
                                             >
                                                 {isProcessing ? (
@@ -401,32 +362,10 @@ export default function Import({ users, scientificFields, errors, flash }: Props
                                         <strong className="text-foreground">Tanggal:</strong> YYYY-MM-DD (contoh: 2026-12-31)
                                     </div>
                                     <div>
-                                        <strong className="text-foreground">SINTA Rank:</strong> Angka 1-6 atau kosong
+                                        <strong className="text-foreground">SINTA Rank:</strong> angka 1-6 atau kosong (non_sinta)
                                     </div>
                                     <div>
-                                        <strong className="text-foreground">Indexations:</strong> Format: "Scopus (2020-01-15), DOAJ (2019-06-20)"
-                                    </div>
-                                    <div>
-                                        <strong className="text-foreground">Scientific Field:</strong> Harus sesuai dengan nama bidang ilmu yang ada
-                                        di sistem
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Scientific Fields Reference */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-base">Bidang Ilmu Valid</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="max-h-60 overflow-y-auto text-sm">
-                                        <ul className="space-y-1">
-                                            {scientificFields.map((field) => (
-                                                <li key={field.id} className="text-muted-foreground">
-                                                    • {field.name}
-                                                </li>
-                                            ))}
-                                        </ul>
+                                        <strong className="text-foreground">Bidang Ilmu:</strong> Akan ditugaskan secara manual setelah import.
                                     </div>
                                 </CardContent>
                             </Card>

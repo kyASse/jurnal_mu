@@ -7,6 +7,7 @@ use App\Http\Requests\StoreJournalRequest;
 use App\Http\Requests\UpdateJournalRequest;
 use App\Models\Journal;
 use App\Models\ScientificField;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -15,18 +16,44 @@ class JournalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Journal::class);
         $user = Auth::user();
 
-        $journals = Journal::where('user_id', $user->id)
-            ->with(['scientificField', 'university'])
-            ->latest()
-            ->paginate(10);
+        $query = Journal::where('user_id', $user->id)
+            ->with(['scientificField', 'university']);
+
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('issn', 'like', "%{$search}%")
+                    ->orWhere('e_issn', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by SINTA rank
+        if ($sintaRank = $request->input('sinta_rank')) {
+            $query->where('sinta_rank', $sintaRank);
+        }
+
+        // Filter by scientific field
+        if ($fieldId = $request->input('scientific_field_id')) {
+            $query->where('scientific_field_id', $fieldId);
+        }
+
+        // Filter by approval status
+        if ($status = $request->input('approval_status')) {
+            $query->where('approval_status', $status);
+        }
+
+        $journals = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('User/Journals/Index', [
             'journals' => $journals,
+            'filters' => $request->only(['search', 'sinta_rank', 'scientific_field_id', 'approval_status']),
+            'scientificFields' => ScientificField::select('id', 'name')->orderBy('name')->get(),
         ]);
     }
 
@@ -40,6 +67,7 @@ class JournalController extends Controller
 
         return Inertia::render('User/Journals/Create', [
             'scientificFields' => $scientificFields,
+            'sintaRankOptions' => Journal::getSintaRankOptions(),
             'indexationOptions' => $this->getIndexationOptions(),
         ]);
     }
@@ -53,7 +81,7 @@ class JournalController extends Controller
         $user = Auth::user();
 
         // Ensure user has a university assigned
-        if (! $user->university_id) {
+        if (!$user->university_id) {
             return back()->withErrors(['university_id' => 'Anda belum terdaftar di kampus manapun. Hubungi Admin Kampus.']);
         }
 
@@ -63,7 +91,31 @@ class JournalController extends Controller
 
         Journal::create($validated);
 
-        return redirect()->route('journals.index')->with('success', 'Jurnal berhasil ditambahkan.');
+        return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil ditambahkan.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Journal $journal)
+    {
+        $this->authorize('view', $journal);
+
+        $journal->load([
+            'scientificField',
+            'university',
+            'assessments' => fn($q) => $q->latest()->limit(10),
+            'articles' => fn($q) => $q->latest()->limit(10),
+        ]);
+
+        return Inertia::render('User/Journals/Show', [
+            'journal' => $journal,
+            'statistics' => [
+                'total_assessments' => $journal->assessments()->count(),
+                'latest_score' => $journal->assessments()->latest()->first()?->total_score,
+                'total_articles' => $journal->articles()->count(),
+            ],
+        ]);
     }
 
     /**
@@ -78,6 +130,7 @@ class JournalController extends Controller
         return Inertia::render('User/Journals/Edit', [
             'journal' => $journal,
             'scientificFields' => $scientificFields,
+            'sintaRankOptions' => Journal::getSintaRankOptions(),
             'indexationOptions' => $this->getIndexationOptions(),
         ]);
     }
@@ -91,7 +144,7 @@ class JournalController extends Controller
 
         $journal->update($request->validated());
 
-        return redirect()->route('journals.index')->with('success', 'Data jurnal berhasil diperbarui.');
+        return redirect()->route('user.journals.index')->with('success', 'Data jurnal berhasil diperbarui.');
     }
 
     /**
@@ -103,7 +156,7 @@ class JournalController extends Controller
 
         $journal->delete();
 
-        return redirect()->route('journals.index')->with('success', 'Jurnal berhasil dihapus.');
+        return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil dihapus.');
     }
 
     /**
@@ -111,15 +164,9 @@ class JournalController extends Controller
      */
     private function getIndexationOptions(): array
     {
-        return [
-            ['value' => 'Scopus', 'label' => 'Scopus'],
-            ['value' => 'WoS', 'label' => 'Web of Science (WoS)'],
-            ['value' => 'DOAJ', 'label' => 'DOAJ (Directory of Open Access Journals)'],
-            ['value' => 'Copernicus', 'label' => 'Copernicus'],
-            ['value' => 'Google Scholar', 'label' => 'Google Scholar'],
-            ['value' => 'Garuda', 'label' => 'Garuda (Ristekdikti)'],
-            ['value' => 'Dimensions', 'label' => 'Dimensions'],
-            ['value' => 'BASE', 'label' => 'BASE (Bielefeld Academic Search Engine)'],
-        ];
+        return collect(Journal::getIndexationPlatforms())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values()
+            ->toArray();
     }
 }

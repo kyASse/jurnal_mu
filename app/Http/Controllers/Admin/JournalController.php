@@ -34,7 +34,7 @@ class JournalController extends Controller
 
         // Base query - Super Admin sees all journals
         $query = Journal::query()
-            ->with(['university', 'user', 'scientificField', 'latestAssessment']);
+            ->with(['university', 'user', 'scientificField']);
 
         // Apply search filter
         if ($request->filled('search')) {
@@ -66,17 +66,13 @@ class JournalController extends Controller
             $query->byIndexation($request->indexation);
         }
 
-        // Apply Dikti accreditation filter
-        if ($request->filled('accreditation_grade')) {
-            $query->byAccreditationGrade($request->accreditation_grade);
-        }
 
         // Paginate results
         $journals = $query
             ->orderBy('title')
             ->paginate(10)
             ->withQueryString()
-            ->through(fn ($journal) => [
+            ->through(fn($journal) => [
                 'id' => $journal->id,
                 'title' => $journal->title,
                 'issn' => $journal->issn,
@@ -98,9 +94,8 @@ class JournalController extends Controller
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
                 'is_active' => $journal->is_active,
-                'assessment_status' => $journal->latestAssessment?->status ?? null,
-                'assessment_status_label' => $journal->latestAssessment?->status_label ?? 'Belum Ada',
-                'latest_score' => $journal->latestAssessment?->percentage ?? null,
+                'approval_status' => $journal->approval_status,
+                'indexation_labels' => $journal->indexation_labels,
                 'created_at' => $journal->created_at->format('Y-m-d'),
             ]);
 
@@ -116,14 +111,9 @@ class JournalController extends Controller
             ->orderBy('name')
             ->get();
 
-        $sintaRanks = collect([
-            ['value' => 1, 'label' => 'SINTA 1'],
-            ['value' => 2, 'label' => 'SINTA 2'],
-            ['value' => 3, 'label' => 'SINTA 3'],
-            ['value' => 4, 'label' => 'SINTA 4'],
-            ['value' => 5, 'label' => 'SINTA 5'],
-            ['value' => 6, 'label' => 'SINTA 6'],
-        ]);
+        $sintaRanks = collect(Journal::getSintaRankOptions())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
 
         $statusOptions = collect([
             ['value' => 'draft', 'label' => 'Draft'],
@@ -132,22 +122,18 @@ class JournalController extends Controller
         ]);
 
         $indexationOptions = collect(Journal::getIndexationPlatforms())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
             ->values();
 
-        $accreditationGradeOptions = collect(Journal::getAccreditationGrades())
-            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
-            ->values();
 
         return Inertia::render('Admin/Journals/Index', [
             'journals' => $journals,
-            'filters' => $request->only(['search', 'university_id', 'status', 'sinta_rank', 'scientific_field_id', 'indexation', 'accreditation_grade']),
+            'filters' => $request->only(['search', 'university_id', 'status', 'sinta_rank', 'scientific_field_id', 'indexation']),
             'universities' => $universities,
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
             'statusOptions' => $statusOptions,
             'indexationOptions' => $indexationOptions,
-            'accreditationGradeOptions' => $accreditationGradeOptions,
         ]);
     }
 
@@ -190,17 +176,13 @@ class JournalController extends Controller
                 // SINTA
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
-                'sinta_indexed_date' => $journal->sinta_indexed_date?->format('Y-m-d'),
 
-                // Dikti Accreditation
-                'accreditation_status' => $journal->accreditation_status,
-                'accreditation_status_label' => $journal->accreditation_status_label,
-                'accreditation_grade' => $journal->accreditation_grade,
-                'dikti_accreditation_number' => $journal->dikti_accreditation_number,
-                'dikti_accreditation_label' => $journal->dikti_accreditation_label,
-                'accreditation_issued_date' => $journal->accreditation_issued_date?->format('Y-m-d'),
-                'accreditation_expiry_date' => $journal->accreditation_expiry_date?->format('Y-m-d'),
-                'is_accreditation_expired' => $journal->is_accreditation_expired,
+                // Accreditation (merged)
+                'accreditation_label' => $journal->accreditation_label,
+                'accreditation_start_year' => $journal->accreditation_start_year,
+                'accreditation_end_year' => $journal->accreditation_end_year,
+                'accreditation_sk_number' => $journal->accreditation_sk_number,
+                'accreditation_sk_date' => $journal->accreditation_sk_date?->format('Y-m-d'),
                 'accreditation_expiry_status' => $journal->accreditation_expiry_status,
 
                 // Indexations
@@ -224,7 +206,7 @@ class JournalController extends Controller
                     'id' => $journal->scientificField->id,
                     'name' => $journal->scientificField->name,
                 ] : null,
-                'assessments' => $journal->assessments->map(fn ($assessment) => [
+                'assessments' => $journal->assessments->map(fn($assessment) => [
                     'id' => $assessment->id,
                     'assessment_date' => $assessment->assessment_date,
                     'period' => $assessment->period,

@@ -1,56 +1,11 @@
 /**
- * JournalsEdit Component
+ * JournalsEdit Component for Admin Kampus
  *
  * @description
  * The editing interface for existing journals. Pre-populates all form fields
- * with current journal data and allows users to update information such as
- * ISSN, titles, and classification details.
+ * with current journal data and allows Admin Kampus to update information.
  *
- * @component
- *
- * @interface Journal
- * @property {number} id - Journal ID
- * @property {string} title - Journal Title
- * @property {string} issn - ISSN
- * @property {string} e_issn - E-ISSN
- * @property {string} url - URL
- * @property {number} scientific_field_id - Foreign key for scientific field
- * @property {number|null} sinta_rank - SINTA Rank
- * @property {string} frequency - Publication frequency
- * @property {string} publisher - Publisher name
- * @property {number|null} first_published_year - Year of first publication
- *
- * @interface Props
- * @property {Journal} journal - The existing journal data to edit
- * @property {Array} scientificFields - List of available scientific fields
- *
- * @param {Props} props - Component props
- * @param {Journal} props.journal - Current journal data
- * @param {Array} props.scientificFields - Reference data for dropdowns
- *
- * @returns {JSX.Element} The rendered Edit Journal page
- *
- * @example
- * ```tsx
- * <JournalsEdit journal={journalData} scientificFields={fieldsList} />
- * ```
- *
- * @features
- * - Data pre-filling
- * - PUT request handling for updates
- * - Validation error display
- * - Navigation back to index
- *
- * @route PUT /journals/{id}
- *
- * @requires @inertiajs/react
- * @requires @/layouts/app-layout
- * @requires @/components/ui/button
- * @requires @/components/ui/select
- * @requires lucide-react
- *
- * @author JurnalMU Team
- * @filepath /resources/js/pages/User/Journals/Edit.tsx
+ * @route PUT /admin-kampus/journals/{id}
  */
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -140,16 +95,16 @@ export default function JournalsEdit({ journal, scientificFields, sintaRankOptio
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('user.journals.update', journal.id));
+        put(route('admin-kampus.journals.update', journal.id));
     };
 
     const currentYear = new Date().getFullYear();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'My Journals', href: route('user.journals.index') },
-        { title: journal.title, href: route('user.journals.show', journal.id) },
-        { title: 'Edit', href: route('user.journals.edit', journal.id) },
+        { title: 'Journals', href: route('admin-kampus.journals.index') },
+        { title: journal.title, href: route('admin-kampus.journals.show', journal.id) },
+        { title: 'Edit', href: route('admin-kampus.journals.edit', journal.id) },
     ];
 
     return (
@@ -160,10 +115,10 @@ export default function JournalsEdit({ journal, scientificFields, sintaRankOptio
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6">
-                        <Link href={route('user.journals.index')}>
+                        <Link href={route('admin-kampus.journals.index')}>
                             <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600 dark:hover:text-blue-400">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
-                                Back to My Journals
+                                Back to Journals Management
                             </Button>
                         </Link>
                         <div className="flex items-center gap-2">
@@ -394,7 +349,6 @@ export default function JournalsEdit({ journal, scientificFields, sintaRankOptio
                                 </div>
                             </div>
 
-
                             {/* Contact & Additional Info */}
                             <div className="space-y-4">
                                 <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100 dark:border-gray-700">Contact & Additional Information</h3>
@@ -553,7 +507,7 @@ export default function JournalsEdit({ journal, scientificFields, sintaRankOptio
                             </div>
 
                             <div className="flex items-center justify-end gap-4 border-t pt-4 dark:border-gray-700">
-                                <Link href={route('user.journals.index')}>
+                                <Link href={route('admin-kampus.journals.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>

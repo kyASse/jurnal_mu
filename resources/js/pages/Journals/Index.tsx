@@ -40,7 +40,7 @@ interface Journal {
         id: number;
         name: string;
     } | null;
-    sinta_rank: number | null;
+    sinta_rank: string | null;
     sinta_rank_label: string;
 }
 
@@ -75,7 +75,7 @@ interface Props {
     filters: {
         search?: string;
         university_id?: number;
-        sinta_rank?: number;
+        sinta_rank?: string;
         scientific_field_id?: number;
         indexation?: string;
     };
@@ -89,7 +89,7 @@ export default function JournalsIndex({ journals, filters, universities, scienti
     const { auth } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [universityFilter, setUniversityFilter] = useState(filters.university_id?.toString() || '');
-    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank?.toString() || '');
+    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank || '');
     const [scientificFieldFilter, setScientificFieldFilter] = useState(filters.scientific_field_id?.toString() || '');
     const [indexationFilter, setIndexationFilter] = useState(filters.indexation || '');
 
@@ -136,11 +136,15 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center gap-3">
                             <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#079C4E]">
-                                    <BookOpen className="h-6 w-6" />
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+                                    <img 
+                                        src="logo_dark.png" 
+                                        alt="Majelis Diktilitbang" 
+                                        className="h-8 w-8 object-contain"
+                                    />
                                 </div>
                                 <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
-                                    JurnalMu
+                                    Journal MU
                                 </span>
                             </Link>
                         </div>

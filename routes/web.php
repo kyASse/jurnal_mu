@@ -49,7 +49,7 @@ Route::get('/', function () {
         ->orderBy('sinta_rank')
         ->limit(4)
         ->get()
-        ->map(fn ($journal) => [
+        ->map(fn($journal) => [
             'id' => $journal->id,
             'title' => $journal->title,
             'sinta_rank' => $journal->sinta_rank,
@@ -92,6 +92,10 @@ Route::get('/journals', [\App\Http\Controllers\PublicJournalController::class, '
     ->name('journals.index');
 Route::get('/journals/{journal}', [\App\Http\Controllers\PublicJournalController::class, 'show'])
     ->name('journals.show');
+
+// Browse journals by university
+Route::get('/browse/universities', [\App\Http\Controllers\PublicJournalController::class, 'browseUniversities'])
+    ->name('browse.universities');
 
 /*
 |--------------------------------------------------------------------------
@@ -138,7 +142,7 @@ Route::middleware(['auth'])->group(function () {
     | Super Admin Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:' . Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
 
         // Data Master (Placeholder)
         Route::get('data-master', [DataMasterController::class, 'index'])
@@ -286,7 +290,7 @@ Route::middleware(['auth'])->group(function () {
     | Admin Kampus Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
+    Route::middleware(['role:' . Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
 
         // User Approval Workflow (Two-Step Approval Phase 1)
         Route::prefix('users')->name('users.')->group(function () {
@@ -322,8 +326,18 @@ Route::middleware(['auth'])->group(function () {
         // View journals from their university
         Route::get('journals', [\App\Http\Controllers\AdminKampus\JournalController::class, 'index'])
             ->name('journals.index');
+        Route::get('journals/create', [\App\Http\Controllers\AdminKampus\JournalController::class, 'create'])
+            ->name('journals.create');
+        Route::post('journals', [\App\Http\Controllers\AdminKampus\JournalController::class, 'store'])
+            ->name('journals.store');
         Route::get('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
             ->name('journals.show');
+        Route::get('journals/{journal}/edit', [\App\Http\Controllers\AdminKampus\JournalController::class, 'edit'])
+            ->name('journals.edit');
+        Route::put('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'update'])
+            ->name('journals.update');
+        Route::delete('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'destroy'])
+            ->name('journals.destroy');
 
         // Import journals from CSV
         Route::get('journals/import/template', [\App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
@@ -380,18 +394,23 @@ Route::middleware(['auth'])->group(function () {
     | User (Pengelola Jurnal) Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::USER])->prefix('user')->name('user.')->group(function () {
+    Route::middleware(['role:' . Role::USER])->prefix('user')->name('user.')->group(function () {
 
         // Profil (Placeholder)
         Route::get('profil', [ProfilController::class, 'index'])
             ->name('profil.index');
 
-        // Jurnal (Placeholder)
-        Route::get('jurnal', [JurnalController::class, 'index'])
-            ->name('jurnal.index');
-
-        // Journals Management (existing feature - keep for backward compatibility)
-        Route::resource('journals', UserJournalController::class);
+        // Journals Management
+        Route::resource('journals', UserJournalController::class)
+            ->names([
+                'index' => 'journals.index',
+                'create' => 'journals.create',
+                'store' => 'journals.store',
+                'show' => 'journals.show',
+                'edit' => 'journals.edit',
+                'update' => 'journals.update',
+                'destroy' => 'journals.destroy',
+            ]);
 
         // Assessments Management
         Route::prefix('assessments')->name('assessments.')->group(function () {
@@ -463,7 +482,7 @@ Route::middleware(['auth'])->group(function () {
     | Reviewer Routes (v1.1)
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::REVIEWER])->prefix('reviewer')->name('reviewer.')->group(function () {
+    Route::middleware(['role:' . Role::REVIEWER])->prefix('reviewer')->name('reviewer.')->group(function () {
 
         // Assignments Management
         Route::prefix('assignments')->name('assignments.')->group(function () {
@@ -502,5 +521,5 @@ Route::middleware(['auth'])->group(function () {
     // });
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

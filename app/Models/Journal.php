@@ -28,17 +28,16 @@ class Journal extends Model
         'first_published_year',
         'scientific_field_id',
         'sinta_rank',
-        'sinta_indexed_date',
-        'accreditation_status',
-        'accreditation_grade',
-        'dikti_accreditation_number',
-        'accreditation_issued_date',
-        'accreditation_expiry_date',
+        'accreditation_start_year',
+        'accreditation_end_year',
+        'accreditation_sk_number',
+        'accreditation_sk_date',
         'indexations',
         'editor_in_chief',
         'email',
         'phone',
         'cover_image_url',
+        'cover_image',
         'about',
         'scope',
         'is_active',
@@ -55,16 +54,28 @@ class Journal extends Model
      */
     protected $casts = [
         'first_published_year' => 'integer',
-        'sinta_rank' => 'integer',
-        'sinta_indexed_date' => 'date',
-        'accreditation_issued_date' => 'date',
-        'accreditation_expiry_date' => 'date',
+        'sinta_rank' => 'string',
+        'accreditation_start_year' => 'integer',
+        'accreditation_end_year' => 'integer',
+        'accreditation_sk_date' => 'date',
         'approved_at' => 'datetime',
         'indexations' => 'array',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'sinta_rank_label',
+        'approval_status_label',
+        'accreditation_label',
+        'indexation_labels',
     ];
 
     /**
@@ -245,7 +256,7 @@ class Journal extends Model
      */
     public function scopeByApprovalStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -271,17 +282,12 @@ class Journal extends Model
     /**
      * Scope to filter by SINTA rank
      *
-     * @param  mixed  $rank  - integer (1-6) for specific rank, 'non_sinta' for journals without SINTA rank
+     * @param  mixed  $rank  - string enum: 'sinta_1'..'sinta_6', 'non_sinta'
      */
     public function scopeBySintaRank($query, $rank)
     {
-        if (! $rank) {
+        if (!$rank) {
             return $query;
-        }
-
-        // Handle "Non Sinta" filter
-        if ($rank === 'non_sinta') {
-            return $query->whereNull('sinta_rank');
         }
 
         return $query->where('sinta_rank', $rank);
@@ -292,7 +298,7 @@ class Journal extends Model
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (! $search) {
+        if (!$search) {
             return $query;
         }
 
@@ -308,7 +314,7 @@ class Journal extends Model
      */
     public function scopeByAssessmentStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -322,13 +328,13 @@ class Journal extends Model
      */
     public function scopeByIndexation($query, ?string $platform)
     {
-        if (! $platform) {
+        if (!$platform) {
             return $query;
         }
 
         return $query->whereNotNull('indexations')
             ->where(function ($q) use ($platform) {
-                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
+                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$." . $platform . "')");
             });
     }
 
@@ -353,14 +359,18 @@ class Journal extends Model
 
     /**
      * Scope to filter by Dikti accreditation grade
+     *
+     * @deprecated Accreditation grade field removed in Feb 2026 migration
      */
     public function scopeByAccreditationGrade($query, ?string $grade)
     {
-        if (! $grade) {
+        if (!$grade) {
             return $query;
         }
 
-        return $query->where('accreditation_grade', $grade);
+        // Legacy: accreditation_grade column has been removed
+        // Now sinta_rank contains the merged accreditation info
+        return $query;
     }
 
     /**
@@ -368,7 +378,7 @@ class Journal extends Model
      */
     public function scopeByPembinaanPeriod($query, ?string $period)
     {
-        if (! $period) {
+        if (!$period) {
             return $query;
         }
 
@@ -384,7 +394,7 @@ class Journal extends Model
      */
     public function scopeByPembinaanYear($query, ?string $year)
     {
-        if (! $year) {
+        if (!$year) {
             return $query;
         }
 
@@ -399,7 +409,7 @@ class Journal extends Model
      */
     public function scopeByParticipation($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -419,7 +429,7 @@ class Journal extends Model
      */
     public function scopeByAssessmentApprovalStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -448,21 +458,41 @@ class Journal extends Model
      */
     public function getSintaRankLabelAttribute(): string
     {
-        return $this->sinta_rank ? "SINTA {$this->sinta_rank}" : 'Belum Terindeks';
+        $labels = self::getSintaRankOptions();
+
+        return $labels[$this->sinta_rank] ?? 'Non Sinta';
     }
 
     /**
-     * Get accreditation label
+     * Get approval status label
+     */
+    public function getApprovalStatusLabelAttribute(): string
+    {
+        $labels = [
+            'pending' => 'Pending Approval',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+        ];
+
+        return $labels[$this->approval_status] ?? 'Unknown';
+    }
+
+    /**
+     * Get accreditation label (merged with SINTA)
      */
     public function getAccreditationLabelAttribute(): string
     {
-        if (! $this->accreditation_status) {
-            return 'Belum Terakreditasi';
+        if (!$this->sinta_rank || $this->sinta_rank === 'non_sinta') {
+            return 'Non Sinta';
         }
 
-        return $this->accreditation_grade
-            ? "{$this->accreditation_status} ({$this->accreditation_grade})"
-            : $this->accreditation_status;
+        $label = $this->sinta_rank_label;
+
+        if ($this->accreditation_start_year && $this->accreditation_end_year) {
+            $label .= " ({$this->accreditation_start_year}-{$this->accreditation_end_year})";
+        }
+
+        return $label;
     }
 
     /**
@@ -482,15 +512,15 @@ class Journal extends Model
     }
 
     /**
-     * Check if Dikti accreditation is expired
+     * Check if accreditation is expired (based on end year)
      */
     public function getIsAccreditationExpiredAttribute(): bool
     {
-        if (! $this->accreditation_expiry_date) {
+        if (!$this->accreditation_end_year) {
             return false;
         }
 
-        return $this->accreditation_expiry_date->isPast();
+        return $this->accreditation_end_year < (int) date('Y');
     }
 
     /**
@@ -500,15 +530,17 @@ class Journal extends Model
      */
     public function getAccreditationExpiryStatusAttribute(): string
     {
-        if (! $this->accreditation_expiry_date) {
+        if (!$this->accreditation_end_year) {
             return 'none';
         }
 
-        if ($this->accreditation_expiry_date->isPast()) {
+        $currentYear = (int) date('Y');
+
+        if ($this->accreditation_end_year < $currentYear) {
             return 'expired';
         }
 
-        if ($this->accreditation_expiry_date->diffInDays(now()) <= 30) {
+        if ($this->accreditation_end_year === $currentYear) {
             return 'expiring_soon';
         }
 
@@ -520,14 +552,15 @@ class Journal extends Model
      */
     public function getDiktiAccreditationLabelAttribute(): string
     {
-        if (! $this->dikti_accreditation_number) {
-            return 'Belum Terakreditasi Dikti';
+        if (!$this->accreditation_sk_number) {
+            return 'Belum Ada SK';
         }
 
-        $label = "No. {$this->dikti_accreditation_number}";
+        $skNumber = $this->accreditation_sk_number;
+        $label = "SK No. {$skNumber}";
 
-        if ($this->accreditation_grade) {
-            $label .= " ({$this->accreditation_grade})";
+        if ($this->sinta_rank && $this->sinta_rank !== 'non_sinta') {
+            $label .= " ({$this->sinta_rank_label})";
         }
 
         return $label;
@@ -540,7 +573,7 @@ class Journal extends Model
      */
     public function getIndexationLabelsAttribute(): array
     {
-        if (! $this->indexations || ! is_array($this->indexations)) {
+        if (!$this->indexations || !is_array($this->indexations)) {
             return [];
         }
 
@@ -611,6 +644,8 @@ class Journal extends Model
     /**
      * Get available Dikti accreditation grades
      *
+     * @deprecated Use getSintaRankOptions() instead
+     *
      * @return array<string, string>
      */
     public static function getAccreditationGrades(): array
@@ -620,6 +655,24 @@ class Journal extends Model
             'Baik Sekali' => 'Baik Sekali',
             'Baik' => 'Baik',
             'Cukup' => 'Cukup',
+        ];
+    }
+
+    /**
+     * Get available SINTA rank options (merged accreditation)
+     *
+     * @return array<string, string>
+     */
+    public static function getSintaRankOptions(): array
+    {
+        return [
+            'sinta_1' => 'SINTA 1',
+            'sinta_2' => 'SINTA 2',
+            'sinta_3' => 'SINTA 3',
+            'sinta_4' => 'SINTA 4',
+            'sinta_5' => 'SINTA 5',
+            'sinta_6' => 'SINTA 6',
+            'non_sinta' => 'Non Sinta',
         ];
     }
 }

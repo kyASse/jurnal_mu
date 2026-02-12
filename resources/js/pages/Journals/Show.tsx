@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { type Article, type Journal, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronRight, Download, Globe, Mail, MapPin, Search, User } from 'lucide-react';
+import { BookOpen, ChevronRight, Download, Globe, Mail, MapPin, Search, Target, User } from 'lucide-react';
 import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 
@@ -109,11 +109,15 @@ export default function JournalsShow() {
                 <nav className="fixed top-0 z-50 w-full border-b border-primary/20 bg-primary text-white shadow-sm backdrop-blur-md transition-all dark:border-primary/30 dark:bg-primary">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-primary shadow-sm">
-                                <BookOpen className="h-6 w-6" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
+                                <img 
+                                    src="logo_dark.png" 
+                                    alt="Majelis Diktilitbang" 
+                                    className="h-8 w-8 object-contain"
+                                />
                             </div>
                             <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
-                                JurnalMu
+                                Journal MU
                             </span>
                         </Link>
                         <div className="flex items-center gap-4">
@@ -297,12 +301,12 @@ export default function JournalsShow() {
 
                             <div className="flex flex-wrap items-center gap-2">
                                 <SintaBadge rank={journal.sinta_rank ?? null} />
-                                {journal.dikti_accreditation_label && (
+                                {journal.accreditation_label && (
                                     <Badge
                                         variant="outline"
                                         className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300"
                                     >
-                                        {journal.dikti_accreditation_label}
+                                        {journal.accreditation_label}
                                     </Badge>
                                 )}
                                 {journal.indexation_labels && journal.indexation_labels.length > 0 && (
@@ -325,6 +329,34 @@ export default function JournalsShow() {
                                 </a>
                             </div>
                         </div>
+
+                        {/* Description & Scope Section */}
+                        {(journal.about || journal.scope) && (
+                            <div className="mb-6 grid gap-6 md:grid-cols-2">
+                                {journal.about && (
+                                    <div className="rounded-xl border bg-card p-6 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
+                                        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-foreground">
+                                            <BookOpen className="h-5 w-5 text-primary" />
+                                            About Journal
+                                        </h2>
+                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                                            {journal.about}
+                                        </p>
+                                    </div>
+                                )}
+                                {journal.scope && (
+                                    <div className="rounded-xl border bg-card p-6 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
+                                        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-foreground">
+                                            <Target className="h-5 w-5 text-primary" />
+                                            Scope and Focus
+                                        </h2>
+                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                                            {journal.scope}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Search Bar */}
                         <div className="mb-6 flex gap-2">
@@ -449,11 +481,10 @@ export default function JournalsShow() {
                                             <Link
                                                 key={i}
                                                 href={link.url}
-                                                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition-all ${
-                                                    link.active
+                                                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition-all ${link.active
                                                         ? 'border-[hsl(var(--accent-red))] bg-[hsl(var(--accent-red))] font-semibold text-white shadow-md'
                                                         : 'border-border bg-card text-foreground hover:bg-muted dark:bg-card dark:hover:bg-muted'
-                                                }`}
+                                                    }`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
                                         ) : (
@@ -534,11 +565,10 @@ export default function JournalsShow() {
                                                 handleFilter('volume', item.volume);
                                                 handleFilter('issue', item.issue);
                                             }}
-                                            className={`block w-full text-left text-xs transition-colors ${
-                                                queries.volume == item.volume && queries.issue == item.issue
+                                            className={`block w-full text-left text-xs transition-colors ${queries.volume == item.volume && queries.issue == item.issue
                                                     ? 'font-bold text-[hsl(var(--accent-red))]'
                                                     : 'text-primary hover:text-primary/80'
-                                            }`}
+                                                }`}
                                         >
                                             {item.label} ({item.year})
                                         </button>

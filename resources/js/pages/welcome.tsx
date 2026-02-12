@@ -11,7 +11,7 @@ interface WelcomeProps extends SharedData {
     featuredJournals: Array<{
         id: number;
         title: string;
-        sinta_rank: number;
+        sinta_rank: string;
         sinta_rank_label: string;
         issn: string;
         e_issn: string;
@@ -19,7 +19,7 @@ interface WelcomeProps extends SharedData {
         cover_image_url?: string;
         indexation_labels?: string[];
     }>;
-    sintaStats: Record<number, number>;
+    sintaStats: Record<string, number>;
     totalUniversities: number;
     totalJournals: number;
 }
@@ -50,11 +50,15 @@ export default function Welcome() {
                 <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#079C4E] text-white backdrop-blur-md transition-all">
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#079C4E]">
-                                <BookOpen className="h-6 w-6" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+                                <img 
+                                    src="logo_dark.png" 
+                                    alt="Majelis Diktilitbang" 
+                                    className="h-8 w-8 object-contain"
+                                />
                             </div>
                             <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
-                                JurnalMu
+                                Journal MU
                             </span>
                         </div>
 
@@ -128,20 +132,22 @@ export default function Welcome() {
                             </div>
                             <div className="mt-4 flex justify-center gap-4 text-sm text-emerald-100">
                                 <span>Can't find what you're looking for?</span>
-                                <a href="#" className="font-semibold text-[#FCEE1F] hover:underline">
-                                    Browse Categories
-                                </a>
+                                <Link href={route('browse.universities')} className="font-semibold text-[#FCEE1F] hover:underline">
+                                    Browse by University
+                                </Link>
                             </div>
                         </div>
                     </div>
 
-                    {/* STATS / ACCREDITATION CARDS (Overlapping Hero) */}
+                    {/* STATS / ACCREDITATION CARDS - Temporarily hidden per meeting notes (Feb 11) */}
+                    {/* TODO: Re-enable after finalizing chart design */}
+                    {/*
                     <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
                             {[1, 2, 3, 4, 5, 6].map((score) => (
                                 <Link
                                     key={score}
-                                    href={route('journals.index', { sinta_rank: score })}
+                                    href={route('journals.index', { sinta_rank: `sinta_${score}` })}
                                     className="group cursor-pointer overflow-hidden rounded-xl border-b-4 bg-white p-4 shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl dark:bg-zinc-800"
                                     style={{ borderColor: score <= 2 ? '#E11A1F' : score <= 4 ? '#FCEE1F' : '#1A2A75' }}
                                 >
@@ -149,17 +155,18 @@ export default function Welcome() {
                                     <div className="flex items-end justify-between">
                                         <span className="text-2xl font-bold text-gray-900 dark:text-white">SINTA {score}</span>
                                         <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 transition-colors group-hover:bg-[#079C4E] group-hover:text-white dark:bg-zinc-700 dark:text-gray-300">
-                                            {sintaStats[score] || 0} Journals
+                                            {sintaStats[`sinta_${score}`] || 0} Journals
                                         </span>
                                     </div>
                                 </Link>
                             ))}
                         </div>
                     </div>
+                    */}
                 </div>
 
                 {/* MAIN CONTENT AREA */}
-                <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                <main className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                     {/* Featured Journals Section */}
                     <div className="mb-12 flex items-end justify-between">
                         <div>

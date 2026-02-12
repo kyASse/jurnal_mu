@@ -137,18 +137,14 @@ export interface Journal {
     about?: string;
     scope?: string;
     // SINTA details
-    sinta_rank?: number | null;
+    sinta_rank?: string | null;
     sinta_rank_label?: string;
-    sinta_score?: number | null;
-    sinta_indexed_date?: string | null;
     // Accreditation details
-    accreditation_status?: string;
-    accreditation_status_label?: string;
-    accreditation_grade?: string | null;
-    dikti_accreditation_number?: string | null;
-    dikti_accreditation_label?: string;
-    accreditation_expiry_date?: string | null;
-    accreditation_expiry_status?: 'valid' | 'expiring_soon' | 'expired' | 'none';
+    accreditation_start_year?: number | null;
+    accreditation_end_year?: number | null;
+    accreditation_sk_number?: string | null;
+    accreditation_sk_date?: string | null;
+    accreditation_label?: string;
     // Indexation
     indexed_in?: string[];
     indexation_labels?: string[];
@@ -425,7 +421,7 @@ export interface IndexationStatistic {
 }
 
 export interface AccreditationStatistic {
-    sinta_rank: number | null;
+    sinta_rank: string | null;
     label: string;
     count: number;
     percentage: number;
