@@ -21,10 +21,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { AlertCircle, BookOpen, ChevronLeft, ChevronRight, Edit, Eye, ExternalLink, FileText, Plus, Search, Trash2, XCircle } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
+import SintaBadge from '@/components/badges/SintaBadge';
 
 interface Assessment {
     id: number;
@@ -43,7 +45,8 @@ interface Journal {
     scientific_field: {
         name: string;
     };
-    sinta_rank: number | null;
+    sinta_rank: string | null;
+    sinta_rank_label: string;
     approval_status: 'pending' | 'approved' | 'rejected';
     approval_status_label: string;
     rejection_reason: string | null;
@@ -117,11 +120,19 @@ export default function JournalsIndex({ journals, filters: initialFilters, scien
 
     const getApprovalStatusBadge = (status: 'pending' | 'approved' | 'rejected', label: string) => {
         const colors = {
-            pending: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/30',
-            approved: 'bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/30',
-            rejected: 'bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/30',
+            pending: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800',
+            approved: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
+            rejected: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
         };
-        return <Badge className={colors[status]}>{label}</Badge>;
+
+        // Fallback labels if backend doesn't provide them (though they should be in $appends now)
+        const displayLabel = label || {
+            pending: 'Pending Approval',
+            approved: 'Approved',
+            rejected: 'Rejected'
+        }[status] || status;
+
+        return <Badge variant="outline" className={cn("px-2 py-0.5 font-medium", colors[status])}>{displayLabel}</Badge>;
     };
 
     return (
@@ -176,12 +187,13 @@ export default function JournalsIndex({ journals, filters: initialFilters, scien
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All Ranks</SelectItem>
-                                        <SelectItem value="1">SINTA 1</SelectItem>
-                                        <SelectItem value="2">SINTA 2</SelectItem>
-                                        <SelectItem value="3">SINTA 3</SelectItem>
-                                        <SelectItem value="4">SINTA 4</SelectItem>
-                                        <SelectItem value="5">SINTA 5</SelectItem>
-                                        <SelectItem value="6">SINTA 6</SelectItem>
+                                        <SelectItem value="sinta_1">SINTA 1</SelectItem>
+                                        <SelectItem value="sinta_2">SINTA 2</SelectItem>
+                                        <SelectItem value="sinta_3">SINTA 3</SelectItem>
+                                        <SelectItem value="sinta_4">SINTA 4</SelectItem>
+                                        <SelectItem value="sinta_5">SINTA 5</SelectItem>
+                                        <SelectItem value="sinta_6">SINTA 6</SelectItem>
+                                        <SelectItem value="non_sinta">Non SINTA</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -274,11 +286,7 @@ export default function JournalsIndex({ journals, filters: initialFilters, scien
                                             </TableCell>
                                             <TableCell>{journal.scientific_field?.name || '-'}</TableCell>
                                             <TableCell>
-                                                {journal.sinta_rank ? (
-                                                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/30">SINTA {journal.sinta_rank}</Badge>
-                                                ) : (
-                                                    <span className="text-sm text-gray-400 dark:text-gray-500">Not Indexed</span>
-                                                )}
+                                                <SintaBadge rank={journal.sinta_rank} />
                                             </TableCell>
                                             <TableCell>
                                                 <TooltipProvider>
@@ -325,9 +333,11 @@ export default function JournalsIndex({ journals, filters: initialFilters, scien
                                                         </Button>
                                                     </Link>
 
-                                                    <Button variant="ghost" size="sm" onClick={() => handleDelete(journal.id, journal.title)} title="Delete">
-                                                        <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                                    </Button>
+                                                    {journal.approval_status !== 'approved' && (
+                                                        <Button variant="ghost" size="sm" onClick={() => handleDelete(journal.id, journal.title)} title="Delete">
+                                                            <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                         </TableRow>
