@@ -40,7 +40,7 @@ interface Journal {
         id: number;
         name: string;
     } | null;
-    sinta_rank: number | null;
+    sinta_rank: string | null;
     sinta_rank_label: string;
 }
 
@@ -75,7 +75,7 @@ interface Props {
     filters: {
         search?: string;
         university_id?: number;
-        sinta_rank?: number;
+        sinta_rank?: string;
         scientific_field_id?: number;
         indexation?: string;
     };
@@ -89,7 +89,7 @@ export default function JournalsIndex({ journals, filters, universities, scienti
     const { auth } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [universityFilter, setUniversityFilter] = useState(filters.university_id?.toString() || '');
-    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank?.toString() || '');
+    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank || '');
     const [scientificFieldFilter, setScientificFieldFilter] = useState(filters.scientific_field_id?.toString() || '');
     const [indexationFilter, setIndexationFilter] = useState(filters.indexation || '');
 

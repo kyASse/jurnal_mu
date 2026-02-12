@@ -297,12 +297,12 @@ export default function JournalsShow() {
 
                             <div className="flex flex-wrap items-center gap-2">
                                 <SintaBadge rank={journal.sinta_rank ?? null} />
-                                {journal.dikti_accreditation_label && (
+                                {journal.accreditation_label && (
                                     <Badge
                                         variant="outline"
                                         className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300"
                                     >
-                                        {journal.dikti_accreditation_label}
+                                        {journal.accreditation_label}
                                     </Badge>
                                 )}
                                 {journal.indexation_labels && journal.indexation_labels.length > 0 && (
@@ -449,11 +449,10 @@ export default function JournalsShow() {
                                             <Link
                                                 key={i}
                                                 href={link.url}
-                                                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition-all ${
-                                                    link.active
+                                                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition-all ${link.active
                                                         ? 'border-[hsl(var(--accent-red))] bg-[hsl(var(--accent-red))] font-semibold text-white shadow-md'
                                                         : 'border-border bg-card text-foreground hover:bg-muted dark:bg-card dark:hover:bg-muted'
-                                                }`}
+                                                    }`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
                                         ) : (
@@ -534,11 +533,10 @@ export default function JournalsShow() {
                                                 handleFilter('volume', item.volume);
                                                 handleFilter('issue', item.issue);
                                             }}
-                                            className={`block w-full text-left text-xs transition-colors ${
-                                                queries.volume == item.volume && queries.issue == item.issue
+                                            className={`block w-full text-left text-xs transition-colors ${queries.volume == item.volume && queries.issue == item.issue
                                                     ? 'font-bold text-[hsl(var(--accent-red))]'
                                                     : 'text-primary hover:text-primary/80'
-                                            }`}
+                                                }`}
                                         >
                                             {item.label} ({item.year})
                                         </button>
