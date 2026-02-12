@@ -192,7 +192,15 @@ export default function BrowseUniversities({ universityStats, selectedUniversity
                                                 {/* Journals Grid */}
                                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                                                     {journals.data.map((journal) => (
-                                                        <JournalCard key={journal.id} journal={journal} />
+                                                        <JournalCard
+                                                            key={journal.id}
+                                                            id={journal.id}
+                                                            title={journal.title}
+                                                            issn={journal.issn}
+                                                            e_issn={journal.e_issn}
+                                                            sinta_rank={journal.sinta_rank_label}
+                                                            external_url={journal.url}
+                                                        />
                                                     ))}
                                                 </div>
 
@@ -236,7 +244,7 @@ export default function BrowseUniversities({ universityStats, selectedUniversity
                                                             onClick={() =>
                                                                 handlePageChange(
                                                                     journals.links.find((link) => link.label === 'Next &raquo;')?.url ||
-                                                                        null,
+                                                                    null,
                                                                 )
                                                             }
                                                             disabled={journals.current_page === journals.last_page}
