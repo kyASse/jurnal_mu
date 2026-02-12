@@ -64,14 +64,12 @@ interface Journal {
     phone: string | null;
     about: string | null;
     scope: string | null;
-    sinta_rank: number | null;
-    sinta_indexed_date: string | null;
-    accreditation_status: string | null;
-    accreditation_status_label: string;
-    accreditation_grade: string | null;
-    dikti_accreditation_number: string | null;
-    accreditation_issued_date: string | null;
-    accreditation_expiry_date: string | null;
+    sinta_rank: string | null;
+    sinta_rank_label: string | null;
+    accreditation_start_year: number | null;
+    accreditation_end_year: number | null;
+    accreditation_sk_number: string | null;
+    accreditation_sk_date: string | null;
     indexations: Record<string, { indexed_at: string }> | null;
     approval_status: 'pending' | 'approved' | 'rejected';
     approval_status_label: string;
@@ -188,10 +186,12 @@ export default function JournalShow({ journal, statistics }: Props) {
                                         Edit
                                     </Button>
                                 </Link>
-                                <Button variant="outline" size="sm" onClick={handleDelete}>
-                                    <Trash2 className="mr-2 h-4 w-4 text-red-600 dark:text-red-400" />
-                                    Delete
-                                </Button>
+                                {journal.approval_status !== 'approved' && (
+                                    <Button variant="outline" size="sm" onClick={handleDelete}>
+                                        <Trash2 className="mr-2 h-4 w-4 text-red-600 dark:text-red-400" />
+                                        Delete
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </CardHeader>
@@ -312,28 +312,30 @@ export default function JournalShow({ journal, statistics }: Props) {
 
                                 {/* Rankings & Indexations */}
                                 <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold">Rankings & Indexations</h3>
+                                    <h3 className="text-lg font-semibold">Peringkat & Indeksasi</h3>
                                     <div className="space-y-3">
                                         <div>
-                                            <p className="mb-2 text-sm text-muted-foreground">SINTA Ranking</p>
-                                            {journal.sinta_rank ? (
-                                                <div className="flex items-center gap-2">
-                                                    <SintaBadge rank={journal.sinta_rank} />
-                                                    {journal.sinta_indexed_date && (
-                                                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                                                            <Calendar className="h-3 w-3" />
-                                                            Since {new Date(journal.sinta_indexed_date).toLocaleDateString('id-ID')}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <p className="text-sm">Not SINTA indexed</p>
-                                            )}
+                                            <p className="mb-2 text-sm text-muted-foreground">Peringkat Akreditasi</p>
+                                            <div className="flex items-center gap-2">
+                                                <SintaBadge rank={journal.sinta_rank} />
+                                            </div>
                                         </div>
+
+                                        {journal.accreditation_sk_number && (
+                                            <div>
+                                                <p className="mb-2 text-sm text-muted-foreground">Detail Akreditasi</p>
+                                                <AccreditationBadge
+                                                    sk_number={journal.accreditation_sk_number}
+                                                    start_year={journal.accreditation_start_year}
+                                                    end_year={journal.accreditation_end_year}
+                                                    sinta_rank_label={journal.sinta_rank_label}
+                                                />
+                                            </div>
+                                        )}
 
                                         {journal.indexations && Object.keys(journal.indexations).length > 0 && (
                                             <div>
-                                                <p className="mb-2 text-sm text-muted-foreground">Indexed In</p>
+                                                <p className="mb-2 text-sm text-muted-foreground">Terindeks Di</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {Object.entries(journal.indexations).map(([platform, data]) => (
                                                         <IndexationBadge key={platform} platform={platform} indexed_date={data.indexed_at} />
@@ -343,37 +345,6 @@ export default function JournalShow({ journal, statistics }: Props) {
                                         )}
                                     </div>
                                 </div>
-
-                                {/* Accreditation */}
-                                {journal.accreditation_status && (
-                                    <div className="space-y-4">
-                                        <h3 className="text-lg font-semibold">Dikti Accreditation</h3>
-                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Status</p>
-                                                <AccreditationBadge accreditation_status={journal.accreditation_status} accreditation_grade={journal.accreditation_grade} />
-                                            </div>
-                                            {journal.dikti_accreditation_number && (
-                                                <div>
-                                                    <p className="text-sm text-muted-foreground">Number</p>
-                                                    <p className="font-medium">{journal.dikti_accreditation_number}</p>
-                                                </div>
-                                            )}
-                                            {journal.accreditation_issued_date && (
-                                                <div>
-                                                    <p className="text-sm text-muted-foreground">Issued Date</p>
-                                                    <p className="font-medium">{new Date(journal.accreditation_issued_date).toLocaleDateString('id-ID')}</p>
-                                                </div>
-                                            )}
-                                            {journal.accreditation_expiry_date && (
-                                                <div>
-                                                    <p className="text-sm text-muted-foreground">Expiry Date</p>
-                                                    <p className="font-medium">{new Date(journal.accreditation_expiry_date).toLocaleDateString('id-ID')}</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
                             </TabsContent>
 
                             {/* Assessments Tab */}
