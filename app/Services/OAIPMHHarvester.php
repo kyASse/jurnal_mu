@@ -54,8 +54,9 @@ class OAIPMHHarvester
                 throw new \Exception($errorMessage);
             }
 
-            // Register OAI namespace
+            // Register OAI namespaces
             $xml->registerXPathNamespace('oai', 'http://www.openarchives.org/OAI/2.0/');
+            $xml->registerXPathNamespace('oai_dc', 'http://www.openarchives.org/OAI/2.0/oai_dc/');
             $xml->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
 
             // Extract records from XML
@@ -116,6 +117,7 @@ class OAIPMHHarvester
         // Register namespaces
         $record->registerXPathNamespace('oai', 'http://www.openarchives.org/OAI/2.0/');
         $record->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+        $record->registerXPathNamespace('oai_dc', 'http://www.openarchives.org/OAI/2.0/oai_dc/');
 
         // Extract OAI header information
         $header = $record->xpath('oai:header')[0] ?? null;
@@ -123,12 +125,21 @@ class OAIPMHHarvester
             throw new \Exception('Missing OAI header in record');
         }
 
+        // Skip deleted records
+        $status = (string) $header->attributes()['status'] ?? '';
+        if ($status === 'deleted') {
+            return; // Silently skip deleted records
+        }
+
         $oaiIdentifier = (string) $header->identifier;
         $oaiDatestamp = (string) $header->datestamp;
         $oaiSet = isset($header->setSpec) ? (string) $header->setSpec : null;
 
-        // Extract Dublin Core metadata
-        $metadata = $record->xpath('oai:metadata/oai:dc/*');
+        // Try multiple XPath patterns for metadata (different OAI-PMH implementations)
+        $metadata = $record->xpath('oai:metadata/oai_dc:dc/*');
+        if (empty($metadata)) {
+            $metadata = $record->xpath('oai:metadata/*/*');
+        }
         if (empty($metadata)) {
             throw new \Exception("No metadata found for record: {$oaiIdentifier}");
         }
