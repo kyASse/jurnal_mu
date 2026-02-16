@@ -53,8 +53,12 @@ export interface User {
     university_id?: number;
     avatar_url?: string;
     avatar?: string;
+    phone?: string;
+    position?: string;
     is_reviewer?: boolean;
     scientific_field?: ScientificField;
+    scientific_field_id?: number;
+    initials?: string;
 }
 
 export interface University {
@@ -92,6 +96,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
 export interface ScientificField {
     id: number;
     name: string;
+    code: string;
 }
 
 export interface Article {
