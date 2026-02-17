@@ -396,9 +396,13 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::middleware(['role:' . Role::USER])->prefix('user')->name('user.')->group(function () {
 
-        // Profil (Placeholder)
+        // Profil (Dashboard)
         Route::get('profil', [ProfilController::class, 'index'])
             ->name('profil.index');
+        Route::post('profil/notifications/{id}/read', [ProfilController::class, 'markNotificationAsRead'])
+            ->name('profil.notifications.read');
+        Route::post('profil/notifications/read-all', [ProfilController::class, 'markAllNotificationsAsRead'])
+            ->name('profil.notifications.read-all');
 
         // Journals Management
         Route::resource('journals', UserJournalController::class)
