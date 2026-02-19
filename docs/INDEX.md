@@ -10,6 +10,7 @@ Dokumen perencanaan, roadmap, dan visi proyek
 - `jurnal_mu MVP v1.1 - UPDATED.md` - MVP versi 1.1 terbaru
 - `jurnal_mu project plan.md` - Rencana proyek lengkap
 - `jurnal_mu roadmap v1.1 - UPDATED.md` - Roadmap produk
+- `v1.2_STATUS_REPORT.md` - ✨ **NEW** Laporan status implementasi v1.2 lengkap
 - `PUBLIC_PAGE_MVP.md` - MVP halaman publik
 - `v1.1 Migration Strategy.md` - Strategi migrasi v1.1
 - `v1.1 Scope Update Summary.md` - Update cakupan v1.1
@@ -79,8 +80,10 @@ Catatan rapat dan diskusi proyek
 Dokumen arsip dan referensi lama
 - `PHASE3_4_COMPLETION_SUMMARY.md` - Ringkasan penyelesaian phase 3-4
 
-### 📁 [development](./development/)
+### �️ [development](./development/)
 Dokumentasi development khusus
+- **MAINTENANCE.md** - ✨ **UPDATED** Panduan pemeliharaan aplikasi lengkap (monitoring, troubleshooting, security)
+- **OPERATIONAL_RUNBOOK.md** - ✨ **NEW** Prosedur operasional harian, mingguan, dan incident response
 - Checklist dan panduan implementasi fitur
 
 ### 📁 [test](./test/)
@@ -93,9 +96,12 @@ Screenshot dan dokumentasi visual
 ---
 
 ## 🔍 Quick Navigation
-
-| Tujuan | Folder |
+/Document |
 |--------|--------|
+| Memahami MVP dan roadmap | [project-planning](./project-planning/) |
+| Status implementasi v1.2 | [v1.2_STATUS_REPORT.md](./project-planning/v1.2_STATUS_REPORT.md) 🆕 |
+| Panduan pemeliharaan sistem | [MAINTENANCE.md](./development/MAINTENANCE.md) ✨ |
+| Prosedur operasional harian | [OPERATIONAL_RUNBOOK.md](./development/OPERATIONAL_RUNBOOK.md) 🆕
 | Memahami MVP dan roadmap | [project-planning](./project-planning/) |
 | Lihat schema database | [database](./database/) |
 | Cari informasi fitur | [features](./features/) |
