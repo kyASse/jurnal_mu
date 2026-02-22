@@ -40,6 +40,13 @@ class JournalController extends Controller
 
         $authUser = $request->user();
 
+        // Guard: Admin Kampus must have a university assigned
+        abort_if(
+            is_null($authUser->university_id),
+            403,
+            'Akun Admin Kampus Anda belum terhubung ke universitas. Hubungi Super Admin.'
+        );
+
         // Base query - scoped to Admin Kampus's university
         $query = Journal::query()
             ->with(['university', 'user', 'scientificField', 'latestAssessment'])
