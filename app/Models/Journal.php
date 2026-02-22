@@ -266,8 +266,12 @@ class Journal extends Model
     /**
      * Scope to filter by university
      */
-    public function scopeForUniversity($query, int $universityId)
+    public function scopeForUniversity($query, ?int $universityId)
     {
+        if (is_null($universityId) || $universityId <= 0) {
+            return $query;
+        }
+
         return $query->where('university_id', $universityId);
     }
 
