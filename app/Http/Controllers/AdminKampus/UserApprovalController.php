@@ -4,6 +4,8 @@ namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\UserApprovedNotification;
+use App\Notifications\UserRejectedNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -84,8 +86,7 @@ class UserApprovalController extends Controller
             'rejection_reason' => null,
         ]);
 
-        // TODO: Send UserApprovedNotification
-        // $user->notify(new UserApprovedNotification());
+        $user->notify(new UserApprovedNotification($user));
 
         return redirect()
             ->route('admin-kampus.users.index')
@@ -127,8 +128,7 @@ class UserApprovalController extends Controller
             'rejection_reason' => $request->reason,
         ]);
 
-        // TODO: Send UserRejectedNotification
-        // $user->notify(new UserRejectedNotification($request->reason));
+        $user->notify(new UserRejectedNotification($user, $request->reason));
 
         return redirect()
             ->route('admin-kampus.users.index')

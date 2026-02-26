@@ -4,6 +4,8 @@ namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
 use App\Models\Journal;
+use App\Notifications\JournalApprovedNotification;
+use App\Notifications\JournalRejectedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -86,8 +88,7 @@ class JournalApprovalController extends Controller
         // Invalidate university statistics cache
         Cache::forget('browse.universities.stats');
 
-        // TODO: Send JournalApprovedNotification
-        // $journal->user->notify(new JournalApprovedNotification($journal));
+        $journal->user->notify(new JournalApprovedNotification($journal));
 
         return redirect()
             ->route('admin-kampus.journals.pending')
@@ -131,8 +132,7 @@ class JournalApprovalController extends Controller
         // Invalidate university statistics cache
         Cache::forget('browse.universities.stats');
 
-        // TODO: Send JournalRejectedNotification
-        // $journal->user->notify(new JournalRejectedNotification($journal, $request->reason));
+        $journal->user->notify(new JournalRejectedNotification($journal, $request->reason));
 
         return redirect()
             ->route('admin-kampus.journals.pending')

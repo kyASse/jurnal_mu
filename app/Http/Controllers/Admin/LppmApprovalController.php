@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\LppmApprovedNotification;
+use App\Notifications\LppmRejectedNotification;
 use Illuminate\Http\Request;
 
 /**
@@ -53,8 +55,7 @@ class LppmApprovalController extends Controller
             'rejection_reason' => null,
         ]);
 
-        // TODO: Send LppmApprovedNotification
-        // $user->notify(new LppmApprovedNotification());
+        $user->notify(new LppmApprovedNotification($user));
 
         return redirect()
             ->route('admin.admin-kampus.index')
@@ -96,8 +97,7 @@ class LppmApprovalController extends Controller
             'rejection_reason' => $request->reason,
         ]);
 
-        // TODO: Send LppmRejectedNotification
-        // $user->notify(new LppmRejectedNotification($request->reason));
+        $user->notify(new LppmRejectedNotification($user, $request->reason));
 
         return redirect()
             ->route('admin.admin-kampus.index')
