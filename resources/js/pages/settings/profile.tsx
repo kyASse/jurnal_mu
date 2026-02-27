@@ -1,7 +1,7 @@
 import { type BreadcrumbItem, type ScientificField, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Camera, Trash2, Upload } from 'lucide-react';
+import { Camera, CheckCircle, Clock, ShieldCheck, Trash2, Upload, XCircle } from 'lucide-react';
 import { FormEventHandler, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -229,6 +229,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="name">Full Name</Label>
                                 <Input
                                     id="name"
+                                    name="name"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
@@ -242,6 +243,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="email">Email Address</Label>
                                 <Input
                                     id="email"
+                                    name="email"
                                     type="email"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
@@ -278,6 +280,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="phone">Phone Number</Label>
                                 <Input
                                     id="phone"
+                                    name="phone"
                                     type="tel"
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value)}
@@ -291,6 +294,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="position">Position</Label>
                                 <Input
                                     id="position"
+                                    name="position"
                                     value={data.position}
                                     onChange={(e) => setData('position', e.target.value)}
                                     placeholder="Lecturer, Researcher, etc."
@@ -331,6 +335,74 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 </Transition>
                             </div>
                         </form>
+                    </div>
+                    {/* Account Information (Read-only) */}
+                    <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border">
+                        <HeadingSmall title="Account Information" description="Your account details (read-only)" />
+                        <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Role</dt>
+                                <dd className="mt-1 text-sm font-medium">{auth.user.role?.display_name ?? auth.user.role?.name ?? '—'}</dd>
+                            </div>
+                            {auth.user.university && (
+                                <div>
+                                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Universitas</dt>
+                                    <dd className="mt-1 text-sm font-medium">{auth.user.university.name}</dd>
+                                </div>
+                            )}
+                            <div>
+                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status Akun</dt>
+                                <dd className="mt-1">
+                                    {auth.user.approval_status === 'approved' ? (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400">
+                                            <CheckCircle className="h-4 w-4" /> Approved
+                                        </span>
+                                    ) : auth.user.approval_status === 'rejected' ? (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-red-600 dark:text-red-400">
+                                            <XCircle className="h-4 w-4" /> Rejected
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 dark:text-amber-400">
+                                            <Clock className="h-4 w-4" /> Pending
+                                        </span>
+                                    )}
+                                </dd>
+                            </div>
+                            {auth.user.last_login_at && (
+                                <div>
+                                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Login Terakhir</dt>
+                                    <dd className="mt-1 text-sm text-muted-foreground">
+                                        {new Date(auth.user.last_login_at).toLocaleString('id-ID')}
+                                    </dd>
+                                </div>
+                            )}
+                            {auth.user.created_at && (
+                                <div>
+                                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Member Sejak</dt>
+                                    <dd className="mt-1 text-sm text-muted-foreground">
+                                        {new Date(auth.user.created_at).toLocaleDateString('id-ID', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
+                                    </dd>
+                                </div>
+                            )}
+                            <div>
+                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Verifikasi Email</dt>
+                                <dd className="mt-1">
+                                    {auth.user.email_verified_at ? (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400">
+                                            <ShieldCheck className="h-4 w-4" /> Verified
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 dark:text-amber-400">
+                                            <Clock className="h-4 w-4" /> Belum diverifikasi
+                                        </span>
+                                    )}
+                                </dd>
+                            </div>
+                        </dl>
                     </div>
                 </div>
 
