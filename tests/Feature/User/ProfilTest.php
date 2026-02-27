@@ -245,7 +245,7 @@ test('guest cannot submit user profil update', function () {
         'name' => 'Hacker',
         'email' => 'hacker@example.com',
     ])
-    ->assertRedirect(route('login'));
+        ->assertRedirect(route('login'));
 });
 
 test('admin kampus cannot submit user profil update', function () {

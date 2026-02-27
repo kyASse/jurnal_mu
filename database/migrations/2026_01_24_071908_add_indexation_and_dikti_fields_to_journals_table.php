@@ -54,7 +54,7 @@ return new class extends Migration
         // Drop columns that belong ONLY to this migration.
         $columnsToDrop = array_filter(
             ['dikti_accreditation_number', 'accreditation_issued_date',
-             'accreditation_expiry_date', 'indexations', 'sinta_indexed_date'],
+                'accreditation_expiry_date', 'indexations', 'sinta_indexed_date'],
             fn ($col) => Schema::hasColumn('journals', $col)
         );
 

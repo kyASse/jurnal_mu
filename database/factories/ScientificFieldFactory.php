@@ -43,7 +43,7 @@ class ScientificFieldFactory extends Factory
         ];
 
         return [
-            'code' => strtoupper($this->faker->unique()->lexify('???')) . $this->faker->unique()->numberBetween(100, 999),
+            'code' => strtoupper($this->faker->unique()->lexify('???')).$this->faker->unique()->numberBetween(100, 999),
             'name' => $this->faker->unique()->randomElement($fieldNames),
             'description' => $this->faker->optional(0.7)->sentence(12),
             'parent_id' => null, // Default to root level

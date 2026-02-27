@@ -18,11 +18,9 @@
 namespace Tests\Browser;
 
 use App\Models\Role;
-use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
@@ -46,12 +44,12 @@ class ProfileManagementTest extends DuskTestCase
         $userRole = Role::where('name', Role::USER)->first();
 
         $this->user = User::create([
-            'name'       => 'Dewi Rahayu',
-            'email'      => 'dewi.rahayu@jurnal-test.id',
-            'password'   => bcrypt('Password123!'),
-            'role_id'    => $userRole->id,
+            'name' => 'Dewi Rahayu',
+            'email' => 'dewi.rahayu@jurnal-test.id',
+            'password' => bcrypt('Password123!'),
+            'role_id' => $userRole->id,
             'university_id' => $university->id,
-            'is_active'  => true,
+            'is_active' => true,
             'approval_status' => 'approved',
         ]);
     }
@@ -112,7 +110,7 @@ class ProfileManagementTest extends DuskTestCase
         Storage::fake('public');
 
         $this->browse(function (Browser $browser) {
-            $testImagePath = __DIR__ . '/testfiles/test-avatar.png';
+            $testImagePath = __DIR__.'/testfiles/test-avatar.png';
 
             // Create a minimal 1x1 PNG without requiring GD extension
             if (! file_exists($testImagePath)) {

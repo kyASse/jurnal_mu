@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import { Bell, CheckCircle2, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
+import { Bell, CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface NotificationCardProps {

@@ -215,4 +215,3 @@ test('profile update requires name to be present', function () {
         ])
         ->assertSessionHasErrors('name');
 });
-

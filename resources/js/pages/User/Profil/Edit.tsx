@@ -82,10 +82,7 @@ export default function ProfilEdit({ scientificFields, status }: EditProfilProps
 
                 {/* Form card */}
                 <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border">
-                    <HeadingSmall
-                        title="Edit Profil"
-                        description="Perbarui informasi profil Anda"
-                    />
+                    <HeadingSmall title="Edit Profil" description="Perbarui informasi profil Anda" />
 
                     <form onSubmit={submit} className="mt-6 space-y-6">
                         {/* Name */}
@@ -118,9 +115,7 @@ export default function ProfilEdit({ scientificFields, status }: EditProfilProps
                             />
                             <InputError message={errors.email} />
                             {auth.user.email_verified_at === undefined || auth.user.email_verified_at === null ? (
-                                <p className="text-xs text-amber-600 dark:text-amber-400">
-                                    Email belum diverifikasi.
-                                </p>
+                                <p className="text-xs text-amber-600 dark:text-amber-400">Email belum diverifikasi.</p>
                             ) : null}
                         </div>
 
@@ -155,10 +150,7 @@ export default function ProfilEdit({ scientificFields, status }: EditProfilProps
                         {/* Scientific Field */}
                         <div className="grid gap-2">
                             <Label htmlFor="scientific_field_id">Bidang Ilmu</Label>
-                            <Select
-                                value={data.scientific_field_id}
-                                onValueChange={(value) => setData('scientific_field_id', value)}
-                            >
+                            <Select value={data.scientific_field_id} onValueChange={(value) => setData('scientific_field_id', value)}>
                                 <SelectTrigger id="scientific_field_id">
                                     <SelectValue placeholder="Pilih bidang ilmu" />
                                 </SelectTrigger>
@@ -197,20 +189,18 @@ export default function ProfilEdit({ scientificFields, status }: EditProfilProps
                     <HeadingSmall title="Informasi Akun" description="Data akun (tidak dapat diubah)" />
                     <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Role</dt>
-                            <dd className="mt-1 text-sm font-medium">
-                                {auth.user.role?.display_name ?? auth.user.role?.name ?? '—'}
-                            </dd>
+                            <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Role</dt>
+                            <dd className="mt-1 text-sm font-medium">{auth.user.role?.display_name ?? auth.user.role?.name ?? '—'}</dd>
                         </div>
                         {auth.user.university && (
                             <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Universitas</dt>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Universitas</dt>
                                 <dd className="mt-1 text-sm font-medium">{auth.user.university.name}</dd>
                             </div>
                         )}
                         {auth.user.created_at && (
                             <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Member Sejak</dt>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Member Sejak</dt>
                                 <dd className="mt-1 text-sm text-muted-foreground">
                                     {new Date(auth.user.created_at).toLocaleDateString('id-ID', {
                                         year: 'numeric',

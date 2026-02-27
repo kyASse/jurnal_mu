@@ -77,11 +77,11 @@ class JournalFactory extends Factory
     /**
      * Indicate journal is indexed in multiple platforms.
      */
-    public function multipleIndexations(array $platforms = null): static
+    public function multipleIndexations(?array $platforms = null): static
     {
         $platforms = $platforms ?? ['Scopus', 'Google Scholar', 'DOAJ'];
         $indexations = [];
-        
+
         foreach ($platforms as $platform) {
             $indexations[$platform] = true;
         }
@@ -98,7 +98,7 @@ class JournalFactory extends Factory
     {
         $platforms = ['Scopus', 'Web of Science', 'DOAJ', 'Google Scholar', 'PubMed', 'Sinta'];
         $selected = $this->faker->randomElements($platforms, $this->faker->numberBetween(1, 3));
-        
+
         $indexations = [];
         foreach ($selected as $platform) {
             $indexations[$platform] = true;
@@ -130,7 +130,7 @@ class JournalFactory extends Factory
     public function randomSintaRank(): static
     {
         $rank = $this->faker->numberBetween(1, 6);
-        
+
         return $this->state(fn (array $attributes) => [
             'sinta_rank' => "sinta_{$rank}",
         ]);
@@ -163,7 +163,7 @@ class JournalFactory extends Factory
      */
     public function withRandomScientificField(): static
     {
-        $field = ScientificField::inRandomOrder()->first() 
+        $field = ScientificField::inRandomOrder()->first()
                     ?? ScientificField::factory()->create();
 
         return $this->state(fn (array $attributes) => [
@@ -177,12 +177,12 @@ class JournalFactory extends Factory
     public function complete(): static
     {
         return $this->state(function (array $attributes) {
-            $field = ScientificField::inRandomOrder()->first() 
+            $field = ScientificField::inRandomOrder()->first()
                         ?? ScientificField::factory()->create();
 
             // 70% chance of being indexed in Scopus
             $hasScopus = $this->faker->boolean(70);
-            
+
             // Random additional indexations
             $platforms = ['Google Scholar', 'DOAJ'];
             if ($hasScopus) {
@@ -198,8 +198,8 @@ class JournalFactory extends Factory
             }
 
             // 60% chance of having SINTA rank
-            $sintaRank = $this->faker->boolean(60) 
-                ? 'sinta_' . $this->faker->numberBetween(1, 6)
+            $sintaRank = $this->faker->boolean(60)
+                ? 'sinta_'.$this->faker->numberBetween(1, 6)
                 : 'non_sinta';
 
             return [

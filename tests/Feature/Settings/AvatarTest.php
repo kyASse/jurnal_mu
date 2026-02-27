@@ -39,7 +39,7 @@ function fakePng(string $name = 'avatar.png', ?int $sizeKB = null): UploadedFile
     if ($sizeKB !== null) {
         // Pad beyond the requested KB (append null bytes - doesn't break PNG validation rules
         // checked by `mimes` but DOES trip the `max` size validator)
-        $base = $base . str_repeat("\0", $sizeKB * 1024);
+        $base = $base.str_repeat("\0", $sizeKB * 1024);
     }
 
     return UploadedFile::fake()->createWithContent($name, $base);

@@ -31,15 +31,15 @@ class StoreJournalRequest extends FormRequest
             // Publication Details
             'publisher' => 'nullable|string|max:255',
             'frequency' => 'required|string|max:50',
-            'first_published_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'first_published_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
 
             // Classification
             'scientific_field_id' => 'required|exists:scientific_fields,id',
 
             // SINTA / Accreditation (merged)
             'sinta_rank' => 'required|string|in:sinta_1,sinta_2,sinta_3,sinta_4,sinta_5,sinta_6,non_sinta',
-            'accreditation_start_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 5),
-            'accreditation_end_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 10) . '|gte:accreditation_start_year',
+            'accreditation_start_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 5),
+            'accreditation_end_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 10).'|gte:accreditation_start_year',
             'accreditation_sk_number' => 'nullable|string|max:100',
             'accreditation_sk_date' => 'nullable|date|before_or_equal:today',
 

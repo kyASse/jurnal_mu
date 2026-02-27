@@ -15,15 +15,13 @@
  * - Edit Profile button links to /settings/profile
  */
 
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi, beforeAll } from 'vitest';
 import ProfileCard from '@/components/profile/ProfileCard';
+import { render, screen } from '@testing-library/react';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 // Mock @inertiajs/react (Link + route helper)
 vi.mock('@inertiajs/react', () => ({
-    Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
-        <a href={href}>{children}</a>
-    ),
+    Link: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
 
 // Mock the global route() Ziggy function
@@ -70,11 +68,7 @@ describe('ProfileCard', () => {
 
     describe('Email verification badge', () => {
         it('shows Verified badge when email_verified_at is provided', () => {
-            render(
-                <ProfileCard
-                    user={{ ...baseUser, email_verified_at: '2025-01-01T00:00:00.000Z' }}
-                />
-            );
+            render(<ProfileCard user={{ ...baseUser, email_verified_at: '2025-01-01T00:00:00.000Z' }} />);
 
             expect(screen.getByText('Verified')).toBeInTheDocument();
         });
@@ -108,7 +102,7 @@ describe('ProfileCard', () => {
                         ...baseUser,
                         university: { id: 1, name: 'Universitas Ahmad Dahlan', short_name: 'UAD' },
                     }}
-                />
+                />,
             );
 
             expect(screen.getByText('UAD')).toBeInTheDocument();
@@ -121,7 +115,7 @@ describe('ProfileCard', () => {
                         ...baseUser,
                         university: { id: 2, name: 'Universitas Muhammadiyah Yogyakarta' },
                     }}
-                />
+                />,
             );
 
             expect(screen.getByText('Universitas Muhammadiyah Yogyakarta')).toBeInTheDocument();
@@ -143,7 +137,7 @@ describe('ProfileCard', () => {
                         ...baseUser,
                         scientific_field: { id: 1, code: 'TI', name: 'Teknik Informatika' },
                     }}
-                />
+                />,
             );
 
             expect(screen.getByText('TI - Teknik Informatika')).toBeInTheDocument();

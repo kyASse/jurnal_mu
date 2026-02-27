@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Journal;
-use App\Models\Role;
 use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
@@ -10,7 +9,7 @@ uses()->group('unit', 'journal', 'statistics');
 
 beforeEach(function () {
     $this->seedRoles();
-    
+
     // Create test university and user
     $this->university = University::factory()->create(['name' => 'Test University']);
     $this->user = User::factory()->user()->create(['university_id' => $this->university->id]);
@@ -26,14 +25,14 @@ describe('Journal Indexation Scopes', function () {
             'scientific_field_id' => $this->scientificField->id,
             'indexations' => ['Scopus' => true],
         ]);
-        
+
         Journal::factory()->create([
             'user_id' => $this->user->id,
             'university_id' => $this->university->id,
             'scientific_field_id' => $this->scientificField->id,
             'indexations' => ['Google Scholar' => true],
         ]);
-        
+
         Journal::factory()->create([
             'user_id' => $this->user->id,
             'university_id' => $this->university->id,

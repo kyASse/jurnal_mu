@@ -164,7 +164,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                     {/* Avatar Section */}
                     <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border">
                         <HeadingSmall title="Profile Picture" description="Update your avatar" />
-                        
+
                         <div className="mt-4 flex items-start gap-6">
                             {/* Avatar Display */}
                             <div className="relative">
@@ -199,24 +199,13 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                             <Upload className="mr-2 h-4 w-4" />
                                             {uploadingAvatar ? 'Uploading...' : 'Upload'}
                                         </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={cancelAvatarPreview}
-                                            disabled={uploadingAvatar}
-                                            size="sm"
-                                        >
+                                        <Button type="button" variant="outline" onClick={cancelAvatarPreview} disabled={uploadingAvatar} size="sm">
                                             Cancel
                                         </Button>
                                     </div>
                                 ) : (
                                     <div className="flex gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => fileInputRef.current?.click()}
-                                            size="sm"
-                                        >
+                                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} size="sm">
                                             <Camera className="mr-2 h-4 w-4" />
                                             Change Avatar
                                         </Button>
@@ -333,9 +322,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button disabled={processing}>
-                                    {processing ? 'Saving...' : 'Save Changes'}
-                                </Button>
+                                <Button disabled={processing}>{processing ? 'Saving...' : 'Save Changes'}</Button>
 
                                 <Transition
                                     show={recentlySuccessful}
@@ -354,17 +341,17 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                         <HeadingSmall title="Account Information" description="Your account details (read-only)" />
                         <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Role</dt>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Role</dt>
                                 <dd className="mt-1 text-sm font-medium">{auth.user.role?.display_name ?? auth.user.role?.name ?? '—'}</dd>
                             </div>
                             {auth.user.university && (
                                 <div>
-                                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Universitas</dt>
+                                    <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Universitas</dt>
                                     <dd className="mt-1 text-sm font-medium">{auth.user.university.name}</dd>
                                 </div>
                             )}
                             <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status Akun</dt>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Status Akun</dt>
                                 <dd className="mt-1">
                                     {auth.user.approval_status === 'approved' ? (
                                         <span className="inline-flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400">
@@ -383,7 +370,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                             </div>
                             {auth.user.last_login_at && (
                                 <div>
-                                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Login Terakhir</dt>
+                                    <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Login Terakhir</dt>
                                     <dd className="mt-1 text-sm text-muted-foreground">
                                         {new Date(auth.user.last_login_at).toLocaleString('id-ID')}
                                     </dd>
@@ -391,7 +378,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                             )}
                             {auth.user.created_at && (
                                 <div>
-                                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Member Sejak</dt>
+                                    <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Member Sejak</dt>
                                     <dd className="mt-1 text-sm text-muted-foreground">
                                         {new Date(auth.user.created_at).toLocaleDateString('id-ID', {
                                             year: 'numeric',
@@ -402,7 +389,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 </div>
                             )}
                             <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Verifikasi Email</dt>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Verifikasi Email</dt>
                                 <dd className="mt-1">
                                     {auth.user.email_verified_at ? (
                                         <span className="inline-flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400">

@@ -6,17 +6,16 @@ use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 uses()->group('feature', 'cache', 'statistics');
 
 beforeEach(function () {
     $this->seedRoles();
     Cache::flush();
-    
+
     $this->university = University::factory()->create();
     $this->scientificField = ScientificField::factory()->create();
-    
+
     $this->superAdmin = User::factory()->superAdmin()->create();
     $this->adminKampus = User::factory()->adminKampus()->create(['university_id' => $this->university->id]);
     $this->user = User::factory()->user()->create(['university_id' => $this->university->id]);
@@ -31,7 +30,7 @@ describe('Cache Creation and Keys', function () {
         ]);
 
         $this->actingAs($this->superAdmin)->get('/dashboard');
-        
+
         expect(Cache::has('dashboard_statistics_super_admin'))->toBeTrue();
     });
 
@@ -43,7 +42,7 @@ describe('Cache Creation and Keys', function () {
         ]);
 
         $this->actingAs($this->adminKampus)->get('/dashboard');
-        
+
         expect(Cache::has("dashboard_statistics_university_{$this->university->id}"))->toBeTrue();
     });
 
@@ -55,7 +54,7 @@ describe('Cache Creation and Keys', function () {
         ]);
 
         $this->actingAs($this->user)->get('/dashboard');
-        
+
         expect(Cache::has("dashboard_statistics_user_{$this->user->id}"))->toBeTrue();
     });
 });
@@ -84,7 +83,7 @@ describe('Cache Hit Performance', function () {
         // Second request (warm cache) - should use cached data
         $response = $this->actingAs($this->user)->get('/dashboard');
         $stats = $response->viewData('page')['props']['statistics'];
-        
+
         // Statistics from response should match cached statistics
         expect($stats['totals']['total_journals'])->toBe($cachedStats['totals']['total_journals']);
         expect($stats['totals']['indexed_journals'])->toBe($cachedStats['totals']['indexed_journals']);
@@ -246,7 +245,7 @@ describe('Cache Invalidation on Journal Updated', function () {
 
     test('changing university_id clears old and new university caches', function () {
         $university2 = University::factory()->create();
-        
+
         $journal = Journal::factory()->create([
             'user_id' => $this->user->id,
             'university_id' => $this->university->id,
@@ -270,7 +269,7 @@ describe('Cache Invalidation on Journal Updated', function () {
 
     test('changing user_id clears old and new user caches', function () {
         $user2 = User::factory()->user()->create(['university_id' => $this->university->id]);
-        
+
         $journal = Journal::factory()->create([
             'user_id' => $this->user->id,
             'university_id' => $this->university->id,

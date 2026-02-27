@@ -1,6 +1,6 @@
-import { ArrowLeftRight, ArrowRight, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
+import { ArrowLeftRight, ArrowRight, User } from 'lucide-react';
 
 interface ActivityItemProps {
     activity: {
@@ -65,9 +65,7 @@ export default function ActivityItem({ activity }: ActivityItemProps) {
         <div className="flex gap-3 rounded-lg border border-sidebar-border/70 bg-card p-4 dark:border-sidebar-border">
             <div
                 className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
-                    activity.type === 'received'
-                        ? 'bg-green-100 dark:bg-green-900/20'
-                        : 'bg-blue-100 dark:bg-blue-900/20'
+                    activity.type === 'received' ? 'bg-green-100 dark:bg-green-900/20' : 'bg-blue-100 dark:bg-blue-900/20'
                 }`}
             >
                 {activity.type === 'received' ? (

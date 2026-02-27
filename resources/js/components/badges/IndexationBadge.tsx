@@ -38,12 +38,7 @@ export default function IndexationBadge({ platform, url, indexed_date, showDate 
                 {platform}
             </Badge>
             {url && (
-                <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-500 hover:underline truncate max-w-[160px]"
-                >
+                <a href={url} target="_blank" rel="noopener noreferrer" className="max-w-[160px] truncate text-xs text-blue-500 hover:underline">
                     Lihat halaman
                 </a>
             )}

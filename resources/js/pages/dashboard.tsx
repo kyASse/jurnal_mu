@@ -47,12 +47,12 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {/* Stats Cards - Conditional Grid Based on Role */}
                 <div
-                    className={`grid grid-cols-1 auto-rows-min gap-4 ${
+                    className={`grid auto-rows-min grid-cols-1 gap-4 ${
                         isSuperAdmin && stats.pending_lppm_count !== undefined
                             ? 'md:grid-cols-2 lg:grid-cols-4'
                             : isUser && stats.journals_by_status
-                                ? 'sm:grid-cols-2 lg:grid-cols-5'
-                                : 'md:grid-cols-3'
+                              ? 'sm:grid-cols-2 lg:grid-cols-5'
+                              : 'md:grid-cols-3'
                     }`}
                 >
                     {/* Total Assessments */}
@@ -210,8 +210,8 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                                     {isSuperAdmin
                                         ? 'Belum ada jurnal yang terdaftar di sistem.'
                                         : auth.user?.role?.name === 'Admin Kampus'
-                                            ? 'Belum ada jurnal yang terdaftar di universitas Anda.'
-                                            : 'Anda belum mengelola jurnal. Mulai dengan menambahkan jurnal baru.'}
+                                          ? 'Belum ada jurnal yang terdaftar di universitas Anda.'
+                                          : 'Anda belum mengelola jurnal. Mulai dengan menambahkan jurnal baru.'}
                                 </p>
                             </div>
                         </div>

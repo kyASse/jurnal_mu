@@ -20,23 +20,23 @@ test('user_dapat_membuat_journal_baru_dengan_data_valid', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Ilmu Komputer Indonesia',
-            'e_issn'             => '1234-5678',
-            'issn'               => '8765-4321',
-            'url'                => 'https://journal.example.ac.id',
-            'oai_pmh_url'        => 'https://journal.example.ac.id/oai',
-            'frequency'          => 'Quarterly',
+            'title' => 'Jurnal Ilmu Komputer Indonesia',
+            'e_issn' => '1234-5678',
+            'issn' => '8765-4321',
+            'url' => 'https://journal.example.ac.id',
+            'oai_pmh_url' => 'https://journal.example.ac.id/oai',
+            'frequency' => 'Quarterly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertRedirect(route('user.journals.index'));
 
     $this->assertDatabaseHas('journals', [
-        'title'         => 'Jurnal Ilmu Komputer Indonesia',
-        'e_issn'        => '1234-5678',
-        'user_id'       => $user->id,
+        'title' => 'Jurnal Ilmu Komputer Indonesia',
+        'e_issn' => '1234-5678',
+        'user_id' => $user->id,
         'university_id' => $university->id,
-        'sinta_rank'    => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ]);
 });
 
@@ -47,17 +47,17 @@ test('user_dapat_membuat_journal_dengan_akreditasi_sinta', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'                    => 'Jurnal Sains Terapan',
-            'e_issn'                   => '2222-3333',
-            'url'                      => 'https://jurnal.ac.id',
-            'oai_pmh_url'              => 'https://jurnal.ac.id/oai',
-            'frequency'                => 'Semi-Annual',
-            'scientific_field_id'      => $field->id,
-            'sinta_rank'               => 'sinta_2',
+            'title' => 'Jurnal Sains Terapan',
+            'e_issn' => '2222-3333',
+            'url' => 'https://jurnal.ac.id',
+            'oai_pmh_url' => 'https://jurnal.ac.id/oai',
+            'frequency' => 'Semi-Annual',
+            'scientific_field_id' => $field->id,
+            'sinta_rank' => 'sinta_2',
             'accreditation_start_year' => 2023,
-            'accreditation_end_year'   => 2028,
-            'accreditation_sk_number'  => '105/E/KPT/2023',
-            'accreditation_sk_date'    => '2023-06-15',
+            'accreditation_end_year' => 2028,
+            'accreditation_sk_number' => '105/E/KPT/2023',
+            'accreditation_sk_date' => '2023-06-15',
         ])
         ->assertRedirect(route('user.journals.index'));
 
@@ -74,14 +74,14 @@ test('user_dapat_membuat_journal_dengan_indexation_url', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Terindeks Scopus',
-            'e_issn'             => '4444-5555',
-            'url'                => 'https://journal.scopus.ac.id',
-            'oai_pmh_url'        => 'https://journal.scopus.ac.id/oai',
-            'frequency'          => 'Monthly',
+            'title' => 'Jurnal Terindeks Scopus',
+            'e_issn' => '4444-5555',
+            'url' => 'https://journal.scopus.ac.id',
+            'oai_pmh_url' => 'https://journal.scopus.ac.id/oai',
+            'frequency' => 'Monthly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'sinta_1',
-            'indexations'        => [
+            'sinta_rank' => 'sinta_1',
+            'indexations' => [
                 ['platform' => 'Scopus', 'url' => 'https://www.scopus.com/sourceid/12345'],
                 ['platform' => 'DOAJ', 'url' => ''],
             ],
@@ -105,14 +105,14 @@ test('user_dapat_membuat_journal_dengan_indexation_tanpa_url', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Indeks Kosong',
-            'e_issn'             => '6666-7777',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Quarterly',
+            'title' => 'Jurnal Indeks Kosong',
+            'e_issn' => '6666-7777',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Quarterly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
-            'indexations'        => [
+            'sinta_rank' => 'non_sinta',
+            'indexations' => [
                 ['platform' => 'Google Scholar', 'url' => ''],
             ],
         ])
@@ -135,13 +135,13 @@ test('gagal_simpan_jika_title_kosong', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => '',
-            'e_issn'             => '1234-5678',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Quarterly',
+            'title' => '',
+            'e_issn' => '1234-5678',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Quarterly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertSessionHasErrors(['title']);
 
@@ -155,13 +155,13 @@ test('gagal_simpan_jika_e_issn_kosong', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Quarterly',
+            'title' => 'Jurnal Test',
+            'e_issn' => '',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Quarterly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertSessionHasErrors(['e_issn']);
 });
@@ -173,13 +173,13 @@ test('gagal_simpan_jika_format_e_issn_tidak_valid', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '12345678',   // missing dash
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Quarterly',
+            'title' => 'Jurnal Test',
+            'e_issn' => '12345678',   // missing dash
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Quarterly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertSessionHasErrors(['e_issn']);
 });
@@ -191,13 +191,13 @@ test('gagal_simpan_jika_oai_pmh_url_kosong', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '1234-5678',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => '',
-            'frequency'          => 'Quarterly',
+            'title' => 'Jurnal Test',
+            'e_issn' => '1234-5678',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => '',
+            'frequency' => 'Quarterly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertSessionHasErrors(['oai_pmh_url']);
 });
@@ -209,13 +209,13 @@ test('gagal_simpan_jika_frequency_kosong', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '1234-5678',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => '',
+            'title' => 'Jurnal Test',
+            'e_issn' => '1234-5678',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => '',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertSessionHasErrors(['frequency']);
 });
@@ -226,13 +226,13 @@ test('gagal_simpan_jika_scientific_field_id_tidak_valid', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '1234-5678',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Monthly',
+            'title' => 'Jurnal Test',
+            'e_issn' => '1234-5678',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Monthly',
             'scientific_field_id' => 99999,   // non-existent
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertSessionHasErrors(['scientific_field_id']);
 });
@@ -244,13 +244,13 @@ test('gagal_simpan_jika_sinta_rank_tidak_valid', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '1234-5678',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Monthly',
+            'title' => 'Jurnal Test',
+            'e_issn' => '1234-5678',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Monthly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'invalid_rank',
+            'sinta_rank' => 'invalid_rank',
         ])
         ->assertSessionHasErrors(['sinta_rank']);
 });
@@ -262,14 +262,14 @@ test('gagal_simpan_jika_url_indexation_format_tidak_valid', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '1234-5678',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Monthly',
+            'title' => 'Jurnal Test',
+            'e_issn' => '1234-5678',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Monthly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
-            'indexations'        => [
+            'sinta_rank' => 'non_sinta',
+            'indexations' => [
                 ['platform' => 'Scopus', 'url' => 'not-a-valid-url'],
             ],
         ])
@@ -287,13 +287,13 @@ test('gagal_simpan_jika_user_tidak_memiliki_university', function () {
 
     $this->actingAs($user)
         ->post(route('user.journals.store'), [
-            'title'              => 'Jurnal Test',
-            'e_issn'             => '1234-5678',
-            'url'                => 'https://journal.ac.id',
-            'oai_pmh_url'        => 'https://journal.ac.id/oai',
-            'frequency'          => 'Quarterly',
+            'title' => 'Jurnal Test',
+            'e_issn' => '1234-5678',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Quarterly',
             'scientific_field_id' => $field->id,
-            'sinta_rank'         => 'non_sinta',
+            'sinta_rank' => 'non_sinta',
         ])
         ->assertSessionHasErrors(['university_id']);
 
