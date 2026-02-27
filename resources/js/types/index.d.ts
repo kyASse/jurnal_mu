@@ -51,6 +51,11 @@ export interface User {
     role: Role;
     roles?: Role[]; // Multi-role support
     university_id?: number;
+    university?: {
+        id: number;
+        name: string;
+        short_name?: string;
+    };
     avatar_url?: string;
     avatar?: string;
     phone?: string;
@@ -59,6 +64,9 @@ export interface User {
     scientific_field?: ScientificField;
     scientific_field_id?: number;
     initials?: string;
+    approval_status?: 'pending' | 'approved' | 'rejected';
+    last_login_at?: string;
+    created_at?: string;
 }
 
 export interface University {
