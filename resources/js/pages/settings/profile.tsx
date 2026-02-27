@@ -22,6 +22,19 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+/**
+ * Sanitize a URL to only allow safe protocols for use in image src attributes.
+ * Prevents XSS via javascript: or data: (non-image) URIs (CWE-79, CWE-116).
+ */
+const sanitizeImageUrl = (url: string | null | undefined): string => {
+    if (!url) return '';
+    // Allow only safe URL schemes: https, http, blob (local object URLs), and data:image/*
+    if (/^(https?:\/\/|blob:|data:image\/)/i.test(url)) {
+        return url;
+    }
+    return '';
+};
+
 type ProfileForm = {
     name: string;
     email: string;
@@ -157,7 +170,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                             <div className="relative">
                                 {avatarPreview || auth.user.avatar_url ? (
                                     <img
-                                        src={avatarPreview || auth.user.avatar_url}
+                                        src={sanitizeImageUrl(avatarPreview || auth.user.avatar_url)}
                                         alt={auth.user.name}
                                         className="h-24 w-24 rounded-full object-cover ring-2 ring-sidebar-border"
                                     />
