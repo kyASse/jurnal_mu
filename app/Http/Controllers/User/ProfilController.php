@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Models\JournalReassignment;
+use App\Models\ScientificField;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -197,6 +199,41 @@ class ProfilController extends Controller
             'reason' => $reassignment->reason,
             'created_at' => $reassignment->created_at->format('Y-m-d H:i:s'),
         ])->toArray();
+    }
+
+    /**
+     * Show the profile edit form for the authenticated user (User role area).
+     */
+    public function edit(Request $request): Response
+    {
+        $scientificFields = ScientificField::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
+        return Inertia::render('User/Profil/Edit', [
+            'scientificFields' => $scientificFields,
+            'status' => $request->session()->get('status'),
+        ]);
+    }
+
+    /**
+     * Update the authenticated user's profile (User role area).
+     */
+    public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        self::clearStatisticsCache($user->id);
+
+        return to_route('user.profil.index')
+            ->with('success', 'Profil berhasil diperbarui.');
     }
 
     /**

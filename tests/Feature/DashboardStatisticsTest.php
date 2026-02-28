@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
 use App\Models\Journal;
-use App\Models\Role;
 use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
@@ -13,15 +11,15 @@ uses()->group('feature', 'dashboard', 'statistics');
 beforeEach(function () {
     $this->seedRoles();
     Cache::flush(); // Clear cache before each test
-    
+
     // Create test data
     $this->university1 = University::factory()->create(['name' => 'University A']);
     $this->university2 = University::factory()->create(['name' => 'University B']);
-    
+
     $this->field1 = ScientificField::factory()->create(['name' => 'Engineering']);
     $this->field2 = ScientificField::factory()->create(['name' => 'Medicine']);
     $this->field3 = ScientificField::factory()->create(['name' => 'Economics']);
-    
+
     // Create users
     $this->superAdmin = User::factory()->superAdmin()->create();
     $this->adminKampus1 = User::factory()->adminKampus()->create(['university_id' => $this->university1->id]);
@@ -40,10 +38,10 @@ describe('Statistics Calculation Accuracy', function () {
         ]);
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
-        
+
         $response->assertOk();
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['totals']['total_journals'])->toBe(10);
     });
 
@@ -74,7 +72,7 @@ describe('Statistics Calculation Accuracy', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['totals']['total_journals'])->toBe(6);
         expect($statistics['totals']['indexed_journals'])->toBe(3);
     });
@@ -116,7 +114,7 @@ describe('Statistics Calculation Accuracy', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['totals']['sinta_journals'])->toBe(4);
         expect($statistics['totals']['non_sinta_journals'])->toBe(2);
     });
@@ -148,9 +146,9 @@ describe('Statistics Calculation Accuracy', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         $indexationMap = collect($statistics['by_indexation'])->keyBy('name');
-        
+
         expect($indexationMap['Scopus']['count'])->toBe(7); // 5 + 2
         expect($indexationMap['DOAJ']['count'])->toBe(3);
         expect($indexationMap['Web of Science']['count'])->toBe(2);
@@ -177,9 +175,9 @@ describe('Statistics Calculation Accuracy', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         $accreditationMap = collect($statistics['by_accreditation'])->keyBy('label');
-        
+
         expect($accreditationMap['Non-Sinta']['count'])->toBe(4);
         expect($accreditationMap['SINTA 1']['count'])->toBe(1);
         expect($accreditationMap['SINTA 2']['count'])->toBe(1);
@@ -213,11 +211,11 @@ describe('Statistics Calculation Accuracy', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['by_scientific_field'])->toHaveCount(3);
-        
+
         $fieldMap = collect($statistics['by_scientific_field'])->keyBy('name');
-        
+
         expect($fieldMap['Engineering']['count'])->toBe(5);
         expect($fieldMap['Medicine']['count'])->toBe(3);
         expect($fieldMap['Economics']['count'])->toBe(2);
@@ -234,14 +232,14 @@ describe('Percentage Calculations', function () {
             'scientific_field_id' => $this->field1->id,
             'indexations' => ['Scopus' => true],
         ]);
-        
+
         Journal::factory()->count(3)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
             'scientific_field_id' => $this->field1->id,
             'indexations' => ['DOAJ' => true],
         ]);
-        
+
         Journal::factory()->count(2)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
@@ -251,9 +249,9 @@ describe('Percentage Calculations', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         $indexationMap = collect($statistics['by_indexation'])->keyBy('name');
-        
+
         expect($indexationMap['Scopus']['percentage'])->toBe(50.0);
         expect($indexationMap['DOAJ']['percentage'])->toBe(30.0);
         expect($indexationMap['Web of Science']['percentage'])->toBe(20.0);
@@ -268,14 +266,14 @@ describe('Percentage Calculations', function () {
             'scientific_field_id' => $this->field1->id,
             'sinta_rank' => 'non_sinta',
         ]);
-        
+
         Journal::factory()->count(2)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
             'scientific_field_id' => $this->field1->id,
             'sinta_rank' => 'sinta_1',
         ]);
-        
+
         Journal::factory()->count(2)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
@@ -285,9 +283,9 @@ describe('Percentage Calculations', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         $accreditationMap = collect($statistics['by_accreditation'])->keyBy('label');
-        
+
         expect($accreditationMap['Non-Sinta']['percentage'])->toBe(60.0);
         expect($accreditationMap['SINTA 1']['percentage'])->toBe(20.0);
         expect($accreditationMap['SINTA 2']['percentage'])->toBe(20.0);
@@ -304,7 +302,7 @@ describe('Percentage Calculations', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['by_indexation'][0]['percentage'])->toBe(100.0);
     });
 });
@@ -327,7 +325,7 @@ describe('Role-Based Data Scoping', function () {
 
         $response = $this->actingAs($this->superAdmin)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['totals']['total_journals'])->toBe(8);
     });
 
@@ -348,7 +346,7 @@ describe('Role-Based Data Scoping', function () {
 
         $response = $this->actingAs($this->adminKampus1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['totals']['total_journals'])->toBe(5);
     });
 
@@ -369,7 +367,7 @@ describe('Role-Based Data Scoping', function () {
 
         $response = $this->actingAs($this->user1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['totals']['total_journals'])->toBe(5);
     });
 
@@ -406,7 +404,7 @@ describe('Empty Dataset Handling', function () {
     test('handles zero journals gracefully', function () {
         $response = $this->actingAs($this->user1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         expect($statistics['totals']['total_journals'])->toBe(0);
         expect($statistics['totals']['indexed_journals'])->toBe(0);
         expect($statistics['totals']['sinta_journals'])->toBe(0);
@@ -419,7 +417,7 @@ describe('Empty Dataset Handling', function () {
         // No journals = 0/0 should be handled as 0%
         $response = $this->actingAs($this->user1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         foreach ($statistics['by_accreditation'] as $accreditation) {
             expect($accreditation['percentage'])->toBeNumeric()->toEqual(0);
         }
@@ -435,7 +433,7 @@ describe('Empty Dataset Handling', function () {
 
         $response = $this->actingAs($this->user1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         // Should not crash, scientific field aggregation should handle null
         expect($statistics['totals']['total_journals'])->toBe(1);
         expect($statistics['by_scientific_field'])->toBeArray();
@@ -454,7 +452,7 @@ describe('Data Structure and Types', function () {
 
         $response = $this->actingAs($this->user1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         // Check totals structure
         expect($statistics)->toHaveKey('totals');
         expect($statistics['totals'])->toHaveKeys([
@@ -491,14 +489,14 @@ describe('Data Structure and Types', function () {
             'scientific_field_id' => $this->field1->id,
             'indexations' => ['Scopus' => true],
         ]);
-        
+
         Journal::factory()->count(10)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
             'scientific_field_id' => $this->field1->id,
             'indexations' => ['Google Scholar' => true],
         ]);
-        
+
         Journal::factory()->count(3)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
@@ -508,7 +506,7 @@ describe('Data Structure and Types', function () {
 
         $response = $this->actingAs($this->user1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         // Should be sorted: Google Scholar (10), Scopus (5), DOAJ (3)
         expect($statistics['by_indexation'][0]['name'])->toBe('Google Scholar');
         expect($statistics['by_indexation'][0]['count'])->toBe(10);
@@ -524,13 +522,13 @@ describe('Data Structure and Types', function () {
             'university_id' => $this->university1->id,
             'scientific_field_id' => $this->field1->id,
         ]);
-        
+
         Journal::factory()->count(10)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
             'scientific_field_id' => $this->field2->id,
         ]);
-        
+
         Journal::factory()->count(5)->create([
             'user_id' => $this->user1->id,
             'university_id' => $this->university1->id,
@@ -539,7 +537,7 @@ describe('Data Structure and Types', function () {
 
         $response = $this->actingAs($this->user1)->get('/dashboard');
         $statistics = $response->viewData('page')['props']['statistics'];
-        
+
         // Should be sorted: Medicine (10), Economics (5), Engineering (3)
         expect($statistics['by_scientific_field'][0]['name'])->toBe('Medicine');
         expect($statistics['by_scientific_field'][0]['count'])->toBe(10);

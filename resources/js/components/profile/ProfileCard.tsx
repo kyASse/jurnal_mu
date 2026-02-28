@@ -39,15 +39,11 @@ export default function ProfileCard({ user }: ProfileCardProps) {
                 </Link>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-start sm:space-x-6 sm:space-y-0">
+                <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-6">
                     {/* Avatar */}
                     <div className="flex-shrink-0">
                         {user.avatar_url ? (
-                            <img
-                                src={user.avatar_url}
-                                alt={user.name}
-                                className="h-24 w-24 rounded-full object-cover ring-2 ring-sidebar-border"
-                            />
+                            <img src={user.avatar_url} alt={user.name} className="h-24 w-24 rounded-full object-cover ring-2 ring-sidebar-border" />
                         ) : (
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 ring-2 ring-sidebar-border dark:bg-blue-900/20">
                                 <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">

@@ -12,7 +12,7 @@ uses()->group('feature', 'performance', 'statistics');
 beforeEach(function () {
     $this->seedRoles();
     Cache::flush();
-    
+
     $this->university = University::factory()->create();
     $this->scientificField = ScientificField::factory()->create();
     $this->user = User::factory()->user()->create(['university_id' => $this->university->id]);
@@ -83,7 +83,7 @@ describe('Cache Performance', function () {
 
         // Warm cache should have significantly fewer queries
         expect($warmQueries)->toBeLessThan($coldQueries / 2);
-        
+
         // Warm cache should have minimal queries (auth + cache check)
         expect($warmQueries)->toBeLessThan(10);
     });
@@ -93,7 +93,7 @@ describe('Large Dataset Handling', function () {
     test('handles 1000+ journals without performance degradation', function () {
         // Create 1000 journals with realistic distribution
         $fields = ScientificField::factory()->count(10)->create();
-        
+
         for ($i = 0; $i < 1000; $i++) {
             Journal::factory()->create([
                 'user_id' => $this->user->id,
@@ -124,7 +124,7 @@ describe('Large Dataset Handling', function () {
     test('statistics calculation is accurate with large datasets', function () {
         // Create exactly 100 journals with known distribution
         // 50% Scopus, 30% SINTA 1, rest evenly distributed
-        
+
         $field1 = ScientificField::factory()->create(['name' => 'Field A']);
         $field2 = ScientificField::factory()->create(['name' => 'Field B']);
 
@@ -201,7 +201,7 @@ describe('Large Dataset Handling', function () {
                 'user_id' => $this->user->id,
                 'university_id' => $this->university->id,
                 'scientific_field_id' => $fields->random()->id,
-                'indexations' => !empty($indexations) ? $indexations : null,
+                'indexations' => ! empty($indexations) ? $indexations : null,
                 'sinta_rank' => rand(0, 10) > 5 ? (string) rand(1, 6) : null,
             ]);
         }
@@ -211,7 +211,7 @@ describe('Large Dataset Handling', function () {
 
         expect($statistics['totals']['total_journals'])->toBe(100);
         expect($statistics['by_scientific_field'])->not->toBeEmpty();
-        
+
         // Should have variety in data
         expect(count($statistics['by_indexation']))->toBeGreaterThan(0);
     });

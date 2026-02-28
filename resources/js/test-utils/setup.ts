@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
 // Cleanup after each test
 afterEach(() => {
@@ -47,8 +47,7 @@ beforeAll(() => {
     console.error = (...args: any[]) => {
         if (
             typeof args[0] === 'string' &&
-            (args[0].includes('Warning: ReactDOM.render') ||
-                args[0].includes('Not implemented: HTMLFormElement.prototype.submit'))
+            (args[0].includes('Warning: ReactDOM.render') || args[0].includes('Not implemented: HTMLFormElement.prototype.submit'))
         ) {
             return;
         }

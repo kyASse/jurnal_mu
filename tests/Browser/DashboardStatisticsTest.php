@@ -18,7 +18,7 @@ class DashboardStatisticsTest extends DuskTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Seed roles
         Role::create([
             'name' => Role::SUPER_ADMIN,

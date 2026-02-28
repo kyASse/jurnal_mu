@@ -14,10 +14,7 @@ interface StatisticsDashboardProps {
  * Error Boundary for Chart Rendering
  * Catches errors in chart components and displays fallback UI
  */
-class ChartErrorBoundary extends Component<
-    { children: ReactNode; fallback?: ReactNode },
-    { hasError: boolean; error?: Error }
-> {
+class ChartErrorBoundary extends Component<{ children: ReactNode; fallback?: ReactNode }, { hasError: boolean; error?: Error }> {
     constructor(props: { children: ReactNode; fallback?: ReactNode }) {
         super(props);
         this.state = { hasError: false };
@@ -59,12 +56,12 @@ class ChartErrorBoundary extends Component<
 export default function StatisticsDashboard({ statistics }: StatisticsDashboardProps) {
     const { resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
-    
+
     // Prevent hydration mismatch - wait for client-side mount
     useEffect(() => {
         setMounted(true);
     }, []);
-    
+
     // Default to light mode if theme not resolved yet
     const isDarkMode = mounted && resolvedTheme === 'dark';
 
@@ -163,10 +160,7 @@ export default function StatisticsDashboard({ statistics }: StatisticsDashboardP
     ];
 
     // Filter out zero-count categories to avoid invisible segments in donut chart
-    const filteredAccreditationData = useMemo(
-        () => statistics.by_accreditation.filter((item) => item.count > 0),
-        [statistics.by_accreditation],
-    );
+    const filteredAccreditationData = useMemo(() => statistics.by_accreditation.filter((item) => item.count > 0), [statistics.by_accreditation]);
 
     // Accreditation/SINTA Chart Configuration with accessibility
     const accreditationChartOptions: ApexOptions = useMemo(

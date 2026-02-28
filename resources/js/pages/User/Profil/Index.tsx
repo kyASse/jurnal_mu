@@ -6,20 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Journal } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    Bell,
-    BookOpen,
-    CheckCircle,
-    ClipboardCheck,
-    Clock,
-    Edit,
-    Eye,
-    History,
-    TrendingUp,
-    XCircle,
-} from 'lucide-react';
+import { Bell, BookOpen, ClipboardCheck, Clock, Edit, Eye, History, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -122,14 +111,7 @@ interface ProfilIndexProps {
     unreadNotificationsCount: number;
 }
 
-export default function ProfilIndex({
-    user,
-    statistics,
-    journals,
-    recentActivity,
-    notifications,
-    unreadNotificationsCount,
-}: ProfilIndexProps) {
+export default function ProfilIndex({ user, statistics, journals, recentActivity, notifications, unreadNotificationsCount }: ProfilIndexProps) {
     const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread'>('all');
     const [localNotifications, setLocalNotifications] = useState(notifications);
     const [localUnreadCount, setLocalUnreadCount] = useState(unreadNotificationsCount);
@@ -140,9 +122,7 @@ export default function ProfilIndex({
     ];
 
     const handleMarkNotificationAsRead = (id: string) => {
-        setLocalNotifications((prev) =>
-            prev.map((notif) => (notif.id === id ? { ...notif, read_at: new Date().toISOString() } : notif)),
-        );
+        setLocalNotifications((prev) => prev.map((notif) => (notif.id === id ? { ...notif, read_at: new Date().toISOString() } : notif)));
         setLocalUnreadCount((prev) => Math.max(0, prev - 1));
     };
 
@@ -164,8 +144,7 @@ export default function ProfilIndex({
         );
     };
 
-    const filteredNotifications =
-        notificationFilter === 'unread' ? localNotifications.filter((n) => !n.read_at) : localNotifications;
+    const filteredNotifications = notificationFilter === 'unread' ? localNotifications.filter((n) => !n.read_at) : localNotifications;
 
     const getStatusBadge = (status: string) => {
         const statusConfig = {
@@ -221,30 +200,10 @@ export default function ProfilIndex({
 
                         {/* Statistics Cards */}
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <StatCard
-                                icon={BookOpen}
-                                label="Total Jurnal"
-                                value={statistics.total_journals}
-                                color="blue"
-                            />
-                            <StatCard
-                                icon={ClipboardCheck}
-                                label="Total Penilaian"
-                                value={statistics.total_assessments}
-                                color="green"
-                            />
-                            <StatCard
-                                icon={TrendingUp}
-                                label="Rata-rata Skor"
-                                value={statistics.average_score.toFixed(2)}
-                                color="purple"
-                            />
-                            <StatCard
-                                icon={Clock}
-                                label="Pending"
-                                value={statistics.journals_by_status.pending}
-                                color="amber"
-                            />
+                            <StatCard icon={BookOpen} label="Total Jurnal" value={statistics.total_journals} color="blue" />
+                            <StatCard icon={ClipboardCheck} label="Total Penilaian" value={statistics.total_assessments} color="green" />
+                            <StatCard icon={TrendingUp} label="Rata-rata Skor" value={statistics.average_score.toFixed(2)} color="purple" />
+                            <StatCard icon={Clock} label="Pending" value={statistics.journals_by_status.pending} color="amber" />
                         </div>
 
                         {/* Recent Activity */}
@@ -292,13 +251,9 @@ export default function ProfilIndex({
                                             <tr>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Judul Jurnal</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">ISSN</th>
-                                                <th className="px-4 py-3 text-left text-sm font-semibold">
-                                                    Bidang Ilmu
-                                                </th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Bidang Ilmu</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                                                <th className="px-4 py-3 text-left text-sm font-semibold">
-                                                    Penilaian Terakhir
-                                                </th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Penilaian Terakhir</th>
                                                 <th className="px-4 py-3 text-right text-sm font-semibold">Aksi</th>
                                             </tr>
                                         </thead>
@@ -315,12 +270,8 @@ export default function ProfilIndex({
                                                             )}
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm text-muted-foreground">
-                                                        {journal.issn || '-'}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm">
-                                                        {journal.scientific_field?.name || '-'}
-                                                    </td>
+                                                    <td className="px-4 py-3 text-sm text-muted-foreground">{journal.issn || '-'}</td>
+                                                    <td className="px-4 py-3 text-sm">{journal.scientific_field?.name || '-'}</td>
                                                     <td className="px-4 py-3">{getStatusBadge(journal.approval_status)}</td>
                                                     <td className="px-4 py-3 text-sm">
                                                         {journal.latest_assessment ? (
@@ -385,9 +336,7 @@ export default function ProfilIndex({
                             <div className="rounded-lg border border-sidebar-border/70 bg-card p-12 text-center dark:border-sidebar-border">
                                 <History className="mx-auto h-16 w-16 text-muted-foreground opacity-50" />
                                 <h3 className="mt-4 text-lg font-semibold">Belum Ada Aktivitas</h3>
-                                <p className="mt-2 text-sm text-muted-foreground">
-                                    Riwayat pengalihan jurnal akan muncul di sini.
-                                </p>
+                                <p className="mt-2 text-sm text-muted-foreground">Riwayat pengalihan jurnal akan muncul di sini.</p>
                             </div>
                         )}
                     </TabsContent>
@@ -422,11 +371,7 @@ export default function ProfilIndex({
                         {filteredNotifications.length > 0 ? (
                             <div className="space-y-3">
                                 {filteredNotifications.map((notification) => (
-                                    <NotificationCard
-                                        key={notification.id}
-                                        notification={notification}
-                                        onMarkRead={handleMarkNotificationAsRead}
-                                    />
+                                    <NotificationCard key={notification.id} notification={notification} onMarkRead={handleMarkNotificationAsRead} />
                                 ))}
                             </div>
                         ) : (
@@ -436,9 +381,7 @@ export default function ProfilIndex({
                                     {notificationFilter === 'unread' ? 'Tidak Ada Notifikasi Belum Dibaca' : 'Belum Ada Notifikasi'}
                                 </h3>
                                 <p className="mt-2 text-sm text-muted-foreground">
-                                    {notificationFilter === 'unread'
-                                        ? 'Semua notifikasi sudah dibaca.'
-                                        : 'Notifikasi akan muncul di sini.'}
+                                    {notificationFilter === 'unread' ? 'Semua notifikasi sudah dibaca.' : 'Notifikasi akan muncul di sini.'}
                                 </p>
                             </div>
                         )}

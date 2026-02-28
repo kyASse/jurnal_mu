@@ -88,9 +88,9 @@ abstract class TestCase extends BaseTestCase
                 // - 30% no indexation
                 // - 50% SINTA accredited (ranks 1-6)
                 // - Scientific fields distributed evenly
-                
+
                 $journalsForUser = (int) ($journalsPerUniversity / 3);
-                
+
                 for ($k = 0; $k < $journalsForUser; $k++) {
                     $field = $fields->random();
                     $rand = rand(1, 100);
@@ -127,7 +127,7 @@ abstract class TestCase extends BaseTestCase
                         $sintaDistribution = [1 => 5, 2 => 10, 3 => 15, 4 => 30, 5 => 25, 6 => 15];
                         $roll = rand(1, 100);
                         $cumulative = 0;
-                        
+
                         foreach ($sintaDistribution as $rank => $percentage) {
                             $cumulative += $percentage;
                             if ($roll <= $cumulative) {
@@ -138,7 +138,7 @@ abstract class TestCase extends BaseTestCase
                     }
 
                     $journal->update([
-                        'indexations' => !empty($indexations) ? $indexations : null,
+                        'indexations' => ! empty($indexations) ? $indexations : null,
                         'sinta_rank' => $sintaRank,
                     ]);
                 }

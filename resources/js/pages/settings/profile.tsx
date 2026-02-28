@@ -1,7 +1,7 @@
 import { type BreadcrumbItem, type ScientificField, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Camera, Trash2, Upload } from 'lucide-react';
+import { Camera, CheckCircle, Clock, ShieldCheck, Trash2, Upload, XCircle } from 'lucide-react';
 import { FormEventHandler, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -21,6 +21,19 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/settings/profile',
     },
 ];
+
+/**
+ * Sanitize a URL to only allow safe protocols for use in image src attributes.
+ * Prevents XSS via javascript: or data: (non-image) URIs (CWE-79, CWE-116).
+ */
+const sanitizeImageUrl = (url: string | null | undefined): string => {
+    if (!url) return '';
+    // Allow only safe URL schemes: https, http, blob (local object URLs), and data:image/*
+    if (/^(https?:\/\/|blob:|data:image\/)/i.test(url)) {
+        return url;
+    }
+    return '';
+};
 
 type ProfileForm = {
     name: string;
@@ -151,13 +164,13 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                     {/* Avatar Section */}
                     <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border">
                         <HeadingSmall title="Profile Picture" description="Update your avatar" />
-                        
+
                         <div className="mt-4 flex items-start gap-6">
                             {/* Avatar Display */}
                             <div className="relative">
                                 {avatarPreview || auth.user.avatar_url ? (
                                     <img
-                                        src={avatarPreview || auth.user.avatar_url}
+                                        src={sanitizeImageUrl(avatarPreview || auth.user.avatar_url)}
                                         alt={auth.user.name}
                                         className="h-24 w-24 rounded-full object-cover ring-2 ring-sidebar-border"
                                     />
@@ -186,24 +199,13 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                             <Upload className="mr-2 h-4 w-4" />
                                             {uploadingAvatar ? 'Uploading...' : 'Upload'}
                                         </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={cancelAvatarPreview}
-                                            disabled={uploadingAvatar}
-                                            size="sm"
-                                        >
+                                        <Button type="button" variant="outline" onClick={cancelAvatarPreview} disabled={uploadingAvatar} size="sm">
                                             Cancel
                                         </Button>
                                     </div>
                                 ) : (
                                     <div className="flex gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => fileInputRef.current?.click()}
-                                            size="sm"
-                                        >
+                                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} size="sm">
                                             <Camera className="mr-2 h-4 w-4" />
                                             Change Avatar
                                         </Button>
@@ -229,6 +231,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="name">Full Name</Label>
                                 <Input
                                     id="name"
+                                    name="name"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
@@ -242,6 +245,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="email">Email Address</Label>
                                 <Input
                                     id="email"
+                                    name="email"
                                     type="email"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
@@ -278,6 +282,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="phone">Phone Number</Label>
                                 <Input
                                     id="phone"
+                                    name="phone"
                                     type="tel"
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value)}
@@ -291,6 +296,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 <Label htmlFor="position">Position</Label>
                                 <Input
                                     id="position"
+                                    name="position"
                                     value={data.position}
                                     onChange={(e) => setData('position', e.target.value)}
                                     placeholder="Lecturer, Researcher, etc."
@@ -316,9 +322,7 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button disabled={processing}>
-                                    {processing ? 'Saving...' : 'Save Changes'}
-                                </Button>
+                                <Button disabled={processing}>{processing ? 'Saving...' : 'Save Changes'}</Button>
 
                                 <Transition
                                     show={recentlySuccessful}
@@ -331,6 +335,74 @@ export default function Profile({ mustVerifyEmail, status, scientificFields }: P
                                 </Transition>
                             </div>
                         </form>
+                    </div>
+                    {/* Account Information (Read-only) */}
+                    <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border">
+                        <HeadingSmall title="Account Information" description="Your account details (read-only)" />
+                        <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Role</dt>
+                                <dd className="mt-1 text-sm font-medium">{auth.user.role?.display_name ?? auth.user.role?.name ?? '—'}</dd>
+                            </div>
+                            {auth.user.university && (
+                                <div>
+                                    <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Universitas</dt>
+                                    <dd className="mt-1 text-sm font-medium">{auth.user.university.name}</dd>
+                                </div>
+                            )}
+                            <div>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Status Akun</dt>
+                                <dd className="mt-1">
+                                    {auth.user.approval_status === 'approved' ? (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400">
+                                            <CheckCircle className="h-4 w-4" /> Approved
+                                        </span>
+                                    ) : auth.user.approval_status === 'rejected' ? (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-red-600 dark:text-red-400">
+                                            <XCircle className="h-4 w-4" /> Rejected
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 dark:text-amber-400">
+                                            <Clock className="h-4 w-4" /> Pending
+                                        </span>
+                                    )}
+                                </dd>
+                            </div>
+                            {auth.user.last_login_at && (
+                                <div>
+                                    <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Login Terakhir</dt>
+                                    <dd className="mt-1 text-sm text-muted-foreground">
+                                        {new Date(auth.user.last_login_at).toLocaleString('id-ID')}
+                                    </dd>
+                                </div>
+                            )}
+                            {auth.user.created_at && (
+                                <div>
+                                    <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Member Sejak</dt>
+                                    <dd className="mt-1 text-sm text-muted-foreground">
+                                        {new Date(auth.user.created_at).toLocaleDateString('id-ID', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
+                                    </dd>
+                                </div>
+                            )}
+                            <div>
+                                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Verifikasi Email</dt>
+                                <dd className="mt-1">
+                                    {auth.user.email_verified_at ? (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400">
+                                            <ShieldCheck className="h-4 w-4" /> Verified
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 dark:text-amber-400">
+                                            <Clock className="h-4 w-4" /> Belum diverifikasi
+                                        </span>
+                                    )}
+                                </dd>
+                            </div>
+                        </dl>
                     </div>
                 </div>
 

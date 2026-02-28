@@ -1,6 +1,6 @@
+import { createEmptyStatistics, createMockStatistics, renderWithProviders, screen, waitFor } from '@/test-utils/test-helpers';
 import { describe, expect, it, vi } from 'vitest';
 import StatisticsDashboard from '../StatisticsDashboard';
-import { createEmptyStatistics, createMockStatistics, renderWithProviders, screen, waitFor } from '@/test-utils/test-helpers';
 
 // Mock ApexCharts
 vi.mock('react-apexcharts', () => ({
