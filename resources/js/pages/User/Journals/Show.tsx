@@ -206,7 +206,7 @@ export default function JournalShow({ journal, statistics }: Props) {
                                         {(journal.cover_image || journal.cover_image_url) ? (
                                             <img
                                                 src={journal.cover_image ?? journal.cover_image_url ?? ''}
-                                                alt="Cover"
+                                                alt={journal.title ? `Sampul jurnal "${journal.title}"` : 'Sampul jurnal'}
                                                 className="h-full w-full object-cover"
                                             />
                                         ) : (
