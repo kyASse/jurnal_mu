@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Journal extends Model
 {
@@ -568,6 +569,35 @@ class Journal extends Model
         }
 
         return $label;
+    }
+
+    /**
+     * Get the cover image URL, normalising legacy relative paths (/storage/...)
+     * to fully-qualified URLs using the configured APP_URL.
+     *
+     * This ensures cover images render correctly when the app is hosted
+     * under a subdirectory (e.g. http://localhost/jurnal_mu/).
+     */
+    public function getCoverImageAttribute(?string $value): ?string
+    {
+        if (! $value) {
+            return $value;
+        }
+
+        // Current format — relative path: journal-covers/cover_1_xxx.jpg
+        if (! str_starts_with($value, '/') && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://')) {
+            return Storage::disk('public')->url($value);
+        }
+
+        // Legacy stored path: /storage/journal-covers/...
+        if (str_starts_with($value, '/storage/')) {
+            $relativePath = ltrim(str_replace('/storage/', '', $value), '/');
+
+            return Storage::disk('public')->url($relativePath);
+        }
+
+        // Already a full URL (deprecated stored format or external cover_image_url)
+        return $value;
     }
 
     /**
