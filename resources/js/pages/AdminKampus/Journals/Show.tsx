@@ -123,12 +123,11 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
 
     const handleCoverSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        coverForm
-            .transform((data) => ({ ...data, _method: 'PATCH' }))
-            .post(route('admin-kampus.journals.upload-cover', journal.id), {
-                forceFormData: true,
-                onSuccess: () => setShowCoverForm(false),
-            });
+        coverForm.transform((data) => ({ ...data, _method: 'PATCH' }));
+        coverForm.post(route('admin-kampus.journals.upload-cover', journal.id), {
+            forceFormData: true,
+            onSuccess: () => setShowCoverForm(false),
+        });
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
