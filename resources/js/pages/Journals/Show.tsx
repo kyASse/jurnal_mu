@@ -177,8 +177,8 @@ export default function JournalsShow() {
                         {/* Cover Image */}
                         <div className="overflow-hidden rounded-xl border bg-card shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
                             <div className="aspect-[3/4] w-full bg-muted dark:bg-muted">
-                                {journal.cover_image_url ? (
-                                    <img src={journal.cover_image_url} alt={journal.title} className="h-full w-full object-cover" />
+                                {journal.cover_image || journal.cover_image_url ? (
+                                    <img src={journal.cover_image ?? journal.cover_image_url} alt={journal.title} className="h-full w-full object-cover" />
                                 ) : (
                                     <div className="flex h-full items-center justify-center">
                                         <BookOpen className="h-16 w-16 text-gray-300" />
