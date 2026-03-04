@@ -38,6 +38,8 @@ export default function JournalsShow() {
     const [searchQuery, setSearchQuery] = useState(queries.search || '');
     const [yearFrom, setYearFrom] = useState<string>(queries.year_start || '');
     const [yearTo, setYearTo] = useState<string>(queries.year_end || '');
+    const [showAbout, setShowAbout] = useState(false);
+    const [showScope, setShowScope] = useState(false);
 
     // Dynamic year range from article data
     const minYear =
@@ -394,14 +396,31 @@ export default function JournalsShow() {
 
                         {/* Description & Scope Section */}
                         {(journal.about || journal.scope) && (
-                            <div className="mb-6 grid gap-6 md:grid-cols-2">
+                            <div className="mb-6 space-y-4">
                                 {journal.about && (
                                     <div className="rounded-xl border bg-card p-6 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
                                         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-foreground">
                                             <BookOpen className="h-5 w-5 text-primary" />
                                             About Journal
                                         </h2>
-                                        <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">{journal.about}</p>
+                                        <div className="relative">
+                                            <p
+                                                className={`text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground transition-all duration-300 ${
+                                                    showAbout ? '' : 'line-clamp-4'
+                                                }`}
+                                            >
+                                                {journal.about}
+                                            </p>
+                                            {!showAbout && (
+                                                <div className="pointer-events-none absolute bottom-0 left-0 h-8 w-full bg-gradient-to-t from-card to-transparent" />
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => setShowAbout((prev) => !prev)}
+                                            className="mt-3 flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                                        >
+                                            {showAbout ? 'View Less ▲' : 'View More ▼'}
+                                        </button>
                                     </div>
                                 )}
                                 {journal.scope && (
@@ -410,7 +429,24 @@ export default function JournalsShow() {
                                             <Target className="h-5 w-5 text-primary" />
                                             Scope and Focus
                                         </h2>
-                                        <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">{journal.scope}</p>
+                                        <div className="relative">
+                                            <p
+                                                className={`text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground transition-all duration-300 ${
+                                                    showScope ? '' : 'line-clamp-4'
+                                                }`}
+                                            >
+                                                {journal.scope}
+                                            </p>
+                                            {!showScope && (
+                                                <div className="pointer-events-none absolute bottom-0 left-0 h-8 w-full bg-gradient-to-t from-card to-transparent" />
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => setShowScope((prev) => !prev)}
+                                            className="mt-3 flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                                        >
+                                            {showScope ? 'View Less ▲' : 'View More ▼'}
+                                        </button>
                                     </div>
                                 )}
                             </div>
