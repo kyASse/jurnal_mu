@@ -566,12 +566,15 @@ export default function JournalsShow() {
                             )}
                             {articles.last_page > 1 && (
                                 <div className="mt-8 flex justify-center gap-1">
-                                    {articles.links.map((link, i) =>
-                                        link.url ? (
+                                    {articles.links.map((link, i) => {
+                                        const isNavButton = link.label.includes('Previous') || link.label.includes('Next');
+                                        const buttonClass = isNavButton ? 'px-3 py-2' : 'h-9 w-9';
+                                        
+                                        return link.url ? (
                                             <Link
                                                 key={i}
                                                 href={link.url}
-                                                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition-all ${
+                                                className={`flex ${buttonClass} items-center justify-center rounded-lg border text-sm transition-all ${
                                                     link.active
                                                         ? 'border-[hsl(var(--accent-red))] bg-[hsl(var(--accent-red))] font-semibold text-white shadow-md'
                                                         : 'border-border bg-card text-foreground hover:bg-muted dark:bg-card dark:hover:bg-muted'
@@ -581,11 +584,11 @@ export default function JournalsShow() {
                                         ) : (
                                             <span
                                                 key={i}
-                                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted text-sm text-muted-foreground/50 dark:bg-muted"
+                                                className={`flex ${buttonClass} items-center justify-center rounded-lg border border-border bg-muted text-sm text-muted-foreground/50 dark:bg-muted`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
-                                        ),
-                                    )}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
