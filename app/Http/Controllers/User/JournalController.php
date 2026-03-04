@@ -14,6 +14,13 @@ use Inertia\Inertia;
 
 class JournalController extends Controller
 {
+    protected JournalCoverService $coverService;
+
+    public function __construct(JournalCoverService $coverService)
+    {
+        $this->coverService = $coverService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -94,8 +101,7 @@ class JournalController extends Controller
 
         // Handle optional cover image upload
         if ($request->hasFile('cover_image')) {
-            $coverService = new JournalCoverService;
-            $journal->update(['cover_image' => $coverService->upload($request->file('cover_image'), $journal)]);
+            $journal->update(['cover_image' => $this->coverService->upload($request->file('cover_image'), $journal)]);
         }
 
         return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil ditambahkan.');
@@ -153,8 +159,7 @@ class JournalController extends Controller
 
         // Handle optional cover image upload
         if ($request->hasFile('cover_image')) {
-            $coverService = new JournalCoverService;
-            $validated['cover_image'] = $coverService->upload($request->file('cover_image'), $journal);
+            $validated['cover_image'] = $this->coverService->upload($request->file('cover_image'), $journal);
         } else {
             unset($validated['cover_image']);
         }
@@ -185,8 +190,7 @@ class JournalController extends Controller
             'cover_image.dimensions' => 'Resolusi cover minimal 300x400 piksel.',
         ]);
 
-        $coverService = new JournalCoverService;
-        $journal->update(['cover_image' => $coverService->upload($request->file('cover_image'), $journal)]);
+        $journal->update(['cover_image' => $this->coverService->upload($request->file('cover_image'), $journal)]);
 
         return redirect()->route('user.journals.show', $journal)
             ->with('success', 'Cover jurnal berhasil diperbarui.');
