@@ -30,13 +30,32 @@ use App\Http\Controllers\User\PembinaanController as UserPembinaanController;
 use App\Http\Controllers\User\ProfilController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| Public Storage File Serving
 |--------------------------------------------------------------------------
+|
+| Serves files stored on the "public" disk (storage/app/public/).
+| This route is required because PHP's built-in dev server (artisan serve)
+| does not follow Windows directory junctions, so the public/storage
+| junction is not traversed for static files. This route streams files
+| directly from the storage layer, bypassing the junction entirely.
+|
+| In production (Apache/Nginx), the web server serves these files
+| directly from the public/storage symlink before PHP is invoked,
+| so this route is never reached and adds zero overhead.
 */
+Route::get('/storage/{path}', function (string $path) {
+    if (! Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return Storage::disk('public')->response($path);
+})->where('path', '.+')->name('storage.serve');
+
 
 //  Laman Page
 Route::get('/', function () {
