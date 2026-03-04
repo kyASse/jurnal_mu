@@ -584,14 +584,19 @@ class Journal extends Model
             return $value;
         }
 
-        // Normalise legacy stored paths: /storage/journal-covers/...
+        // Current format — relative path: journal-covers/cover_1_xxx.jpg
+        if (! str_starts_with($value, '/') && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://')) {
+            return Storage::disk('public')->url($value);
+        }
+
+        // Legacy stored path: /storage/journal-covers/...
         if (str_starts_with($value, '/storage/')) {
             $relativePath = ltrim(str_replace('/storage/', '', $value), '/');
 
             return Storage::disk('public')->url($relativePath);
         }
 
-        // Already a full URL (or external cover_image_url)
+        // Already a full URL (deprecated stored format or external cover_image_url)
         return $value;
     }
 
