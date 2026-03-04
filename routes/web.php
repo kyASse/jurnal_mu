@@ -431,10 +431,6 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('journals/{journal}/cover', [UserJournalController::class, 'uploadCover'])
             ->name('journals.upload-cover');
 
-        // Cover image upload (dedicated endpoint)
-        Route::patch('journals/{journal}/cover', [UserJournalController::class, 'uploadCover'])
-            ->name('journals.upload-cover');
-
         // Assessments Management
         Route::prefix('assessments')->name('assessments.')->group(function () {
             Route::get('/', [AssessmentController::class, 'index'])
