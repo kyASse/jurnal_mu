@@ -31,12 +31,13 @@ class JournalCoverService
      */
     public function upload(UploadedFile $file, Journal $journal): string
     {
-        $filename = 'cover_' . $journal->id . '_' . time() . '.' . $file->extension();
+        $filename = 'cover_'.$journal->id.'_'.time().'.'.$file->extension();
         $path = $file->storeAs(self::STORAGE_DIR, $filename, self::DISK);
 
         // Delete the old local cover file if it exists, now that the new one is stored
         $this->deleteExisting($journal);
-        return '/storage/' . $path;
+
+        return '/storage/'.$path;
     }
 
     /**

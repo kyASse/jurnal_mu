@@ -611,9 +611,9 @@ class JournalController extends Controller
             'cover_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=300,min_height=400',
         ], [
             'cover_image.required' => 'Pilih file gambar untuk diupload.',
-            'cover_image.image'    => 'File cover harus berupa gambar.',
-            'cover_image.mimes'    => 'Format cover harus JPEG, PNG, JPG, atau WebP.',
-            'cover_image.max'      => 'Ukuran file cover maksimal 2MB.',
+            'cover_image.image' => 'File cover harus berupa gambar.',
+            'cover_image.mimes' => 'Format cover harus JPEG, PNG, JPG, atau WebP.',
+            'cover_image.max' => 'Ukuran file cover maksimal 2MB.',
             'cover_image.dimensions' => 'Resolusi cover minimal 300x400 piksel.',
         ]);
 

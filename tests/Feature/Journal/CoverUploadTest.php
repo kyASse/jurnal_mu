@@ -41,33 +41,33 @@ function buildPng(int $width, int $height, ?int $sizeKB = null): string
 
     // IHDR chunk: width(4), height(4), bit_depth(1), color_type(2=RGB), compression, filter, interlace
     $ihdrData = pack('NNccccc', $width, $height, 8, 2, 0, 0, 0);
-    $ihdrCrc  = pack('N', crc32('IHDR' . $ihdrData));
-    $ihdr     = pack('N', 13) . 'IHDR' . $ihdrData . $ihdrCrc;
+    $ihdrCrc = pack('N', crc32('IHDR'.$ihdrData));
+    $ihdr = pack('N', 13).'IHDR'.$ihdrData.$ihdrCrc;
 
     // IDAT chunk: one row of RGB pixels (all black), deflate compressed
-    $rowSize  = 3 * $width; // RGB
-    $scanline = "\x00" . str_repeat("\x00", $rowSize); // filter byte + row data
-    $rawData  = str_repeat($scanline, $height);
+    $rowSize = 3 * $width; // RGB
+    $scanline = "\x00".str_repeat("\x00", $rowSize); // filter byte + row data
+    $rawData = str_repeat($scanline, $height);
     $deflated = gzcompress($rawData, 9);
-    $idatCrc  = pack('N', crc32('IDAT' . $deflated));
-    $idat     = pack('N', strlen($deflated)) . 'IDAT' . $deflated . $idatCrc;
+    $idatCrc = pack('N', crc32('IDAT'.$deflated));
+    $idat = pack('N', strlen($deflated)).'IDAT'.$deflated.$idatCrc;
 
     // IEND chunk
     $iendCrc = pack('N', crc32('IEND'));
-    $iend    = pack('N', 0) . 'IEND' . $iendCrc;
+    $iend = pack('N', 0).'IEND'.$iendCrc;
 
-    $png = $sig . $ihdr . $idat . $iend;
+    $png = $sig.$ihdr.$idat.$iend;
 
     // Optionally pad to target KB using a PNG comment (tEXt chunk)
     if ($sizeKB !== null) {
         $targetBytes = $sizeKB * 1024;
-        $padNeeded   = $targetBytes - strlen($png) - 12; // 12 = chunk overhead
+        $padNeeded = $targetBytes - strlen($png) - 12; // 12 = chunk overhead
         if ($padNeeded > 0) {
-            $textData = 'Comment' . "\x00" . str_repeat('x', $padNeeded);
-            $textCrc  = pack('N', crc32('tEXt' . $textData));
-            $tEXt     = pack('N', strlen($textData)) . 'tEXt' . $textData . $textCrc;
+            $textData = 'Comment'."\x00".str_repeat('x', $padNeeded);
+            $textCrc = pack('N', crc32('tEXt'.$textData));
+            $tEXt = pack('N', strlen($textData)).'tEXt'.$textData.$textCrc;
             // Insert before IEND
-            $png = $sig . $ihdr . $idat . $tEXt . $iend;
+            $png = $sig.$ihdr.$idat.$tEXt.$iend;
         }
     }
 
@@ -96,13 +96,13 @@ function fakeSmallPng(string $name = 'small.png'): UploadedFile
 function journalPayload(int $fieldId): array
 {
     return [
-        'title'            => 'Jurnal Uji Cover',
-        'e_issn'           => '1111-2222',
-        'url'              => 'https://journal.example.ac.id',
-        'oai_pmh_url'      => 'https://journal.example.ac.id/oai',
-        'frequency'        => 'Quarterly',
+        'title' => 'Jurnal Uji Cover',
+        'e_issn' => '1111-2222',
+        'url' => 'https://journal.example.ac.id',
+        'oai_pmh_url' => 'https://journal.example.ac.id/oai',
+        'frequency' => 'Quarterly',
         'scientific_field_id' => $fieldId,
-        'sinta_rank'       => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ];
 }
 
@@ -146,12 +146,12 @@ test('admin_kampus_dapat_ganti_cover_saat_update_jurnal', function () {
     Storage::disk('public')->put($oldPath, 'old-file-content');
 
     $journal = Journal::factory()->create([
-        'university_id'   => $university->id,
-        'user_id'         => $admin->id,
+        'university_id' => $university->id,
+        'user_id' => $admin->id,
         'scientific_field_id' => $field->id,
-        'cover_image'     => '/storage/' . $oldPath,
+        'cover_image' => '/storage/'.$oldPath,
         'approval_status' => 'pending',
-        'sinta_rank'      => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ]);
 
     $newFile = fakeCoverPng('new-cover.png');
@@ -184,11 +184,11 @@ test('admin_kampus_dapat_upload_cover_via_endpoint_khusus', function () {
     $field = ScientificField::factory()->create();
 
     $journal = Journal::factory()->create([
-        'university_id'   => $university->id,
-        'user_id'         => $admin->id,
+        'university_id' => $university->id,
+        'user_id' => $admin->id,
         'scientific_field_id' => $field->id,
         'approval_status' => 'pending',
-        'sinta_rank'      => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ]);
 
     $file = fakeCoverPng('upload.png');
@@ -239,11 +239,11 @@ test('user_dapat_upload_cover_via_endpoint_khusus', function () {
     $field = ScientificField::factory()->create();
 
     $journal = Journal::factory()->create([
-        'university_id'   => $university->id,
-        'user_id'         => $user->id,
+        'university_id' => $university->id,
+        'user_id' => $user->id,
         'scientific_field_id' => $field->id,
         'approval_status' => 'pending',
-        'sinta_rank'      => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ]);
 
     $file = fakeCoverPng('user-cover.png');
@@ -269,11 +269,11 @@ test('user_tidak_bisa_upload_cover_jurnal_milik_orang_lain', function () {
     $field = ScientificField::factory()->create();
 
     $journal = Journal::factory()->create([
-        'university_id'   => $university->id,
-        'user_id'         => $owner->id,
+        'university_id' => $university->id,
+        'user_id' => $owner->id,
         'scientific_field_id' => $field->id,
         'approval_status' => 'pending',
-        'sinta_rank'      => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ]);
 
     $file = fakeCoverPng();
@@ -295,11 +295,11 @@ test('cover_ditolak_jika_ukuran_lebih_dari_2mb', function () {
     $field = ScientificField::factory()->create();
 
     $journal = Journal::factory()->create([
-        'university_id'   => $university->id,
-        'user_id'         => $user->id,
+        'university_id' => $university->id,
+        'user_id' => $user->id,
         'scientific_field_id' => $field->id,
         'approval_status' => 'pending',
-        'sinta_rank'      => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ]);
 
     // ~3MB file — use UploadedFile::fake()->create() to set reported size directly
@@ -323,11 +323,11 @@ test('cover_ditolak_jika_format_bukan_gambar', function () {
     $field = ScientificField::factory()->create();
 
     $journal = Journal::factory()->create([
-        'university_id'   => $university->id,
-        'user_id'         => $user->id,
+        'university_id' => $university->id,
+        'user_id' => $user->id,
         'scientific_field_id' => $field->id,
         'approval_status' => 'pending',
-        'sinta_rank'      => 'non_sinta',
+        'sinta_rank' => 'non_sinta',
     ]);
 
     $pdfFile = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
