@@ -71,7 +71,10 @@ class JournalController extends Controller
     public function create()
     {
         $this->authorize('create', Journal::class);
-        $scientificFields = ScientificField::select('id', 'name')->get();
+        $scientificFields = ScientificField::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('User/Journals/Create', [
             'scientificFields' => $scientificFields,
@@ -96,6 +99,10 @@ class JournalController extends Controller
         $validated = $request->validated();
         $validated['user_id'] = $user->id;
         $validated['university_id'] = $user->university_id;
+
+        // Bug fix: unset cover_image so UploadedFile object is not passed to Journal::create()
+        // The file is handled separately after the record is created.
+        unset($validated['cover_image']);
 
         $journal = Journal::create($validated);
 
