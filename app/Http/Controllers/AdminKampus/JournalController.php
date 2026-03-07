@@ -543,6 +543,15 @@ class JournalController extends Controller
             $validated['user_id'] = $authUser->id;
         }
 
+        // Bug fix #4: Admin Kampus creates approved journals, not pending
+        $validated['approval_status'] = 'approved';
+        $validated['approved_by'] = $authUser->id;
+        $validated['approved_at'] = now();
+
+        // Bug fix #1: unset cover_image so UploadedFile object is not passed to Journal::create()
+        // The file is handled separately after the record is created.
+        unset($validated['cover_image']);
+
         $journal = Journal::create($validated);
 
         // Handle optional cover image upload
