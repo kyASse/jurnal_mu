@@ -99,11 +99,30 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Debug: log form data before submission
+        console.log('Form data being submitted:', {
+            name: data.name,
+            email: data.email,
+            password: data.password ? '[password provided]' : '[empty]',
+            password_confirmation: data.password_confirmation ? '[provided]' : '[empty]',
+            phone: data.phone,
+            position: data.position,
+            scientific_field_id: data.scientific_field_id,
+            role_ids: data.role_ids,
+            is_active: data.is_active,
+        });
+
         put(route('admin-kampus.users.update', user.id), {
             onSuccess: () => {
                 toast.success('User updated successfully');
             },
-            onError: () => {
+            onError: (errors) => {
+                console.error('Validation errors:', errors);
+                // Show specific error messages
+                Object.entries(errors).forEach(([field, message]) => {
+                    console.error(`${field}: ${message}`);
+                });
                 toast.error('Failed to update user. Please check the form.');
             },
         });

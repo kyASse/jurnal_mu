@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Journal;
+use App\Models\Role;
 use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
@@ -281,7 +282,8 @@ test('gagal_simpan_jika_url_indexation_format_tidak_valid', function () {
 // ---------------------------------------------------------------------------
 
 test('gagal_simpan_jika_user_tidak_memiliki_university', function () {
-    // User with university_id = null
+    // User with university_id = null — tidak bisa membuat jurnal
+    // Controller: return back()->with('error', '...') bukan withErrors()
     $user = User::factory()->user(null)->create(['is_active' => true]);
     $field = ScientificField::factory()->create();
 
@@ -295,7 +297,7 @@ test('gagal_simpan_jika_user_tidak_memiliki_university', function () {
             'scientific_field_id' => $field->id,
             'sinta_rank' => 'non_sinta',
         ])
-        ->assertSessionHasErrors(['university_id']);
+        ->assertSessionHas('error');  // flash message, bukan validation error
 
     $this->assertDatabaseCount('journals', 0);
 });
@@ -318,4 +320,98 @@ test('user_tidak_aktif_diarahkan_ke_login', function () {
     $this->actingAs($user)
         ->get(route('user.journals.create'))
         ->assertRedirect(route('login'));
+});
+
+// ---------------------------------------------------------------------------
+// Role-based access control
+// ---------------------------------------------------------------------------
+
+test('admin_kampus_tidak_dapat_mengakses_form_buat_journal_user', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+
+    $this->actingAs($adminKampus)
+        ->get(route('user.journals.create'))
+        ->assertForbidden();
+});
+
+test('admin_kampus_tidak_dapat_menyimpan_journal_melalui_route_user', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+    $field = ScientificField::factory()->create();
+
+    $this->actingAs($adminKampus)
+        ->post(route('user.journals.store'), [
+            'title' => 'Jurnal Infiltrasi',
+            'e_issn' => '9999-8888',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Quarterly',
+            'scientific_field_id' => $field->id,
+            'sinta_rank' => 'non_sinta',
+        ])
+        ->assertForbidden();
+
+    $this->assertDatabaseCount('journals', 0);
+});
+
+test('super_admin_tidak_dapat_mengakses_form_buat_journal_user', function () {
+    $superAdmin = User::factory()->superAdmin()->create(['is_active' => true]);
+
+    $this->actingAs($superAdmin)
+        ->get(route('user.journals.create'))
+        ->assertForbidden();
+});
+
+test('super_admin_tidak_dapat_menyimpan_journal_melalui_route_user', function () {
+    $superAdmin = User::factory()->superAdmin()->create(['is_active' => true]);
+    $field = ScientificField::factory()->create();
+
+    $this->actingAs($superAdmin)
+        ->post(route('user.journals.store'), [
+            'title' => 'Jurnal Super Admin',
+            'e_issn' => '7777-6666',
+            'url' => 'https://journal.ac.id',
+            'oai_pmh_url' => 'https://journal.ac.id/oai',
+            'frequency' => 'Monthly',
+            'scientific_field_id' => $field->id,
+            'sinta_rank' => 'non_sinta',
+        ])
+        ->assertForbidden();
+
+    $this->assertDatabaseCount('journals', 0);
+});
+
+test('pengelola_jurnal_tidak_dapat_mengakses_route_user_jika_tidak_punya_role_user', function () {
+    // Role 'Pengelola Jurnal' adalah role berbeda dari 'User'
+    // Middleware hanya mengizinkan role 'User', bukan 'Pengelola Jurnal'
+    $university = University::factory()->create();
+
+    $pengelolaRole = Role::create([
+        'name' => Role::PENGELOLA_JURNAL,
+        'display_name' => 'Pengelola Jurnal',
+        'description' => 'Pengelola Jurnal',
+    ]);
+
+    $pengelola = User::factory()->create([
+        'university_id' => $university->id,
+        'role_id' => $pengelolaRole->id,
+        'is_active' => true,
+    ]);
+
+    $pengelola->roles()->attach($pengelolaRole->id, ['assigned_at' => now()]);
+
+    $this->actingAs($pengelola)
+        ->get(route('user.journals.create'))
+        ->assertForbidden();
+});
+
+test('hanya_role_user_yang_bisa_mengakses_create_journal', function () {
+    // Verifikasi bahwa user dengan role yang benar bisa mengakses halaman create
+    $university = University::factory()->create();
+    $user = User::factory()->user($university->id)->create(['is_active' => true]);
+
+    $this->actingAs($user)
+        ->get(route('user.journals.create'))
+        ->assertOk();
 });
