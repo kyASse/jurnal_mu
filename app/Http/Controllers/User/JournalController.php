@@ -10,6 +10,7 @@ use App\Models\ScientificField;
 use App\Services\JournalCoverService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class JournalController extends Controller
@@ -91,27 +92,55 @@ class JournalController extends Controller
         $this->authorize('create', Journal::class);
         $user = Auth::user();
 
+        Log::info('JournalController@store - Start', [
+            'actor_id' => $user?->id,
+            'request_method' => $request->method(),
+            'request_all' => $request->except(['cover_image']),
+        ]);
+
         // Ensure user has a university assigned
         if (! $user->university_id) {
+            Log::warning('JournalController@store - Missing university assignment', [
+                'actor_id' => $user?->id,
+            ]);
+
             return back()->with('error', 'Anda belum terdaftar di kampus manapun. Hubungi Admin Kampus untuk mendaftarkan akun Anda ke universitas.');
         }
 
-        $validated = $request->validated();
-        $validated['user_id'] = $user->id;
-        $validated['university_id'] = $user->university_id;
+        try {
+            $validated = $request->validated();
+            $validated['user_id'] = $user->id;
+            $validated['university_id'] = $user->university_id;
 
-        // Bug fix: unset cover_image so UploadedFile object is not passed to Journal::create()
-        // The file is handled separately after the record is created.
-        unset($validated['cover_image']);
+            // Bug fix: unset cover_image so UploadedFile object is not passed to Journal::create()
+            // The file is handled separately after the record is created.
+            unset($validated['cover_image']);
 
-        $journal = Journal::create($validated);
+            $journal = Journal::create($validated);
 
-        // Handle optional cover image upload
-        if ($request->hasFile('cover_image')) {
-            $journal->update(['cover_image' => $this->coverService->upload($request->file('cover_image'), $journal)]);
+            // Handle optional cover image upload
+            if ($request->hasFile('cover_image')) {
+                $journal->update(['cover_image' => $this->coverService->upload($request->file('cover_image'), $journal)]);
+            }
+
+            Log::info('JournalController@store - Successfully created', [
+                'actor_id' => $user?->id,
+                'journal_id' => $journal->id,
+                'journal_title' => $journal->title,
+                'approval_status' => $journal->approval_status,
+                'is_active' => $journal->is_active,
+            ]);
+
+            return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            Log::error('JournalController@store - Failed to create', [
+                'actor_id' => $user?->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
         }
-
-        return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil ditambahkan.');
     }
 
     /**
@@ -162,18 +191,61 @@ class JournalController extends Controller
     {
         $this->authorize('update', $journal);
 
-        $validated = $request->validated();
+        $user = Auth::user();
+        $before = [
+            'title' => $journal->title,
+            'issn' => $journal->issn,
+            'e_issn' => $journal->e_issn,
+            'approval_status' => $journal->approval_status,
+            'is_active' => $journal->is_active,
+        ];
 
-        // Handle optional cover image upload
-        if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $this->coverService->upload($request->file('cover_image'), $journal);
-        } else {
-            unset($validated['cover_image']);
+        Log::info('JournalController@update - Start', [
+            'actor_id' => $user?->id,
+            'journal_id' => $journal->id,
+            'request_method' => $request->method(),
+            'request_all' => $request->except(['cover_image']),
+            'before' => $before,
+        ]);
+
+        try {
+            $validated = $request->validated();
+
+            // Handle optional cover image upload
+            if ($request->hasFile('cover_image')) {
+                $validated['cover_image'] = $this->coverService->upload($request->file('cover_image'), $journal);
+            } else {
+                unset($validated['cover_image']);
+            }
+
+            $journal->update($validated);
+            $journal->refresh();
+
+            Log::info('JournalController@update - Successfully updated', [
+                'actor_id' => $user?->id,
+                'journal_id' => $journal->id,
+                'before' => $before,
+                'after' => [
+                    'title' => $journal->title,
+                    'issn' => $journal->issn,
+                    'e_issn' => $journal->e_issn,
+                    'approval_status' => $journal->approval_status,
+                    'is_active' => $journal->is_active,
+                ],
+            ]);
+
+            return redirect()->route('user.journals.index')->with('success', 'Data jurnal berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            Log::error('JournalController@update - Failed to update', [
+                'actor_id' => $user?->id,
+                'journal_id' => $journal->id,
+                'before' => $before,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
         }
-
-        $journal->update($validated);
-
-        return redirect()->route('user.journals.index')->with('success', 'Data jurnal berhasil diperbarui.');
     }
 
     /**
@@ -210,9 +282,42 @@ class JournalController extends Controller
     {
         $this->authorize('delete', $journal);
 
-        $journal->delete();
+        $user = Auth::user();
+        $snapshot = [
+            'title' => $journal->title,
+            'issn' => $journal->issn,
+            'e_issn' => $journal->e_issn,
+            'approval_status' => $journal->approval_status,
+            'is_active' => $journal->is_active,
+        ];
 
-        return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil dihapus.');
+        Log::info('JournalController@destroy - Start', [
+            'actor_id' => $user?->id,
+            'journal_id' => $journal->id,
+            'journal' => $snapshot,
+        ]);
+
+        try {
+            $journal->delete();
+
+            Log::info('JournalController@destroy - Successfully deleted', [
+                'actor_id' => $user?->id,
+                'journal_id' => $journal->id,
+                'journal' => $snapshot,
+            ]);
+
+            return redirect()->route('user.journals.index')->with('success', 'Jurnal berhasil dihapus.');
+        } catch (\Throwable $e) {
+            Log::error('JournalController@destroy - Failed to delete', [
+                'actor_id' => $user?->id,
+                'journal_id' => $journal->id,
+                'journal' => $snapshot,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 
     /**
