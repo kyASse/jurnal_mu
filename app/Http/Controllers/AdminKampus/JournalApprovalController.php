@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Journal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -66,32 +67,83 @@ class JournalApprovalController extends Controller
     {
         $this->authorize('approve', $journal);
 
+        $actorId = auth()->id();
+        $before = [
+            'approval_status' => $journal->approval_status,
+            'approved_by' => $journal->approved_by,
+            'approved_at' => $journal->approved_at,
+            'rejection_reason' => $journal->rejection_reason,
+        ];
+
+        Log::info('JournalApprovalController@approve - Start', [
+            'actor_id' => $actorId,
+            'journal_id' => $journal->id,
+            'journal_title' => $journal->title,
+            'before' => $before,
+        ]);
+
         // Ensure LPPM can only approve journals from their university
         if ($journal->university_id !== auth()->user()->university_id) {
+            Log::warning('JournalApprovalController@approve - Unauthorized university access', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'journal_university_id' => $journal->university_id,
+                'actor_university_id' => auth()->user()->university_id,
+            ]);
+
             abort(403, 'Unauthorized - Journal is not from your university');
         }
 
         // Prevent approving already approved journals
         if ($journal->approval_status === 'approved') {
+            Log::info('JournalApprovalController@approve - Already approved', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'before' => $before,
+            ]);
+
             return back()->with('error', 'Jurnal sudah disetujui sebelumnya.');
         }
 
-        $journal->update([
-            'approval_status' => 'approved',
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-            'rejection_reason' => null,
-        ]);
+        try {
+            $journal->update([
+                'approval_status' => 'approved',
+                'approved_by' => $actorId,
+                'approved_at' => now(),
+                'rejection_reason' => null,
+            ]);
 
-        // Invalidate university statistics cache
-        Cache::forget('browse.universities.stats');
+            // Invalidate university statistics cache
+            Cache::forget('browse.universities.stats');
 
-        // TODO: Send JournalApprovedNotification
-        // $journal->user->notify(new JournalApprovedNotification($journal));
+            Log::info('JournalApprovalController@approve - Successfully approved', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'after' => [
+                    'approval_status' => $journal->approval_status,
+                    'approved_by' => $journal->approved_by,
+                    'approved_at' => $journal->approved_at,
+                    'rejection_reason' => $journal->rejection_reason,
+                ],
+            ]);
 
-        return redirect()
-            ->route('admin-kampus.journals.pending')
-            ->with('success', "Jurnal \"{$journal->name}\" berhasil disetujui dan sekarang terlihat di platform.");
+            // TODO: Send JournalApprovedNotification
+            // $journal->user->notify(new JournalApprovedNotification($journal));
+
+            return redirect()
+                ->route('admin-kampus.journals.pending')
+                ->with('success', "Jurnal \"{$journal->name}\" berhasil disetujui dan sekarang terlihat di platform.");
+        } catch (\Throwable $e) {
+            Log::error('JournalApprovalController@approve - Failed to approve', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'before' => $before,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 
     /**
@@ -111,31 +163,84 @@ class JournalApprovalController extends Controller
 
         $this->authorize('approve', $journal);
 
+        $actorId = auth()->id();
+        $before = [
+            'approval_status' => $journal->approval_status,
+            'approved_by' => $journal->approved_by,
+            'approved_at' => $journal->approved_at,
+            'rejection_reason' => $journal->rejection_reason,
+        ];
+
+        Log::info('JournalApprovalController@reject - Start', [
+            'actor_id' => $actorId,
+            'journal_id' => $journal->id,
+            'journal_title' => $journal->title,
+            'reason' => $request->reason,
+            'before' => $before,
+        ]);
+
         // Ensure LPPM can only reject journals from their university
         if ($journal->university_id !== auth()->user()->university_id) {
+            Log::warning('JournalApprovalController@reject - Unauthorized university access', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'journal_university_id' => $journal->university_id,
+                'actor_university_id' => auth()->user()->university_id,
+            ]);
+
             abort(403, 'Unauthorized - Journal is not from your university');
         }
 
         // Prevent rejecting already processed journals
         if ($journal->approval_status !== 'pending') {
+            Log::info('JournalApprovalController@reject - Already processed', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'before' => $before,
+            ]);
+
             return back()->with('error', 'Jurnal sudah diproses sebelumnya.');
         }
 
-        $journal->update([
-            'approval_status' => 'rejected',
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-            'rejection_reason' => $request->reason,
-        ]);
+        try {
+            $journal->update([
+                'approval_status' => 'rejected',
+                'approved_by' => $actorId,
+                'approved_at' => now(),
+                'rejection_reason' => $request->reason,
+            ]);
 
-        // Invalidate university statistics cache
-        Cache::forget('browse.universities.stats');
+            // Invalidate university statistics cache
+            Cache::forget('browse.universities.stats');
 
-        // TODO: Send JournalRejectedNotification
-        // $journal->user->notify(new JournalRejectedNotification($journal, $request->reason));
+            Log::info('JournalApprovalController@reject - Successfully rejected', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'after' => [
+                    'approval_status' => $journal->approval_status,
+                    'approved_by' => $journal->approved_by,
+                    'approved_at' => $journal->approved_at,
+                    'rejection_reason' => $journal->rejection_reason,
+                ],
+            ]);
 
-        return redirect()
-            ->route('admin-kampus.journals.pending')
-            ->with('success', "Jurnal \"{$journal->name}\" ditolak. Pengelola jurnal telah diberi notifikasi.");
+            // TODO: Send JournalRejectedNotification
+            // $journal->user->notify(new JournalRejectedNotification($journal, $request->reason));
+
+            return redirect()
+                ->route('admin-kampus.journals.pending')
+                ->with('success', "Jurnal \"{$journal->name}\" ditolak. Pengelola jurnal telah diberi notifikasi.");
+        } catch (\Throwable $e) {
+            Log::error('JournalApprovalController@reject - Failed to reject', [
+                'actor_id' => $actorId,
+                'journal_id' => $journal->id,
+                'before' => $before,
+                'reason' => $request->reason,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 }
