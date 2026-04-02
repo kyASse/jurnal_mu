@@ -122,6 +122,9 @@ class JournalPolicy
 
     /**
      * Determine if the user can delete the journal.
+     *
+     * Journals with approval_status = 'approved' cannot be deleted
+     * (they are considered verified and in use).
      */
     public function delete(User $user, Journal $journal): bool
     {
@@ -131,23 +134,23 @@ class JournalPolicy
         }
 
         // Admin Kampus can delete journals from their university
-        // BUT not if it has submitted assessments
+        // BUT not if the journal has been approved
         if ($user->isAdminKampus()) {
             if ($user->university_id !== $journal->university_id) {
                 return false;
             }
 
-            return ! $journal->hasSubmittedAssessment();
+            return $journal->approval_status !== 'approved';
         }
 
         // User can delete their own journals
-        // BUT not if it has submitted assessments
+        // BUT not if the journal has been approved
         if ($user->isUser()) {
             if ($user->id !== $journal->user_id) {
                 return false;
             }
 
-            return ! $journal->hasSubmittedAssessment();
+            return $journal->approval_status !== 'approved';
         }
 
         return false;
@@ -211,6 +214,50 @@ class JournalPolicy
         // User can export their own journals
         if ($user->isUser()) {
             return $user->id === $journal->user_id;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the user can approve/reject journal submissions.
+     *
+     * Rules:
+     * - Admin Kampus: Can approve journals from their university
+     * - Super Admin: Can approve any journal (for testing/oversight)
+     */
+    public function approve(User $user, Journal $journal): bool
+    {
+        // Super Admin can approve any journal
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        // Admin Kampus can approve journals from their university
+        if ($user->isAdminKampus()) {
+            return $user->university_id === $journal->university_id;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the user can reassign journal manager.
+     *
+     * Rules:
+     * - Admin Kampus: Can reassign journals within their university
+     * - Super Admin: Can reassign any journal
+     */
+    public function reassign(User $user, Journal $journal): bool
+    {
+        // Super Admin can reassign any journal
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        // Admin Kampus can reassign journals from their university
+        if ($user->isAdminKampus()) {
+            return $user->university_id === $journal->university_id;
         }
 
         return false;

@@ -43,15 +43,18 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+// Select UI imports removed — not used in this file
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface University {
     id: number;
     code: string;
+    ptm_code?: string;
     name: string;
     short_name: string;
     address: string;
@@ -62,6 +65,9 @@ interface University {
     email: string;
     website: string;
     logo_url: string;
+    accreditation_status?: string;
+    cluster?: string;
+    profile_description?: string;
     is_active: boolean;
 }
 
@@ -87,6 +93,7 @@ export default function UniversitiesEdit({ university }: Props) {
 
     const { data, setData, put, processing, errors } = useForm({
         code: university.code || '',
+        ptm_code: university.ptm_code || '',
         name: university.name || '',
         short_name: university.short_name || '',
         address: university.address || '',
@@ -97,19 +104,29 @@ export default function UniversitiesEdit({ university }: Props) {
         email: university.email || '',
         website: university.website || '',
         logo_url: university.logo_url || '',
+        accreditation_status: university.accreditation_status || '',
+        cluster: university.cluster || '',
+        profile_description: university.profile_description || '',
         is_active: university.is_active,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin.universities.update', university.id));
+        put(route('admin.universities.update', university.id), {
+            onSuccess: () => {
+                toast.success('University updated successfully');
+            },
+            onError: () => {
+                toast.error('Failed to update university. Please check the form for errors.');
+            },
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit ${university.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
@@ -145,6 +162,21 @@ export default function UniversitiesEdit({ university }: Props) {
                                     className="mt-2"
                                 />
                                 {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code}</p>}
+                            </div>
+
+                            {/* PTM Code */}
+                            <div>
+                                <Label htmlFor="ptm_code">PTM Code (PDDIKTI)</Label>
+                                <Input
+                                    id="ptm_code"
+                                    value={data.ptm_code}
+                                    onChange={(e) => setData('ptm_code', e.target.value)}
+                                    placeholder="e.g., 12345 (5 digit code from PDDIKTI)"
+                                    maxLength={10}
+                                    className="mt-2"
+                                />
+                                <p className="mt-1 text-xs text-muted-foreground">Unique code from PDDIKTI for integration with national systems</p>
+                                {errors.ptm_code && <p className="mt-1 text-sm text-red-600">{errors.ptm_code}</p>}
                             </div>
 
                             {/* Name */}
@@ -287,6 +319,63 @@ export default function UniversitiesEdit({ university }: Props) {
                             </div>
                         </div>
 
+                        {/* University Profile */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                University Profile
+                            </h3>
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <Label htmlFor="accreditation_status">Accreditation Status</Label>
+                                    <select
+                                        id="accreditation_status"
+                                        value={data.accreditation_status}
+                                        onChange={(e) => setData('accreditation_status', e.target.value)}
+                                        className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <option value="">Select Accreditation</option>
+                                        <option value="Unggul">Unggul</option>
+                                        <option value="Baik Sekali">Baik Sekali</option>
+                                        <option value="Baik">Baik</option>
+                                        <option value="Cukup">Cukup</option>
+                                    </select>
+                                    {errors.accreditation_status && <p className="mt-1 text-sm text-red-600">{errors.accreditation_status}</p>}
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="cluster">Cluster</Label>
+                                    <select
+                                        id="cluster"
+                                        value={data.cluster}
+                                        onChange={(e) => setData('cluster', e.target.value)}
+                                        className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <option value="">Select Cluster</option>
+                                        <option value="Mandiri">Mandiri</option>
+                                        <option value="Utama">Utama</option>
+                                        <option value="Madya">Madya</option>
+                                    </select>
+                                    {errors.cluster && <p className="mt-1 text-sm text-red-600">{errors.cluster}</p>}
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="profile_description">Profile Description</Label>
+                                <Textarea
+                                    id="profile_description"
+                                    value={data.profile_description}
+                                    onChange={(e) => setData('profile_description', e.target.value)}
+                                    rows={4}
+                                    maxLength={250}
+                                    placeholder="Brief description of the university (max 250 characters)"
+                                    className="mt-2"
+                                />
+                                <p className="mt-1 text-xs text-muted-foreground">{data.profile_description.length}/250 characters</p>
+                                {errors.profile_description && <p className="mt-1 text-sm text-red-600">{errors.profile_description}</p>}
+                            </div>
+                        </div>
+
                         {/* Status */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
@@ -308,7 +397,7 @@ export default function UniversitiesEdit({ university }: Props) {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
+                        <div className="flex flex-col-reverse items-stretch justify-end gap-4 border-t border-sidebar-border/70 pt-6 sm:flex-row sm:items-center dark:border-sidebar-border">
                             <Link href={route('admin.universities.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel

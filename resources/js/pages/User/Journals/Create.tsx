@@ -44,69 +44,134 @@
  * @author JurnalMU Team
  * @filepath /resources/js/pages/User/Journals/Create.tsx
  */
+import { JournalCoverUpload } from '@/components/JournalCoverUpload';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, BookOpen } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { AlertCircle, ArrowLeft, BookOpen, Trash2 } from 'lucide-react';
+import { FormEventHandler, useEffect, useRef } from 'react';
 
 interface Props {
     scientificFields: Array<{
         id: number;
         name: string;
     }>;
+    sintaRankOptions: Record<string, string>;
+    indexationOptions: Array<{
+        value: string;
+        label: string;
+    }>;
 }
 
-export default function JournalsCreate({ scientificFields }: Props) {
+export default function JournalsCreate({ scientificFields, sintaRankOptions, indexationOptions }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         issn: '',
         e_issn: '',
         url: '',
         scientific_field_id: '',
-        sinta_rank: '',
+        sinta_rank: 'non_sinta',
         frequency: '',
         publisher: '',
         first_published_year: '',
+        // Accreditation (shown conditionally when sinta_rank !== non_sinta)
+        accreditation_start_year: '',
+        accreditation_end_year: '',
+        accreditation_sk_number: '',
+        accreditation_sk_date: '',
+        // Contact & Additional Info
+        editor_in_chief: '',
+        email: '',
+        phone: '',
+        oai_urls: [''] as string[],
+        about: '',
+        scope: '',
+        // Indexations
+        indexations: [] as Array<{ platform: string; url: string }>,
+        // Cover image
+        cover_image: null as File | null,
     });
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('journals.store'));
+        post(route('user.journals.store'), {
+            forceFormData: true,
+            preserveState: true,
+            preserveScroll: false,
+        });
     };
 
     const currentYear = new Date().getFullYear();
+    const todayLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
+
+    // Scroll to error summary whenever validation errors appear
+    const errorSummaryRef = useRef<HTMLDivElement>(null);
+    const hasErrors = Object.keys(errors).length > 0;
+
+    useEffect(() => {
+        if (hasErrors && errorSummaryRef.current) {
+            errorSummaryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [hasErrors]);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'My Journals', href: route('user.journals.index') },
+        { title: 'Create', href: route('user.journals.create') },
+    ];
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Journal" />
 
             <div className="py-6">
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6">
-                        <Link href={route('journals.index')}>
-                            <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600">
+                        <Link href={route('user.journals.index')}>
+                            <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-blue-600 dark:hover:text-blue-400">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to My Journals
                             </Button>
                         </Link>
                         <div className="flex items-center gap-2">
-                            <BookOpen className="h-8 w-8 text-blue-600" />
-                            <h1 className="text-3xl font-bold text-gray-900">Register New Journal</h1>
+                            <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Register New Journal</h1>
                         </div>
-                        <p className="mt-1 ml-10 text-gray-600">Enter the details of the journal you manage</p>
+                        <p className="mt-1 ml-10 text-gray-600 dark:text-gray-400">Enter the details of the journal you manage</p>
                     </div>
 
                     {/* Form */}
-                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Validation Error Summary */}
+                            {hasErrors && (
+                                <div ref={errorSummaryRef}>
+                                    <Alert variant="destructive">
+                                        <AlertCircle className="h-4 w-4" />
+                                        <AlertTitle>Terdapat kesalahan pada form</AlertTitle>
+                                        <AlertDescription>
+                                            <ul className="mt-1 list-disc space-y-1 pl-4 text-sm">
+                                                {Object.entries(errors).map(([field, message]) => (
+                                                    <li key={field}>{message as string}</li>
+                                                ))}
+                                            </ul>
+                                        </AlertDescription>
+                                    </Alert>
+                                </div>
+                            )}
+
                             {/* Basic Info */}
                             <div className="space-y-4">
-                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Journal Information</h3>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100">
+                                    Journal Information
+                                </h3>
 
                                 <div>
                                     <Label htmlFor="title">
@@ -137,13 +202,16 @@ export default function JournalsCreate({ scientificFields }: Props) {
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="e_issn">E-ISSN (Online)</Label>
+                                        <Label htmlFor="e_issn">
+                                            E-ISSN (Online) <span className="text-red-500">*</span>
+                                        </Label>
                                         <Input
                                             id="e_issn"
                                             value={data.e_issn}
                                             onChange={(e) => setData('e_issn', e.target.value)}
                                             placeholder="xxxx-xxxx"
                                             className="mt-1"
+                                            required
                                         />
                                         {errors.e_issn && <p className="mt-1 text-sm text-red-600">{errors.e_issn}</p>}
                                     </div>
@@ -168,7 +236,9 @@ export default function JournalsCreate({ scientificFields }: Props) {
 
                             {/* Classification */}
                             <div className="space-y-4">
-                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900">Classification & Metadata</h3>
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100">
+                                    Classification & Metadata
+                                </h3>
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
@@ -191,23 +261,93 @@ export default function JournalsCreate({ scientificFields }: Props) {
                                     </div>
 
                                     <div>
-                                        <Label>SINTA Rank</Label>
+                                        <Label>
+                                            Peringkat Akreditasi <span className="text-red-500">*</span>
+                                        </Label>
                                         <Select value={data.sinta_rank} onValueChange={(val) => setData('sinta_rank', val)}>
                                             <SelectTrigger className="mt-1">
-                                                <SelectValue placeholder="Select Rank (Optional)" />
+                                                <SelectValue placeholder="Pilih Peringkat" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="1">SINTA 1</SelectItem>
-                                                <SelectItem value="2">SINTA 2</SelectItem>
-                                                <SelectItem value="3">SINTA 3</SelectItem>
-                                                <SelectItem value="4">SINTA 4</SelectItem>
-                                                <SelectItem value="5">SINTA 5</SelectItem>
-                                                <SelectItem value="6">SINTA 6</SelectItem>
+                                                {Object.entries(sintaRankOptions).map(([value, label]) => (
+                                                    <SelectItem key={value} value={value}>
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         {errors.sinta_rank && <p className="mt-1 text-sm text-red-600">{errors.sinta_rank}</p>}
                                     </div>
                                 </div>
+
+                                {data.sinta_rank && data.sinta_rank !== 'non_sinta' && (
+                                    <div className="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+                                        <h4 className="mb-3 text-sm font-semibold text-blue-800 dark:text-blue-200">Detail Akreditasi</h4>
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div>
+                                                <Label htmlFor="accreditation_start_year">Tahun Mulai Akreditasi</Label>
+                                                <Input
+                                                    id="accreditation_start_year"
+                                                    type="number"
+                                                    min="1900"
+                                                    max={currentYear + 5}
+                                                    value={data.accreditation_start_year}
+                                                    onChange={(e) => setData('accreditation_start_year', e.target.value)}
+                                                    placeholder="e.g. 2024"
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_start_year && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_start_year}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="accreditation_end_year">Tahun Berakhir Akreditasi</Label>
+                                                <Input
+                                                    id="accreditation_end_year"
+                                                    type="number"
+                                                    min="1900"
+                                                    max={currentYear + 10}
+                                                    value={data.accreditation_end_year}
+                                                    onChange={(e) => setData('accreditation_end_year', e.target.value)}
+                                                    placeholder="e.g. 2029"
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_end_year && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_end_year}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div>
+                                                <Label htmlFor="accreditation_sk_number">Nomor SK</Label>
+                                                <Input
+                                                    id="accreditation_sk_number"
+                                                    value={data.accreditation_sk_number}
+                                                    onChange={(e) => setData('accreditation_sk_number', e.target.value)}
+                                                    placeholder="e.g. 105/E/KPT/2024"
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_sk_number && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_sk_number}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="accreditation_sk_date">Tanggal SK</Label>
+                                                <Input
+                                                    id="accreditation_sk_date"
+                                                    type="date"
+                                                    value={data.accreditation_sk_date}
+                                                    onChange={(e) => setData('accreditation_sk_date', e.target.value)}
+                                                    max={todayLocal}
+                                                    className="mt-1"
+                                                />
+                                                {errors.accreditation_sk_date && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors.accreditation_sk_date}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
@@ -236,9 +376,11 @@ export default function JournalsCreate({ scientificFields }: Props) {
                                             id="first_published_year"
                                             type="number"
                                             min="1900"
-                                            max={currentYear}
+                                            max={currentYear + 1}
                                             value={data.first_published_year}
-                                            onChange={(e) => setData('first_published_year', e.target.value)}
+                                            onChange={(e) =>
+                                                setData('first_published_year', e.target.value === '' ? '' : String(Number(e.target.value)))
+                                            }
                                             placeholder="e.g. 2010"
                                             className="mt-1"
                                         />
@@ -259,8 +401,212 @@ export default function JournalsCreate({ scientificFields }: Props) {
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-end gap-4 border-t pt-4">
-                                <Link href={route('journals.index')}>
+                            {/* Contact & Additional Info */}
+                            <div className="space-y-4">
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100">
+                                    Contact & Additional Information
+                                </h3>
+
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div>
+                                        <Label htmlFor="editor_in_chief">Editor-in-Chief</Label>
+                                        <Input
+                                            id="editor_in_chief"
+                                            value={data.editor_in_chief}
+                                            onChange={(e) => setData('editor_in_chief', e.target.value)}
+                                            placeholder="Dr. John Doe"
+                                            className="mt-1"
+                                        />
+                                        {errors.editor_in_chief && <p className="mt-1 text-sm text-red-600">{errors.editor_in_chief}</p>}
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="email">Journal Email</Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            value={data.email}
+                                            onChange={(e) => setData('email', e.target.value)}
+                                            placeholder="editor@journal.ac.id"
+                                            className="mt-1"
+                                        />
+                                        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="phone">Phone Number</Label>
+                                        <Input
+                                            id="phone"
+                                            value={data.phone}
+                                            onChange={(e) => setData('phone', e.target.value)}
+                                            placeholder="+62 274 123456"
+                                            className="mt-1"
+                                        />
+                                        {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <Label>
+                                                OAI-PMH URLs (Multi) <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setData('oai_urls', [...data.oai_urls, ''])}
+                                            >
+                                                Tambah URL OAI
+                                            </Button>
+                                        </div>
+                                        {data.oai_urls.map((oaiUrl, index) => (
+                                            <div key={index} className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2">
+                                                    <Input
+                                                        type="url"
+                                                        value={oaiUrl}
+                                                        onChange={(e) => {
+                                                            const newUrls = [...data.oai_urls];
+                                                            newUrls[index] = e.target.value;
+                                                            setData('oai_urls', newUrls);
+                                                        }}
+                                                        placeholder="https://journal.ac.id/index.php/jite/oai"
+                                                        className="mt-1"
+                                                        required
+                                                    />
+                                                    {data.oai_urls.length > 1 && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-red-500 hover:text-red-700"
+                                                            onClick={() => {
+                                                                const newUrls = data.oai_urls.filter((_, i) => i !== index);
+                                                                setData('oai_urls', newUrls);
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                                {errors[`oai_urls.${index}` as keyof typeof errors] && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors[`oai_urls.${index}` as keyof typeof errors]}</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <p className="mt-1 text-xs text-muted-foreground">URL untuk harvesting dan indeksasi metadata</p>
+                                        {errors.oai_urls && <p className="mt-1 text-sm text-red-600">{errors.oai_urls}</p>}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="about">About Journal</Label>
+                                    <Textarea
+                                        id="about"
+                                        rows={4}
+                                        value={data.about}
+                                        onChange={(e) => setData('about', e.target.value)}
+                                        placeholder="Brief description of the journal..."
+                                        className="mt-1"
+                                        maxLength={1000}
+                                    />
+                                    <p className="mt-1 text-xs text-muted-foreground">{data.about.length}/1000 characters</p>
+                                    {errors.about && <p className="mt-1 text-sm text-red-600">{errors.about}</p>}
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="scope">Scope & Focus</Label>
+                                    <Textarea
+                                        id="scope"
+                                        rows={3}
+                                        value={data.scope}
+                                        onChange={(e) => setData('scope', e.target.value)}
+                                        placeholder="Research areas covered by the journal..."
+                                        className="mt-1"
+                                        maxLength={2500}
+                                    />
+                                    <p className="mt-1 text-xs text-muted-foreground">{data.scope.length}/2500 characters</p>
+                                    {errors.scope && <p className="mt-1 text-sm text-red-600">{errors.scope}</p>}
+                                </div>
+
+                                <div>
+                                    <Label>Cover Image (Opsional)</Label>
+                                    <div className="mt-1">
+                                        <JournalCoverUpload onChange={(file) => setData('cover_image', file)} error={errors.cover_image} />
+                                        {hasErrors && (
+                                            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                                                Jika sebelumnya sudah memilih gambar, silakan pilih ulang setelah memperbaiki error di atas.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Indexations */}
+                            <div className="space-y-4">
+                                <h3 className="border-b pb-2 text-lg font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100">
+                                    Indexations (Optional)
+                                </h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Select databases where this journal is indexed</p>
+
+                                <div className="space-y-3">
+                                    {indexationOptions.map((option) => {
+                                        const isSelected = data.indexations.some((i) => i.platform === option.value);
+                                        const selectedItem = data.indexations.find((i) => i.platform === option.value);
+
+                                        return (
+                                            <div key={option.value} className="rounded-md border p-4 dark:border-gray-700">
+                                                <div className="flex items-start gap-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`indexation-${option.value}`}
+                                                        checked={isSelected}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setData('indexations', [...data.indexations, { platform: option.value, url: '' }]);
+                                                            } else {
+                                                                setData(
+                                                                    'indexations',
+                                                                    data.indexations.filter((i) => i.platform !== option.value),
+                                                                );
+                                                            }
+                                                        }}
+                                                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <div className="flex-1">
+                                                        <Label htmlFor={`indexation-${option.value}`} className="cursor-pointer font-medium">
+                                                            {option.label}
+                                                        </Label>
+                                                        {isSelected && (
+                                                            <div className="mt-2">
+                                                                <Label className="text-xs text-gray-600 dark:text-gray-400">URL (opsional)</Label>
+                                                                <Input
+                                                                    type="url"
+                                                                    value={selectedItem?.url || ''}
+                                                                    onChange={(e) => {
+                                                                        setData(
+                                                                            'indexations',
+                                                                            data.indexations.map((i) =>
+                                                                                i.platform === option.value ? { ...i, url: e.target.value } : i,
+                                                                            ),
+                                                                        );
+                                                                    }}
+                                                                    placeholder={`https://example.com/journal/${option.value.toLowerCase().replace(' ', '-')}`}
+                                                                    className="mt-1"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {errors.indexations && <p className="mt-1 text-sm text-red-600">{errors.indexations}</p>}
+                            </div>
+
+                            <div className="flex flex-col-reverse items-stretch justify-end gap-4 border-t pt-4 sm:flex-row sm:items-center dark:border-gray-700">
+                                <Link href={route('user.journals.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\HarvestJournalArticlesJob;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,7 +37,7 @@ class JournalController extends Controller
 
         // Base query - Super Admin sees all journals
         $query = Journal::query()
-            ->with(['university', 'user', 'scientificField', 'latestAssessment']);
+            ->with(['university', 'user', 'scientificField']);
 
         // Apply search filter
         if ($request->filled('search')) {
@@ -60,9 +64,14 @@ class JournalController extends Controller
             $query->where('scientific_field_id', $request->scientific_field_id);
         }
 
+        // Apply indexation filter
+        if ($request->filled('indexation')) {
+            $query->byIndexation($request->indexation);
+        }
+
         // Paginate results
         $journals = $query
-            ->orderBy('title')
+            ->latest()
             ->paginate(10)
             ->withQueryString()
             ->through(fn ($journal) => [
@@ -87,31 +96,26 @@ class JournalController extends Controller
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
                 'is_active' => $journal->is_active,
-                'assessment_status' => $journal->latestAssessment?->status ?? null,
-                'assessment_status_label' => $journal->latestAssessment?->status_label ?? 'Belum Ada',
-                'latest_score' => $journal->latestAssessment?->percentage ?? null,
+                'approval_status' => $journal->approval_status,
+                'indexation_labels' => $journal->indexation_labels,
                 'created_at' => $journal->created_at->format('Y-m-d'),
             ]);
 
-        // Get filter options
-        $universities = University::select('id', 'name')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        // Get filter options (with cache)
+        $universities = Cache::remember('universities.active.list', 3600, function () {
+            return University::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'code']);
+        });
 
         $scientificFields = ScientificField::select('id', 'name')
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        $sintaRanks = collect([
-            ['value' => 1, 'label' => 'SINTA 1'],
-            ['value' => 2, 'label' => 'SINTA 2'],
-            ['value' => 3, 'label' => 'SINTA 3'],
-            ['value' => 4, 'label' => 'SINTA 4'],
-            ['value' => 5, 'label' => 'SINTA 5'],
-            ['value' => 6, 'label' => 'SINTA 6'],
-        ]);
+        $sintaRanks = collect(Journal::getSintaRankOptions())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
 
         $statusOptions = collect([
             ['value' => 'draft', 'label' => 'Draft'],
@@ -119,13 +123,18 @@ class JournalController extends Controller
             ['value' => 'reviewed', 'label' => 'Reviewed'],
         ]);
 
+        $indexationOptions = collect(Journal::getIndexationPlatforms())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
         return Inertia::render('Admin/Journals/Index', [
             'journals' => $journals,
-            'filters' => $request->only(['search', 'university_id', 'status', 'sinta_rank', 'scientific_field_id']),
+            'filters' => $request->only(['search', 'university_id', 'status', 'sinta_rank', 'scientific_field_id', 'indexation']),
             'universities' => $universities,
             'scientificFields' => $scientificFields,
             'sintaRanks' => $sintaRanks,
             'statusOptions' => $statusOptions,
+            'indexationOptions' => $indexationOptions,
         ]);
     }
 
@@ -151,6 +160,21 @@ class JournalController extends Controller
             },
         ]);
 
+        $articlesCount = $journal->articles()->count();
+        $articles = $journal->articles()
+            ->orderBy('publication_date', 'desc')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(fn ($article) => [
+                'id' => $article->id,
+                'title' => $article->title,
+                'authors' => $article->authors,
+                'publication_date' => $article->publication_date?->format('Y-m-d'),
+                'abstract' => $article->abstract,
+                'doi' => $article->doi,
+                'url' => $article->article_url,
+            ]);
+
         return Inertia::render('Admin/Journals/Show', [
             'journal' => [
                 'id' => $journal->id,
@@ -164,11 +188,26 @@ class JournalController extends Controller
                 'first_published_year' => $journal->first_published_year,
                 'editor_in_chief' => $journal->editor_in_chief,
                 'email' => $journal->email,
+
+                // SINTA
                 'sinta_rank' => $journal->sinta_rank,
                 'sinta_rank_label' => $journal->sinta_rank_label,
-                'accreditation_status' => $journal->accreditation_status,
-                'accreditation_status_label' => $journal->accreditation_status_label,
-                'accreditation_grade' => $journal->accreditation_grade,
+
+                // Accreditation (merged)
+                'accreditation_label' => $journal->accreditation_label,
+                'accreditation_start_year' => $journal->accreditation_start_year,
+                'accreditation_end_year' => $journal->accreditation_end_year,
+                'accreditation_sk_number' => $journal->accreditation_sk_number,
+                'accreditation_sk_date' => $journal->accreditation_sk_date?->format('Y-m-d'),
+                'accreditation_expiry_status' => $journal->accreditation_expiry_status,
+
+                // Indexations
+                'indexations' => $journal->indexations,
+                'indexation_labels' => $journal->indexation_labels,
+
+                // OAI-PMH
+                'oai_urls' => $journal->oai_urls,
+
                 'is_active' => $journal->is_active,
                 'created_at' => $journal->created_at->format('Y-m-d H:i'),
                 'updated_at' => $journal->updated_at->format('Y-m-d H:i'),
@@ -205,6 +244,43 @@ class JournalController extends Controller
                     ],
                 ]),
             ],
+            'articles' => $articles,
+            'articlesCount' => $articlesCount,
+            'lastHarvestLog' => DB::table('oai_harvesting_logs')
+                ->where('journal_id', $journal->id)
+                ->orderByDesc('harvested_at')
+                ->first(),
+            'isHarvestPending' => DB::table('jobs')
+                ->where('queue', 'harvesting')
+                ->where('payload', 'like', '%"journal_id":'.$journal->id.'%')
+                ->exists(),
         ]);
+    }
+
+    /**
+     * @route POST /admin/journals/{journal}/harvest
+     *
+     * @features Dispatch background job to harvest articles from OAI-PMH endpoint.
+     */
+    public function harvest(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        if (empty($journal->oai_urls)) {
+            return redirect()
+                ->route('admin.journals.show', $journal)
+                ->with('error', 'Jurnal ini belum memiliki OAI-PMH URL.');
+        }
+
+        $clearExisting = (bool) $request->input('force', false);
+        HarvestJournalArticlesJob::dispatch($journal, null, $clearExisting)->onQueue('harvesting');
+
+        $message = $clearExisting
+            ? 'Permintaan force sync OAI telah dikirim.'
+            : 'Permintaan sinkronisasi OAI telah dikirim.';
+
+        return redirect()
+            ->back()
+            ->with('success', $message);
     }
 }

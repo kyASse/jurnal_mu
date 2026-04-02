@@ -45,6 +45,59 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
 
+            // Additional Super Admins
+            [
+                'name' => 'DIKTI Administrator',
+                'email' => 'dikti@journalmu.org',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password123'),
+                'google_id' => null,
+                'microsoft_id' => null,
+                'avatar_url' => 'https://ui-avatars.com/api/?name=DIKTI+Admin&background=0D8ABC&color=fff',
+                'phone' => '081234567801',
+                'position' => 'DIKTI Coordinator',
+                'role_id' => $superAdminRoleId,
+                'university_id' => null,
+                'is_active' => true,
+                'last_login_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'LPPM Administrator',
+                'email' => 'lppm@journalmu.org',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password123'),
+                'google_id' => null,
+                'microsoft_id' => null,
+                'avatar_url' => 'https://ui-avatars.com/api/?name=LPPM+Admin&background=0D8ABC&color=fff',
+                'phone' => '081234567802',
+                'position' => 'LPPM Coordinator',
+                'role_id' => $superAdminRoleId,
+                'university_id' => null,
+                'is_active' => true,
+                'last_login_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Editor Administrator',
+                'email' => 'editor@journalmu.org',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password123'),
+                'google_id' => null,
+                'microsoft_id' => null,
+                'avatar_url' => 'https://ui-avatars.com/api/?name=Editor+Admin&background=0D8ABC&color=fff',
+                'phone' => '081234567803',
+                'position' => 'Chief Editor',
+                'role_id' => $superAdminRoleId,
+                'university_id' => null,
+                'is_active' => true,
+                'last_login_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
             // ==================== ADMIN KAMPUS ====================
             [
                 'name' => 'Dr. Ahmad Fauzi, M.Kom',
@@ -213,10 +266,33 @@ class UserSeeder extends Seeder
         DB::table('users')->insert($users);
 
         $this->command->info(count($users).' Users created successfully!');
+
+        // Mark some users as reviewers for Pembinaan system
+        $this->markReviewers();
+
         $this->command->info('');
         $this->command->info('📧 Login Credentials:');
         $this->command->info('Super Admin: superadmin@ajm.ac.id / password123');
         $this->command->info('Admin UAD: admin.uad@ajm.ac.id / password123');
         $this->command->info('User UAD: andi.prasetyo@uad.ac.id / password123');
+    }
+
+    /**
+     * Mark specific users as reviewers for the Pembinaan system.
+     * Selects experienced users from different universities to serve as reviewers.
+     */
+    private function markReviewers(): void
+    {
+        $reviewerEmails = [
+            'andi.prasetyo@uad.ac.id',     // UAD - Senior lecturer (Informatika)
+            'eko.wijaya@umy.ac.id',        // UMY - Senior lecturer (Ekonomi)
+            'hendra.gunawan@ums.ac.id',    // UMS - Senior lecturer (Teknik)
+        ];
+
+        DB::table('users')
+            ->whereIn('email', $reviewerEmails)
+            ->update(['is_reviewer' => true]);
+
+        $this->command->info('✓ Marked 3 users as reviewers (UAD, UMY, UMS)');
     }
 }

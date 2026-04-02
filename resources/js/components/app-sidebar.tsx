@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { ROLE_NAMES } from '@/constants/roles';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Award, BookOpen, BookType, Box, ClipboardList, FileText, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
+import { Award, BookOpen, BookType, Box, Building2, ClipboardList, LayoutGrid, Library, LifeBuoy, UserCheck, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Common navigation items shared across all roles
@@ -51,14 +51,24 @@ export function AppSidebar() {
                 title: 'Borang Indikator',
                 href: route('admin.borang-indikator.index'),
                 icon: ClipboardList,
+                items: [
+                    { title: 'Templates', href: route('admin.templates.index') },
+                    { title: 'List View', href: route('admin.borang-indikator.list') },
+                ],
+            },
+            {
+                title: 'Universities',
+                href: route('admin.universities.index'),
+                icon: Building2,
             },
             {
                 title: 'User Management',
                 href: '#',
                 icon: Users,
                 items: [
-                    { title: 'Universities', href: route('admin.universities.index') },
                     { title: 'Admin Kampus', href: route('admin.admin-kampus.index') },
+                    { title: 'Pengelola Jurnal', href: route('admin.users.index') },
+                    { title: 'Reviewer', href: route('admin.reviewers.index') },
                 ],
             },
             {
@@ -66,10 +76,21 @@ export function AppSidebar() {
                 href: route('admin.journals.index'),
                 icon: Library,
             },
+            {
+                title: 'Pembinaan',
+                href: route('admin.pembinaan.index'),
+                icon: Award,
+            },
+            {
+                title: 'Reviewer Assignment',
+                href: route('dikti.assessments.index'),
+                icon: UserCheck,
+            },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
-        roleNavItems = [
+        // Build Admin Kampus menu items
+        const adminKampusItems: NavItem[] = [
             {
                 title: 'Pengelola Jurnal',
                 href: route('admin-kampus.users.index'),
@@ -81,17 +102,26 @@ export function AppSidebar() {
                 icon: Library,
             },
             {
+                title: 'Pembinaan',
+                href: '#',
+                icon: Award,
+                items: [
+                    { title: 'Akreditasi', href: route('admin-kampus.pembinaan.akreditasi') },
+                    { title: 'Indeksasi', href: route('admin-kampus.pembinaan.indeksasi') },
+                ],
+            },
+        ];
+
+        // Add Reviewer menu only if user has reviewer role
+        if (user.roles && user.roles.some((role: { name: string }) => role.name === 'Reviewer')) {
+            adminKampusItems.push({
                 title: 'Reviewer',
                 href: route('admin-kampus.reviewer.index'),
                 icon: UserCheck,
-            },
-            {
-                title: 'Pembinaan',
-                href: route('admin-kampus.pembinaan.index'),
-                icon: Award,
-            },
-            ...commonNavItems,
-        ];
+            });
+        }
+
+        roleNavItems = [...adminKampusItems, ...commonNavItems];
     } else if (user.role.name === ROLE_NAMES.USER) {
         roleNavItems = [
             {
@@ -101,18 +131,17 @@ export function AppSidebar() {
             },
             {
                 title: 'Jurnal',
-                href: route('user.jurnal.index'),
+                href: route('user.journals.index'),
                 icon: BookOpen,
             },
             {
-                title: 'Assessments',
-                href: route('user.assessments.index'),
-                icon: FileText,
-            },
-            {
                 title: 'Pembinaan',
-                href: route('user.pembinaan.index'),
+                href: '#',
                 icon: Award,
+                items: [
+                    { title: 'Akreditasi', href: route('user.pembinaan.akreditasi') },
+                    { title: 'Indeksasi', href: route('user.pembinaan.indeksasi') },
+                ],
             },
             ...commonNavItems,
         ];

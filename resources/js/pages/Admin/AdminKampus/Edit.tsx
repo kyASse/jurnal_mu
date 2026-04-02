@@ -109,7 +109,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UniversityCombobox } from '@/components/ui/university-combobox';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -177,7 +177,7 @@ export default function AdminKampusEdit({ adminKampus, universities }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit ${adminKampus.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
@@ -288,19 +288,18 @@ export default function AdminKampusEdit({ adminKampus, universities }: Props) {
                                 <Label htmlFor="university_id">
                                     University <span className="text-red-500">*</span>
                                 </Label>
-                                <Select value={data.university_id} onValueChange={(value) => setData('university_id', value)}>
-                                    <SelectTrigger className="mt-2">
-                                        <SelectValue placeholder="Select University" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {universities.map((uni) => (
-                                            <SelectItem key={uni.id} value={uni.id.toString()}>
-                                                {uni.code} - {uni.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.university_id && <p className="mt-1 text-sm text-red-600">{errors.university_id}</p>}
+                                <div className="mt-2">
+                                    <UniversityCombobox
+                                        universities={universities}
+                                        value={data.university_id}
+                                        onValueChange={(value) => setData('university_id', value)}
+                                        placeholder="Select University"
+                                        error={errors.university_id}
+                                    />
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        This admin will manage journals and users for this university
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
@@ -325,7 +324,7 @@ export default function AdminKampusEdit({ adminKampus, universities }: Props) {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
+                        <div className="flex flex-col-reverse items-stretch justify-end gap-4 border-t border-sidebar-border/70 pt-6 sm:flex-row sm:items-center dark:border-sidebar-border">
                             <Link href={route('admin.admin-kampus.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel

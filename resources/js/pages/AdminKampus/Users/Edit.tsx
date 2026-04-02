@@ -2,11 +2,13 @@
  * UsersEdit Component for Admin Kampus
  *
  * @description
- * A form page for editing existing user (Pengelola Jurnal) accounts within the admin's university.
+ * A form page for editing existing user accounts within the admin's university.
  * Password fields are optional - leave empty to keep the existing password.
+ * Multiple roles can be assigned.
  *
  * @features
  * - Pre-filled personal information fields
+ * - Multi-role selection (not Super Admin)
  * - Optional password update
  * - Status toggle
  * - Form validation with error display
@@ -15,13 +17,16 @@
  * @route GET /admin-kampus/users/{id}/edit
  * @route PUT /admin-kampus/users/{id}
  */
+import MultiRoleSelect from '@/components/multi-role-select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { AlertCircle, ArrowLeft, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface User {
     id: number;
@@ -29,7 +34,9 @@ interface User {
     email: string;
     phone: string | null;
     position: string | null;
+    scientific_field_id: number | null;
     is_active: boolean;
+    role_ids: number[];
 }
 
 interface University {
@@ -38,12 +45,27 @@ interface University {
     short_name: string;
 }
 
+interface Role {
+    id: number;
+    name: string;
+    display_name: string;
+    description: string;
+}
+
+interface ScientificField {
+    id: number;
+    name: string;
+    code: string;
+}
+
 interface Props {
     user: User;
     university: University;
+    roles: Role[];
+    scientificFields: ScientificField[];
 }
 
-export default function UsersEdit({ user, university }: Props) {
+export default function UsersEdit({ user, university, roles, scientificFields }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -70,19 +92,47 @@ export default function UsersEdit({ user, university }: Props) {
         password_confirmation: '',
         phone: user.phone || '',
         position: user.position || '',
+        scientific_field_id: user.scientific_field_id?.toString() || '',
+        role_ids: user.role_ids || [],
         is_active: user.is_active,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin-kampus.users.update', user.id));
+
+        // Debug: log form data before submission
+        console.log('Form data being submitted:', {
+            name: data.name,
+            email: data.email,
+            password: data.password ? '[password provided]' : '[empty]',
+            password_confirmation: data.password_confirmation ? '[provided]' : '[empty]',
+            phone: data.phone,
+            position: data.position,
+            scientific_field_id: data.scientific_field_id,
+            role_ids: data.role_ids,
+            is_active: data.is_active,
+        });
+
+        put(route('admin-kampus.users.update', user.id), {
+            onSuccess: () => {
+                toast.success('User updated successfully');
+            },
+            onError: (errors) => {
+                console.error('Validation errors:', errors);
+                // Show specific error messages
+                Object.entries(errors).forEach(([field, message]) => {
+                    console.error(`${field}: ${message}`);
+                });
+                toast.error('Failed to update user. Please check the form.');
+            },
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit User - ${user.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
@@ -216,6 +266,53 @@ export default function UsersEdit({ user, university }: Props) {
                             </div>
                         </div>
 
+                        {/* Scientific Field */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                Scientific Field
+                            </h3>
+
+                            <div>
+                                <Label htmlFor="scientific_field_id">Bidang Ilmu</Label>
+                                <Select
+                                    value={data.scientific_field_id || undefined}
+                                    onValueChange={(value) => setData('scientific_field_id', value || '')}
+                                >
+                                    <SelectTrigger className="mt-2">
+                                        <SelectValue placeholder="Select Scientific Field (Optional)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {scientificFields.map((field) => (
+                                            <SelectItem key={field.id} value={field.id.toString()}>
+                                                {field.code} - {field.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.scientific_field_id && <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>}
+                                <p className="mt-1 text-sm text-muted-foreground">Bidang ilmu pengelola jurnal (optional, untuk filtering)</p>
+                            </div>
+                        </div>
+
+                        {/* Role Assignment */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                Role Assignment
+                            </h3>
+
+                            <MultiRoleSelect
+                                roles={roles}
+                                selectedRoleIds={data.role_ids}
+                                onChange={(roleIds) => setData('role_ids', roleIds)}
+                                error={errors.role_ids}
+                                label="User Roles"
+                                required
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                Select one or more roles for this user. The first selected role will be the primary role.
+                            </p>
+                        </div>
+
                         {/* Status */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
@@ -237,7 +334,7 @@ export default function UsersEdit({ user, university }: Props) {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
+                        <div className="flex flex-col-reverse items-stretch justify-end gap-4 border-t border-sidebar-border/70 pt-6 sm:flex-row sm:items-center dark:border-sidebar-border">
                             <Link href={route('admin-kampus.users.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel

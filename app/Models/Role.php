@@ -15,6 +15,10 @@ class Role extends Model
 
     public const USER = 'User';
 
+    public const PENGELOLA_JURNAL = 'Pengelola Jurnal';
+
+    public const REVIEWER = 'Reviewer';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -47,7 +51,8 @@ class Role extends Model
      */
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'user_roles')
+            ->withPivot('assigned_at', 'assigned_by');
     }
 
     /*
@@ -92,5 +97,21 @@ class Role extends Model
     public function isUser(): bool
     {
         return $this->name === self::USER;
+    }
+
+    /**
+     * check if role is pengelola jurnal
+     */
+    public function isPengelolaJurnal(): bool
+    {
+        return $this->name === self::PENGELOLA_JURNAL;
+    }
+
+    /**
+     * check if role is reviewer
+     */
+    public function isReviewer(): bool
+    {
+        return $this->name === self::REVIEWER;
     }
 }

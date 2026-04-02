@@ -2,12 +2,13 @@
  * UsersCreate Component for Admin Kampus
  *
  * @description
- * A form page for creating new user (Pengelola Jurnal) accounts within the admin's university.
- * University is auto-assigned from admin's profile, Role is auto-assigned to 'User'.
+ * A form page for creating new user accounts within the admin's university.
+ * University is auto-assigned from admin's profile. Multiple roles can be assigned.
  *
  * @features
  * - Personal information fields (name, email, phone, position)
  * - Password with confirmation
+ * - Multi-role selection (not Super Admin)
  * - Status toggle
  * - Form validation with error display
  * - University displayed as read-only info
@@ -15,13 +16,16 @@
  * @route GET /admin-kampus/users/create
  * @route POST /admin-kampus/users
  */
+import MultiRoleSelect from '@/components/multi-role-select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,11 +48,26 @@ interface University {
     short_name: string;
 }
 
-interface Props {
-    university: University;
+interface Role {
+    id: number;
+    name: string;
+    display_name: string;
+    description: string;
 }
 
-export default function UsersCreate({ university }: Props) {
+interface ScientificField {
+    id: number;
+    name: string;
+    code: string;
+}
+
+interface Props {
+    university: University;
+    roles: Role[];
+    scientificFields: ScientificField[];
+}
+
+export default function UsersCreate({ university, roles, scientificFields }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
@@ -56,19 +75,28 @@ export default function UsersCreate({ university }: Props) {
         password_confirmation: '',
         phone: '',
         position: '',
+        scientific_field_id: '',
+        role_ids: [] as number[],
         is_active: true as boolean,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('admin-kampus.users.store'));
+        post(route('admin-kampus.users.store'), {
+            onSuccess: () => {
+                toast.success('User created successfully');
+            },
+            onError: () => {
+                toast.error('Failed to create user. Please check the form.');
+            },
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create User" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
@@ -90,9 +118,7 @@ export default function UsersCreate({ university }: Props) {
                                 University: {university.name} ({university.short_name})
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-blue-600 dark:text-blue-300">
-                            This user will be automatically assigned to your university with 'User' role.
-                        </p>
+                        <p className="mt-1 text-sm text-blue-600 dark:text-blue-300">This user will be automatically assigned to your university.</p>
                     </div>
 
                     {/* Form */}
@@ -203,6 +229,53 @@ export default function UsersCreate({ university }: Props) {
                             </div>
                         </div>
 
+                        {/* Scientific Field */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                Scientific Field
+                            </h3>
+
+                            <div>
+                                <Label htmlFor="scientific_field_id">Bidang Ilmu</Label>
+                                <Select
+                                    value={data.scientific_field_id || undefined}
+                                    onValueChange={(value) => setData('scientific_field_id', value || '')}
+                                >
+                                    <SelectTrigger className="mt-2">
+                                        <SelectValue placeholder="Select Scientific Field (Optional)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {scientificFields.map((field) => (
+                                            <SelectItem key={field.id} value={field.id.toString()}>
+                                                {field.code} - {field.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.scientific_field_id && <p className="mt-1 text-sm text-red-600">{errors.scientific_field_id}</p>}
+                                <p className="mt-1 text-sm text-muted-foreground">Bidang ilmu pengelola jurnal (optional, untuk filtering)</p>
+                            </div>
+                        </div>
+
+                        {/* Role Assignment */}
+                        <div className="space-y-4">
+                            <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
+                                Role Assignment
+                            </h3>
+
+                            <MultiRoleSelect
+                                roles={roles}
+                                selectedRoleIds={data.role_ids}
+                                onChange={(roleIds) => setData('role_ids', roleIds)}
+                                error={errors.role_ids}
+                                label="User Roles"
+                                required
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                Select one or more roles for this user. The first selected role will be the primary role.
+                            </p>
+                        </div>
+
                         {/* Status */}
                         <div className="space-y-4">
                             <h3 className="border-b border-sidebar-border/70 pb-2 text-lg font-semibold text-foreground dark:border-sidebar-border">
@@ -224,7 +297,7 @@ export default function UsersCreate({ university }: Props) {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
+                        <div className="flex flex-col-reverse items-stretch justify-end gap-4 border-t border-sidebar-border/70 pt-6 sm:flex-row sm:items-center dark:border-sidebar-border">
                             <Link href={route('admin-kampus.users.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel

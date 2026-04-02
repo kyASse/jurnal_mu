@@ -16,10 +16,12 @@
  *
  * @route GET /journals
  */
+import logoUrl from '@/assets/logo_dark.png';
 import JournalCard from '@/components/journal-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
 import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, ChevronLeft, ChevronRight, Home, Search } from 'lucide-react';
@@ -39,7 +41,7 @@ interface Journal {
         id: number;
         name: string;
     } | null;
-    sinta_rank: number | null;
+    sinta_rank: string | null;
     sinta_rank_label: string;
 }
 
@@ -74,20 +76,23 @@ interface Props {
     filters: {
         search?: string;
         university_id?: number;
-        sinta_rank?: number;
+        sinta_rank?: string;
         scientific_field_id?: number;
+        indexation?: string;
     };
     universities: University[];
     scientificFields: ScientificField[];
     sintaRanks: FilterOption[];
+    indexationOptions: FilterOption[];
 }
 
-export default function JournalsIndex({ journals, filters, universities, scientificFields, sintaRanks }: Props) {
+export default function JournalsIndex({ journals, filters, universities, scientificFields, sintaRanks, indexationOptions }: Props) {
     const { auth } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [universityFilter, setUniversityFilter] = useState(filters.university_id?.toString() || '');
-    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank?.toString() || '');
+    const [sintaRankFilter, setSintaRankFilter] = useState(filters.sinta_rank || '');
     const [scientificFieldFilter, setScientificFieldFilter] = useState(filters.scientific_field_id?.toString() || '');
+    const [indexationFilter, setIndexationFilter] = useState(filters.indexation || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -98,6 +103,7 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                 university_id: universityFilter,
                 sinta_rank: sintaRankFilter,
                 scientific_field_id: scientificFieldFilter,
+                indexation: indexationFilter,
             },
             { preserveState: true },
         );
@@ -108,10 +114,11 @@ export default function JournalsIndex({ journals, filters, universities, scienti
         setUniversityFilter('');
         setSintaRankFilter('');
         setScientificFieldFilter('');
+        setIndexationFilter('');
         router.get(route('journals.index'));
     };
 
-    const hasActiveFilters = search || universityFilter || sintaRankFilter || scientificFieldFilter;
+    const hasActiveFilters = search || universityFilter || sintaRankFilter || scientificFieldFilter || indexationFilter;
 
     return (
         <>
@@ -130,32 +137,34 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center gap-3">
                             <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#079C4E]">
-                                    <BookOpen className="h-6 w-6" />
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+                                    <img src={logoUrl} alt="Majelis Diktilitbang" className="h-8 w-8 object-contain" />
                                 </div>
                                 <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
-                                    JurnalMu
+                                    Journal MU
                                 </span>
                             </Link>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             {auth?.user ? (
                                 <Link href={route('dashboard')}>
                                     <Button variant="secondary" className="border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100">
                                         <Home className="mr-2 h-4 w-4" />
-                                        Dashboard
+                                        <span className="hidden sm:inline">Dashboard</span>
                                     </Button>
                                 </Link>
                             ) : (
                                 <>
                                     <Link href={route('login')}>
-                                        <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white">
+                                        <Button variant="ghost" className="px-2 text-white hover:bg-white/20 hover:text-white sm:px-4">
                                             Log in
                                         </Button>
                                     </Link>
                                     <Link href={route('register')}>
-                                        <Button className="border-0 bg-[#FCEE1F] font-bold text-black hover:bg-[#e3d51b]">Register</Button>
+                                        <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">
+                                            Register
+                                        </Button>
                                     </Link>
                                 </>
                             )}
@@ -197,24 +206,14 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                 </div>
 
                                 {/* Filters */}
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
                                     {/* University Filter */}
-                                    <Select
-                                        value={universityFilter || 'all'}
-                                        onValueChange={(value) => setUniversityFilter(value === 'all' ? '' : value)}
-                                    >
-                                        <SelectTrigger className="h-12">
-                                            <SelectValue placeholder="All Universities" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">All Universities</SelectItem>
-                                            {universities.map((university) => (
-                                                <SelectItem key={university.id} value={university.id.toString()}>
-                                                    {university.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <UniversityFilterCombobox
+                                        universities={universities}
+                                        value={universityFilter}
+                                        onValueChange={setUniversityFilter}
+                                        className="h-12"
+                                    />
 
                                     {/* Scientific Field Filter */}
                                     <Select
@@ -252,12 +251,30 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                         </SelectContent>
                                     </Select>
 
-                                    <div className="flex gap-2">
-                                        <Button type="submit" className="h-12 flex-1 bg-[#079C4E] hover:bg-[#068A42]">
+                                    {/* Indexation Filter */}
+                                    <Select
+                                        value={indexationFilter || 'all'}
+                                        onValueChange={(value) => setIndexationFilter(value === 'all' ? '' : value)}
+                                    >
+                                        <SelectTrigger className="h-12">
+                                            <SelectValue placeholder="Indexation" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Indexations</SelectItem>
+                                            {indexationOptions.map((option) => (
+                                                <SelectItem key={option.value} value={option.value.toString()}>
+                                                    {option.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <div className="flex flex-col gap-2 sm:flex-row">
+                                        <Button type="submit" className="h-12 w-full bg-[#079C4E] hover:bg-[#068A42] sm:flex-1">
                                             Search
                                         </Button>
                                         {hasActiveFilters && (
-                                            <Button type="button" variant="outline" onClick={handleClearFilters} className="h-12">
+                                            <Button type="button" variant="outline" onClick={handleClearFilters} className="h-12 w-full sm:w-auto">
                                                 Clear
                                             </Button>
                                         )}
@@ -300,6 +317,7 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                         issn={journal.issn}
                                         e_issn={journal.e_issn}
                                         university={journal.university.name}
+                                        external_url={journal.url}
                                     />
                                 ))}
                             </div>

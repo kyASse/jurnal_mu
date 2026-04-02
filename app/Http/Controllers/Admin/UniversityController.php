@@ -33,6 +33,16 @@ class UniversityController extends Controller
                 $query->where('is_active', $request->boolean('is_active'));
             }
 
+            // Apply accreditation filter
+            if ($request->has('accreditation_status') && $request->accreditation_status) {
+                $query->byAccreditation($request->accreditation_status);
+            }
+
+            // Apply cluster filter
+            if ($request->has('cluster') && $request->cluster) {
+                $query->byCluster($request->cluster);
+            }
+
             // Get universities with counts
             $universities = $query
                 ->withCount(['users', 'journals'])
@@ -42,6 +52,7 @@ class UniversityController extends Controller
                 ->through(fn ($university) => [
                     'id' => $university->id,
                     'code' => $university->code,
+                    'ptm_code' => $university->ptm_code,
                     'name' => $university->name,
                     'short_name' => $university->short_name,
                     'city' => $university->city,
@@ -50,6 +61,9 @@ class UniversityController extends Controller
                     'email' => $university->email,
                     'website' => $university->website,
                     'logo_url' => $university->logo_url,
+                    'accreditation_status' => $university->accreditation_status,
+                    'cluster' => $university->cluster,
+                    'profile_description' => $university->profile_description,
                     'is_active' => $university->is_active,
                     'users_count' => $university->users_count,
                     'journals_count' => $university->journals_count,
@@ -76,7 +90,7 @@ class UniversityController extends Controller
 
         return Inertia::render('Admin/Universities/Index', [
             'universities' => $universities,
-            'filters' => $request->only(['search', 'is_active']),
+            'filters' => $request->only(['search', 'is_active', 'accreditation_status', 'cluster']),
             'can' => [
                 'create' => $request->user()->can('create', University::class),
             ],
@@ -105,6 +119,7 @@ class UniversityController extends Controller
         // Validate request
         $validated = $request->validate([
             'code' => 'required|string|max:20|unique:universities,code',
+            'ptm_code' => 'nullable|string|max:10|unique:universities,ptm_code',
             'name' => 'required|string|max:255',
             'short_name' => 'nullable|string|max:100',
             'address' => 'nullable|string',
@@ -115,6 +130,9 @@ class UniversityController extends Controller
             'email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'logo_url' => 'nullable|url|max:500',
+            'accreditation_status' => 'nullable|string|max:50',
+            'cluster' => 'nullable|string|max:50',
+            'profile_description' => 'nullable|string|max:250',
             'is_active' => 'boolean',
         ]);
 
@@ -141,6 +159,7 @@ class UniversityController extends Controller
             'university' => [
                 'id' => $university->id,
                 'code' => $university->code,
+                'ptm_code' => $university->ptm_code,
                 'name' => $university->name,
                 'short_name' => $university->short_name,
                 'address' => $university->address,
@@ -151,6 +170,9 @@ class UniversityController extends Controller
                 'email' => $university->email,
                 'website' => $university->website,
                 'logo_url' => $university->logo_url,
+                'accreditation_status' => $university->accreditation_status,
+                'cluster' => $university->cluster,
+                'profile_description' => $university->profile_description,
                 'is_active' => $university->is_active,
                 'full_address' => $university->full_address,
                 'created_at' => $university->created_at->format('Y-m-d H:i'),
@@ -188,6 +210,7 @@ class UniversityController extends Controller
             'university' => [
                 'id' => $university->id,
                 'code' => $university->code,
+                'ptm_code' => $university->ptm_code,
                 'name' => $university->name,
                 'short_name' => $university->short_name,
                 'address' => $university->address,
@@ -198,6 +221,9 @@ class UniversityController extends Controller
                 'email' => $university->email,
                 'website' => $university->website,
                 'logo_url' => $university->logo_url,
+                'accreditation_status' => $university->accreditation_status,
+                'cluster' => $university->cluster,
+                'profile_description' => $university->profile_description,
                 'is_active' => $university->is_active,
             ],
         ]);
@@ -214,6 +240,7 @@ class UniversityController extends Controller
         // Validate request
         $validated = $request->validate([
             'code' => 'required|string|max:20|unique:universities,code,'.$university->id,
+            'ptm_code' => 'nullable|string|max:10|unique:universities,ptm_code,'.$university->id,
             'name' => 'required|string|max:255',
             'short_name' => 'nullable|string|max:100',
             'address' => 'nullable|string',
@@ -224,6 +251,9 @@ class UniversityController extends Controller
             'email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'logo_url' => 'nullable|url|max:500',
+            'accreditation_status' => 'nullable|string|max:50',
+            'cluster' => 'nullable|string|max:50',
+            'profile_description' => 'nullable|string|max:250',
             'is_active' => 'boolean',
         ]);
 

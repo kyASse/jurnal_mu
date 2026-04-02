@@ -21,6 +21,8 @@ export default [
             'react/react-in-jsx-scope': 'off',
             'react/prop-types': 'off',
             'react/no-unescaped-entities': 'off',
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
         },
         settings: {
             react: {
@@ -38,7 +40,7 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'resources/js/ziggy.js'],
+        ignores: ['vendor/**', 'node_modules/**', 'public/**', 'build/**', 'bootstrap/ssr/**', 'tailwind.config.js', 'resources/js/ziggy.js'],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

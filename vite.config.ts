@@ -16,6 +16,28 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    server: {
+        hmr: {
+            host: 'localhost',
+            port: 5173,
+        },
+    },
+    build:{
+        outDir: 'build',
+        emptyOutDir: true,
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Vendor code splitting
+                    'vendor-react': ['react', 'react-dom', '@inertiajs/react'],
+                    'vendor-ui': ['@radix-ui/react-slot', '@radix-ui/react-select', '@radix-ui/react-popover'],
+                    'vendor-charts': ['apexcharts', 'react-apexcharts'],
+                    'vendor-utils': ['clsx', 'tailwind-merge'],
+                },
+            },
+        },
+    },
     esbuild: {
         jsx: 'automatic',
     },

@@ -42,9 +42,23 @@ class JournalSeeder extends Seeder
                 'frequency' => 'Triwulanan',
                 'first_published_year' => 2015,
                 'scientific_field_id' => $compFieldId,
-                'sinta_rank' => 3,
-                'accreditation_status' => 'Terakreditasi',
-                'accreditation_grade' => 'S3',
+
+                // SINTA
+                'sinta_rank' => 'sinta_3',
+
+                // Dikti Accreditation
+                'accreditation_start_year' => 2023,
+                'accreditation_end_year' => 2028,
+                'accreditation_sk_number' => '105/E/KPT/2023',
+                'accreditation_sk_date' => '2023-03-15', // Valid (5 years)
+
+                // Indexations (SINTA 3 → DOAJ + Google Scholar + Garuda)
+                'indexations' => json_encode([
+                    'DOAJ' => ['indexed_at' => '2021-08-20'],
+                    'Google Scholar' => ['indexed_at' => '2019-01-10'],
+                    'Garuda' => ['indexed_at' => '2018-05-15'],
+                ]),
+
                 'editor_in_chief' => 'Andi Prasetyo, S.Kom, M.T',
                 'email' => 'jifo@uad.ac.id',
                 'is_active' => true,
@@ -62,9 +76,22 @@ class JournalSeeder extends Seeder
                 'frequency' => 'Semesteran',
                 'first_published_year' => 2018,
                 'scientific_field_id' => $eduFieldId,
-                'sinta_rank' => 4,
-                'accreditation_status' => 'Terakreditasi',
-                'accreditation_grade' => 'S4',
+
+                // SINTA
+                'sinta_rank' => 'sinta_4',
+
+                // Dikti Accreditation (Expiring Soon - 25 days left)
+                'accreditation_start_year' => 2020,
+                'accreditation_end_year' => 2026, // Expiring soon
+                'accreditation_sk_number' => '087/E/KPT/2020',
+                'accreditation_sk_date' => '2020-02-20',
+
+                // Indexations (SINTA 4 → Google Scholar + Garuda)
+                'indexations' => json_encode([
+                    'Google Scholar' => ['indexed_at' => '2019-03-15'],
+                    'Garuda' => ['indexed_at' => '2018-11-20'],
+                ]),
+
                 'editor_in_chief' => 'Dewi Kartika, S.Pd, M.Pd',
                 'email' => 'jpp@uad.ac.id',
                 'is_active' => true,
@@ -84,9 +111,25 @@ class JournalSeeder extends Seeder
                 'frequency' => 'Triwulanan',
                 'first_published_year' => 2010,
                 'scientific_field_id' => $ecoFieldId,
-                'sinta_rank' => 2,
-                'accreditation_status' => 'Terakreditasi',
-                'accreditation_grade' => 'S2',
+
+                // SINTA
+                'sinta_rank' => 'sinta_2',
+
+                // Dikti Accreditation
+                'accreditation_start_year' => 2022,
+                'accreditation_end_year' => 2027,
+                'accreditation_sk_number' => '042/E/KPT/2022',
+                'accreditation_sk_date' => '2022-07-10', // Valid
+
+                // Indexations (SINTA 2 → Scopus + WoS + DOAJ + Google Scholar)
+                'indexations' => json_encode([
+                    'Scopus' => ['indexed_at' => '2020-05-15'],
+                    'WoS' => ['indexed_at' => '2021-11-20'],
+                    'DOAJ' => ['indexed_at' => '2019-08-10'],
+                    'Google Scholar' => ['indexed_at' => '2018-02-05'],
+                    'Garuda' => ['indexed_at' => '2017-06-01'],
+                ]),
+
                 'editor_in_chief' => 'Eko Wijaya, S.E, M.M',
                 'email' => 'jmb@umy.ac.id',
                 'is_active' => true,
@@ -104,9 +147,24 @@ class JournalSeeder extends Seeder
                 'frequency' => 'Triwulanan',
                 'first_published_year' => 2012,
                 'scientific_field_id' => $medFieldId,
-                'sinta_rank' => 3,
-                'accreditation_status' => 'Terakreditasi',
-                'accreditation_grade' => 'S3',
+
+                // SINTA
+                'sinta_rank' => 'sinta_3',
+
+                // Dikti Accreditation (Expired 30 days ago)
+                'accreditation_start_year' => 2019,
+                'accreditation_end_year' => 2025, // Expired
+                'accreditation_sk_number' => '061/E/KPT/2019',
+                'accreditation_sk_date' => '2019-12-15',
+
+                // Indexations (SINTA 3 → DOAJ + Google Scholar + Copernicus)
+                'indexations' => json_encode([
+                    'DOAJ' => ['indexed_at' => '2021-03-25'],
+                    'Copernicus' => ['indexed_at' => '2020-09-15'],
+                    'Google Scholar' => ['indexed_at' => '2019-04-10'],
+                    'Garuda' => ['indexed_at' => '2018-07-20'],
+                ]),
+
                 'editor_in_chief' => 'Fitri Rahmawati, S.Kep, Ns, M.Kep',
                 'email' => 'jkkm@umy.ac.id',
                 'is_active' => true,
@@ -126,9 +184,24 @@ class JournalSeeder extends Seeder
                 'frequency' => 'Semesteran',
                 'first_published_year' => 2008,
                 'scientific_field_id' => $engFieldId,
-                'sinta_rank' => 4,
-                'accreditation_status' => 'Terakreditasi',
-                'accreditation_grade' => 'S4',
+
+                // SINTA
+                'sinta_rank' => 'sinta_4',
+
+                // Dikti Accreditation
+                'accreditation_start_year' => 2021,
+                'accreditation_end_year' => 2026,
+                'accreditation_sk_number' => '098/E/KPT/2021',
+                'accreditation_sk_date' => '2021-10-05', // Valid
+
+                // Indexations (SINTA 4 → DOAJ + Google Scholar)
+                'indexations' => json_encode([
+                    'DOAJ' => ['indexed_at' => '2022-02-10'],
+                    'Google Scholar' => ['indexed_at' => '2019-06-15'],
+                    'Garuda' => ['indexed_at' => '2018-03-05'],
+                    'BASE' => ['indexed_at' => '2021-08-20'],
+                ]),
+
                 'editor_in_chief' => 'Hendra Gunawan, S.T, M.T',
                 'email' => 'jtsa@ums.ac.id',
                 'is_active' => true,

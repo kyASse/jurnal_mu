@@ -1,15 +1,18 @@
+import { IndexationBadge, SintaBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from '@inertiajs/react';
 import { BookOpen } from 'lucide-react';
 
 interface JournalCardProps {
-    id: number;
+    id: number; // Journal ID for internal routing
     title: string;
     issn?: string | null;
     e_issn?: string | null;
-    sinta_rank?: number | null;
+    sinta_rank: string | null;
+    indexation_labels?: string[];
     university?: string;
+    external_url?: string | null; // External journal website URL
     coverColor?: string; // Optional color for the card header pattern
 }
 
@@ -19,9 +22,20 @@ export default function JournalCard({
     issn,
     e_issn,
     sinta_rank,
+    indexation_labels = [],
     university = 'Universitas Muhammadiyah',
+    external_url = null,
     coverColor = 'bg-[#079C4E]', // Default to Official Green
 }: JournalCardProps) {
+    // Display max 3 indexations, prioritizing Scopus, WoS, DOAJ
+    const priorityIndexations = ['Scopus', 'WoS', 'DOAJ'];
+    const displayIndexations = [
+        ...indexation_labels.filter((label) => priorityIndexations.includes(label)),
+        ...indexation_labels.filter((label) => !priorityIndexations.includes(label)),
+    ].slice(0, 3);
+
+    const remainingCount = indexation_labels.length - displayIndexations.length;
+
     return (
         <div className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900">
             {/* Decorative Header / Cover Placeholder */}
@@ -34,17 +48,17 @@ export default function JournalCard({
             </div>
 
             <div className="flex flex-1 flex-col p-5">
-                {/* Sinta Badge */}
-                <div className="mb-3 flex items-start justify-between">
-                    {sinta_rank ? (
-                        <Badge
-                            className={` ${sinta_rank <= 2 ? 'bg-[#E11A1F] text-white hover:bg-[#c4151a]' : ''} ${sinta_rank >= 3 && sinta_rank <= 4 ? 'bg-[#FCEE1F] text-black hover:bg-[#e3d51b]' : ''} ${sinta_rank >= 5 ? 'bg-[#1A2A75] text-white hover:bg-[#131f57]' : ''} border-0 px-2.5 py-0.5 font-bold`}
-                        >
-                            SINTA {sinta_rank}
-                        </Badge>
-                    ) : (
-                        <Badge variant="secondary" className="text-gray-500">
-                            Not Indexed
+                {/* Badges Row */}
+                <div className="mb-3 flex flex-wrap items-start gap-2">
+                    <SintaBadge rank={sinta_rank} />
+
+                    {displayIndexations.map((label) => (
+                        <IndexationBadge key={label} platform={label} variant="default" />
+                    ))}
+
+                    {remainingCount > 0 && (
+                        <Badge variant="outline" className="text-xs">
+                            +{remainingCount} more
                         </Badge>
                     )}
                 </div>
@@ -71,11 +85,13 @@ export default function JournalCard({
                     <Button asChild className="w-full bg-[#079C4E] font-semibold text-white hover:bg-[#068a45]">
                         <Link href={route('journals.show', id)}>View Journal</Link>
                     </Button>
-                    <Button asChild variant="outline" size="icon" className="shrink-0 border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10">
-                        <a href="#" title="More options">
-                            <BookOpen className="h-4 w-4" />
-                        </a>
-                    </Button>
+                    {external_url && (
+                        <Button asChild variant="outline" size="icon" className="shrink-0 border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10">
+                            <a href={external_url} target="_blank" rel="noopener noreferrer" title="Visit Journal Website">
+                                <BookOpen className="h-4 w-4" />
+                            </a>
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>
