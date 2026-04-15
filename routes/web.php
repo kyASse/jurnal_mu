@@ -237,6 +237,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
             ->name('assessments.index');
 
+        // Support / Ticketing System for Super Admin
+        Route::resource('tickets', \App\Http\Controllers\Admin\TicketController::class)->except(['create', 'store', 'edit']);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\TicketController::class, 'reply'])
+            ->name('tickets.reply');
+        Route::patch('tickets/{ticket}/status', [\App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])
+            ->name('tickets.update-status');
+
+        // Support / Ticketing System for Super Admin
+        Route::resource('tickets', \App\Http\Controllers\Admin\TicketController::class)->except(['create', 'store', 'edit']);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\TicketController::class, 'reply'])
+            ->name('tickets.reply');
+        Route::patch('tickets/{ticket}/status', [\App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])
+            ->name('tickets.update-status');
+
         // Pembinaan Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
             Route::get('/', [AdminPembinaanController::class, 'index'])
