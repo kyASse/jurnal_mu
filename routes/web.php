@@ -522,6 +522,16 @@ Route::middleware(['auth'])->group(function () {
             Route::post('registrations/{registration}/create-assessment', [UserPembinaanController::class, 'createAssessment'])
                 ->name('registrations.create-assessment');
         });
+
+        // Support / Ticketing System for User
+        Route::resource('tickets', \App\Http\Controllers\User\TicketController::class)->names([
+            'index' => 'tickets.index',
+            'create' => 'tickets.create',
+            'store' => 'tickets.store',
+            'show' => 'tickets.show',
+        ]);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\User\TicketController::class, 'reply'])
+            ->name('tickets.reply');
     });
 
     /*
