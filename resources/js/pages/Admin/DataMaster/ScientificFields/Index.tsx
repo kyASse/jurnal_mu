@@ -152,7 +152,7 @@ export default function ScientificFieldsIndex({ categories, classifications, par
             <TableBody>
                 {data.length === 0 ? (
                     <TableRow>
-                        <TableCell colSpan={type === 'classification' ? 5 : 4} className="h-24 text-center">
+                        <TableCell colSpan={5} className="h-24 text-center">
                             Tidak ada data.
                         </TableCell>
                     </TableRow>
