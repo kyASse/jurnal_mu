@@ -108,7 +108,7 @@ class ScientificFieldController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Scientific Fields Import Failed: ' . $e->getMessage());
-            return back()->with('error', 'Gagal mengimport data. Pastikan format Excel sesuai. ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengimport data. Pastikan format Excel sesuai.');
         }
     }
 
