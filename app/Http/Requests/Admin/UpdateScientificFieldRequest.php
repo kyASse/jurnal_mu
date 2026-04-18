@@ -15,21 +15,21 @@ class UpdateScientificFieldRequest extends FormRequest
     public function rules(): array
     {
         $id = $this->route('scientific_field')->id ?? $this->route('scientific_field');
-        
+
         return [
-            'code' => ['required', 'string', 'max:50', 'unique:scientific_fields,code,' . $id],
+            'code' => ['required', 'string', 'max:50', 'unique:scientific_fields,code,'.$id],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'parent_id' => [
-                'nullable', 
+                'nullable',
                 'exists:scientific_fields,id',
                 function ($attribute, $value, $fail) use ($id) {
                     if ($value == $id) {
                         $fail('A scientific field cannot be its own parent.');
                     }
-                }
+                },
             ],
-            'is_active' => ['boolean']
+            'is_active' => ['boolean'],
         ];
     }
 }

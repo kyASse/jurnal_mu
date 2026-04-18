@@ -5,7 +5,6 @@ use App\Models\ScientificField;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
@@ -27,7 +26,7 @@ beforeEach(function () {
 
     $this->adminKampus = clone User::factory()->make([
         'role_id' => $this->adminKampusRoleId,
-        'university_id' => $this->university->id, 
+        'university_id' => $this->university->id,
     ]);
     $this->adminKampus->save();
 });
@@ -101,7 +100,7 @@ it('allows super admin to delete a scientific field', function () {
         ->delete(route('admin.data-master.scientific-fields.destroy', $field->id));
 
     $response->assertRedirect();
-    
+
     if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(ScientificField::class))) {
         $this->assertSoftDeleted('scientific_fields', ['id' => $field->id]);
     } else {
@@ -127,8 +126,8 @@ it('allows super admin to import scientific fields via csv', function () {
     $header = "code,name,description,parent_code,is_active\n";
     $row1 = "IMP-001,Imported Field 1,Description 1,,1\n";
     $row2 = "IMP-002,Imported Field 2,Description 2,IMP-001,1\n";
-    
-    $file = UploadedFile::fake()->createWithContent('import.csv', $header . $row1 . $row2);
+
+    $file = UploadedFile::fake()->createWithContent('import.csv', $header.$row1.$row2);
 
     $response = $this->actingAs($this->superAdmin)
         ->post(route('admin.data-master.scientific-fields.import'), [
@@ -140,12 +139,11 @@ it('allows super admin to import scientific fields via csv', function () {
         'code' => 'IMP-001',
         'name' => 'Imported Field 1',
     ]);
-    
+
     $parent = ScientificField::where('code', 'IMP-001')->first();
-    
+
     $this->assertDatabaseHas('scientific_fields', [
         'code' => 'IMP-002',
         'parent_id' => $parent->id,
     ]);
 });
-

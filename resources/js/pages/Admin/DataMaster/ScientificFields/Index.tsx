@@ -1,40 +1,27 @@
-import { Head, useForm } from '@inertiajs/react';
-import { BreadcrumbItem } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, Download, Upload, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { 
-    DropdownMenu, 
-    DropdownMenuContent, 
-    DropdownMenuItem, 
-    DropdownMenuLabel, 
-    DropdownMenuSeparator, 
-    DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogDescription, 
-    DialogFooter, 
-    DialogHeader, 
-    DialogTitle 
-} from '@/components/ui/dialog';
-import { 
-    Select, 
-    SelectContent, 
-    SelectItem, 
-    SelectTrigger, 
-    SelectValue 
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
+import { Download, MoreHorizontal, Pencil, Plus, Trash2, Upload } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface ScientificField {
@@ -69,15 +56,29 @@ export default function ScientificFieldsIndex({ categories, classifications, par
     const [isImportOpen, setIsImportOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<ScientificField | null>(null);
 
-    const { data, setData, post, put, delete: destroy, processing, reset, errors } = useForm({
+    const {
+        data,
+        setData,
+        post,
+        put,
+        delete: destroy,
+        processing,
+        reset,
+        errors,
+    } = useForm({
         code: '',
         name: '',
         description: '',
         parent_id: null as number | null,
-        is_active: true,
+        is_active: true as boolean,
     });
 
-    const { data: importData, setData: setImportData, post: postImport, processing: importing, errors: importErrors } = useForm({
+    const {
+        post: postImport,
+        setData: setImportData,
+        processing: importing,
+        errors: importErrors,
+    } = useForm({
         file: null as File | null,
     });
 
@@ -137,7 +138,7 @@ export default function ScientificFieldsIndex({ categories, classifications, par
         });
     };
 
-    const FieldTable = ({ data, type }: { data: ScientificField[], type: 'category' | 'classification' }) => (
+    const FieldTable = ({ data, type }: { data: ScientificField[]; type: 'category' | 'classification' }) => (
         <Table>
             <TableHeader>
                 <TableRow>
@@ -166,13 +167,9 @@ export default function ScientificFieldsIndex({ categories, classifications, par
                                     <Badge variant="outline">{item.parent?.name || '-'}</Badge>
                                 </TableCell>
                             )}
-                            {type === 'category' && (
-                                <TableCell>{item.children_count || 0}</TableCell>
-                            )}
+                            {type === 'category' && <TableCell>{item.children_count || 0}</TableCell>}
                             <TableCell>
-                                <Badge variant={item.is_active ? 'default' : 'secondary'}>
-                                    {item.is_active ? 'Aktif' : 'Non-aktif'}
-                                </Badge>
+                                <Badge variant={item.is_active ? 'default' : 'secondary'}>{item.is_active ? 'Aktif' : 'Non-aktif'}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
                                 <DropdownMenu>
@@ -192,10 +189,7 @@ export default function ScientificFieldsIndex({ categories, classifications, par
                                             <Pencil className="mr-2 h-4 w-4" /> Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem 
-                                            className="text-destructive"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
+                                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(item.id)}>
                                             <Trash2 className="mr-2 h-4 w-4" /> Hapus
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -254,45 +248,37 @@ export default function ScientificFieldsIndex({ categories, classifications, par
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>{editingItem ? 'Edit Bidang Ilmu' : 'Tambah Bidang Ilmu'}</DialogTitle>
-                        <DialogDescription>
-                            Pastikan kode unik dan nama sesuai dengan standar nasional.
-                        </DialogDescription>
+                        <DialogDescription>Pastikan kode unik dan nama sesuai dengan standar nasional.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="code" className="text-right">Kode</Label>
-                            <Input 
-                                id="code" 
-                                value={data.code} 
-                                onChange={e => setData('code', e.target.value)} 
-                                className="col-span-3" 
-                                required
-                            />
-                            {errors.code && <p className="col-start-2 col-span-3 text-xs text-destructive">{errors.code}</p>}
+                            <Label htmlFor="code" className="text-right">
+                                Kode
+                            </Label>
+                            <Input id="code" value={data.code} onChange={(e) => setData('code', e.target.value)} className="col-span-3" required />
+                            {errors.code && <p className="col-span-3 col-start-2 text-xs text-destructive">{errors.code}</p>}
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">Nama</Label>
-                            <Input 
-                                id="name" 
-                                value={data.name} 
-                                onChange={e => setData('name', e.target.value)} 
-                                className="col-span-3" 
-                                required
-                            />
+                            <Label htmlFor="name" className="text-right">
+                                Nama
+                            </Label>
+                            <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} className="col-span-3" required />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="parent" className="text-right">Parent</Label>
+                            <Label htmlFor="parent" className="text-right">
+                                Parent
+                            </Label>
                             <div className="col-span-3">
-                                <Select 
-                                    value={data.parent_id?.toString() || "none"} 
-                                    onValueChange={v => setData('parent_id', v === "none" ? null : parseInt(v))}
+                                <Select
+                                    value={data.parent_id?.toString() || 'none'}
+                                    onValueChange={(v) => setData('parent_id', v === 'none' ? null : parseInt(v))}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih Kategori (Opsional)" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="none">Tanpa Parent (Kategori Utama)</SelectItem>
-                                        {parentOptions.map(opt => (
+                                        {parentOptions.map((opt) => (
                                             <SelectItem key={opt.id} value={opt.id.toString()}>
                                                 {opt.code} - {opt.name}
                                             </SelectItem>
@@ -302,28 +288,32 @@ export default function ScientificFieldsIndex({ categories, classifications, par
                             </div>
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="description" className="text-right">Deskripsi</Label>
-                            <Textarea 
-                                id="description" 
-                                value={data.description} 
-                                onChange={e => setData('description', e.target.value)} 
-                                className="col-span-3" 
+                            <Label htmlFor="description" className="text-right">
+                                Deskripsi
+                            </Label>
+                            <Textarea
+                                id="description"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                className="col-span-3"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="status" className="text-right">Status</Label>
+                            <Label htmlFor="status" className="text-right">
+                                Status
+                            </Label>
                             <div className="flex items-center space-x-2">
-                                <Switch 
-                                    id="status" 
-                                    checked={data.is_active} 
-                                    onCheckedChange={v => setData('is_active', v)} 
-                                />
+                                <Switch id="status" checked={data.is_active} onCheckedChange={(v) => setData('is_active', v)} />
                                 <Label htmlFor="status">Aktif</Label>
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="ghost" onClick={() => setIsFormOpen(false)}>Batal</Button>
-                            <Button type="submit" disabled={processing}>Simpan</Button>
+                            <Button type="button" variant="ghost" onClick={() => setIsFormOpen(false)}>
+                                Batal
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                Simpan
+                            </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -341,18 +331,22 @@ export default function ScientificFieldsIndex({ categories, classifications, par
                     <form onSubmit={handleImport} className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="file">File Excel/CSV</Label>
-                            <Input 
-                                id="file" 
-                                type="file" 
-                                accept=".xlsx,.csv" 
-                                onChange={e => setImportData('file', e.target.files?.[0] || null)}
+                            <Input
+                                id="file"
+                                type="file"
+                                accept=".xlsx,.csv"
+                                onChange={(e) => setImportData('file', e.target.files?.[0] || null)}
                                 required
                             />
                             {importErrors.file && <p className="text-xs text-destructive">{importErrors.file}</p>}
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="ghost" onClick={() => setIsImportOpen(false)}>Batal</Button>
-                            <Button type="submit" disabled={importing}>Upload</Button>
+                            <Button type="button" variant="ghost" onClick={() => setIsImportOpen(false)}>
+                                Batal
+                            </Button>
+                            <Button type="submit" disabled={importing}>
+                                Upload
+                            </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

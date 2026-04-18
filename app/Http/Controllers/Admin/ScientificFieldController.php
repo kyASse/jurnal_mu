@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScientificField;
+use App\Http\Requests\Admin\ImportScientificFieldRequest;
 use App\Http\Requests\Admin\StoreScientificFieldRequest;
 use App\Http\Requests\Admin\UpdateScientificFieldRequest;
-use App\Http\Requests\Admin\ImportScientificFieldRequest;
+use App\Models\ScientificField;
 use Illuminate\Http\RedirectResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Inertia\Response;
 use Spatie\SimpleExcel\SimpleExcelReader;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 
@@ -32,7 +32,7 @@ class ScientificFieldController extends Controller
         return Inertia::render('Admin/DataMaster/ScientificFields/Index', [
             'categories' => $categories,
             'classifications' => $classifications,
-            'parentOptions' => ScientificField::parents()->select('id', 'name', 'code')->orderBy('name')->get()
+            'parentOptions' => ScientificField::parents()->select('id', 'name', 'code')->orderBy('name')->get(),
         ]);
     }
 
@@ -60,6 +60,7 @@ class ScientificFieldController extends Controller
 
         try {
             $scientific_field->delete();
+
             return redirect()->route('admin.data-master.scientific-fields.index')
                 ->with('message', 'Bidang ilmu berhasil dihapus.');
         } catch (\Exception $e) {
@@ -74,7 +75,7 @@ class ScientificFieldController extends Controller
 
             $rows = SimpleExcelReader::create($request->file('file')->path())
                 ->getRows()
-                ->filter(fn (array $row) => !empty($row['code']) && !empty($row['name']))
+                ->filter(fn (array $row) => ! empty($row['code']) && ! empty($row['name']))
                 ->values();
 
             $count = 0;
@@ -93,7 +94,7 @@ class ScientificFieldController extends Controller
 
                 $codes[] = $row['code'];
 
-                if (!empty($row['parent_code'])) {
+                if (! empty($row['parent_code'])) {
                     $parentCodes[] = $row['parent_code'];
                 }
 
@@ -108,13 +109,13 @@ class ScientificFieldController extends Controller
             $rows->each(function (array $row) use ($fieldsByCode) {
                 $field = $fieldsByCode->get($row['code']);
 
-                if (!$field) {
+                if (! $field) {
                     return;
                 }
 
                 $parentId = null;
 
-                if (!empty($row['parent_code'])) {
+                if (! empty($row['parent_code'])) {
                     $parent = $fieldsByCode->get($row['parent_code']);
                     if ($parent) {
                         $parentId = $parent->id;
@@ -126,12 +127,14 @@ class ScientificFieldController extends Controller
                 ]);
             });
             DB::commit();
+
             return redirect()->route('admin.data-master.scientific-fields.index')
                 ->with('message', "{$count} Bidang ilmu berhasil diimport.");
-                
+
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Scientific Fields Import Failed: ' . $e->getMessage());
+            Log::error('Scientific Fields Import Failed: '.$e->getMessage());
+
             return back()->with('error', 'Gagal mengimport data. Pastikan format Excel sesuai.');
         }
     }
@@ -139,9 +142,9 @@ class ScientificFieldController extends Controller
     public function export()
     {
         $fields = ScientificField::with('parent:id,code')->orderBy('id')->get();
-        
+
         $writer = SimpleExcelWriter::streamDownload('scientific_fields.xlsx');
-        
+
         foreach ($fields as $field) {
             $writer->addRow([
                 'code' => $field->code,
@@ -151,7 +154,7 @@ class ScientificFieldController extends Controller
                 'is_active' => $field->is_active ? 1 : 0,
             ]);
         }
-        
+
         return $writer->toBrowser();
     }
 }

@@ -19,7 +19,7 @@ class StoreScientificFieldRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'parent_id' => ['nullable', 'exists:scientific_fields,id'],
-            'is_active' => ['boolean']
+            'is_active' => ['boolean'],
         ];
     }
 }

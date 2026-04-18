@@ -1,9 +1,9 @@
+import { Badge } from '@/components/ui/badge';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { BookType, ArrowRight, ClipboardCheck, Award, Building2, ShieldCheck, Globe } from 'lucide-react';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { ArrowRight, Award, BookType, Building2, ClipboardCheck, Globe, ShieldCheck } from 'lucide-react';
 
 /**
  * Data Master Index Page (Super Admin)
@@ -26,7 +26,7 @@ export default function DataMasterIndex() {
             href: route('admin.data-master.scientific-fields.index'),
             color: 'text-blue-500',
             bgColor: 'bg-blue-500/10',
-            isImplemented: true
+            isImplemented: true,
         },
         {
             title: 'Indikator Penilaian',
@@ -35,7 +35,7 @@ export default function DataMasterIndex() {
             href: '#',
             color: 'text-green-500',
             bgColor: 'bg-green-500/10',
-            isImplemented: false
+            isImplemented: false,
         },
         {
             title: 'Standar Akreditasi (SINTA)',
@@ -44,7 +44,7 @@ export default function DataMasterIndex() {
             href: '#',
             color: 'text-orange-500',
             bgColor: 'bg-orange-500/10',
-            isImplemented: false
+            isImplemented: false,
         },
         {
             title: 'Tipe Institusi (PTM)',
@@ -53,7 +53,7 @@ export default function DataMasterIndex() {
             href: '#',
             color: 'text-purple-500',
             bgColor: 'bg-purple-500/10',
-            isImplemented: false
+            isImplemented: false,
         },
         {
             title: 'Indexing Databases',
@@ -62,7 +62,7 @@ export default function DataMasterIndex() {
             href: '#',
             color: 'text-cyan-500',
             bgColor: 'bg-cyan-500/10',
-            isImplemented: false
+            isImplemented: false,
         },
         {
             title: 'Global Settings',
@@ -71,7 +71,7 @@ export default function DataMasterIndex() {
             href: '#',
             color: 'text-red-500',
             bgColor: 'bg-red-500/10',
-            isImplemented: false
+            isImplemented: false,
         },
     ];
 
@@ -88,9 +88,11 @@ export default function DataMasterIndex() {
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {masterDataItems.map((item, index) => {
+                    {masterDataItems.map((item) => {
                         const Content = (
-                            <Card className={`h-full transition-all ${item.isImplemented ? 'hover:border-primary/50 hover:bg-muted/50' : 'opacity-70 grayscale-[0.5]'}`}>
+                            <Card
+                                className={`h-full transition-all ${item.isImplemented ? 'hover:border-primary/50 hover:bg-muted/50' : 'opacity-70 grayscale-[0.5]'}`}
+                            >
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
                                         <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${item.bgColor}`}>
@@ -99,12 +101,12 @@ export default function DataMasterIndex() {
                                         {item.isImplemented ? (
                                             <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                                         ) : (
-                                            <Badge variant="secondary" className="text-[10px] font-normal">Under Development</Badge>
+                                            <Badge variant="secondary" className="text-[10px] font-normal">
+                                                Under Development
+                                            </Badge>
                                         )}
                                     </div>
-                                    <CardTitle className="mt-4 flex items-center gap-2">
-                                        {item.title}
-                                    </CardTitle>
+                                    <CardTitle className="mt-4 flex items-center gap-2">{item.title}</CardTitle>
                                     <CardDescription className="mt-2 line-clamp-2">{item.description}</CardDescription>
                                 </CardHeader>
                             </Card>
