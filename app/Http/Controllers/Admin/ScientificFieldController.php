@@ -72,35 +72,59 @@ class ScientificFieldController extends Controller
         try {
             DB::beginTransaction();
 
-            $rows = SimpleExcelReader::create($request->file('file')->path())->getRows();
+            $rows = SimpleExcelReader::create($request->file('file')->path())
+                ->getRows()
+                ->filter(fn (array $row) => !empty($row['code']) && !empty($row['name']))
+                ->values();
 
             $count = 0;
-            $rows->each(function (array $row) use (&$count) {
-                if (empty($row['code']) || empty($row['name'])) {
-                    return;
-                }
+            $codes = [];
+            $parentCodes = [];
 
-                $parentId = null;
-                if (!empty($row['parent_code'])) {
-                    $parent = ScientificField::where('code', $row['parent_code'])->first();
-                    if ($parent) {
-                        $parentId = $parent->id;
-                    }
-                }
-
+            $rows->each(function (array $row) use (&$count, &$codes, &$parentCodes) {
                 ScientificField::updateOrCreate(
                     ['code' => $row['code']],
                     [
                         'name' => $row['name'],
                         'description' => $row['description'] ?? null,
-                        'parent_id' => $parentId,
                         'is_active' => isset($row['is_active']) ? (bool) $row['is_active'] : true,
                     ]
                 );
 
+                $codes[] = $row['code'];
+
+                if (!empty($row['parent_code'])) {
+                    $parentCodes[] = $row['parent_code'];
+                }
+
                 $count++;
             });
 
+            $fieldsByCode = ScientificField::whereIn(
+                'code',
+                array_values(array_unique(array_merge($codes, $parentCodes)))
+            )->get()->keyBy('code');
+
+            $rows->each(function (array $row) use ($fieldsByCode) {
+                $field = $fieldsByCode->get($row['code']);
+
+                if (!$field) {
+                    return;
+                }
+
+                $parentId = null;
+
+                if (!empty($row['parent_code'])) {
+                    $parent = $fieldsByCode->get($row['parent_code']);
+                    if ($parent) {
+                        $parentId = $parent->id;
+                    }
+                }
+
+                $field->update([
+                    'parent_id' => $parentId,
+                ]);
+            });
             DB::commit();
             return redirect()->route('admin.data-master.scientific-fields.index')
                 ->with('message', "{$count} Bidang ilmu berhasil diimport.");
