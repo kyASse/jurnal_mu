@@ -137,9 +137,19 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::middleware(['role:'.Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
 
-        // Data Master (Placeholder)
+        // Data Master (Dashboard)
         Route::get('data-master', [DataMasterController::class, 'index'])
             ->name('data-master.index');
+
+        // Scientific Fields nested in Data Master
+        Route::prefix('data-master')->name('data-master.')->group(function () {
+            Route::post('scientific-fields/import', [\App\Http\Controllers\Admin\ScientificFieldController::class, 'import'])
+                ->name('scientific-fields.import');
+            Route::get('scientific-fields/export', [\App\Http\Controllers\Admin\ScientificFieldController::class, 'export'])
+                ->name('scientific-fields.export');
+            Route::resource('scientific-fields', \App\Http\Controllers\Admin\ScientificFieldController::class)
+                ->except(['show', 'create', 'edit']);
+        });
 
         // Borang Indikator (Using Accreditation Templates System)
         Route::get('borang-indikator', [AccreditationTemplateController::class, 'index'])
