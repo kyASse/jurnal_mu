@@ -116,7 +116,7 @@ class ScientificFieldController extends Controller
     {
         $fields = ScientificField::with('parent:id,code')->orderBy('id')->get();
         
-        $writer = SimpleExcelWriter::streamDownload('scientific-fields-' . date('Ymd-His') . '.xlsx');
+        $writer = SimpleExcelWriter::streamDownload('scientific_fields.xlsx');
         
         foreach ($fields as $field) {
             $writer->addRow([
