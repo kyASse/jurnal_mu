@@ -116,7 +116,11 @@ it('allows super admin to export scientific fields', function () {
         ->get(route('admin.data-master.scientific-fields.export'));
 
     $response->assertStatus(200);
-    $response->assertDownload('scientific_fields.xlsx');
+
+    $contentDisposition = $response->headers->get('content-disposition');
+
+    expect($contentDisposition)->not->toBeNull();
+    expect($contentDisposition)->toMatch('/attachment;\s*filename="?scientific-fields-[^"]+\.xlsx"?/');
 });
 
 it('allows super admin to import scientific fields via csv', function () {

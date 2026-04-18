@@ -152,7 +152,7 @@ export default function ScientificFieldsIndex({ categories, classifications, par
             <TableBody>
                 {data.length === 0 ? (
                     <TableRow>
-                        <TableCell colSpan={type === 'classification' ? 5 : 4} className="h-24 text-center">
+                        <TableCell colSpan={5} className="h-24 text-center">
                             Tidak ada data.
                         </TableCell>
                     </TableRow>
@@ -177,7 +177,12 @@ export default function ScientificFieldsIndex({ categories, classifications, par
                             <TableCell className="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <Button
+                                            variant="ghost"
+                                            className="h-8 w-8 p-0"
+                                            aria-label={`Buka menu aksi untuk ${item.name} (${item.code})`}
+                                            title={`Buka menu aksi untuk ${item.name} (${item.code})`}
+                                        >
                                             <MoreHorizontal className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
