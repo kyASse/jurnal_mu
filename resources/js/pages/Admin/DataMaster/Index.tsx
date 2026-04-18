@@ -111,11 +111,11 @@ export default function DataMasterIndex() {
                         );
 
                         return item.isImplemented ? (
-                            <Link key={index} href={item.href} className="group outline-none focus:ring-2 focus:ring-primary">
+                            <Link key={item.title} href={item.href} className="group outline-none focus:ring-2 focus:ring-primary">
                                 {Content}
                             </Link>
                         ) : (
-                            <div key={index} className="cursor-not-allowed">
+                            <div key={item.title} className="cursor-not-allowed">
                                 {Content}
                             </div>
                         );
