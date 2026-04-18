@@ -77,7 +77,7 @@ export default function ScientificFieldsIndex({ categories, classifications, par
         is_active: true,
     });
 
-    const { data: importData, setData: setImportData, post: postImport, processing: importing } = useForm({
+    const { data: importData, setData: setImportData, post: postImport, processing: importing, errors: importErrors } = useForm({
         file: null as File | null,
     });
 
@@ -343,7 +343,7 @@ export default function ScientificFieldsIndex({ categories, classifications, par
                                 onChange={e => setImportData('file', e.target.files?.[0] || null)}
                                 required
                             />
-                            {errors.file && <p className="text-xs text-destructive">{errors.file}</p>}
+                            {importErrors.file && <p className="text-xs text-destructive">{importErrors.file}</p>}
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="ghost" onClick={() => setIsImportOpen(false)}>Batal</Button>
