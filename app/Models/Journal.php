@@ -624,12 +624,13 @@ class Journal extends Model
             'monthly' => 'Bulanan',
             'bi-monthly' => 'Dua Bulanan',
             'quarterly' => 'Triwulanan',
+            '4-monthly' => '4 Bulanan (3 Kali Terbit Per Tahun)',
             'semi-annual' => 'Semi-Tahunan',
             'annual' => 'Tahunan',
             'other' => 'Lainnya',
         ];
 
-        return $frequencies[$this->frequency] ?? $this->frequency ?? 'Tidak Diketahui';
+        return $frequencies[strtolower($this->frequency)] ?? $this->frequency ?? 'Tidak Diketahui';
     }
 
     /*
