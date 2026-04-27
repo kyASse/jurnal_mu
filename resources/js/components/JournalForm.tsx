@@ -340,6 +340,7 @@ export default function JournalForm({
                                 <SelectItem value="Monthly">Monthly (Bulanan)</SelectItem>
                                 <SelectItem value="Bi-Monthly">Bi-Monthly (2 Bulanan)</SelectItem>
                                 <SelectItem value="Quarterly">Quarterly (Triwulan)</SelectItem>
+                                <SelectItem value="4-Monthly">4 Bulanan (3 Kali Terbit Per Tahun)</SelectItem>
                                 <SelectItem value="Semi-Annual">Semi-Annual (Semesteran)</SelectItem>
                                 <SelectItem value="Annual">Annual (Tahunan)</SelectItem>
                                 <SelectItem value="Other">Other</SelectItem>
