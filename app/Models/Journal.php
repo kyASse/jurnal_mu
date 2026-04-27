@@ -630,7 +630,13 @@ class Journal extends Model
             'other' => 'Lainnya',
         ];
 
-        return $frequencies[strtolower($this->frequency)] ?? $this->frequency ?? 'Tidak Diketahui';
+        $frequency = $this->frequency;
+
+        if ($frequency === null) {
+            return 'Tidak Diketahui';
+        }
+
+        return $frequencies[strtolower($frequency)] ?? $frequency;
     }
 
     /*
