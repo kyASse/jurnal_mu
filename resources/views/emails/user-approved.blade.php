@@ -12,7 +12,7 @@ Anda sekarang dapat login ke sistem dan mulai mengelola jurnal ilmiah Anda.
 - **Email:** {{ $applicant->email }}
 - **Universitas:** {{ $applicant->university->name ?? '-' }}
 
-<x-mail::button :url="$url">
+<x-mail::button :url="$url" color="success">
 Login ke Sistem
 </x-mail::button>
 
@@ -21,6 +21,8 @@ Jika Anda memerlukan bantuan, silakan hubungi Admin LPPM universitas Anda.
 Terima kasih,<br>
 Tim **Journal MU**
 
+
+</x-mail::message>
+
 ---
 *Email ini dikirim otomatis oleh sistem Journal MU. Harap tidak membalas email ini.*
-</x-mail::message>

@@ -45,6 +45,8 @@ Lihat Daftar Jurnal Saya
 Terima kasih,<br>
 Tim **Journal MU**
 
+
+</x-mail::message>
+
 ---
 *Email ini dikirim otomatis oleh sistem Journal MU. Harap tidak membalas email ini.*
-</x-mail::message>

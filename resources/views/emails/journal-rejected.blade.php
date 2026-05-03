@@ -23,7 +23,7 @@ Kami telah meninjau pengajuan jurnal Anda di platform **Journal MU**, dan dengan
 
 Silakan perbarui data jurnal Anda sesuai dengan catatan di atas, kemudian ajukan kembali untuk mendapatkan persetujuan.
 
-<x-mail::button :url="$url">
+<x-mail::button :url="$url" color="error">
 Lihat Detail Jurnal
 </x-mail::button>
 
@@ -32,6 +32,8 @@ Jika ada pertanyaan, silakan hubungi Admin LPPM universitas Anda.
 Terima kasih,<br>
 Tim **Journal MU**
 
+
+</x-mail::message>
+
 ---
 *Email ini dikirim otomatis oleh sistem Journal MU. Harap tidak membalas email ini.*
-</x-mail::message>

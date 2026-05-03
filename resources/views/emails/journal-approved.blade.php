@@ -18,13 +18,15 @@ Selamat! Pengajuan jurnal Anda di platform **Journal MU** telah ditinjau dan dis
 
 Anda dapat melihat detail jurnal dan mulai mengelola submission serta proses akreditasi.
 
-<x-mail::button :url="$url">
+<x-mail::button :url="$url" color="success">
 Lihat Jurnal
 </x-mail::button>
 
 Terima kasih,<br>
 Tim **Journal MU**
 
+
+</x-mail::message>
+
 ---
 *Email ini dikirim otomatis oleh sistem Journal MU. Harap tidak membalas email ini.*
-</x-mail::message>
