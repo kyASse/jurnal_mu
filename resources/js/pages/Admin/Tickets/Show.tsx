@@ -17,11 +17,11 @@ export default function AdminShow({ ticket }: any) {
         { title: `Ticket #${ticket.id}`, href: route('admin.tickets.show', ticket.id) },
     ];
 
-    const getStatusVariant = (status: string) => {
+    const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
         switch (status) {
             case 'open': return 'destructive';
-            case 'in_progress': return 'warning';
-            case 'resolved': return 'success';
+            case 'in_progress': return 'default';
+            case 'resolved': return 'outline';
             case 'closed': return 'secondary';
             default: return 'default';
         }
@@ -73,7 +73,7 @@ export default function AdminShow({ ticket }: any) {
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-6">
+                <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 flex flex-col gap-4">
                         <Card className="h-full flex flex-col flex-1">
                             <CardHeader className="border-b px-4 py-3">
@@ -125,7 +125,7 @@ export default function AdminShow({ ticket }: any) {
                                         />
                                         {replyErrors.message && <div className="text-xs text-red-500">{replyErrors.message}</div>}
                                         
-                                        <div className="flex items-center justify-between">
+                                        <div className="flex flex-wrap items-center justify-between gap-3">
                                             <div className="flex items-center gap-2">
                                                 <Button 
                                                     type="button" 
@@ -144,7 +144,7 @@ export default function AdminShow({ ticket }: any) {
                                                     onChange={e => setReplyData('attachment', e.target.files ? e.target.files[0] : null)} 
                                                 />
                                             </div>
-                                            <Button type="submit" disabled={sendingReply || !replyData.message.trim()}>
+                                            <Button className="w-full sm:w-auto" type="submit" disabled={sendingReply || !replyData.message.trim()}>
                                                 <Send className="w-4 h-4 mr-2" /> Send Reply
                                             </Button>
                                         </div>

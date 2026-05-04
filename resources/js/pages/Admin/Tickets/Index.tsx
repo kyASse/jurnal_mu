@@ -14,11 +14,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function AdminIndex({ tickets, filters }: any) {
-    const getStatusVariant = (status: string) => {
+    const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
         switch (status) {
             case 'open': return 'destructive';
-            case 'in_progress': return 'warning';
-            case 'resolved': return 'success';
+            case 'in_progress': return 'default';
+            case 'resolved': return 'outline';
             case 'closed': return 'secondary';
             default: return 'default';
         }
@@ -82,42 +82,72 @@ export default function AdminIndex({ tickets, filters }: any) {
                                 <p className="text-sm text-muted-foreground mt-1">There are no tickets matching your criteria.</p>
                             </div>
                         ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Ticket ID</TableHead>
-                                        <TableHead>User / Reporter</TableHead>
-                                        <TableHead>Subject</TableHead>
-                                        <TableHead>Category</TableHead>
-                                        <TableHead>Priority</TableHead>
-                                        <TableHead>Created</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
+                            <>
+                                {/* Desktop Table View */}
+                                <div className="hidden md:block overflow-x-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Ticket ID</TableHead>
+                                                <TableHead>User / Reporter</TableHead>
+                                                <TableHead>Subject</TableHead>
+                                                <TableHead>Category</TableHead>
+                                                <TableHead>Priority</TableHead>
+                                                <TableHead>Created</TableHead>
+                                                <TableHead>Status</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {tickets.data.map((ticket: any) => (
+                                                <TableRow key={ticket.id}>
+                                                    <TableCell className="font-medium">#{ticket.id}</TableCell>
+                                                    <TableCell>{ticket.user.name}</TableCell>
+                                                    <TableCell className="max-w-[200px] truncate">{ticket.subject}</TableCell>
+                                                    <TableCell className="capitalize">{ticket.category.replace('_', ' ')}</TableCell>
+                                                    <TableCell className="capitalize">{ticket.priority}</TableCell>
+                                                    <TableCell className="text-muted-foreground text-sm">{new Date(ticket.created_at).toLocaleDateString()}</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={getStatusVariant(ticket.status)}>
+                                                            {ticket.status.replace('_', ' ')}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Button variant="ghost" size="sm" onClick={() => router.visit(route('admin.tickets.show', ticket.id))}>
+                                                            <Eye className="w-4 h-4 mr-2" /> Details
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+
+                                {/* Mobile Card View */}
+                                <div className="grid grid-cols-1 gap-4 md:hidden">
                                     {tickets.data.map((ticket: any) => (
-                                        <TableRow key={ticket.id}>
-                                            <TableCell className="font-medium">#{ticket.id}</TableCell>
-                                            <TableCell>{ticket.user.name}</TableCell>
-                                            <TableCell className="max-w-[200px] truncate">{ticket.subject}</TableCell>
-                                            <TableCell className="capitalize">{ticket.category.replace('_', ' ')}</TableCell>
-                                            <TableCell className="capitalize">{ticket.priority}</TableCell>
-                                            <TableCell className="text-muted-foreground text-sm">{new Date(ticket.created_at).toLocaleDateString()}</TableCell>
-                                            <TableCell>
+                                        <div key={ticket.id} className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+                                            <div className="flex justify-between items-start gap-2">
+                                                <div>
+                                                    <span className="text-xs font-semibold text-muted-foreground block mb-1">#{ticket.id} • {new Date(ticket.created_at).toLocaleDateString()}</span>
+                                                    <h4 className="font-medium line-clamp-2 text-sm">{ticket.subject}</h4>
+                                                    <p className="text-xs text-muted-foreground mt-1">By: {ticket.user.name}</p>
+                                                </div>
                                                 <Badge variant={getStatusVariant(ticket.status)}>
                                                     {ticket.status.replace('_', ' ')}
                                                 </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Button variant="ghost" size="sm" onClick={() => router.visit(route('admin.tickets.show', ticket.id))}>
-                                                    <Eye className="w-4 h-4 mr-2" /> Details
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 text-xs mt-1">
+                                                <Badge variant="secondary" className="capitalize">{ticket.category.replace('_', ' ')}</Badge>
+                                                <Badge variant="default" className="capitalize">{ticket.priority} Priority</Badge>
+                                            </div>
+                                            <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => router.visit(route('admin.tickets.show', ticket.id))}>
+                                                <Eye className="w-4 h-4 mr-2" /> View Details
+                                            </Button>
+                                        </div>
                                     ))}
-                                </TableBody>
-                            </Table>
+                                </div>
+                            </>
                         )}
                     </CardContent>
                 </Card>
