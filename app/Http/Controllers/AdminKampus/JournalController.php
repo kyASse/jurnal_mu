@@ -13,6 +13,7 @@ use App\Models\Role;
 use App\Models\ScientificField;
 use App\Models\User;
 use App\Services\JournalCoverService;
+use App\Services\JournalService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,9 +32,12 @@ class JournalController extends Controller
 {
     protected JournalCoverService $coverService;
 
-    public function __construct(JournalCoverService $coverService)
+    private JournalService $journalService;
+
+    public function __construct(JournalCoverService $coverService, JournalService $journalService)
     {
         $this->coverService = $coverService;
+        $this->journalService = $journalService;
     }
 
     /**
@@ -116,7 +120,7 @@ class JournalController extends Controller
 
         // Paginate results
         $journals = $query
-            ->orderBy('title')
+            ->latest()
             ->paginate(10)
             ->withQueryString()
             ->through(fn ($journal) => [
@@ -367,6 +371,19 @@ class JournalController extends Controller
             ->exists();
 
         $articlesCount = $journal->articles()->count();
+        $articles = $journal->articles()
+            ->orderBy('publication_date', 'desc')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(fn ($article) => [
+                'id' => $article->id,
+                'title' => $article->title,
+                'authors' => $article->authors,
+                'publication_date' => $article->publication_date?->format('Y-m-d'),
+                'abstract' => $article->abstract,
+                'doi' => $article->doi,
+                'url' => $article->article_url,
+            ]);
 
         return Inertia::render('AdminKampus/Journals/Show', [
             'journal' => [
@@ -398,7 +415,7 @@ class JournalController extends Controller
                 'indexation_labels' => $journal->indexation_labels,
 
                 // OAI-PMH
-                'oai_pmh_url' => $journal->oai_pmh_url,
+                'oai_urls' => $journal->oai_urls,
 
                 // Cover image
                 'cover_image' => $journal->cover_image,
@@ -440,6 +457,7 @@ class JournalController extends Controller
                     ],
                 ]),
             ],
+            'articles' => $articles,
             'articlesCount' => $articlesCount,
             'lastHarvestLog' => $lastHarvestLog ? (array) $lastHarvestLog : null,
             'isHarvestPending' => $isHarvestPending,
@@ -459,7 +477,7 @@ class JournalController extends Controller
     {
         $this->authorize('update', $journal);
 
-        if (empty($journal->oai_pmh_url)) {
+        if (empty($journal->oai_urls)) {
             return redirect()
                 ->route('admin-kampus.journals.show', $journal)
                 ->with('error', 'Jurnal ini belum memiliki OAI-PMH URL. Tambahkan URL-nya terlebih dahulu melalui form edit jurnal.');
@@ -478,6 +496,52 @@ class JournalController extends Controller
 
         return redirect()
             ->route('admin-kampus.journals.show', $journal)
+            ->with('success', $message);
+    }
+
+    /**
+     * @route POST /admin-kampus/journals/harvest/bulk
+     *
+     * @features Dispatch background job to harvest articles from OAI-PMH endpoint for multiple journals.
+     */
+    public function bulkHarvest(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'journal_ids' => ['required', 'array', 'min:1'],
+            'journal_ids.*' => [
+                'integer',
+                'distinct',
+                \Illuminate\Validation\Rule::exists('journals', 'id')->where(function ($query) {
+                    $query->where('university_id', Auth::user()->university_id);
+                }),
+            ],
+        ]);
+
+        $journals = Journal::whereIn('id', $request->input('journal_ids'))->get();
+        $dispatchedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($journals as $journal) {
+            $this->authorize('update', $journal);
+
+            if (empty($journal->oai_urls)) {
+                $skippedCount++;
+
+                continue;
+            }
+
+            $clearExisting = (bool) $request->input('force', false);
+            HarvestJournalArticlesJob::dispatch($journal, null, $clearExisting)->onQueue('harvesting');
+            $dispatchedCount++;
+        }
+
+        $message = "Proses massal OAI-PMH sinkronisasi dijadwalkan untuk $dispatchedCount jurnal.";
+        if ($skippedCount > 0) {
+            $message .= " (Lewati $skippedCount jurnal tanpa URL OAI-PMH)";
+        }
+
+        return redirect()
+            ->back()
             ->with('success', $message);
     }
 
@@ -528,9 +592,8 @@ class JournalController extends Controller
         $this->authorize('create', Journal::class);
 
         $authUser = Auth::user();
-
         $validated = $request->validated();
-        $validated['university_id'] = $authUser->university_id;
+        $targetUserId = null;
 
         // If user_id is provided, use it; otherwise default to the admin user
         if ($request->filled('user_id')) {
@@ -538,29 +601,22 @@ class JournalController extends Controller
             $targetUser = User::where('id', $request->user_id)
                 ->where('university_id', $authUser->university_id)
                 ->firstOrFail();
-            $validated['user_id'] = $targetUser->id;
-        } else {
-            $validated['user_id'] = $authUser->id;
+            $targetUserId = $targetUser->id;
         }
 
-        // Bug fix #4: Admin Kampus creates approved journals, not pending
-        $validated['approval_status'] = 'approved';
-        $validated['approved_by'] = $authUser->id;
-        $validated['approved_at'] = now();
+        try {
+            $this->journalService->createJournal(
+                $validated,
+                $request->file('cover_image'),
+                $authUser,
+                $targetUserId
+            );
 
-        // Bug fix #1: unset cover_image so UploadedFile object is not passed to Journal::create()
-        // The file is handled separately after the record is created.
-        unset($validated['cover_image']);
-
-        $journal = Journal::create($validated);
-
-        // Handle optional cover image upload
-        if ($request->hasFile('cover_image')) {
-            $journal->update(['cover_image' => $this->coverService->upload($request->file('cover_image'), $journal)]);
+            return redirect()->route('admin-kampus.journals.index')
+                ->with('success', 'Jurnal berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan jurnal. Silakan coba lagi nanti.');
         }
-
-        return redirect()->route('admin-kampus.journals.index')
-            ->with('success', 'Jurnal berhasil ditambahkan.');
     }
 
     /**
@@ -600,18 +656,21 @@ class JournalController extends Controller
 
         $validated = $request->validated();
 
-        // Handle optional cover image upload (file replaces text path in validated)
-        if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $this->coverService->upload($request->file('cover_image'), $journal);
-        } else {
-            // Exclude cover_image from validated so existing value is preserved
-            unset($validated['cover_image']);
+        try {
+            $this->journalService->updateJournal(
+                $validated,
+                $request->file('cover_image'),
+                $journal,
+                Auth::user()
+            );
+
+            return redirect()->route('admin-kampus.journals.index')
+                ->with('success', 'Data jurnal berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui jurnal. Silakan coba lagi.');
         }
-
-        $journal->update($validated);
-
-        return redirect()->route('admin-kampus.journals.index')
-            ->with('success', 'Data jurnal berhasil diperbarui.');
     }
 
     /**

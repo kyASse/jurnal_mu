@@ -7,8 +7,6 @@
  */
 import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
 import { JournalCoverUpload } from '@/components/JournalCoverUpload';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -20,6 +18,10 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PaginationLink } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type OaiHarvestingLog } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
@@ -107,7 +109,7 @@ interface Journal {
     indexations?: Record<string, { indexed_at: string }> | null;
     indexation_labels?: string[];
     // OAI-PMH
-    oai_pmh_url?: string | null;
+    oai_urls?: string[] | null;
     // Cover
     cover_image?: string | null;
     cover_image_url?: string | null;
@@ -120,14 +122,42 @@ interface Journal {
     assessments: Assessment[];
 }
 
+interface Article {
+    id: number;
+    title: string;
+    authors: string | string[];
+    publication_date: string | null;
+    abstract: string | null;
+    doi: string | null;
+    url: string | null;
+}
+
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginatedData<T> {
+    data: T[];
+    links: PaginationLink[];
+    current_page: number;
+    last_page: number;
+    from: number | null;
+    to: number | null;
+    total: number;
+    per_page: number;
+}
+
 interface Props {
     journal: Journal;
+    articles: PaginatedData<Article>;
     articlesCount: number;
     lastHarvestLog: OaiHarvestingLog | null;
     isHarvestPending: boolean;
 }
 
-export default function JournalShow({ journal, articlesCount, lastHarvestLog, isHarvestPending }: Props) {
+export default function JournalShow({ journal, articles, articlesCount, lastHarvestLog, isHarvestPending }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [harvesting, setHarvesting] = useState(false);
     const [forceSyncing, setForceSyncing] = useState(false);
@@ -193,7 +223,7 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Journal - ${journal.title}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 {/* Flash Messages */}
                 {flash?.success && (
                     <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
@@ -216,11 +246,11 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                             </Button>
                         </Link>
 
-                        <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-4">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                                 {/* Journal Cover / Icon */}
                                 <div
-                                    className="group relative flex w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-blue-100 shadow-sm dark:bg-blue-900/20"
+                                    className="group relative flex w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-blue-100 shadow-sm sm:w-28 dark:bg-blue-900/20"
                                     style={{ aspectRatio: '2/3' }}
                                 >
                                     {journal.cover_image || journal.cover_image_url ? (
@@ -308,9 +338,11 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                     {/* Info Grid */}
                     <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Journal Details */}
-                        <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
-                            <h3 className="mb-4 text-lg font-semibold text-foreground">Journal Details</h3>
-                            <div className="space-y-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-lg">Journal Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <Bookmark className="h-5 w-5 text-muted-foreground" />
                                     <div>
@@ -378,13 +410,15 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                                         </div>
                                     </div>
                                 )}
-                            </div>
-                        </div>
+                            </CardContent>
+                        </Card>
 
                         {/* Manager & Contact */}
-                        <div className="rounded-lg border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border">
-                            <h3 className="mb-4 text-lg font-semibold text-foreground">Manager & Contact</h3>
-                            <div className="space-y-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-lg">Manager & Contact</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <User className="h-5 w-5 text-muted-foreground" />
                                     <div>
@@ -443,13 +477,13 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     {/* OAI-PMH Harvest Section */}
-                    <div className="mb-8 overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
-                        <div className="flex items-center justify-between border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
+                    <Card className="mb-8 overflow-hidden border-sidebar-border/70 shadow-sm dark:border-sidebar-border">
+                        <div className="flex flex-col gap-4 border-b border-sidebar-border/70 p-6 sm:flex-row sm:items-center sm:justify-between dark:border-sidebar-border">
                             <div className="flex items-center gap-2">
                                 <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                                 <h3 className="text-lg font-semibold text-foreground">Artikel OAI-PMH</h3>
@@ -457,20 +491,20 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                                     {articlesCount} artikel
                                 </Badge>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                                 {isHarvestPending && (
-                                    <span className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
+                                    <span className="flex w-full items-center gap-1.5 text-sm text-amber-600 sm:w-auto dark:text-amber-400">
                                         <Clock className="h-4 w-4 animate-pulse" />
                                         Dalam antrian...
                                     </span>
                                 )}
                                 <Button
                                     onClick={handleHarvest}
-                                    disabled={harvesting || isHarvestPending || !journal.oai_pmh_url}
+                                    disabled={harvesting || isHarvestPending || !journal.oai_urls || journal.oai_urls.length === 0}
                                     size="sm"
                                     className="gap-2"
                                     title={
-                                        !journal.oai_pmh_url
+                                        !journal.oai_urls || journal.oai_urls.length === 0
                                             ? 'Tambahkan OAI-PMH URL di form edit jurnal terlebih dahulu'
                                             : 'Sync artikel dari OAI-PMH endpoint'
                                     }
@@ -481,7 +515,7 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button
-                                            disabled={forceSyncing || !journal.oai_pmh_url}
+                                            disabled={forceSyncing || !journal.oai_urls || journal.oai_urls.length === 0}
                                             size="sm"
                                             variant="outline"
                                             className="gap-2 border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
@@ -497,9 +531,10 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                                             <AlertDialogDescription>
                                                 Tindakan ini akan <strong>menghapus semua artikel yang sudah tersimpan</strong> untuk jurnal ini,
                                                 kemudian mengimport ulang seluruh data dari OAI-PMH endpoint dari awal.
-                                                <br /><br />
-                                                Gunakan opsi ini jika terdapat <strong>data duplikat</strong> atau artikel tidak ter-update dengan benar setelah sync biasa.
-                                                Proses tidak dapat dibatalkan.
+                                                <br />
+                                                <br />
+                                                Gunakan opsi ini jika terdapat <strong>data duplikat</strong> atau artikel tidak ter-update dengan
+                                                benar setelah sync biasa. Proses tidak dapat dibatalkan.
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
@@ -516,22 +551,28 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                             </div>
                         </div>
 
-                        <div className="p-6">
-                            {/* OAI-PMH URL */}
-                            {journal.oai_pmh_url ? (
+                        <CardContent className="p-6">
+                            {/* OAI-PMH URLs */}
+                            {journal.oai_urls && journal.oai_urls.length > 0 ? (
                                 <div className="mb-4 flex items-start gap-2 rounded-md bg-muted/50 p-3 text-sm">
                                     <Globe className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                                     <div>
-                                        <span className="text-muted-foreground">OAI-PMH Endpoint: </span>
-                                        <a
-                                            href={journal.oai_pmh_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="font-mono break-all text-blue-600 hover:underline dark:text-blue-400"
-                                        >
-                                            {journal.oai_pmh_url}
-                                            <ExternalLink className="ml-1 inline h-3 w-3" />
-                                        </a>
+                                        <span className="text-muted-foreground">OAI-PMH Endpoints: </span>
+                                        <ul className="mt-1 flex flex-col gap-1">
+                                            {journal.oai_urls.map((oai, idx) => (
+                                                <li key={idx}>
+                                                    <a
+                                                        href={oai}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="font-mono break-all text-blue-600 hover:underline dark:text-blue-400"
+                                                    >
+                                                        {oai}
+                                                        <ExternalLink className="ml-1 inline h-3 w-3" />
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
                                 </div>
                             ) : (
@@ -611,67 +652,208 @@ export default function JournalShow({ journal, articlesCount, lastHarvestLog, is
                                     Belum pernah di-harvest. Klik <strong>Sync Artikel</strong> untuk memulai.
                                 </p>
                             )}
-                        </div>
-                    </div>
+
+                            {/* Articles Table */}
+                            {articles && articles.data.length > 0 ? (
+                                <div className="mt-8 space-y-4">
+                                    <h4 className="text-md font-semibold text-foreground">Daftar Artikel (Total: {articles.total})</h4>
+                                    <div className="overflow-x-auto rounded-md border border-sidebar-border/70 dark:border-sidebar-border">
+                                        <table className="w-full text-left text-sm text-muted-foreground">
+                                            <thead className="bg-muted/50 text-xs text-foreground uppercase">
+                                                <tr>
+                                                    <th className="px-4 py-3 font-medium">Judul</th>
+                                                    <th className="px-4 py-3 font-medium">Penulis</th>
+                                                    <th className="cursor-pointer px-4 py-3 font-medium">Tanggal Publish</th>
+                                                    <th className="px-4 py-3 text-right font-medium">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {articles.data.map((article) => (
+                                                    <tr
+                                                        key={article.id}
+                                                        className="border-b border-sidebar-border/70 last:border-0 hover:bg-muted/30 dark:border-sidebar-border"
+                                                    >
+                                                        <td className="px-4 py-3">
+                                                            <p className="line-clamp-2 font-medium text-foreground" title={article.title}>
+                                                                {article.title}
+                                                            </p>
+                                                            {article.doi && (
+                                                                <a
+                                                                    href={`https://doi.org/${article.doi}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline dark:text-blue-400"
+                                                                >
+                                                                    DOI: {article.doi}
+                                                                </a>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-4 py-3">
+                                                            <p
+                                                                className="line-clamp-2 text-sm"
+                                                                title={Array.isArray(article.authors) ? article.authors.join(', ') : article.authors}
+                                                            >
+                                                                {Array.isArray(article.authors) ? article.authors.join(', ') : article.authors}
+                                                            </p>
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm whitespace-nowrap">{article.publication_date || '-'}</td>
+                                                        <td className="px-4 py-3 text-right">
+                                                            {article.url && (
+                                                                <a
+                                                                    href={article.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                                                                    title="Buka Artikel"
+                                                                >
+                                                                    Buka <ExternalLink className="h-3 w-3" />
+                                                                </a>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Pagination */}
+                                    {articles.last_page > 1 && (
+                                        <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                                            <div className="text-sm text-muted-foreground">
+                                                Showing <span className="font-medium">{articles.from || 0}</span> to{' '}
+                                                <span className="font-medium">{articles.to || 0}</span> of{' '}
+                                                <span className="font-medium">{articles.total}</span> results
+                                            </div>
+                                            <div className="flex flex-wrap items-center justify-center gap-2">
+                                                {articles.links.map((link, index) => {
+                                                    const isPrev = link.label.includes('Previous');
+                                                    const isNext = link.label.includes('Next');
+
+                                                    if (isPrev) {
+                                                        return (
+                                                            <Button
+                                                                key={index}
+                                                                variant="outline"
+                                                                size="sm"
+                                                                disabled={!link.url}
+                                                                onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
+                                                            >
+                                                                &laquo; Previous
+                                                            </Button>
+                                                        );
+                                                    }
+                                                    if (isNext) {
+                                                        return (
+                                                            <Button
+                                                                key={index}
+                                                                variant="outline"
+                                                                size="sm"
+                                                                disabled={!link.url}
+                                                                onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
+                                                            >
+                                                                Next &raquo;
+                                                            </Button>
+                                                        );
+                                                    }
+
+                                                    // Only show max 5 page numbers (simplify logic if needed, but standard Inertia gives 1..n + ...)
+                                                    if (link.label === '...') {
+                                                        return (
+                                                            <span key={index} className="px-2 text-muted-foreground">
+                                                                ...
+                                                            </span>
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <Button
+                                                            key={index}
+                                                            variant={link.active ? 'default' : 'outline'}
+                                                            size="sm"
+                                                            className={link.active ? 'pointer-events-none' : ''}
+                                                            onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
+                                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="mt-8 rounded-md border border-dashed border-sidebar-border/70 bg-muted/20 p-8 text-center dark:border-sidebar-border">
+                                    <BookOpen className="mx-auto mb-3 h-8 w-8 text-muted-foreground/50" />
+                                    <h4 className="text-md font-medium text-foreground">Belum ada artikel</h4>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        Klik tombol "Sync Artikel" di atas untuk memulai mengambil data artikel dari OAI-PMH endpoint.
+                                    </p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
 
                     {/* Assessments Table - Hidden for launch */}
-                    {/* <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-card shadow-sm dark:border-sidebar-border">
-                        <div className="border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
-                            <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                    {/* <Card className="overflow-hidden border-sidebar-border/70 shadow-sm dark:border-sidebar-border">
+                        <CardHeader className="border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
+                            <CardTitle className="flex items-center gap-2 text-lg">
                                 <TrendingUp className="h-5 w-5" />
                                 Assessment History
-                            </h3>
-                        </div>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Period</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Score</TableHead>
-                                    <TableHead>Grade</TableHead>
-                                    <TableHead>Assessor</TableHead>
-                                    <TableHead>Submitted</TableHead>
-                                    <TableHead className="text-center">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {journal.assessments.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
-                                            No assessments available yet.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    journal.assessments.map((assessment) => (
-                                        <TableRow key={assessment.id}>
-                                            <TableCell>{assessment.assessment_date}</TableCell>
-                                            <TableCell>{assessment.period || '-'}</TableCell>
-                                            <TableCell>{getStatusBadge(assessment)}</TableCell>
-                                            <TableCell>
-                                                {Number(assessment.total_score).toFixed(1)} / {Number(assessment.max_score).toFixed(1)}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-semibold">{Number(assessment.percentage).toFixed(1)}%</span>
-                                                    {getGradeBadge(Number(assessment.percentage))}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>{assessment.user.name}</TableCell>
-                                            <TableCell>{assessment.submitted_at || '-'}</TableCell>
-                                            <TableCell className="text-center">
-                                                <Link href={route('user.assessments.show', assessment.id)}>
-                                                    <Button variant="ghost" size="sm" title="View Details">
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                            </TableCell>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Period</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Score</TableHead>
+                                            <TableHead>Grade</TableHead>
+                                            <TableHead>Assessor</TableHead>
+                                            <TableHead>Submitted</TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div> */}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {journal.assessments.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                                                    No assessments available yet.
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            journal.assessments.map((assessment) => (
+                                                <TableRow key={assessment.id}>
+                                                    <TableCell>{assessment.assessment_date}</TableCell>
+                                                    <TableCell>{assessment.period || '-'}</TableCell>
+                                                    <TableCell>{getStatusBadge(assessment)}</TableCell>
+                                                    <TableCell>
+                                                        {Number(assessment.total_score).toFixed(1)} / {Number(assessment.max_score).toFixed(1)}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-semibold">{Number(assessment.percentage).toFixed(1)}%</span>
+                                                            {getGradeBadge(Number(assessment.percentage))}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>{assessment.user.name}</TableCell>
+                                                    <TableCell>{assessment.submitted_at || '-'}</TableCell>
+                                                    <TableCell className="text-center">
+                                                        <Link href={route('user.assessments.show', assessment.id)}>
+                                                            <Button variant="ghost" size="sm" title="View Details">
+                                                                <Eye className="h-4 w-4" />
+                                                            </Button>
+                                                        </Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card> */}
                 </div>
             </div>
         </AppLayout>
