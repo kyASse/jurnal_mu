@@ -102,8 +102,8 @@ export default function Create() {
                                 {errors.attachment && <div className="text-sm text-red-500">{errors.attachment}</div>}
                             </div>
 
-                            <div className="flex justify-end gap-4">
-                                <Button type="submit" disabled={processing}>
+                            <div className="flex flex-col sm:flex-row justify-end gap-4">
+                                <Button type="submit" disabled={processing} className="w-full sm:w-auto">
                                     Submit Ticket
                                 </Button>
                             </div>

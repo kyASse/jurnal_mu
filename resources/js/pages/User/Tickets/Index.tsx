@@ -13,11 +13,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ tickets }: any) {
-    const getStatusVariant = (status: string) => {
+    const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
         switch (status) {
             case 'open': return 'destructive';
-            case 'in_progress': return 'warning';
-            case 'resolved': return 'success';
+            case 'in_progress': return 'default';
+            case 'resolved': return 'outline';
             case 'closed': return 'secondary';
             default: return 'default';
         }
@@ -28,12 +28,12 @@ export default function Index({ tickets }: any) {
             <Head title="Support Tickets" />
 
             <div className="flex flex-col gap-6 p-4 lg:p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">Support Tickets</h1>
                         <p className="text-muted-foreground mt-1">Manage and track your support requests and bug reports.</p>
                     </div>
-                    <Button onClick={() => router.visit(route('user.tickets.create'))}>
+                    <Button className="w-full sm:w-auto" onClick={() => router.visit(route('user.tickets.create'))}>
                         <PlusCircle className="w-4 h-4 mr-2" />
                         Create Ticket
                     </Button>
@@ -51,38 +51,67 @@ export default function Index({ tickets }: any) {
                                 <p className="text-sm text-muted-foreground mt-1">You haven't created any support tickets yet.</p>
                             </div>
                         ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Ticket ID</TableHead>
-                                        <TableHead>Subject</TableHead>
-                                        <TableHead>Category</TableHead>
-                                        <TableHead>Priority</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
+                            <>
+                                {/* Desktop Table View */}
+                                <div className="hidden md:block overflow-x-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Ticket ID</TableHead>
+                                                <TableHead>Subject</TableHead>
+                                                <TableHead>Category</TableHead>
+                                                <TableHead>Priority</TableHead>
+                                                <TableHead>Status</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {tickets.data.map((ticket: any) => (
+                                                <TableRow key={ticket.id}>
+                                                    <TableCell className="font-medium">#{ticket.id}</TableCell>
+                                                    <TableCell>{ticket.subject}</TableCell>
+                                                    <TableCell className="capitalize">{ticket.category.replace('_', ' ')}</TableCell>
+                                                    <TableCell className="capitalize">{ticket.priority}</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={getStatusVariant(ticket.status)}>
+                                                            {ticket.status.replace('_', ' ')}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Button variant="ghost" size="sm" onClick={() => router.visit(route('user.tickets.show', ticket.id))}>
+                                                            <Eye className="w-4 h-4 mr-2" /> View
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                                
+                                {/* Mobile Card View */}
+                                <div className="grid grid-cols-1 gap-4 md:hidden">
                                     {tickets.data.map((ticket: any) => (
-                                        <TableRow key={ticket.id}>
-                                            <TableCell className="font-medium">#{ticket.id}</TableCell>
-                                            <TableCell>{ticket.subject}</TableCell>
-                                            <TableCell className="capitalize">{ticket.category.replace('_', ' ')}</TableCell>
-                                            <TableCell className="capitalize">{ticket.priority}</TableCell>
-                                            <TableCell>
+                                        <div key={ticket.id} className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+                                            <div className="flex justify-between items-start gap-2">
+                                                <div>
+                                                    <span className="text-xs font-semibold text-muted-foreground block mb-1">#{ticket.id}</span>
+                                                    <h4 className="font-medium line-clamp-2 text-sm">{ticket.subject}</h4>
+                                                </div>
                                                 <Badge variant={getStatusVariant(ticket.status)}>
                                                     {ticket.status.replace('_', ' ')}
                                                 </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Button variant="ghost" size="sm" onClick={() => router.visit(route('user.tickets.show', ticket.id))}>
-                                                    <Eye className="w-4 h-4 mr-2" /> View
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 text-xs mt-1">
+                                                <Badge variant="secondary" className="capitalize">{ticket.category.replace('_', ' ')}</Badge>
+                                                <Badge variant="default" className="capitalize">{ticket.priority} Priority</Badge>
+                                            </div>
+                                            <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => router.visit(route('user.tickets.show', ticket.id))}>
+                                                <Eye className="w-4 h-4 mr-2" /> View Details
+                                            </Button>
+                                        </div>
                                     ))}
-                                </TableBody>
-                            </Table>
+                                </div>
+                            </>
                         )}
                         {/* Pagination links here if necessary */}
                     </CardContent>

@@ -16,11 +16,11 @@ export default function Show({ ticket }: any) {
         { title: `Ticket #${ticket.id}`, href: route('user.tickets.show', ticket.id) },
     ];
 
-    const getStatusVariant = (status: string) => {
+    const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
         switch (status) {
             case 'open': return 'destructive';
-            case 'in_progress': return 'warning';
-            case 'resolved': return 'success';
+            case 'in_progress': return 'default';
+            case 'resolved': return 'outline';
             case 'closed': return 'secondary';
             default: return 'default';
         }
@@ -52,7 +52,7 @@ export default function Show({ ticket }: any) {
                     </Button>
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">#{ticket.id} {ticket.subject}</h1>
-                        <div className="flex gap-2 items-center text-sm text-muted-foreground mt-1">
+                        <div className="flex flex-wrap gap-2 items-center text-sm text-muted-foreground mt-1">
                             <span className="capitalize">Category: {ticket.category.replace('_', ' ')}</span>
                             <span>&bull;</span>
                             <span className="capitalize">Priority: {ticket.priority}</span>
@@ -64,7 +64,7 @@ export default function Show({ ticket }: any) {
                     </div>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 flex flex-col gap-4">
                         <Card className="h-full flex flex-col flex-1">
                             <CardHeader className="border-b px-4 py-3">
@@ -116,7 +116,7 @@ export default function Show({ ticket }: any) {
                                             />
                                             {errors.message && <div className="text-xs text-red-500">{errors.message}</div>}
                                             
-                                            <div className="flex items-center justify-between">
+                                            <div className="flex flex-wrap items-center justify-between gap-3">
                                                 <div className="flex items-center gap-2">
                                                     <Button 
                                                         type="button" 
@@ -135,7 +135,7 @@ export default function Show({ ticket }: any) {
                                                         onChange={e => setData('attachment', e.target.files ? e.target.files[0] : null)} 
                                                     />
                                                 </div>
-                                                <Button type="submit" disabled={processing || !data.message.trim()}>
+                                                <Button className="w-full sm:w-auto" type="submit" disabled={processing || !data.message.trim()}>
                                                     <Send className="w-4 h-4 mr-2" /> Send Reply
                                                 </Button>
                                             </div>
