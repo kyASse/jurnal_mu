@@ -24,8 +24,8 @@ class StoreJournalRequest extends FormRequest
         return [
             // Basic Info
             'title' => 'required|string|max:255',
-            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{4}$/',
-            'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{4}$/',
+            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i',
+            'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i',
             'url' => 'required|url|max:500',
 
             // Publication Details
@@ -61,7 +61,8 @@ class StoreJournalRequest extends FormRequest
             'phone' => 'nullable|string|max:50',
 
             // Additional Info
-            'oai_pmh_url' => 'required|url|max:500',
+            'oai_urls' => 'required|array',
+            'oai_urls.*' => 'url|max:500',
             'about' => 'nullable|string|max:1000',
             'scope' => 'nullable|string|max:2500',
 
@@ -81,14 +82,14 @@ class StoreJournalRequest extends FormRequest
             'url.url' => 'Format URL tidak valid.',
             'scientific_field_id.required' => 'Bidang ilmu wajib dipilih.',
             'scientific_field_id.exists' => 'Bidang ilmu tidak valid.',
-            'issn.regex' => 'Format ISSN harus xxxx-xxxx.',
+            'issn.regex' => 'Format ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
             'e_issn.required' => 'E-ISSN wajib diisi.',
-            'e_issn.regex' => 'Format E-ISSN harus xxxx-xxxx.',
+            'e_issn.regex' => 'Format E-ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
             'sinta_rank.required' => 'Peringkat akreditasi wajib dipilih.',
             'sinta_rank.in' => 'Peringkat akreditasi tidak valid.',
             'accreditation_end_year.gte' => 'Tahun akhir akreditasi harus setelah tahun mulai.',
-            'oai_pmh_url.required' => 'URL OAI-PMH wajib diisi.',
-            'oai_pmh_url.url' => 'Format URL OAI-PMH tidak valid.',
+            'oai_urls.array' => 'Format OAI-PMH wajib di isi dan URLs harus berupa array.',
+            'oai_urls.*.url' => 'Format URL OAI-PMH tidak valid.',
             'indexations.*.url.url' => 'Format URL indeksasi tidak valid.',
             'cover_image.image' => 'File cover harus berupa gambar.',
             'cover_image.mimes' => 'Format cover harus JPEG, PNG, JPG, atau WebP.',
@@ -104,8 +105,8 @@ class StoreJournalRequest extends FormRequest
     {
         $mergeData = [];
 
-        // Transform indexations from frontend format to database format        
-        if ($this->has('indexations') && is_array($this->indexations)) {        
+        // Transform indexations from frontend format to database format
+        if ($this->has('indexations') && is_array($this->indexations)) {
             $transformed = [];
             foreach ($this->indexations as $item) {
                 if (isset($item['platform'])) {
@@ -134,7 +135,7 @@ class StoreJournalRequest extends FormRequest
             }
         }
 
-        if (!empty($mergeData)) {
+        if (! empty($mergeData)) {
             $this->merge($mergeData);
         }
     }

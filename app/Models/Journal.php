@@ -23,7 +23,7 @@ class Journal extends Model
         'issn',
         'e_issn',
         'url',
-        'oai_pmh_url',
+        'oai_urls',
         'publisher',
         'frequency',
         'first_published_year',
@@ -60,6 +60,7 @@ class Journal extends Model
         'accreditation_end_year' => 'integer',
         'accreditation_sk_date' => 'date',
         'approved_at' => 'datetime',
+        'oai_urls' => 'array',
         'indexations' => 'array',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
@@ -339,7 +340,7 @@ class Journal extends Model
 
         return $query->whereNotNull('indexations')
             ->where(function ($q) use ($platform) {
-                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
+                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.\"$platform\"')");
             });
     }
 
@@ -623,12 +624,19 @@ class Journal extends Model
             'monthly' => 'Bulanan',
             'bi-monthly' => 'Dua Bulanan',
             'quarterly' => 'Triwulanan',
+            '4-monthly' => '4 Bulanan (3 Kali Terbit Per Tahun)',
             'semi-annual' => 'Semi-Tahunan',
             'annual' => 'Tahunan',
             'other' => 'Lainnya',
         ];
 
-        return $frequencies[$this->frequency] ?? $this->frequency ?? 'Tidak Diketahui';
+        $frequency = $this->frequency;
+
+        if ($frequency === null) {
+            return 'Tidak Diketahui';
+        }
+
+        return $frequencies[strtolower($frequency)] ?? $frequency;
     }
 
     /*

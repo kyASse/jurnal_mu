@@ -11,7 +11,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { type Article, type Journal, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BadgeCheck, BookOpen, Calendar, ChevronRight, Download, FileText, Globe, Info, Mail, MapPin, Search, Target, User } from 'lucide-react';
+import {
+    BadgeCheck,
+    BookOpen,
+    Calendar,
+    ChevronDown,
+    ChevronRight,
+    Download,
+    FileText,
+    Globe,
+    Info,
+    Mail,
+    MapPin,
+    Search,
+    Target,
+    User,
+} from 'lucide-react';
 import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 
@@ -41,6 +56,7 @@ export default function JournalsShow() {
     const [yearTo, setYearTo] = useState<string>(queries.year_end || '');
     const [showAbout, setShowAbout] = useState(false);
     const [showScope, setShowScope] = useState(false);
+    const [isOaiExpanded, setIsOaiExpanded] = useState(false);
 
     // Dynamic year range from article data
     const minYear =
@@ -132,27 +148,30 @@ export default function JournalsShow() {
                                 Journal MU
                             </span>
                         </Link>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <Link href={route('journals.index')}>
-                                <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white">
-                                    All Journals
+                                <Button variant="ghost" className="px-2 text-white hover:bg-white/20 hover:text-white sm:px-4">
+                                    <span className="hidden sm:inline">All Journals</span>
+                                    <span className="sm:hidden">Journals</span>
                                 </Button>
                             </Link>
                             {auth?.user ? (
                                 <Link href={route('dashboard')}>
-                                    <Button variant="secondary" className="border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100">
+                                    <Button variant="secondary" className="border-0 bg-white px-3 font-bold text-[#079C4E] hover:bg-gray-100 sm:px-4">
                                         Dashboard
                                     </Button>
                                 </Link>
                             ) : (
                                 <>
                                     <Link href={route('login')}>
-                                        <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white">
+                                        <Button variant="ghost" className="px-2 text-white hover:bg-white/20 hover:text-white sm:px-4">
                                             Log in
                                         </Button>
                                     </Link>
                                     <Link href={route('register')}>
-                                        <Button className="border-0 bg-[#FCEE1F] font-bold text-black hover:bg-[#e3d51b]">Register</Button>
+                                        <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">
+                                            Register
+                                        </Button>
                                     </Link>
                                 </>
                             )}
@@ -176,123 +195,9 @@ export default function JournalsShow() {
                 </div>
 
                 {/* MAIN CONTENT GRID (Garuda Layout: Left Sidebar - Main - Right Sidebar) */}
-                <main className="mx-auto grid max-w-7xl gap-6 px-4 pb-16 sm:px-6 lg:grid-cols-12 lg:px-8">
-                    {/* LEFT SIDEBAR (Journal Info & Menu) - 3 Columns */}
-                    <aside className="space-y-6 lg:col-span-3">
-                        {/* Cover Image */}
-                        <div className="overflow-hidden rounded-xl border bg-card shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
-                            <div className="aspect-[3/4] w-full bg-muted dark:bg-muted">
-                                {journal.cover_image || journal.cover_image_url ? (
-                                    <img
-                                        src={journal.cover_image ?? journal.cover_image_url}
-                                        alt={journal.title}
-                                        className="h-full w-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-full items-center justify-center">
-                                        <BookOpen className="h-16 w-16 text-gray-300" />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Article Per Year Chart */}
-                        <div className="rounded-xl border bg-card p-4 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
-                            <h3 className="mb-3 text-xs font-bold tracking-wide text-muted-foreground uppercase">Article Per Year (5 Year)</h3>
-                            {articlesByYear.length > 0 ? (
-                                <div className="h-40 w-full">
-                                    <Chart options={chartOptions} series={chartSeries} type="bar" height="100%" />
-                                </div>
-                            ) : (
-                                <div className="flex h-40 flex-col items-center justify-center gap-2 text-muted-foreground">
-                                    <FileText className="h-8 w-8 opacity-30" />
-                                    <span className="text-xs">No article data yet</span>
-                                </div>
-                            )}
-                            <div className="mt-2 text-center text-xs text-gray-400">Total: {journal.articles_count} Articles</div>
-                        </div>
-
-                        {/* Menu Links */}
-                        <div className="overflow-hidden rounded-xl border bg-card shadow-md dark:border-border dark:bg-card">
-                            <div className="p-0">
-                                <Link
-                                    href={route('journals.show', journal.id)}
-                                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm font-medium text-primary transition-colors hover:bg-muted dark:border-border dark:hover:bg-muted"
-                                >
-                                    <ChevronRight className="h-4 w-4" /> Home Page
-                                </Link>
-                                {journal.oai_pmh_url && (
-                                    <a
-                                        href={journal.oai_pmh_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
-                                    >
-                                        <ChevronRight className="h-4 w-4" /> OAI Link
-                                    </a>
-                                )}
-                                <a
-                                    href={journal.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
-                                >
-                                    <ChevronRight className="h-4 w-4" /> Editorial Team
-                                </a>
-                                <a
-                                    href={`mailto:${journal.email}`}
-                                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
-                                >
-                                    <ChevronRight className="h-4 w-4" /> Contact
-                                </a>
-                                <a
-                                    href={`https://scholar.google.com/citations?view_op=search_authors&mauthors=${encodeURIComponent(journal.title)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:hover:bg-muted"
-                                >
-                                    <ChevronRight className="h-4 w-4" /> Google Scholar
-                                </a>
-                            </div>
-                        </div>
-
-                        {/* Contact Info Card */}
-                        <div className="rounded-xl border bg-card p-5 shadow-md dark:border-border dark:bg-card">
-                            <div className="mb-4 flex items-center gap-3">
-                                <div className="rounded-full bg-primary/10 p-2 text-primary dark:bg-primary/20">
-                                    <User className="h-5 w-5" />
-                                </div>
-                                <div className="text-sm font-bold text-foreground">Contact Person</div>
-                            </div>
-                            <div className="space-y-3 text-xs text-muted-foreground">
-                                {journal.editor_in_chief && (
-                                    <div className="flex gap-2">
-                                        <User className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
-                                        <span>{journal.editor_in_chief}</span>
-                                    </div>
-                                )}
-                                {journal.email && (
-                                    <div className="flex gap-2">
-                                        <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
-                                        <span className="break-all">{journal.email}</span>
-                                    </div>
-                                )}
-                                {/* Using university address as fallback */}
-                                {(journal.university.address || journal.university.city) && (
-                                    <div className="flex gap-2">
-                                        <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
-                                        <span>
-                                            {journal.university.address}
-                                            {journal.university.city ? `, ${journal.university.city}` : ''}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </aside>
-
-                    {/* CENTER CONTENT (Header & Articles) - 6 Columns */}
-                    <div className="lg:col-span-6">
+                <main className="mx-auto flex flex-col gap-6 px-4 pb-16 sm:px-6 lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:px-8">
+                    {/* 1) MOBILE ORDER 1: Journal Header & Metadata */}
+                    <div className="order-1 space-y-6 lg:order-none lg:col-span-6 lg:col-start-4 lg:row-start-1">
                         {/* Journal Header */}
                         <div className="mb-6 rounded-xl border bg-card p-6 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
                             <h1 className="font-heading mb-3 text-2xl leading-tight font-bold text-foreground">{journal.title}</h1>
@@ -385,7 +290,7 @@ export default function JournalsShow() {
                                 </div>
                             )}
                             {journal.accreditation_sk_number && (
-                                <div className="col-span-2 rounded-xl border bg-card p-4 shadow-sm sm:col-span-1 dark:border-border dark:bg-card">
+                                <div className="rounded-xl border bg-card p-4 shadow-sm sm:col-span-1 dark:border-border dark:bg-card">
                                     <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                                         <FileText className="h-3.5 w-3.5" />
                                         SK Number
@@ -452,7 +357,157 @@ export default function JournalsShow() {
                                 )}
                             </div>
                         )}
+                    </div>
 
+                    {/* LEFT SIDEBAR (Journal Info & Menu) - 3 Columns */}
+                    {/* 2) MOBILE ORDER 2: Left Sidebar (Journal Info & Menu) - 3 Columns */}
+                    <aside className="order-2 space-y-6 lg:order-none lg:col-span-3 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+                        {/* Cover Image */}
+                        <div className="overflow-hidden rounded-xl border bg-card shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
+                            <div className="aspect-[3/4] w-full bg-muted dark:bg-muted">
+                                {journal.cover_image || journal.cover_image_url ? (
+                                    <img
+                                        src={journal.cover_image ?? journal.cover_image_url}
+                                        alt={journal.title}
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center">
+                                        <BookOpen className="h-16 w-16 text-gray-300" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Article Per Year Chart */}
+                        <div className="rounded-xl border bg-card p-4 shadow-md transition-shadow hover:shadow-lg dark:border-border dark:bg-card">
+                            <h3 className="mb-3 text-xs font-bold tracking-wide text-muted-foreground uppercase">Article Per Year (5 Year)</h3>
+                            {articlesByYear.length > 0 ? (
+                                <div className="h-40 w-full">
+                                    <Chart options={chartOptions} series={chartSeries} type="bar" height="100%" />
+                                </div>
+                            ) : (
+                                <div className="flex h-40 flex-col items-center justify-center gap-2 text-muted-foreground">
+                                    <FileText className="h-8 w-8 opacity-30" />
+                                    <span className="text-xs">No article data yet</span>
+                                </div>
+                            )}
+                            <div className="mt-2 text-center text-xs text-gray-400">Total: {journal.articles_count} Articles</div>
+                        </div>
+
+                        {/* Menu Links */}
+                        <div className="overflow-hidden rounded-xl border bg-card shadow-md dark:border-border dark:bg-card">
+                            <div className="p-0">
+                                <Link
+                                    href={route('journals.show', journal.id)}
+                                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm font-medium text-primary transition-colors hover:bg-muted dark:border-border dark:hover:bg-muted"
+                                >
+                                    <ChevronRight className="h-4 w-4" /> Home Page
+                                </Link>
+
+                                {/* OAI URLs Accordion */}
+                                {journal.oai_urls && journal.oai_urls.length > 0 && (
+                                    <div className="border-b border-border dark:border-border">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsOaiExpanded(!isOaiExpanded)}
+                                            className={`flex w-full items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted dark:hover:bg-muted ${isOaiExpanded ? 'font-medium text-primary' : 'text-muted-foreground hover:text-primary'}`}
+                                        >
+                                            <div className="flex h-4 w-4 items-center justify-center transition-transform duration-200">
+                                                {isOaiExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                            </div>
+                                            <span>OAI-PMH {journal.oai_urls.length > 1 ? 'Links' : 'Link'}</span>
+                                        </button>
+
+                                        {/* Dropdown Items */}
+                                        <div
+                                            className={`grid transition-all duration-300 ease-in-out ${isOaiExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                                        >
+                                            <div className="overflow-hidden">
+                                                <div className="flex flex-col bg-muted/30 pt-1 pb-2 dark:bg-muted/10">
+                                                    {journal.oai_urls.map((oai, idx) => (
+                                                        <a
+                                                            key={idx}
+                                                            href={oai}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-3 py-2 pr-4 pl-11 text-sm text-muted-foreground transition-colors hover:text-primary"
+                                                        >
+                                                            <Globe className="h-3.5 w-3.5 shrink-0" />
+                                                            <span className="truncate">
+                                                                {journal.oai_urls!.length > 1 ? `OAI Link ${idx + 1}` : 'OAI-PMH Endpoint'}
+                                                            </span>
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <a
+                                    href={journal.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
+                                >
+                                    <ChevronRight className="h-4 w-4" /> Editorial Team
+                                </a>
+                                <a
+                                    href={`mailto:${journal.email}`}
+                                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
+                                >
+                                    <ChevronRight className="h-4 w-4" /> Contact
+                                </a>
+                                <a
+                                    href={`https://scholar.google.com/citations?view_op=search_authors&mauthors=${encodeURIComponent(journal.title)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:hover:bg-muted"
+                                >
+                                    <ChevronRight className="h-4 w-4" /> Google Scholar
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Contact Info Card */}
+                        <div className="rounded-xl border bg-card p-5 shadow-md dark:border-border dark:bg-card">
+                            <div className="mb-4 flex items-center gap-3">
+                                <div className="rounded-full bg-primary/10 p-2 text-primary dark:bg-primary/20">
+                                    <User className="h-5 w-5" />
+                                </div>
+                                <div className="text-sm font-bold text-foreground">Contact Person</div>
+                            </div>
+                            <div className="space-y-3 text-xs text-muted-foreground">
+                                {journal.editor_in_chief && (
+                                    <div className="flex gap-2">
+                                        <User className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                                        <span>{journal.editor_in_chief}</span>
+                                    </div>
+                                )}
+                                {journal.email && (
+                                    <div className="flex gap-2">
+                                        <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                                        <span className="break-all">{journal.email}</span>
+                                    </div>
+                                )}
+                                {/* Using university address as fallback */}
+                                {(journal.university.address || journal.university.city) && (
+                                    <div className="flex gap-2">
+                                        <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                                        <span>
+                                            {journal.university.address}
+                                            {journal.university.city ? `, ${journal.university.city}` : ''}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* CENTER CONTENT (Header & Articles) - 6 Columns */}
+                    {/* 4) MOBILE ORDER 4: Articles List */}
+                    <div className="order-4 lg:order-none lg:col-span-6 lg:col-start-4 lg:row-start-2">
                         {/* Search Bar */}
                         <div className="mb-6 flex gap-2">
                             <form onSubmit={handleSearch} className="flex flex-1 gap-2">
@@ -613,7 +668,7 @@ export default function JournalsShow() {
                                 </div>
                             )}
                             {articles.last_page > 1 && (
-                                <div className="mt-8 flex justify-center gap-1">
+                                <div className="mt-8 flex flex-wrap justify-center gap-1">
                                     {articles.links.map((link, i) => {
                                         const isNavButton = link.label.includes('Previous') || link.label.includes('Next');
                                         const buttonClass = isNavButton ? 'px-3 py-2' : 'h-9 w-9';
@@ -643,7 +698,8 @@ export default function JournalsShow() {
                     </div>
 
                     {/* RIGHT SIDEBAR (Filters) - 3 Columns */}
-                    <aside className="space-y-6 lg:col-span-3">
+                    {/* 3) MOBILE ORDER 3: Filters (Right Sidebar) */}
+                    <aside className="order-3 space-y-6 lg:order-none lg:col-span-3 lg:col-start-10 lg:row-span-2 lg:row-start-1">
                         {/* Filter By Year */}
                         <div className="rounded-xl border bg-card shadow-md dark:border-border dark:bg-card">
                             <div className="border-b border-border bg-muted px-4 py-3 text-sm font-semibold text-foreground dark:border-border dark:bg-muted">
