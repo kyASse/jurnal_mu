@@ -1,8 +1,9 @@
+import logoUrl from '@/assets/logo_dark.png';
 import JournalCard from '@/components/journal-card';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, LayoutDashboard, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, GraduationCap, LayoutDashboard, Library, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface WelcomeProps extends SharedData {
@@ -19,13 +20,17 @@ interface WelcomeProps extends SharedData {
         cover_image_url?: string;
         indexation_labels?: string[];
     }>;
-    sintaStats: Record<string, number>;
     totalUniversities: number;
     totalJournals: number;
+    totalArticles: number;
+    scientificFields?: Array<{
+        id: number;
+        name: string;
+    }>;
 }
 
 export default function Welcome() {
-    const { auth, featuredJournals, sintaStats } = usePage<WelcomeProps>().props;
+    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields } = usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = () => {
@@ -51,30 +56,32 @@ export default function Welcome() {
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center gap-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-                                <img src="logo_dark.png" alt="Majelis Diktilitbang" className="h-8 w-8 object-contain" />
+                                <img src={logoUrl} alt="Majelis Diktilitbang" className="h-8 w-8 object-contain" />
                             </div>
                             <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
                                 Journal MU
                             </span>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             {auth?.user ? (
                                 <Link href={route('dashboard')}>
                                     <Button variant="secondary" className="border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100">
                                         <LayoutDashboard className="mr-2 h-4 w-4" />
-                                        Dashboard
+                                        <span className="hidden sm:inline">Dashboard</span>
                                     </Button>
                                 </Link>
                             ) : (
                                 <>
                                     <Link href={route('login')}>
-                                        <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white">
+                                        <Button variant="ghost" className="px-2 text-white hover:bg-white/20 hover:text-white sm:px-4">
                                             Log in
                                         </Button>
                                     </Link>
                                     <Link href={route('register')}>
-                                        <Button className="border-0 bg-[#FCEE1F] font-bold text-black hover:bg-[#e3d51b]">Register</Button>
+                                        <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">
+                                            Register
+                                        </Button>
                                     </Link>
                                 </>
                             )}
@@ -135,30 +142,59 @@ export default function Welcome() {
                         </div>
                     </div>
 
-                    {/* STATS / ACCREDITATION CARDS - Temporarily hidden per meeting notes (Feb 11) */}
-                    {/* TODO: Re-enable after finalizing chart design */}
-                    {/*
-                    <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-                            {[1, 2, 3, 4, 5, 6].map((score) => (
-                                <Link
-                                    key={score}
-                                    href={route('journals.index', { sinta_rank: `sinta_${score}` })}
-                                    className="group cursor-pointer overflow-hidden rounded-xl border-b-4 bg-white p-4 shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl dark:bg-zinc-800"
-                                    style={{ borderColor: score <= 2 ? '#E11A1F' : score <= 4 ? '#FCEE1F' : '#1A2A75' }}
-                                >
-                                    <div className="mb-1 text-xs font-bold text-gray-400 uppercase">Accredited</div>
-                                    <div className="flex items-end justify-between">
-                                        <span className="text-2xl font-bold text-gray-900 dark:text-white">SINTA {score}</span>
-                                        <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 transition-colors group-hover:bg-[#079C4E] group-hover:text-white dark:bg-zinc-700 dark:text-gray-300">
-                                            {sintaStats[`sinta_${score}`] || 0} Journals
-                                        </span>
+                    <div className="relative z-20 mx-auto -mt-16 max-w-5xl px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+                            {/* Total Journals Stat Card */}
+                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-[#079C4E] bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
+                                <div className="absolute -top-4 -right-4 rounded-full bg-emerald-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-emerald-900/20"></div>
+                                <div className="relative flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">Total Journals</p>
+                                        <p className="mt-2 text-4xl font-black text-gray-900 dark:text-white">
+                                            {new Intl.NumberFormat('id-ID').format(totalJournals || 0)}
+                                        </p>
                                     </div>
-                                </Link>
-                            ))}
+                                    <div className="rounded-xl bg-emerald-100 p-4 text-[#079C4E] dark:bg-[#079C4E]/20">
+                                        <Library className="h-8 w-8" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Total Articles Stat Card */}
+                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-[#1A2A75] bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
+                                <div className="absolute -top-4 -right-4 rounded-full bg-blue-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-blue-900/20"></div>
+                                <div className="relative flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">Total Articles</p>
+                                        <p className="mt-2 text-4xl font-black text-gray-900 dark:text-white">
+                                            {new Intl.NumberFormat('id-ID').format(totalArticles || 0)}
+                                        </p>
+                                    </div>
+                                    <div className="rounded-xl bg-[#1A2A75]/10 p-4 text-[#1A2A75] dark:bg-[#1A2A75]/20 dark:text-blue-400">
+                                        <BookOpen className="h-8 w-8" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Total Universities Stat Card */}
+                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-[#FCEE1F] bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
+                                <div className="absolute -top-4 -right-4 rounded-full bg-yellow-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-yellow-900/20"></div>
+                                <div className="relative flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                            Total Universities
+                                        </p>
+                                        <p className="mt-2 text-4xl font-black text-gray-900 dark:text-white">
+                                            {new Intl.NumberFormat('id-ID').format(totalUniversities || 0)}
+                                        </p>
+                                    </div>
+                                    <div className="rounded-xl bg-[#FCEE1F]/20 p-4 text-yellow-700 dark:bg-[#FCEE1F]/10 dark:text-yellow-400">
+                                        <GraduationCap className="h-8 w-8" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    */}
                 </div>
 
                 {/* MAIN CONTENT AREA */}
@@ -192,6 +228,54 @@ export default function Welcome() {
                         ))}
                     </div>
 
+                    {/* JOURNALS BY SUBJECT SECTION */}
+                    {scientificFields && scientificFields.length > 0 && (
+                        <div className="relative left-1/2 mt-24 w-screen -translate-x-1/2 bg-[#1D5F82] px-4 py-20 text-white sm:px-6 lg:px-8 dark:bg-[#021A3B]">
+                            <div className="mx-auto max-w-7xl">
+                                <div className="grid gap-12 lg:grid-cols-[1fr_3fr]">
+                                    {/* Header / Title area */}
+                                    <div className="space-y-6">
+                                        <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
+                                            <LayoutDashboard className="h-8 w-8 text-[#FCEE1F]" />
+                                        </div>
+                                        <h2 className="font-heading text-3xl font-bold" style={{ fontFamily: '"El Messiri", serif' }}>
+                                            Journals by Subject
+                                        </h2>
+                                        <p className="text-blue-100">
+                                            Explore our extensive collection of journals categorized by scientific fields, showcasing the diverse
+                                            research output from Muhammadiyah Universities across Indonesia.
+                                        </p>
+                                        <Link href={route('journals.index')}>
+                                            <Button
+                                                variant="outline"
+                                                className="mt-4 rounded-full border-white/30 bg-transparent text-white hover:bg-white hover:text-[#06326E]"
+                                            >
+                                                View all journals
+                                                <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Button>
+                                        </Link>
+                                    </div>
+
+                                    {/* Subjects Grid */}
+                                    <div className="grid gap-x-8 gap-y-0 sm:grid-cols-2">
+                                        {scientificFields.map((field) => (
+                                            <Link
+                                                key={field.id}
+                                                href={route('journals.index', { scientific_field_id: field.id })}
+                                                className="group flex w-full items-center justify-between border-b border-white/10 py-5 transition-colors hover:border-white/40"
+                                            >
+                                                <span className="font-medium text-blue-50 transition-colors group-hover:text-white">
+                                                    {field.name}
+                                                </span>
+                                                <ArrowRight className="h-4 w-4 text-white/0 transition-all group-hover:-translate-x-1 group-hover:text-white/50" />
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* CTA Section */}
                     <div className="mt-24 overflow-hidden rounded-3xl bg-[#1A2A75] text-white shadow-2xl">
                         <div className="relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] px-6 py-16 text-center sm:px-12 lg:py-20">
@@ -206,11 +290,18 @@ export default function Welcome() {
                                     Join thousands of authors contributing to the advancement of science and technology through Muhammadiyah's network
                                     of accredited journals.
                                 </p>
-                                <div className="mt-8 flex justify-center gap-4">
-                                    <Button size="lg" className="bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b]">
+                                <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+                                    <Button
+                                        size="lg"
+                                        className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
+                                    >
                                         Submit Manuscript
                                     </Button>
-                                    <Button size="lg" variant="outline" className="border-white px-8 text-white hover:bg-white hover:text-[#1A2A75]">
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        className="w-full border-white px-8 text-white hover:bg-white hover:text-[#1A2A75] sm:w-auto"
+                                    >
                                         Author Guidelines
                                     </Button>
                                 </div>

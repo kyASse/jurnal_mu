@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Journal extends Model
 {
@@ -22,7 +23,7 @@ class Journal extends Model
         'issn',
         'e_issn',
         'url',
-        'oai_pmh_url',
+        'oai_urls',
         'publisher',
         'frequency',
         'first_published_year',
@@ -59,6 +60,7 @@ class Journal extends Model
         'accreditation_end_year' => 'integer',
         'accreditation_sk_date' => 'date',
         'approved_at' => 'datetime',
+        'oai_urls' => 'array',
         'indexations' => 'array',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
@@ -338,7 +340,7 @@ class Journal extends Model
 
         return $query->whereNotNull('indexations')
             ->where(function ($q) use ($platform) {
-                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.".$platform."')");
+                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.\"$platform\"')");
             });
     }
 
@@ -571,6 +573,35 @@ class Journal extends Model
     }
 
     /**
+     * Get the cover image URL, normalising legacy relative paths (/storage/...)
+     * to fully-qualified URLs using the configured APP_URL.
+     *
+     * This ensures cover images render correctly when the app is hosted
+     * under a subdirectory (e.g. http://localhost/jurnal_mu/).
+     */
+    public function getCoverImageAttribute(?string $value): ?string
+    {
+        if (! $value) {
+            return $value;
+        }
+
+        // Current format — relative path: journal-covers/cover_1_xxx.jpg
+        if (! str_starts_with($value, '/') && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://')) {
+            return Storage::disk('public')->url($value);
+        }
+
+        // Legacy stored path: /storage/journal-covers/...
+        if (str_starts_with($value, '/storage/')) {
+            $relativePath = ltrim(str_replace('/storage/', '', $value), '/');
+
+            return Storage::disk('public')->url($relativePath);
+        }
+
+        // Already a full URL (deprecated stored format or external cover_image_url)
+        return $value;
+    }
+
+    /**
      * Get indexation labels as array
      *
      * @return array<string>
@@ -593,12 +624,19 @@ class Journal extends Model
             'monthly' => 'Bulanan',
             'bi-monthly' => 'Dua Bulanan',
             'quarterly' => 'Triwulanan',
+            '4-monthly' => '4 Bulanan (3 Kali Terbit Per Tahun)',
             'semi-annual' => 'Semi-Tahunan',
             'annual' => 'Tahunan',
             'other' => 'Lainnya',
         ];
 
-        return $frequencies[$this->frequency] ?? $this->frequency ?? 'Tidak Diketahui';
+        $frequency = $this->frequency;
+
+        if ($frequency === null) {
+            return 'Tidak Diketahui';
+        }
+
+        return $frequencies[strtolower($frequency)] ?? $frequency;
     }
 
     /*

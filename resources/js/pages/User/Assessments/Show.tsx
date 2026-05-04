@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { AssessmentJournalMetadata } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Calendar, CheckCircle, Download, Edit, FileText, Send, TrendingUp, XCircle } from 'lucide-react';
 
 interface Journal {
@@ -86,14 +86,7 @@ interface Props {
     responsesByCategory: Record<string, Response[]>;
 }
 
-interface FlashProps {
-    error?: string;
-    success?: string;
-}
-
 export default function AssessmentShow({ assessment, responsesByCategory }: Props) {
-    const { flash } = usePage().props as { flash?: FlashProps };
-
     const handleSubmit = () => {
         if (confirm('Yakin ingin submit assessment? Assessment yang sudah disubmit tidak dapat diedit lagi.')) {
             router.post(route('user.assessments.submit', assessment.id));
@@ -213,9 +206,6 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                     </div>
                 </div>
 
-                {/* Flash Message */}
-                {flash?.success && <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-800">{flash.success}</div>}
-
                 {/* Reviewer Feedback */}
                 <ReviewerFeedback assessment={assessment as any} />
 
@@ -298,7 +288,7 @@ export default function AssessmentShow({ assessment, responsesByCategory }: Prop
                             <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                 {assessment.jumlah_editor !== null && (
                                     <div className="rounded-lg border p-4">
                                         <div className="mb-1 text-sm text-muted-foreground">Jumlah Editor</div>

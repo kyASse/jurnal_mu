@@ -7,10 +7,13 @@ use App\Http\Requests\ImportJournalRequest;
 use App\Http\Requests\StoreJournalRequest;
 use App\Http\Requests\UpdateJournalRequest;
 use App\Imports\JournalsImport;
+use App\Jobs\HarvestJournalArticlesJob;
 use App\Models\Journal;
 use App\Models\Role;
 use App\Models\ScientificField;
 use App\Models\User;
+use App\Services\JournalCoverService;
+use App\Services\JournalService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +30,16 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class JournalController extends Controller
 {
+    protected JournalCoverService $coverService;
+
+    private JournalService $journalService;
+
+    public function __construct(JournalCoverService $coverService, JournalService $journalService)
+    {
+        $this->coverService = $coverService;
+        $this->journalService = $journalService;
+    }
+
     /**
      * Display a listing of journals for the Admin Kampus's university.
      *
@@ -107,7 +120,7 @@ class JournalController extends Controller
 
         // Paginate results
         $journals = $query
-            ->orderBy('title')
+            ->latest()
             ->paginate(10)
             ->withQueryString()
             ->through(fn ($journal) => [
@@ -342,6 +355,36 @@ class JournalController extends Controller
             },
         ]);
 
+        // OAI-PMH: fetch last harvest log
+        $lastHarvestLog = DB::table('oai_harvesting_logs')
+            ->where('journal_id', $journal->id)
+            ->orderByDesc('harvested_at')
+            ->first();
+
+        // OAI-PMH: check for pending queue job (best-effort UI hint; ShouldBeUnique on the job
+        // is the authoritative duplicate prevention mechanism).
+        // PHP-serialized integer i:X; is how the journal ID appears in the payload command string.
+        $isHarvestPending = DB::table('jobs')
+            ->where('queue', 'harvesting')
+            ->where('payload', 'like', '%HarvestJournalArticlesJob%')
+            ->where('payload', 'like', '%i:'.$journal->id.';%')
+            ->exists();
+
+        $articlesCount = $journal->articles()->count();
+        $articles = $journal->articles()
+            ->orderBy('publication_date', 'desc')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(fn ($article) => [
+                'id' => $article->id,
+                'title' => $article->title,
+                'authors' => $article->authors,
+                'publication_date' => $article->publication_date?->format('Y-m-d'),
+                'abstract' => $article->abstract,
+                'doi' => $article->doi,
+                'url' => $article->article_url,
+            ]);
+
         return Inertia::render('AdminKampus/Journals/Show', [
             'journal' => [
                 'id' => $journal->id,
@@ -370,6 +413,13 @@ class JournalController extends Controller
                 // Indexations
                 'indexations' => $journal->indexations,
                 'indexation_labels' => $journal->indexation_labels,
+
+                // OAI-PMH
+                'oai_urls' => $journal->oai_urls,
+
+                // Cover image
+                'cover_image' => $journal->cover_image,
+                'cover_image_url' => $journal->cover_image_url,
 
                 'is_active' => $journal->is_active,
                 'created_at' => $journal->created_at->format('Y-m-d H:i'),
@@ -407,7 +457,92 @@ class JournalController extends Controller
                     ],
                 ]),
             ],
+            'articles' => $articles,
+            'articlesCount' => $articlesCount,
+            'lastHarvestLog' => $lastHarvestLog ? (array) $lastHarvestLog : null,
+            'isHarvestPending' => $isHarvestPending,
         ]);
+    }
+
+    /**
+     * Dispatch OAI-PMH harvest job to the queue.
+     *
+     * @route POST /admin-kampus/journals/{journal}/harvest
+     *
+     * @features Dispatch background job to harvest articles from OAI-PMH endpoint.
+     *           Accepts optional `force=1` request field which deletes all existing
+     *           articles for this journal before harvesting (full re-import).
+     */
+    public function harvest(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        if (empty($journal->oai_urls)) {
+            return redirect()
+                ->route('admin-kampus.journals.show', $journal)
+                ->with('error', 'Jurnal ini belum memiliki OAI-PMH URL. Tambahkan URL-nya terlebih dahulu melalui form edit jurnal.');
+        }
+
+        $clearExisting = (bool) $request->input('force', false);
+
+        // ShouldBeUnique on the job prevents duplicate dispatches silently.
+        // clearExisting=true bypasses uniqueness so a forced re-import is always dispatched
+        // even if a normal harvest is already queued.
+        HarvestJournalArticlesJob::dispatch($journal, null, $clearExisting)->onQueue('harvesting');
+
+        $message = $clearExisting
+            ? 'Force sync dijadwalkan. Semua artikel lama akan dihapus dan diimport ulang dari OAI-PMH — silakan refresh halaman beberapa saat kemudian.'
+            : 'Harvest artikel dijadwalkan. Proses berjalan di background — silakan refresh halaman beberapa saat kemudian untuk melihat hasilnya.';
+
+        return redirect()
+            ->route('admin-kampus.journals.show', $journal)
+            ->with('success', $message);
+    }
+
+    /**
+     * @route POST /admin-kampus/journals/harvest/bulk
+     *
+     * @features Dispatch background job to harvest articles from OAI-PMH endpoint for multiple journals.
+     */
+    public function bulkHarvest(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'journal_ids' => ['required', 'array', 'min:1'],
+            'journal_ids.*' => [
+                'integer',
+                'distinct',
+                \Illuminate\Validation\Rule::exists('journals', 'id')->where(function ($query) {
+                    $query->where('university_id', Auth::user()->university_id);
+                }),
+            ],
+        ]);
+
+        $journals = Journal::whereIn('id', $request->input('journal_ids'))->get();
+        $dispatchedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($journals as $journal) {
+            $this->authorize('update', $journal);
+
+            if (empty($journal->oai_urls)) {
+                $skippedCount++;
+
+                continue;
+            }
+
+            $clearExisting = (bool) $request->input('force', false);
+            HarvestJournalArticlesJob::dispatch($journal, null, $clearExisting)->onQueue('harvesting');
+            $dispatchedCount++;
+        }
+
+        $message = "Proses massal OAI-PMH sinkronisasi dijadwalkan untuk $dispatchedCount jurnal.";
+        if ($skippedCount > 0) {
+            $message .= " (Lewati $skippedCount jurnal tanpa URL OAI-PMH)";
+        }
+
+        return redirect()
+            ->back()
+            ->with('success', $message);
     }
 
     /**
@@ -457,9 +592,8 @@ class JournalController extends Controller
         $this->authorize('create', Journal::class);
 
         $authUser = Auth::user();
-
         $validated = $request->validated();
-        $validated['university_id'] = $authUser->university_id;
+        $targetUserId = null;
 
         // If user_id is provided, use it; otherwise default to the admin user
         if ($request->filled('user_id')) {
@@ -467,15 +601,22 @@ class JournalController extends Controller
             $targetUser = User::where('id', $request->user_id)
                 ->where('university_id', $authUser->university_id)
                 ->firstOrFail();
-            $validated['user_id'] = $targetUser->id;
-        } else {
-            $validated['user_id'] = $authUser->id;
+            $targetUserId = $targetUser->id;
         }
 
-        Journal::create($validated);
+        try {
+            $this->journalService->createJournal(
+                $validated,
+                $request->file('cover_image'),
+                $authUser,
+                $targetUserId
+            );
 
-        return redirect()->route('admin-kampus.journals.index')
-            ->with('success', 'Jurnal berhasil ditambahkan.');
+            return redirect()->route('admin-kampus.journals.index')
+                ->with('success', 'Jurnal berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan jurnal. Silakan coba lagi nanti.');
+        }
     }
 
     /**
@@ -513,10 +654,50 @@ class JournalController extends Controller
     {
         $this->authorize('update', $journal);
 
-        $journal->update($request->validated());
+        $validated = $request->validated();
 
-        return redirect()->route('admin-kampus.journals.index')
-            ->with('success', 'Data jurnal berhasil diperbarui.');
+        try {
+            $this->journalService->updateJournal(
+                $validated,
+                $request->file('cover_image'),
+                $journal,
+                Auth::user()
+            );
+
+            return redirect()->route('admin-kampus.journals.index')
+                ->with('success', 'Data jurnal berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui jurnal. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Upload or replace the cover image for a journal (dedicated endpoint).
+     *
+     * @route PATCH /admin-kampus/journals/{journal}/cover
+     *
+     * @features Upload cover image; replaces existing cover; returns to journal show page
+     */
+    public function uploadCover(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        $request->validate([
+            'cover_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=300,min_height=400',
+        ], [
+            'cover_image.required' => 'Pilih file gambar untuk diupload.',
+            'cover_image.image' => 'File cover harus berupa gambar.',
+            'cover_image.mimes' => 'Format cover harus JPEG, PNG, JPG, atau WebP.',
+            'cover_image.max' => 'Ukuran file cover maksimal 2MB.',
+            'cover_image.dimensions' => 'Resolusi cover minimal 300x400 piksel.',
+        ]);
+
+        $journal->update(['cover_image' => $this->coverService->upload($request->file('cover_image'), $journal)]);
+
+        return redirect()->route('admin-kampus.journals.show', $journal)
+            ->with('success', 'Cover jurnal berhasil diperbarui.');
     }
 
     /**

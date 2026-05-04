@@ -24,8 +24,8 @@ class UpdateJournalRequest extends FormRequest
         return [
             // Basic Info
             'title' => 'required|string|max:255',
-            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{4}$/',
-            'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{4}$/',
+            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i',
+            'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i',
             'url' => 'required|url|max:500',
 
             // Publication Details
@@ -39,9 +39,16 @@ class UpdateJournalRequest extends FormRequest
             // SINTA / Accreditation (merged)
             'sinta_rank' => 'required|string|in:sinta_1,sinta_2,sinta_3,sinta_4,sinta_5,sinta_6,non_sinta',
             'accreditation_start_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 5),
-            'accreditation_end_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 10).'|gte:accreditation_start_year',
+            'accreditation_end_year' => array_filter([
+                'nullable',
+                'integer',
+                'min:1900',
+                'max:'.(date('Y') + 10),
+                $this->filled('accreditation_start_year') ? 'gte:accreditation_start_year' : null,
+            ]),
             'accreditation_sk_number' => 'nullable|string|max:100',
-            'accreditation_sk_date' => 'nullable|date|before_or_equal:today',
+            // Use app timezone to avoid UTC mismatch that rejects today's local date as "future"
+            'accreditation_sk_date' => 'nullable|date_format:Y-m-d|before_or_equal:'.now()->timezone(config('app.timezone'))->format('Y-m-d'),
 
             // Indexations
             'indexations' => 'nullable|array',
@@ -53,9 +60,13 @@ class UpdateJournalRequest extends FormRequest
             'phone' => 'nullable|string|max:50',
 
             // Additional Info
-            'oai_pmh_url' => 'required|url|max:500',
+            'oai_urls' => 'required|array',
+            'oai_urls.*' => 'url|max:500',
             'about' => 'nullable|string|max:1000',
-            'scope' => 'nullable|string|max:1000',
+            'scope' => 'nullable|string|max:2500',
+
+            // Cover Image
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=300,min_height=400',
         ];
     }
 
@@ -70,15 +81,19 @@ class UpdateJournalRequest extends FormRequest
             'url.url' => 'Format URL tidak valid.',
             'scientific_field_id.required' => 'Bidang ilmu wajib dipilih.',
             'scientific_field_id.exists' => 'Bidang ilmu tidak valid.',
-            'issn.regex' => 'Format ISSN harus xxxx-xxxx.',
+            'issn.regex' => 'Format ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
             'e_issn.required' => 'E-ISSN wajib diisi.',
-            'e_issn.regex' => 'Format E-ISSN harus xxxx-xxxx.',
+            'e_issn.regex' => 'Format E-ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
             'sinta_rank.required' => 'Peringkat akreditasi wajib dipilih.',
             'sinta_rank.in' => 'Peringkat akreditasi tidak valid.',
             'accreditation_end_year.gte' => 'Tahun akhir akreditasi harus setelah tahun mulai.',
-            'oai_pmh_url.required' => 'URL OAI-PMH wajib diisi.',
-            'oai_pmh_url.url' => 'Format URL OAI-PMH tidak valid.',
+            'oai_urls.array' => 'Format OAI-PMH URLs wajib diisi dan harus berupa array.',
+            'oai_urls.*.url' => 'Format URL OAI-PMH tidak valid.',
             'indexations.*.url.url' => 'Format URL indeksasi tidak valid.',
+            'cover_image.image' => 'File cover harus berupa gambar.',
+            'cover_image.mimes' => 'Format cover harus JPEG, PNG, JPG, atau WebP.',
+            'cover_image.max' => 'Ukuran file cover maksimal 2MB.',
+            'cover_image.dimensions' => 'Resolusi cover minimal 300×400 piksel.',
         ];
     }
 
@@ -87,6 +102,8 @@ class UpdateJournalRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $mergeData = [];
+
         // Transform indexations from frontend format to database format
         if ($this->has('indexations') && is_array($this->indexations)) {
             $transformed = [];
@@ -97,7 +114,28 @@ class UpdateJournalRequest extends FormRequest
                     ];
                 }
             }
-            $this->merge(['indexations' => $transformed]);
+            $mergeData['indexations'] = $transformed;
+        }
+
+        // Normalize first_published_year to integer
+        if ($this->has('first_published_year') && $this->input('first_published_year') !== null && $this->input('first_published_year') !== '') {
+            $mergeData['first_published_year'] = (int) $this->input('first_published_year');
+        }
+
+        // Normalize SK Date to Y-m-d using app timezone if present
+        if ($this->has('accreditation_sk_date') && $this->input('accreditation_sk_date') != '') {
+            try {
+                $date = \Carbon\Carbon::createFromFormat('Y-m-d', (string) $this->input('accreditation_sk_date'), config('app.timezone'));
+                if ($date !== false) {
+                    $mergeData['accreditation_sk_date'] = $date->format('Y-m-d');
+                }
+            } catch (\Exception $e) {
+                // Ignore parse errors, let validation handle it
+            }
+        }
+
+        if (! empty($mergeData)) {
+            $this->merge($mergeData);
         }
     }
 }

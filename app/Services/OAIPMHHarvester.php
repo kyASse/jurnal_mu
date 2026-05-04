@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Article;
 use App\Models\Journal;
+use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -15,98 +17,149 @@ class OAIPMHHarvester
      *
      * @param  Journal  $journal  The journal to harvest articles from
      * @param  string|null  $fromDate  Optional start date for harvesting (format: YYYY-MM-DD)
+     * @param  bool  $clearExisting  If true, delete all existing articles before harvesting (full re-import)
      * @return array Harvesting statistics
      *
      * @throws \Exception
      */
-    public function harvest(Journal $journal, ?string $fromDate = null): array
+    public function harvest(Journal $journal, ?string $fromDate = null, bool $clearExisting = false): array
     {
-        if (! $journal->oai_pmh_url) {
-            throw new \Exception("Journal '{$journal->title}' does not have OAI-PMH URL configured");
+        if (empty($journal->oai_urls)) {
+            throw new \Exception("Journal '{$journal->title}' does not have OAI-PMH URLs configured");
         }
 
-        $stats = [
+        // Force fresh import: wipe existing articles so re-harvest starts clean
+        if ($clearExisting) {
+            $deleted = Article::where('journal_id', $journal->id)->delete();
+            Log::info("Force harvest: deleted {$deleted} existing articles for journal '{$journal->title}' (ID: {$journal->id})");
+        }
+
+        $globalStats = [
             'records_found' => 0,
             'records_imported' => 0,
             'records_updated' => 0,
             'errors' => [],
         ];
 
-        try {
-            $url = $this->buildListRecordsUrl($journal->oai_pmh_url, $fromDate);
-            $response = Http::timeout(30)->get($url);
-
-            if (! $response->successful()) {
-                throw new \Exception("Failed to harvest from OAI-PMH endpoint: HTTP {$response->status()}");
+        foreach ($journal->oai_urls as $index => $oai_url) {
+            if (empty($oai_url)) {
+                continue;
             }
 
-            // Suppress XML errors and handle them gracefully
-            libxml_use_internal_errors(true);
-            $xml = simplexml_load_string($response->body());
+            $stats = [
+                'records_found' => 0,
+                'records_imported' => 0,
+                'records_updated' => 0,
+                'errors' => [],
+            ];
 
-            if ($xml === false) {
-                $errors = libxml_get_errors();
-                libxml_clear_errors();
-                $errorMessage = 'Failed to parse XML response';
-                if (! empty($errors)) {
-                    $errorMessage .= ': '.$errors[0]->message;
+            try {
+                $url = $this->buildListRecordsUrl($oai_url, $fromDate);
+                $pageCount = 0;
+                $maxPages = 500; // Safety cap to prevent infinite loops
+
+                while ($url !== null && $pageCount < $maxPages) {
+                    $pageCount++;
+
+                    $response = Http::timeout(60)->get($url);
+
+                    if (! $response->successful()) {
+                        throw new \Exception("Failed to harvest from OAI-PMH endpoint ({$oai_url}): HTTP {$response->status()}");
+                    }
+
+                    $contentType = $response->header('Content-Type');
+                    if ($contentType && ! str_contains($contentType, 'xml')) {
+                        throw new \Exception("Endpoint {$oai_url} did not return an XML response (Content-Type: {$contentType})");
+                    }
+
+                    libxml_use_internal_errors(true);
+                    $xmlString = $response->body();
+
+                    // Sanitize XML string: remove null bytes and other invalid control characters (0x00 - 0x1F except 0x09, 0x0A, 0x0D)
+                    $cleanXml = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $xmlString);
+
+                    $xml = simplexml_load_string($cleanXml);
+
+                    if ($xml === false) {
+                        $errors = libxml_get_errors();
+                        libxml_clear_errors();
+                        $errorMessage = "Failed to parse XML response from {$oai_url}";
+                        if (! empty($errors)) {
+                            $errorMessage .= ': '.$errors[0]->message;
+                        }
+                        throw new \Exception($errorMessage);
+                    }
+
+                    $xml->registerXPathNamespace('oai', 'http://www.openarchives.org/OAI/2.0/');
+                    $xml->registerXPathNamespace('oai_dc', 'http://www.openarchives.org/OAI/2.0/oai_dc/');
+                    $xml->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+
+                    $records = $xml->xpath('//oai:record');
+
+                    if (! empty($records)) {
+                        $stats['records_found'] += count($records);
+
+                        foreach ($records as $record) {
+                            try {
+                                $this->processRecord($journal, $record, $stats);
+                            } catch (\Exception $e) {
+                                $stats['errors'][] = "From {$oai_url}: ".$e->getMessage();
+                                Log::error("Error processing OAI record ({$oai_url}): {$e->getMessage()}");
+                            }
+                        }
+                    }
+
+                    $resumptionTokenNodes = $xml->xpath('//oai:resumptionToken');
+                    $resumptionToken = null;
+
+                    if (! empty($resumptionTokenNodes)) {
+                        $token = trim((string) $resumptionTokenNodes[0]);
+                        if ($token !== '') {
+                            $resumptionToken = $token;
+                        }
+                    }
+
+                    if ($resumptionToken) {
+                        $url = $this->buildResumptionUrl($oai_url, $resumptionToken);
+                        Log::info("Harvesting page {$pageCount} for journal: {$journal->title} [url: {$oai_url}] (resumptionToken: {$resumptionToken})");
+                    } else {
+                        $url = null;
+                    }
                 }
-                throw new \Exception($errorMessage);
-            }
 
-            // Register OAI namespaces
-            $xml->registerXPathNamespace('oai', 'http://www.openarchives.org/OAI/2.0/');
-            $xml->registerXPathNamespace('oai_dc', 'http://www.openarchives.org/OAI/2.0/oai_dc/');
-            $xml->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
-
-            // Extract records from XML
-            $records = $xml->xpath('//oai:record');
-
-            if (empty($records)) {
-                Log::info("No records found for journal: {$journal->title}");
-
-                return $stats;
-            }
-
-            $stats['records_found'] = count($records);
-
-            // Process each record
-            foreach ($records as $record) {
-                try {
-                    $this->processRecord($journal, $record, $stats);
-                } catch (\Exception $e) {
-                    $stats['errors'][] = $e->getMessage();
-                    Log::error("Error processing OAI record: {$e->getMessage()}");
+                if ($pageCount >= $maxPages) {
+                    Log::warning("Harvest for journal '{$journal->title}' [url: {$oai_url}] reached the max page limit ({$maxPages}).");
                 }
+
+                if ($stats['records_found'] === 0) {
+                    Log::info("No records found for journal: {$journal->title} [url: {$oai_url}]");
+                }
+
+            } catch (\Exception $e) {
+                $stats['errors'][] = $e->getMessage();
+                Log::error("Failed harvesting url {$oai_url}: {$e->getMessage()}");
             }
 
-            // Log harvesting activity
-            DB::table('oai_harvesting_logs')->insert([
-                'journal_id' => $journal->id,
-                'harvested_at' => now(),
-                'records_found' => $stats['records_found'],
-                'records_imported' => $stats['records_imported'],
-                'status' => empty($stats['errors']) ? 'success' : 'partial',
-                'error_message' => empty($stats['errors']) ? null : implode('; ', $stats['errors']),
-            ]);
-
-            Log::info("Harvested {$stats['records_imported']} articles for journal: {$journal->title}");
-
-            return $stats;
-
-        } catch (\Exception $e) {
-            // Log failed harvesting
-            DB::table('oai_harvesting_logs')->insert([
-                'journal_id' => $journal->id,
-                'harvested_at' => now(),
-                'records_found' => $stats['records_found'],
-                'records_imported' => $stats['records_imported'],
-                'status' => 'failed',
-                'error_message' => $e->getMessage(),
-            ]);
-
-            throw $e;
+            // Aggregate stats
+            $globalStats['records_found'] += $stats['records_found'];
+            $globalStats['records_imported'] += $stats['records_imported'];
+            $globalStats['records_updated'] += $stats['records_updated'];
+            $globalStats['errors'] = array_merge($globalStats['errors'], $stats['errors']);
         }
+
+        // Log harvesting activity after processing all urls
+        DB::table('oai_harvesting_logs')->insert([
+            'journal_id' => $journal->id,
+            'harvested_at' => now(),
+            'records_found' => $globalStats['records_found'],
+            'records_imported' => $globalStats['records_imported'],
+            'status' => empty($globalStats['errors']) ? 'success' : 'partial',
+            'error_message' => empty($globalStats['errors']) ? null : mb_substr(implode('; ', $globalStats['errors']), 0, 500),
+        ]);
+
+        Log::info("Harvested {$globalStats['records_imported']} articles total for journal: {$journal->title}");
+
+        return $globalStats;
     }
 
     /**
@@ -131,9 +184,17 @@ class OAIPMHHarvester
             return; // Silently skip deleted records
         }
 
-        $oaiIdentifier = (string) $header->identifier;
+        $oaiIdentifier = trim((string) $header->identifier);
         $oaiDatestamp = (string) $header->datestamp;
         $oaiSet = isset($header->setSpec) ? (string) $header->setSpec : null;
+
+        // Guard: skip records without a usable identifier — inserting with an empty
+        // oai_identifier would bypass the unique index and create silent duplicates.
+        if ($oaiIdentifier === '') {
+            Log::warning("Skipping OAI record with empty identifier for journal ID {$journal->id}");
+
+            return;
+        }
 
         // Try multiple XPath patterns for metadata (different OAI-PMH implementations)
         $metadata = $record->xpath('oai:metadata/oai_dc:dc/*');
@@ -151,13 +212,10 @@ class OAIPMHHarvester
             throw new \Exception("Missing title for record: {$oaiIdentifier}");
         }
 
-        // Check if article already exists
-        $article = Article::where('oai_identifier', $oaiIdentifier)->first();
-
         $articleData = [
             'journal_id' => $journal->id,
             'oai_identifier' => $oaiIdentifier,
-            'oai_datestamp' => $oaiDatestamp,
+            'oai_datestamp' => ! empty($oaiDatestamp) ? Carbon::parse($oaiDatestamp)->format('Y-m-d H:i:s') : null,
             'oai_set' => $oaiSet,
             'title' => $dcData['title'],
             'abstract' => $dcData['abstract'] ?? null,
@@ -173,14 +231,52 @@ class OAIPMHHarvester
             'last_harvested_at' => now(),
         ];
 
-        if ($article) {
-            // Update existing article
-            $article->update($articleData);
-            $stats['records_updated']++;
-        } else {
-            // Create new article
-            Article::create($articleData);
-            $stats['records_imported']++;
+        // Primary lookup: match by oai_identifier (unique index).
+        // Secondary lookup: if the OAI server changed the identifier format between harvests
+        // (a known quirk of several OJS installations) fall back to matching by DOI within
+        // the same journal, so we update rather than create a duplicate.
+        $existingByDoi = null;
+        if (! empty($dcData['doi'])) {
+            $existingByDoi = Article::where('journal_id', $journal->id)
+                ->where('doi', $dcData['doi'])
+                ->whereNot('oai_identifier', $oaiIdentifier)
+                ->first();
+        }
+
+        try {
+            if ($existingByDoi) {
+                // Identifier changed but DOI matches — update in-place and correct the identifier
+                $existingByDoi->update($articleData);
+                $stats['records_updated']++;
+            } else {
+                // Atomic upsert: updateOrCreate is a single SELECT+INSERT/UPDATE operation
+                // wrapped in Laravel's query builder, preventing the race condition that the
+                // old manual SELECT→INSERT pattern was vulnerable to.
+                $result = Article::updateOrCreate(
+                    ['oai_identifier' => $oaiIdentifier],
+                    $articleData
+                );
+
+                if ($result->wasRecentlyCreated) {
+                    $stats['records_imported']++;
+                } else {
+                    $stats['records_updated']++;
+                }
+            }
+        } catch (UniqueConstraintViolationException $e) {
+            // Last-resort fallback: unique constraint fired despite updateOrCreate
+            // (can happen in a tight race between two concurrent harvest jobs).
+            // Attempt a plain update so the record ends up with the latest data.
+            $updated = Article::where('oai_identifier', $oaiIdentifier)->update(
+                array_merge($articleData, ['last_harvested_at' => now()])
+            );
+
+            if ($updated) {
+                $stats['records_updated']++;
+                Log::warning("Race condition on oai_identifier '{$oaiIdentifier}' — resolved via fallback update.");
+            } else {
+                throw $e; // Re-throw only if we genuinely could not handle it
+            }
         }
     }
 
@@ -307,25 +403,33 @@ class OAIPMHHarvester
      */
     protected function parseSourceInfo(string $source, array &$data): void
     {
-        // Pattern: "Vol. 5 No. 1" or "Vol. 5, No. 1"
-        if (preg_match('/Vol\.\s*(\d+).*?No\.\s*(\d+)/i', $source, $matches)) {
+        // Pattern: "Vol. 5 No. 1", "Vol. 5, No. 1", or "Vol 3 No 0" (OJS 2 omits the dots)
+        if (preg_match('/Vol\.?\s*(\d+).*?No\.?\s*(\d+)/i', $source, $matches)) {
             $data['volume'] = $matches[1];
             $data['issue'] = $matches[2];
         }
 
-        // Pattern: "5(1)" or "5 (1)"
+        // Pattern: "5(1)" or "5 (1)" — only treat the parenthesised number as an issue if it
+        // is NOT a 4-digit year (e.g. "Vol. 1 (2026)" must NOT yield issue = 2026)
         if (preg_match('/(\d+)\s*\((\d+)\)/', $source, $matches)) {
             if (! $data['volume']) {
                 $data['volume'] = $matches[1];
             }
-            if (! $data['issue']) {
+            if (! $data['issue'] && (int) $matches[2] < 1000) {
                 $data['issue'] = $matches[2];
             }
         }
 
         // Pattern: pages "10-20" or "pp. 10-20"
-        if (preg_match('/(?:pp?\.\s*)?(\d+)\s*[-–]\s*(\d+)/i', $source, $matches)) {
-            $data['pages'] = "{$matches[1]}-{$matches[2]}";
+        // Guard: skip if both sides are exactly 4 digits — that is an ISSN (e.g. "2442-6571"),
+        // not a real page range. OJS 2 embeds the journal ISSN at the end of dc:source instead
+        // of actual page numbers, so we must not store it as pages.
+        if (preg_match('/(?:pp?\.?\s*)?(\d+)\s*[-–]\s*(\d+)/i', $source, $matches)) {
+            $left = $matches[1];
+            $right = $matches[2];
+            if (! (strlen($left) === 4 && strlen($right) === 4)) {
+                $data['pages'] = "{$left}-{$right}";
+            }
         }
     }
 
@@ -347,5 +451,19 @@ class OAIPMHHarvester
         $baseUrl = rtrim($baseUrl, '/');
 
         return $baseUrl.'?'.http_build_query($params);
+    }
+
+    /**
+     * Build the URL to fetch the next page of records using a resumption token.
+     * Per OAI-PMH spec, resumption token requests must NOT include metadataPrefix.
+     */
+    protected function buildResumptionUrl(string $baseUrl, string $resumptionToken): string
+    {
+        $baseUrl = rtrim($baseUrl, '/');
+
+        return $baseUrl.'?'.http_build_query([
+            'verb' => 'ListRecords',
+            'resumptionToken' => $resumptionToken,
+        ]);
     }
 }

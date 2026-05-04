@@ -17,8 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { AssessmentJournalMetadata } from '@/types';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { AlertCircle, CheckCircle, FileText, Save, Send, Upload, XCircle } from 'lucide-react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { CheckCircle, FileText, Save, Send, Upload, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -86,14 +86,8 @@ interface Props {
     assessment?: Assessment;
 }
 
-interface FlashProps {
-    error?: string;
-    success?: string;
-}
-
 export default function AssessmentForm({ journals, indicators, assessment }: Props) {
     const isEdit = !!assessment;
-    const { flash } = usePage().props as { flash?: FlashProps };
 
     // File upload constants
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
@@ -331,14 +325,6 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                     <p className="mt-1 text-muted-foreground">Lengkapi formulir self-assessment untuk jurnal Anda</p>
                 </div>
 
-                {/* Flash Message */}
-                {flash?.error && (
-                    <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-                        <AlertCircle className="mt-0.5 h-5 w-5" />
-                        <span>{flash.error}</span>
-                    </div>
-                )}
-
                 {/* Reviewer Feedback - Show if editing after revision request */}
                 {isEdit && assessment && <ReviewerFeedback assessment={assessment as any} />}
 
@@ -390,7 +376,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="assessment_date">Tanggal Assessment *</Label>
                                 <Input
@@ -462,7 +448,7 @@ export default function AssessmentForm({ journals, indicators, assessment }: Pro
                         <CardDescription>Total keseluruhan editor, reviewer, dan author di semua terbitan</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                             <div className="space-y-2">
                                 <Label htmlFor="jumlah_editor">Jumlah Editor</Label>
                                 <Input

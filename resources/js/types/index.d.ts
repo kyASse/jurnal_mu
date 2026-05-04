@@ -133,14 +133,25 @@ export interface Article {
     updated_at: string;
 }
 
+export interface OaiHarvestingLog {
+    id: number;
+    journal_id: number;
+    harvested_at: string;
+    records_found: number;
+    records_imported: number;
+    status: 'success' | 'partial' | 'failed';
+    error_message?: string | null;
+}
+
 export interface Journal {
     id: number;
     title: string;
     issn: string;
     e_issn?: string;
     url?: string;
-    oai_pmh_url?: string;
+    oai_urls?: string[];
     cover_image_url?: string;
+    cover_image?: string;
     publisher?: string;
     frequency?: 'monthly' | 'bimonthly' | 'quarterly' | 'semiannually' | 'annually';
     frequency_label?: string;

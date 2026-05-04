@@ -406,6 +406,12 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
+        \Log::info('UserController@update - Start', [
+            'user_id' => $user->id,
+            'request_method' => $request->method(),
+            'request_all' => $request->all(),
+        ]);
+
         $user->load('role');
         $this->authorize('update', $user);
 
@@ -416,13 +422,18 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'password' => ['nullable', 'required_with:password_confirmation', 'confirmed', Rules\Password::defaults()],
+            'password_confirmation' => 'nullable|required_with:password',
             'phone' => 'nullable|string|max:20',
             'position' => 'nullable|string|max:100',
             'scientific_field_id' => 'nullable|exists:scientific_fields,id',
             'role_ids' => 'required|array|min:1',
-            'role_ids.*' => 'required|exists:roles,id',
-            'is_active' => 'boolean',
+            'role_ids.*' => 'required|integer|exists:roles,id',
+            'is_active' => 'required|boolean',
+        ]);
+
+        \Log::info('UserController@update - Validation passed', [
+            'validated_data' => $validated,
         ]);
 
         // Verify no Super Admin role in selection
@@ -463,6 +474,11 @@ class UserController extends Controller
                 ],
             ])->toArray()
         );
+
+        \Log::info('UserController@update - Successfully updated', [
+            'user_id' => $user->id,
+            'updated_data' => $data,
+        ]);
 
         return redirect()->route('admin-kampus.users.index')
             ->with('success', 'User updated successfully with assigned roles.');

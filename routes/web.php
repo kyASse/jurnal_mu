@@ -30,55 +30,43 @@ use App\Http\Controllers\User\PembinaanController as UserPembinaanController;
 use App\Http\Controllers\User\ProfilController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| Public Storage File Serving
 |--------------------------------------------------------------------------
+|
+| Serves files stored on the "public" disk (storage/app/public/).
+| This route is required because PHP's built-in dev server (artisan serve)
+| does not follow Windows directory junctions, so the public/storage
+| junction is not traversed for static files. This route streams files
+| directly from the storage layer, bypassing the junction entirely.
+|
+| In production (Apache/Nginx), the web server serves these files
+| directly from the public/storage symlink before PHP is invoked,
+| so this route is never reached and adds zero overhead.
 */
-
-//  Laman Page
-Route::get('/', function () {
-    // Get featured journals (SINTA 1-2, with cover images)
-    $featuredJournals = \App\Models\Journal::with(['university', 'scientificField'])
-        ->where('is_active', true)
-        ->whereNotNull('sinta_rank')
-        ->whereIn('sinta_rank', [1, 2])
-        ->orderBy('sinta_rank')
-        ->limit(4)
-        ->get()
-        ->map(fn ($journal) => [
-            'id' => $journal->id,
-            'title' => $journal->title,
-            'sinta_rank' => $journal->sinta_rank,
-            'sinta_rank_label' => $journal->sinta_rank_label,
-            'issn' => $journal->issn,
-            'e_issn' => $journal->e_issn,
-            'university' => $journal->university->name ?? 'Unknown',
-            'cover_image_url' => $journal->cover_image_url,
-            'indexation_labels' => $journal->indexation_labels,
-        ]);
-
-    // Get SINTA statistics
-    $sintaStats = [];
-    for ($rank = 1; $rank <= 6; $rank++) {
-        $sintaStats[$rank] = \App\Models\Journal::where('is_active', true)
-            ->where('sinta_rank', $rank)
-            ->count();
+Route::get('/storage/{path}', function (string $path) {
+    // Basic path hardening: reject traversal, backslashes, and absolute paths
+    if (str_contains($path, '..') || str_contains($path, '\\') || str_starts_with($path, '/')) {
+        abort(400);
     }
 
-    // Get total universities and journals
-    $totalUniversities = \App\Models\University::where('is_active', true)->count();
-    $totalJournals = \App\Models\Journal::where('is_active', true)->count();
+    try {
+        if (! Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
 
-    return Inertia::render('welcome', [
-        'featuredJournals' => $featuredJournals,
-        'sintaStats' => $sintaStats,
-        'totalUniversities' => $totalUniversities,
-        'totalJournals' => $totalJournals,
-    ]);
-})->name('home');
+        return Storage::disk('public')->response($path);
+    } catch (\Throwable $e) {
+        // Avoid leaking storage layer errors
+        abort(404);
+    }
+})->where('path', '.+')->name('storage.serve');
+
+//  Laman Page
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +83,12 @@ Route::get('/journals/{journal}', [\App\Http\Controllers\PublicJournalController
 // Browse journals by university
 Route::get('/browse/universities', [\App\Http\Controllers\PublicJournalController::class, 'browseUniversities'])
     ->name('browse.universities');
+
+// Public access to view events
+Route::get('/events', [\App\Http\Controllers\PublicEventController::class, 'index'])
+    ->name('events.index');
+Route::get('/events/{event}', [\App\Http\Controllers\PublicEventController::class, 'show'])
+    ->name('events.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -143,9 +137,19 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::middleware(['role:'.Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
 
-        // Data Master (Placeholder)
+        // Data Master (Dashboard)
         Route::get('data-master', [DataMasterController::class, 'index'])
             ->name('data-master.index');
+
+        // Scientific Fields nested in Data Master
+        Route::prefix('data-master')->name('data-master.')->group(function () {
+            Route::post('scientific-fields/import', [\App\Http\Controllers\Admin\ScientificFieldController::class, 'import'])
+                ->name('scientific-fields.import');
+            Route::get('scientific-fields/export', [\App\Http\Controllers\Admin\ScientificFieldController::class, 'export'])
+                ->name('scientific-fields.export');
+            Route::resource('scientific-fields', \App\Http\Controllers\Admin\ScientificFieldController::class)
+                ->except(['show', 'create', 'edit']);
+        });
 
         // Borang Indikator (Using Accreditation Templates System)
         Route::get('borang-indikator', [AccreditationTemplateController::class, 'index'])
@@ -236,6 +240,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.index');
         Route::get('journals/{journal}', [\App\Http\Controllers\Admin\JournalController::class, 'show'])
             ->name('journals.show');
+        Route::post('journals/{journal}/harvest', [\App\Http\Controllers\Admin\JournalController::class, 'harvest'])
+            ->name('journals.harvest');
 
         // View all assessments (read-only for monitoring)
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
@@ -320,6 +326,12 @@ Route::middleware(['auth'])->group(function () {
             // Journal reassignment
             Route::post('{journal}/reassign', [\App\Http\Controllers\AdminKampus\JournalController::class, 'reassign'])
                 ->name('reassign');
+
+            // OAI-PMH Article Harvest (dispatches to queue)
+            Route::post('harvest/bulk', [\App\Http\Controllers\AdminKampus\JournalController::class, 'bulkHarvest'])
+                ->name('harvest.bulk');
+            Route::post('{journal}/harvest', [\App\Http\Controllers\AdminKampus\JournalController::class, 'harvest'])
+                ->name('harvest');
         });
 
         // View journals from their university
@@ -337,6 +349,10 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.update');
         Route::delete('journals/{journal}', [\App\Http\Controllers\AdminKampus\JournalController::class, 'destroy'])
             ->name('journals.destroy');
+
+        // Cover image upload (dedicated endpoint)
+        Route::patch('journals/{journal}/cover', [\App\Http\Controllers\AdminKampus\JournalController::class, 'uploadCover'])
+            ->name('journals.upload-cover');
 
         // Import journals from CSV
         Route::get('journals/import/template', [\App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
@@ -386,6 +402,18 @@ Route::middleware(['auth'])->group(function () {
                 ->name('request-revision');
         });
 
+        // Agenda Management
+        Route::resource('events', \App\Http\Controllers\AdminKampus\AgendaController::class)
+            ->except(['show'])
+            ->names([
+                'index' => 'events.index',
+                'create' => 'events.create',
+                'store' => 'events.store',
+                'edit' => 'events.edit',
+                'update' => 'events.update',
+                'destroy' => 'events.destroy',
+            ]);
+
     });
 
     /*
@@ -418,6 +446,14 @@ Route::middleware(['auth'])->group(function () {
                 'update' => 'journals.update',
                 'destroy' => 'journals.destroy',
             ]);
+
+        // Cover image upload (dedicated endpoint)
+        Route::patch('journals/{journal}/cover', [UserJournalController::class, 'uploadCover'])
+            ->name('journals.upload-cover');
+
+        // OAI-PMH Article Harvest
+        Route::post('journals/{journal}/harvest', [UserJournalController::class, 'harvest'])
+            ->name('journals.harvest');
 
         // Assessments Management
         Route::prefix('assessments')->name('assessments.')->group(function () {

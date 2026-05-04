@@ -99,11 +99,30 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Debug: log form data before submission
+        console.log('Form data being submitted:', {
+            name: data.name,
+            email: data.email,
+            password: data.password ? '[password provided]' : '[empty]',
+            password_confirmation: data.password_confirmation ? '[provided]' : '[empty]',
+            phone: data.phone,
+            position: data.position,
+            scientific_field_id: data.scientific_field_id,
+            role_ids: data.role_ids,
+            is_active: data.is_active,
+        });
+
         put(route('admin-kampus.users.update', user.id), {
             onSuccess: () => {
                 toast.success('User updated successfully');
             },
-            onError: () => {
+            onError: (errors) => {
+                console.error('Validation errors:', errors);
+                // Show specific error messages
+                Object.entries(errors).forEach(([field, message]) => {
+                    console.error(`${field}: ${message}`);
+                });
                 toast.error('Failed to update user. Please check the form.');
             },
         });
@@ -113,7 +132,7 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit User - ${user.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
                     {/* Header */}
                     <div className="mb-6">
@@ -315,7 +334,7 @@ export default function UsersEdit({ user, university, roles, scientificFields }:
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 border-t border-sidebar-border/70 pt-6 dark:border-sidebar-border">
+                        <div className="flex flex-col-reverse items-stretch justify-end gap-4 border-t border-sidebar-border/70 pt-6 sm:flex-row sm:items-center dark:border-sidebar-border">
                             <Link href={route('admin-kampus.users.index')}>
                                 <Button type="button" variant="outline">
                                     Cancel
