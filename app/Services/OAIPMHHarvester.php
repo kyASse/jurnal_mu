@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Article;
 use App\Models\Journal;
+use Carbon\Carbon;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -66,8 +67,18 @@ class OAIPMHHarvester
                         throw new \Exception("Failed to harvest from OAI-PMH endpoint ({$oai_url}): HTTP {$response->status()}");
                     }
 
+                    $contentType = $response->header('Content-Type');
+                    if ($contentType && ! str_contains($contentType, 'xml')) {
+                        throw new \Exception("Endpoint {$oai_url} did not return an XML response (Content-Type: {$contentType})");
+                    }
+
                     libxml_use_internal_errors(true);
-                    $xml = simplexml_load_string($response->body());
+                    $xmlString = $response->body();
+
+                    // Sanitize XML string: remove null bytes and other invalid control characters (0x00 - 0x1F except 0x09, 0x0A, 0x0D)
+                    $cleanXml = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $xmlString);
+
+                    $xml = simplexml_load_string($cleanXml);
 
                     if ($xml === false) {
                         $errors = libxml_get_errors();
@@ -204,7 +215,7 @@ class OAIPMHHarvester
         $articleData = [
             'journal_id' => $journal->id,
             'oai_identifier' => $oaiIdentifier,
-            'oai_datestamp' => $oaiDatestamp,
+            'oai_datestamp' => ! empty($oaiDatestamp) ? Carbon::parse($oaiDatestamp)->format('Y-m-d H:i:s') : null,
             'oai_set' => $oaiSet,
             'title' => $dcData['title'],
             'abstract' => $dcData['abstract'] ?? null,
