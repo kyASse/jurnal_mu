@@ -428,6 +428,11 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'events.destroy',
             ]);
 
+        // Support / Ticketing System for Admin Kampus
+        Route::resource('tickets', \App\Http\Controllers\AdminKampus\TicketController::class)->except(['edit', 'update']);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\AdminKampus\TicketController::class, 'reply'])->name('tickets.reply');
+        Route::patch('tickets/{ticket}/status', [\App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
+
     });
 
     /*
