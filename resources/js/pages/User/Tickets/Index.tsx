@@ -15,8 +15,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Index({ tickets }: any) {
     const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
         switch (status) {
-            case 'open': return 'destructive';
-            case 'in_progress': return 'default';
+            case 'open': return 'default';
+            case 'in_progress': return 'secondary';
             case 'resolved': return 'outline';
             case 'closed': return 'secondary';
             default: return 'default';
