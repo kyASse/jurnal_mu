@@ -130,7 +130,7 @@ export function AppSidebar() {
             },
             {
                 title: 'Support Tickets',
-                href: route('user.tickets.index'),
+                href: route('admin-kampus.tickets.index'),
                 icon: LifeBuoy,
             },
         ];
