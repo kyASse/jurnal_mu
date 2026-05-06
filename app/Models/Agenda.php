@@ -87,11 +87,6 @@ class Agenda extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function registrations()
-    {
-        return $this->belongsToMany(User::class, 'agenda_registrations')->withTimestamps();
-    }
-
     public function scopeForUniversity(Builder $query, int $universityId): Builder
     {
         return $query->where('university_id', $universityId);
