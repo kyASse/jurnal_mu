@@ -33,7 +33,6 @@ interface Agenda {
     contact_person_phone: string | null;
     contact_person_email: string | null;
     is_active: boolean;
-    is_featured: boolean;
     quota: number | null;
 }
 
@@ -67,7 +66,6 @@ export default function EventsEdit({ agenda }: Props) {
         contact_person_phone: agenda.contact_person_phone || '',
         contact_person_email: agenda.contact_person_email || '',
         is_active: Boolean(agenda.is_active),
-        is_featured: Boolean(agenda.is_featured),
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -265,10 +263,6 @@ export default function EventsEdit({ agenda }: Props) {
                                 <div className="flex items-center space-x-2">
                                     <Switch id="is_active" checked={data.is_active} onCheckedChange={(val) => setData('is_active', val)} />
                                     <Label htmlFor="is_active">Active (Visible)</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Switch id="is_featured" checked={data.is_featured} onCheckedChange={(val) => setData('is_featured', val)} />
-                                    <Label htmlFor="is_featured">Featured Event</Label>
                                 </div>
                             </div>
 
