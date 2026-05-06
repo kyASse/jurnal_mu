@@ -90,6 +90,11 @@ export function AppSidebar() {
                 icon: Award,
             },
             {
+                title: 'Agendas & Events',
+                href: route('admin.events.index'),
+                icon: CalendarDays,
+            },
+            {
                 title: 'Reviewer Assignment',
                 href: route('dikti.assessments.index'),
                 icon: UserCheck,
