@@ -247,6 +247,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
             ->name('assessments.index');
 
+        // Support / Ticketing System for Super Admin
+        Route::resource('tickets', \App\Http\Controllers\Admin\TicketController::class)->except(['create', 'store', 'edit']);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\TicketController::class, 'reply'])
+            ->name('tickets.reply');
+        Route::patch('tickets/{ticket}/status', [\App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])
+            ->name('tickets.update-status');
+
+        // Support / Ticketing System for Super Admin
+        Route::resource('tickets', \App\Http\Controllers\Admin\TicketController::class)->except(['create', 'store', 'edit']);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\TicketController::class, 'reply'])
+            ->name('tickets.reply');
+        Route::patch('tickets/{ticket}/status', [\App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])
+            ->name('tickets.update-status');
+
         // Pembinaan Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
             Route::get('/', [AdminPembinaanController::class, 'index'])
@@ -414,6 +428,11 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'events.destroy',
             ]);
 
+        // Support / Ticketing System for Admin Kampus
+        Route::resource('tickets', \App\Http\Controllers\AdminKampus\TicketController::class)->except(['edit', 'update']);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\AdminKampus\TicketController::class, 'reply'])->name('tickets.reply');
+        Route::patch('tickets/{ticket}/status', [\App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
+
     });
 
     /*
@@ -518,6 +537,16 @@ Route::middleware(['auth'])->group(function () {
             Route::post('registrations/{registration}/create-assessment', [UserPembinaanController::class, 'createAssessment'])
                 ->name('registrations.create-assessment');
         });
+
+        // Support / Ticketing System for User
+        Route::resource('tickets', \App\Http\Controllers\User\TicketController::class)->names([
+            'index' => 'tickets.index',
+            'create' => 'tickets.create',
+            'store' => 'tickets.store',
+            'show' => 'tickets.show',
+        ]);
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\User\TicketController::class, 'reply'])
+            ->name('tickets.reply');
     });
 
     /*

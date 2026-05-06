@@ -23,11 +23,6 @@ import AppLogo from './app-logo';
 // Common navigation items shared across all roles
 const commonNavItems: NavItem[] = [
     {
-        title: 'Support',
-        href: route('support'),
-        icon: LifeBuoy,
-    },
-    {
         title: 'Resources',
         href: route('resources'),
         icon: Box,
@@ -99,6 +94,11 @@ export function AppSidebar() {
                 href: route('dikti.assessments.index'),
                 icon: UserCheck,
             },
+            {
+                title: 'Support Tickets',
+                href: route('admin.tickets.index'),
+                icon: LifeBuoy,
+            },
             ...commonNavItems,
         ];
     } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
@@ -127,6 +127,11 @@ export function AppSidebar() {
                     { title: 'Akreditasi', href: route('admin-kampus.pembinaan.akreditasi') },
                     { title: 'Indeksasi', href: route('admin-kampus.pembinaan.indeksasi') },
                 ],
+            },
+            {
+                title: 'Support Tickets',
+                href: route('admin-kampus.tickets.index'),
+                icon: LifeBuoy,
             },
         ];
 
@@ -160,6 +165,11 @@ export function AppSidebar() {
                     { title: 'Akreditasi', href: route('user.pembinaan.akreditasi') },
                     { title: 'Indeksasi', href: route('user.pembinaan.indeksasi') },
                 ],
+            },
+            {
+                title: 'Support Tickets',
+                href: route('user.tickets.index'),
+                icon: LifeBuoy,
             },
             ...commonNavItems,
         ];
