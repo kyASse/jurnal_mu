@@ -31,7 +31,7 @@ interface AgendaItem {
     location_venue: string | null;
     price: string | null;
     quota: number | null;
-    registered_count: number;
+
     is_featured: boolean;
     university: {
         name: string;
@@ -76,7 +76,6 @@ function EventCard({ agenda }: { agenda: AgendaItem }) {
     };
 
     const dateFormatted = formatDate(agenda.date_start);
-    const progressPercent = agenda.quota ? Math.min((agenda.registered_count / agenda.quota) * 100, 100) : 0;
 
     return (
         <Card className="flex h-full flex-col overflow-hidden border-border/50 bg-card transition-all duration-300 hover:shadow-lg">
@@ -154,23 +153,14 @@ function EventCard({ agenda }: { agenda: AgendaItem }) {
                         </div>
                     </div>
 
-                    {/* Quota Progress */}
-                    <div className="border-t border-border/50 pt-2">
-                        <div className="mb-1.5 flex items-center justify-between text-xs font-medium">
-                            <span className="text-muted-foreground">Capacity</span>
-                            <span
-                                className={agenda.quota && agenda.registered_count >= agenda.quota ? 'font-bold text-destructive' : 'text-foreground'}
-                            >
-                                {agenda.quota ? `${agenda.registered_count} / ${agenda.quota} Registered` : 'Unlimited Stats'}
-                            </span>
+                    {/* Capacity */}
+                    {agenda.quota && (
+                        <div className="border-t border-border/50 pt-2">
+                            <div className="flex items-center text-xs font-medium text-muted-foreground">
+                                Capacity: {agenda.quota} Participants
+                            </div>
                         </div>
-                        {agenda.quota && (
-                            <Progress
-                                value={progressPercent}
-                                className={`h-2 ${progressPercent >= 100 ? '[&>div]:bg-destructive' : '[&>div]:bg-emerald-500'}`}
-                            />
-                        )}
-                    </div>
+                    )}
                 </div>
             </CardContent>
 
