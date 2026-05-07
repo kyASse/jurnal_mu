@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Agenda;
 use App\Models\Article;
 use App\Models\Journal;
 use App\Models\ScientificField;
@@ -126,6 +127,36 @@ class PublicHomeService
                 ->orderByDesc('journals_count')
                 ->take(12)
                 ->get(['id', 'name']);
+        });
+    }
+
+    /**
+     * Get upcoming active events/agendas for the homepage (cached)
+     */
+    public function getUpcomingEvents()
+    {
+        return Cache::remember('home_upcoming_events', now()->addHours(2), function () {
+            return Agenda::with('university:id,name,logo_url')
+                ->active()
+                ->where('date_start', '>=', now()->toDateString())
+                ->orderBy('date_start', 'asc')
+                ->limit(4)
+                ->get()
+                ->map(fn ($agenda) => [
+                    'id' => $agenda->id,
+                    'title' => $agenda->title,
+                    'slug' => $agenda->slug,
+                    'type' => $agenda->type,
+                    'thumbnail_url' => $agenda->thumbnail_url,
+                    'date_start' => $agenda->date_start?->format('Y-m-d'),
+                    'time_start' => $agenda->time_start?->format('H:i'),
+                    'location_type' => $agenda->location_type,
+                    'is_featured' => $agenda->is_featured,
+                    'university' => $agenda->university ? [
+                        'name' => $agenda->university->name,
+                        'logo_url' => $agenda->university->logo_url,
+                    ] : null,
+                ]);
         });
     }
 }
