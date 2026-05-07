@@ -281,6 +281,14 @@ Route::middleware(['auth'])->group(function () {
                 ->name('toggle-status');
         });
 
+        // Agenda / Events Management
+        Route::prefix('events')->name('events.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\AgendaController::class, 'index'])->name('index');
+            Route::post('{event}/toggle-active', [\App\Http\Controllers\Admin\AgendaController::class, 'toggleActive'])->name('toggle-active');
+            Route::post('{event}/toggle-featured', [\App\Http\Controllers\Admin\AgendaController::class, 'toggleFeatured'])->name('toggle-featured');
+            Route::delete('{event}', [\App\Http\Controllers\Admin\AgendaController::class, 'destroy'])->name('destroy');
+        });
+
     });
 
     /*
