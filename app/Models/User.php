@@ -50,6 +50,16 @@ class User extends Authenticatable
         'microsoft_id',
     ];
 
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(TicketMessage::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      */

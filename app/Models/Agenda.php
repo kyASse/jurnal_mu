@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\AgendaFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 
 class Agenda extends Model
 {
-    /** @use HasFactory<\Database\Factories\AgendaFactory> */
+    /** @use HasFactory<AgendaFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -85,11 +86,6 @@ class Agenda extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function registrations()
-    {
-        return $this->belongsToMany(User::class, 'agenda_registrations')->withTimestamps();
     }
 
     public function scopeForUniversity(Builder $query, int $universityId): Builder

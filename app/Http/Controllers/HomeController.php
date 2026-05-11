@@ -21,6 +21,7 @@ class HomeController extends Controller
         $featuredJournals = $this->homeService->getFeaturedJournals();
         $overallStats = $this->homeService->getOverallStats();
         $scientificFields = $this->homeService->getTopScientificFields();
+        $upcomingEvents = $this->homeService->getUpcomingEvents();
 
         return Inertia::render('welcome', [
             'featuredJournals' => $featuredJournals,
@@ -28,6 +29,7 @@ class HomeController extends Controller
             'totalJournals' => $overallStats['totalJournals'],
             'totalArticles' => $overallStats['totalArticles'],
             'scientificFields' => $scientificFields,
+            'upcomingEvents' => $upcomingEvents,
         ]);
     }
 }

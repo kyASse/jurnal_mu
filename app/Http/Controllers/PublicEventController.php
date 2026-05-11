@@ -15,7 +15,6 @@ class PublicEventController extends Controller
     public function index(Request $request): Response
     {
         $query = Agenda::query()
-            ->withCount('registrations')
             ->with('university:id,name,logo_url')
             ->active() // Only active events
             ->where('date_start', '>=', now()->toDateString()) // Upcoming events
@@ -44,7 +43,6 @@ class PublicEventController extends Controller
                 'location_venue' => $agenda->location_venue,
                 'price' => $agenda->price,
                 'quota' => $agenda->quota,
-                'registered_count' => $agenda->registrations_count ?? 0,
                 'is_featured' => $agenda->is_featured,
                 'university' => $agenda->university ? [
                     'name' => $agenda->university->name,

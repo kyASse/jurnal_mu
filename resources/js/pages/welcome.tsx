@@ -1,9 +1,10 @@
 import logoUrl from '@/assets/logo_dark.png';
+import { type EventCardProps } from '@/components/event-card';
 import JournalCard from '@/components/journal-card';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, GraduationCap, LayoutDashboard, Library, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface WelcomeProps extends SharedData {
@@ -27,10 +28,12 @@ interface WelcomeProps extends SharedData {
         id: number;
         name: string;
     }>;
+    upcomingEvents?: EventCardProps[];
 }
 
 export default function Welcome() {
-    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields } = usePage<WelcomeProps>().props;
+    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents } =
+        usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = () => {
@@ -64,6 +67,14 @@ export default function Welcome() {
                         </div>
 
                         <div className="flex items-center gap-2 sm:gap-4">
+                            <div className="hidden items-center gap-6 pr-4 sm:flex">
+                                <Link href={route('journals.index')} className="font-semibold text-white/90 transition-colors hover:text-white">
+                                    Journals
+                                </Link>
+                                <Link href={route('events.index')} className="font-semibold text-white/90 transition-colors hover:text-white">
+                                    Events
+                                </Link>
+                            </div>
                             {auth?.user ? (
                                 <Link href={route('dashboard')}>
                                     <Button variant="secondary" className="border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100">
@@ -227,6 +238,94 @@ export default function Welcome() {
                             />
                         ))}
                     </div>
+
+                    {/* UPCOMING EVENTS SECTION: Split-Screen & Minimalist List */}
+                    {upcomingEvents && upcomingEvents.length > 0 && (
+                        <div className="mt-32 mb-24 grid items-start gap-12 lg:grid-cols-12 lg:gap-16">
+                            {/* Sticky Left Column */}
+                            <div className="lg:sticky lg:top-24 lg:col-span-4">
+                                <h2 className="font-heading mb-4 text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                    Upcoming Events
+                                </h2>
+                                <p className="mb-8 text-gray-600 dark:text-gray-400">
+                                    Discover our curated selection of academic conferences, seminars, and workshops. Join the scholarly community to
+                                    expand your knowledge.
+                                </p>
+                                <Link href={route('events.index')}>
+                                    <Button
+                                        size="sm"
+                                        className="group rounded-full bg-[#1A2A75] px-6 py-6 text-base font-semibold hover:bg-[#131f57]"
+                                    >
+                                        Explore All Events
+                                        <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                                    </Button>
+                                </Link>
+                            </div>
+
+                            {/* Scrolling Right Column (Minimalist List) */}
+                            <div className="space-y-4 lg:col-span-8">
+                                {upcomingEvents.map((event, index) => {
+                                    // Parse date
+                                    const eventDate = event.date_start ? new Date(event.date_start) : null;
+                                    const day = eventDate ? eventDate.getDate() : '--';
+                                    const month = eventDate ? eventDate.toLocaleString('en-US', { month: 'short' }).toUpperCase() : 'TBA';
+
+                                    return (
+                                        <Link
+                                            key={event.id}
+                                            href={route('events.show', event.slug)}
+                                            className="group flex animate-fade-in-up flex-col items-start gap-6 border-b border-gray-200 py-8 transition-all hover:border-[#079C4E] sm:flex-row sm:items-center dark:border-gray-800"
+                                            style={{ animationDelay: `${index * 150}ms` }}
+                                        >
+                                            {/* Date Box */}
+                                            <div className="flex w-24 shrink-0 flex-col items-center justify-center rounded-2xl bg-gray-50 py-4 text-center transition-colors group-hover:bg-[#079C4E]/10 dark:bg-gray-900/50">
+                                                <span className="text-sm font-bold tracking-wider text-[#079C4E]">{month}</span>
+                                                <span className="mt-1 text-3xl font-black text-gray-900 dark:text-white">{day}</span>
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="flex-grow space-y-3 transition-transform duration-300 group-hover:translate-x-2">
+                                                <div className="flex flex-wrap items-center gap-3">
+                                                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold tracking-wide text-[#1A2A75] uppercase dark:bg-blue-900/30 dark:text-blue-300">
+                                                        {event.type}
+                                                    </span>
+                                                    {event.is_featured && (
+                                                        <span className="rounded-full bg-[#FCEE1F]/20 px-3 py-1 text-xs font-bold tracking-wide text-yellow-700 uppercase">
+                                                            Featured
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <h3 className="line-clamp-2 text-2xl leading-tight font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-gray-100">
+                                                    {event.title}
+                                                </h3>
+                                                <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Clock className="h-4 w-4 text-[#079C4E]" />
+                                                        <span>{event.time_start || 'TBA'} WIB</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <MapPin className="h-4 w-4 text-[#079C4E]" />
+                                                        <span className="capitalize">
+                                                            {event.location_type.toLowerCase() === 'online'
+                                                                ? 'Online'
+                                                                : event.location_type.toLowerCase() === 'hybrid'
+                                                                  ? `Hybrid - ${event.university?.name || 'TBA'}`
+                                                                  : event.university?.name || 'Venue TBA'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Hover Arrow */}
+                                            <div className="hidden shrink-0 items-center justify-center rounded-full bg-gray-100 p-4 text-gray-400 transition-all duration-300 group-hover:bg-[#079C4E] group-hover:text-white sm:flex dark:bg-gray-800">
+                                                <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
 
                     {/* JOURNALS BY SUBJECT SECTION */}
                     {scientificFields && scientificFields.length > 0 && (

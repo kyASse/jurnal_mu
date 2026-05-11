@@ -112,7 +112,6 @@ class AgendaController extends Controller
             'contact_person_phone' => 'nullable|string|max:50',
             'contact_person_email' => 'nullable|email|max:100',
             'is_active' => 'boolean',
-            'is_featured' => 'boolean',
         ]);
 
         // Handle file upload
@@ -197,7 +196,6 @@ class AgendaController extends Controller
             'contact_person_phone' => 'nullable|string|max:50',
             'contact_person_email' => 'nullable|email|max:100',
             'is_active' => 'boolean',
-            'is_featured' => 'boolean',
         ]);
 
         if ($request->hasFile('thumbnail')) {

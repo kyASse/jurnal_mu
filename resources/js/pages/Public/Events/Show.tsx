@@ -3,7 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PublicLayout from '@/layouts/public-layout';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Clock, ExternalLink, Globe, Mail, MapPin, Phone, User } from 'lucide-react';
+import {
+    ArrowLeft,
+    CalendarDays,
+    Clock,
+    Copy,
+    ExternalLink,
+    Globe,
+    Link2,
+    Mail,
+    MapPin,
+    MessageCircle,
+    Phone,
+    Share2,
+    Twitter,
+    User,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface AgendaDetails {
     id: number;
@@ -46,6 +62,72 @@ export default function Show({ agenda }: Props) {
             year: 'numeric',
         });
     };
+
+    const [countdown, setCountdown] = useState<{ days: number; hours: number; mins: number; secs: number } | null>(null);
+    const [eventStarted, setEventStarted] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!agenda.date_start) return;
+
+        const updateCountdown = () => {
+            const startDateTime = new Date(`${agenda.date_start}T${agenda.time_start || '00:00'}`);
+            const now = new Date();
+            const diff = startDateTime.getTime() - now.getTime();
+
+            if (diff <= 0) {
+                setEventStarted(true);
+                setCountdown(null);
+                return;
+            }
+
+            setCountdown({
+                days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+                hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                mins: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+                secs: Math.floor((diff % (1000 * 60)) / 1000),
+            });
+        };
+
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000);
+        return () => clearInterval(interval);
+    }, [agenda.date_start, agenda.time_start]);
+
+    const generateGoogleCalendarUrl = () => {
+        if (!agenda.date_start) return '#';
+
+        const formatForGCal = (dateStr: string, timeStr: string | null) => {
+            const d = new Date(`${dateStr}T${timeStr || '00:00'}`);
+            return d.toISOString().replace(/-|:|\.\d\d\d/g, '');
+        };
+
+        const start = formatForGCal(agenda.date_start, agenda.time_start);
+        // If no end date, default to start date + 1 hour
+        const end = formatForGCal(
+            agenda.date_end || agenda.date_start,
+            agenda.time_end || (agenda.time_start ? `${parseInt(agenda.time_start.split(':')[0]) + 1}:00` : '01:00'),
+        );
+
+        const params = new URLSearchParams({
+            action: 'TEMPLATE',
+            text: agenda.title,
+            details: `${agenda.description}\n\nLink: ${window.location.href}`,
+            location: agenda.location_venue || agenda.location_type,
+            dates: `${start}/${end}`,
+        });
+
+        return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    };
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const shareUrl = encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '');
+    const shareTitle = encodeURIComponent(agenda.title);
 
     const isFree = !agenda.price || parseFloat(agenda.price) === 0;
 
@@ -177,6 +259,36 @@ export default function Show({ agenda }: Props) {
                                             Registration Closed
                                         </Button>
                                     )}
+
+                                    {/* Countdown Timer */}
+                                    {countdown && !eventStarted && (
+                                        <div className="mt-6 rounded-xl border border-primary/10 bg-primary/5 p-4">
+                                            <p className="mb-2 text-center text-xs font-semibold tracking-wider text-primary uppercase">Starts In</p>
+                                            <div className="flex justify-center gap-3 text-center">
+                                                <div className="flex w-12 flex-col rounded-md bg-white p-2 shadow-sm dark:bg-zinc-900">
+                                                    <span className="text-xl font-bold">{countdown.days}</span>
+                                                    <span className="text-[10px] text-muted-foreground uppercase">Days</span>
+                                                </div>
+                                                <div className="flex w-12 flex-col rounded-md bg-white p-2 shadow-sm dark:bg-zinc-900">
+                                                    <span className="text-xl font-bold">{countdown.hours}</span>
+                                                    <span className="text-[10px] text-muted-foreground uppercase">Hrs</span>
+                                                </div>
+                                                <div className="flex w-12 flex-col rounded-md bg-white p-2 shadow-sm dark:bg-zinc-900">
+                                                    <span className="text-xl font-bold">{countdown.mins}</span>
+                                                    <span className="text-[10px] text-muted-foreground uppercase">Mins</span>
+                                                </div>
+                                                <div className="flex w-12 flex-col rounded-md bg-white p-2 shadow-sm dark:bg-zinc-900">
+                                                    <span className="text-xl font-bold text-primary">{countdown.secs}</span>
+                                                    <span className="text-[10px] text-muted-foreground uppercase">Secs</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {eventStarted && (
+                                        <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-center dark:border-green-900/50 dark:bg-green-900/20">
+                                            <p className="font-semibold text-green-700 dark:text-green-400">Event has started!</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Date & Time */}
@@ -185,8 +297,21 @@ export default function Show({ agenda }: Props) {
                                         <div className="mt-0.5 rounded-md bg-primary/10 p-2">
                                             <CalendarDays className="h-5 w-5 text-primary" />
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">Date</p>
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-sm font-medium text-muted-foreground">Date</p>
+                                                {agenda.date_start && (
+                                                    <a
+                                                        href={generateGoogleCalendarUrl()}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                                                    >
+                                                        <CalendarDays className="h-3 w-3" />
+                                                        Add to Calendar
+                                                    </a>
+                                                )}
+                                            </div>
                                             <p className="mt-0.5 font-semibold">{formatDate(agenda.date_start)}</p>
                                             {agenda.date_end && agenda.date_end !== agenda.date_start && (
                                                 <p className="font-semibold text-muted-foreground">to {formatDate(agenda.date_end)}</p>
@@ -238,6 +363,65 @@ export default function Show({ agenda }: Props) {
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Social Share Card */}
+                        <Card className="border-muted shadow-sm">
+                            <CardHeader className="bg-muted/20 pb-3">
+                                <CardTitle className="flex items-center text-base">
+                                    <Share2 className="mr-2 h-4 w-4 text-primary" />
+                                    Share this Event
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                <div className="flex items-center gap-3">
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full border-muted-foreground/20 hover:bg-[#25D366] hover:text-white"
+                                    >
+                                        <a
+                                            href={`https://wa.me/?text=${shareTitle}%20${shareUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="Share on WhatsApp"
+                                        >
+                                            <MessageCircle className="h-4 w-4" />
+                                        </a>
+                                    </Button>
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full border-muted-foreground/20 hover:bg-[#1DA1F2] hover:text-white"
+                                    >
+                                        <a
+                                            href={`https://twitter.com/intent/tweet?text=${shareTitle}&url=${shareUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="Share on Twitter"
+                                        >
+                                            <Twitter className="h-4 w-4" />
+                                        </a>
+                                    </Button>
+                                    <Button
+                                        onClick={copyToClipboard}
+                                        variant="outline"
+                                        className="flex-1 rounded-full border-muted-foreground/20 font-medium"
+                                    >
+                                        {copied ? (
+                                            <span className="flex items-center text-emerald-600">
+                                                <Copy className="mr-2 h-4 w-4" /> Copied!
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center">
+                                                <Link2 className="mr-2 h-4 w-4" /> Copy Link
+                                            </span>
+                                        )}
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>
