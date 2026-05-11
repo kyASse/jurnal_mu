@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
+use App\Notifications\NewLPPMRegistrationNotification;
+use App\Notifications\NewUserRegistrationNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -88,8 +90,7 @@ class RegisteredUserController extends Controller
             })->get();
 
             foreach ($diktiAdmins as $admin) {
-                // TODO: Send notification - NewLPPMRegistrationNotification
-                // $admin->notify(new NewLPPMRegistrationNotification($user));
+                $admin->notify(new NewLPPMRegistrationNotification($user));
             }
         } else {
             // Notify LPPM admins from the same university for User approval
@@ -101,8 +102,7 @@ class RegisteredUserController extends Controller
                 ->get();
 
             foreach ($lppmAdmins as $admin) {
-                // TODO: Send notification - NewUserRegistrationNotification
-                // $admin->notify(new NewUserRegistrationNotification($user));
+                $admin->notify(new NewUserRegistrationNotification($user));
             }
         }
 

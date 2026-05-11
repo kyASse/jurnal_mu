@@ -1,29 +1,33 @@
 <x-mail::message>
-# Assessment Revision Requested
+# Permintaan Revisi Penilaian Jurnal
 
-Dear {{ $assessment->user->name }},
+Yth. {{ $assessment->user->name }},
 
-The administrator has reviewed your self-assessment for **{{ $assessment->journal->title }}** and is requesting some revisions.
+Administrator telah meninjau asesmen mandiri Anda untuk jurnal **{{ $assessment->journal->title }}** dan meminta beberapa perbaikan (revisi).
 
-**Journal:** {{ $assessment->journal->title }}  
+**Jurnal:** {{ $assessment->journal->title }}  
 **ISSN:** {{ $assessment->journal->issn }}  
-**Submitted:** {{ $assessment->submitted_at?->format('d M Y H:i') }}  
-**Reviewed:** {{ $assessment->reviewed_at?->format('d M Y H:i') }}
+**Diajukan pada:** {{ $assessment->submitted_at?->format('d M Y H:i') }} WIB  
+**Ditinjau pada:** {{ $assessment->reviewed_at?->format('d M Y H:i') }} WIB
 
-## Administrator's Feedback
+## Catatan Perbaikan (Feedback)
 
 {{ $adminNotes }}
 
-## What's Next?
+## Langkah Selanjutnya
 
-Your assessment has been returned to **draft** status. Please review the administrator's feedback, make the necessary changes, and resubmit your assessment.
+Asesmen Anda telah dikembalikan menjadi status **Draf**. Silakan tinjau kembali masukan dari administrator, lakukan perubahan yang diperlukan, dan ajukan kembali asesmen Anda.
 
-<x-mail::button :url="$url">
-Edit Assessment
+<x-mail::button :url="$url" color="error">
+Perbaiki Asesmen
 </x-mail::button>
 
-If you have any questions about the requested revisions, please contact your university administrator.
+Jika Anda memiliki pertanyaan terkait perbaikan yang diminta, silakan hubungi Admin LPPM universitas Anda.
 
-Best regards,<br>
-{{ config('app.name') }}
+Terima kasih,
+
+**Tim Journal MU**
 </x-mail::message>
+
+---
+*Email ini dikirim otomatis oleh sistem Journal MU. Harap tidak membalas email ini.*

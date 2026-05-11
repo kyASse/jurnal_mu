@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateJournalRequest;
 use App\Imports\JournalsImport;
 use App\Jobs\HarvestJournalArticlesJob;
 use App\Models\Journal;
+use App\Notifications\JournalReassignedNotification;
 use App\Models\Role;
 use App\Models\ScientificField;
 use App\Models\User;
@@ -928,9 +929,8 @@ class JournalController extends Controller
             'user_id' => $request->new_user_id,
         ]);
 
-        // TODO: Send JournalReassignedNotification to both users
-        // $oldUser->notify(new JournalReassignedNotification($journal, 'removed'));
-        // $newUser->notify(new JournalReassignedNotification($journal, 'assigned'));
+        $oldUser->notify(new JournalReassignedNotification($journal, 'removed'));
+        $newUser->notify(new JournalReassignedNotification($journal, 'assigned'));
 
         return back()->with('success', "Jurnal \"{$journal->name}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
     }

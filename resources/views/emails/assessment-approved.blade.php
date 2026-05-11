@@ -1,29 +1,33 @@
 <x-mail::message>
-# Assessment Approved
+# Penilaian Jurnal Disetujui
 
-Dear {{ $assessment->user->name }},
+Yth. {{ $assessment->user->name }},
 
-Good news! Your self-assessment for **{{ $assessment->journal->title }}** has been reviewed and approved by the administrator.
+Kabar baik! Asesmen mandiri Anda untuk jurnal **{{ $assessment->journal->title }}** telah ditinjau dan **disetujui** oleh administrator.
 
-**Journal:** {{ $assessment->journal->title }}  
+**Jurnal:** {{ $assessment->journal->title }}  
 **ISSN:** {{ $assessment->journal->issn }}  
-**Submitted:** {{ $assessment->submitted_at?->format('d M Y H:i') }}  
-**Reviewed:** {{ $assessment->reviewed_at?->format('d M Y H:i') }}
+**Diajukan pada:** {{ $assessment->submitted_at?->format('d M Y H:i') }} WIB  
+**Ditinjau pada:** {{ $assessment->reviewed_at?->format('d M Y H:i') }} WIB
 
 @if($adminNotes)
-## Administrator's Notes
+## Catatan Administrator
 
 {{ $adminNotes }}
 @endif
 
-You can now view the complete assessment report and download the certificate if applicable.
+Anda sekarang dapat melihat laporan penilaian lengkap.
 
-<x-mail::button :url="$url">
-View Assessment
+<x-mail::button :url="$url" color="success">
+Lihat Hasil Penilaian
 </x-mail::button>
 
-Thank you for completing your journal assessment.
+Terima kasih telah menyelesaikan asesmen jurnal Anda.
 
-Best regards,<br>
-{{ config('app.name') }}
+Terima kasih,
+
+**Tim Journal MU**
 </x-mail::message>
+
+---
+*Email ini dikirim otomatis oleh sistem Journal MU. Harap tidak membalas email ini.*

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dikti;
 use App\Http\Controllers\Controller;
 use App\Models\JournalAssessment;
 use App\Models\User;
+use App\Notifications\ReviewerAssignedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -159,8 +160,7 @@ class AssessmentController extends Controller
             'content' => "Reviewer ditugaskan: {$reviewer->name}. ".($validated['assignment_notes'] ?? ''),
         ]);
 
-        // TODO: Send notification to reviewer
-        // $reviewer->notify(new ReviewerAssignedNotification($assessment));
+        $reviewer->notify(new ReviewerAssignedNotification($assessment));
 
         return redirect()
             ->route('dikti.assessments.index')
