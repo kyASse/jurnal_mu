@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TicketController extends Controller
 {
@@ -37,7 +37,7 @@ class TicketController extends Controller
         $ticket->load(['messages.user', 'user']);
 
         return Inertia::render('Admin/Tickets/Show', [
-            'ticket' => $ticket
+            'ticket' => $ticket,
         ]);
     }
 
@@ -60,7 +60,7 @@ class TicketController extends Controller
             'message' => $validated['message'],
             'attachment_path' => $attachmentPath,
         ]);
-        
+
         // Admin replying often means it is in progress if it was open
         if ($ticket->status === 'open') {
             $ticket->update(['status' => 'in_progress']);
@@ -79,7 +79,7 @@ class TicketController extends Controller
 
         $ticket->update(['status' => $validated['status']]);
 
-        return redirect()->back()->with('success', 'Ticket status updated to ' . $validated['status'] . '.');
+        return redirect()->back()->with('success', 'Ticket status updated to '.$validated['status'].'.');
     }
 
     public function destroy(Ticket $ticket)

@@ -62,7 +62,6 @@ class User extends Authenticatable
 
     /**
      * Get the attributes that should be cast.
-
      */
     protected function casts(): array
     {

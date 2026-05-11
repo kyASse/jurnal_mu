@@ -20,7 +20,10 @@ class TicketPolicy
      */
     public function view(User $user, Ticket $ticket): bool
     {
-        if ($user->isSuperAdmin()) return true;
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
         return $user->id === $ticket->user_id;
     }
 
@@ -54,7 +57,10 @@ class TicketPolicy
      */
     public function reply(User $user, Ticket $ticket): bool
     {
-        if ($user->isSuperAdmin()) return true;
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
         return $user->id === $ticket->user_id;
     }
 }

@@ -2,8 +2,10 @@
 
 use App\Models\Role;
 use App\Models\ScientificField;
+use App\Models\University;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\UploadedFile;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -22,7 +24,7 @@ beforeEach(function () {
     $this->superAdmin->save();
 
     // Create a university first to satisfy foreign key constraint
-    $this->university = \App\Models\University::factory()->create();
+    $this->university = University::factory()->create();
 
     $this->adminKampus = clone User::factory()->make([
         'role_id' => $this->adminKampusRoleId,
@@ -101,7 +103,7 @@ it('allows super admin to delete a scientific field', function () {
 
     $response->assertRedirect();
 
-    if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(ScientificField::class))) {
+    if (in_array(SoftDeletes::class, class_uses_recursive(ScientificField::class))) {
         $this->assertSoftDeleted('scientific_fields', ['id' => $field->id]);
     } else {
         $this->assertDatabaseMissing('scientific_fields', ['id' => $field->id]);

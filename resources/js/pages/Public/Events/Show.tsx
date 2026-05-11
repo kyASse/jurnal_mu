@@ -3,7 +3,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PublicLayout from '@/layouts/public-layout';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Clock, Copy, ExternalLink, Globe, Link2, Mail, MapPin, MessageCircle, Phone, Share2, Twitter, User } from 'lucide-react';
+import {
+    ArrowLeft,
+    CalendarDays,
+    Clock,
+    Copy,
+    ExternalLink,
+    Globe,
+    Link2,
+    Mail,
+    MapPin,
+    MessageCircle,
+    Phone,
+    Share2,
+    Twitter,
+    User,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface AgendaDetails {
@@ -89,7 +104,10 @@ export default function Show({ agenda }: Props) {
 
         const start = formatForGCal(agenda.date_start, agenda.time_start);
         // If no end date, default to start date + 1 hour
-        const end = formatForGCal(agenda.date_end || agenda.date_start, agenda.time_end || (agenda.time_start ? `${parseInt(agenda.time_start.split(':')[0]) + 1}:00` : '01:00'));
+        const end = formatForGCal(
+            agenda.date_end || agenda.date_start,
+            agenda.time_end || (agenda.time_start ? `${parseInt(agenda.time_start.split(':')[0]) + 1}:00` : '01:00'),
+        );
 
         const params = new URLSearchParams({
             action: 'TEMPLATE',
@@ -244,8 +262,8 @@ export default function Show({ agenda }: Props) {
 
                                     {/* Countdown Timer */}
                                     {countdown && !eventStarted && (
-                                        <div className="mt-6 rounded-xl bg-primary/5 p-4 border border-primary/10">
-                                            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-primary">Starts In</p>
+                                        <div className="mt-6 rounded-xl border border-primary/10 bg-primary/5 p-4">
+                                            <p className="mb-2 text-center text-xs font-semibold tracking-wider text-primary uppercase">Starts In</p>
                                             <div className="flex justify-center gap-3 text-center">
                                                 <div className="flex w-12 flex-col rounded-md bg-white p-2 shadow-sm dark:bg-zinc-900">
                                                     <span className="text-xl font-bold">{countdown.days}</span>
@@ -267,7 +285,7 @@ export default function Show({ agenda }: Props) {
                                         </div>
                                     )}
                                     {eventStarted && (
-                                        <div className="mt-6 rounded-xl bg-green-50 p-4 border border-green-200 text-center dark:bg-green-900/20 dark:border-green-900/50">
+                                        <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-center dark:border-green-900/50 dark:bg-green-900/20">
                                             <p className="font-semibold text-green-700 dark:text-green-400">Event has started!</p>
                                         </div>
                                     )}
@@ -287,7 +305,7 @@ export default function Show({ agenda }: Props) {
                                                         href={generateGoogleCalendarUrl()}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+                                                        className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                                                     >
                                                         <CalendarDays className="h-3 w-3" />
                                                         Add to Calendar
@@ -359,21 +377,49 @@ export default function Show({ agenda }: Props) {
                             </CardHeader>
                             <CardContent className="pt-4">
                                 <div className="flex items-center gap-3">
-                                    <Button asChild variant="outline" size="icon" className="rounded-full hover:bg-[#25D366] hover:text-white border-muted-foreground/20">
-                                        <a href={`https://wa.me/?text=${shareTitle}%20${shareUrl}`} target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full border-muted-foreground/20 hover:bg-[#25D366] hover:text-white"
+                                    >
+                                        <a
+                                            href={`https://wa.me/?text=${shareTitle}%20${shareUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="Share on WhatsApp"
+                                        >
                                             <MessageCircle className="h-4 w-4" />
                                         </a>
                                     </Button>
-                                    <Button asChild variant="outline" size="icon" className="rounded-full hover:bg-[#1DA1F2] hover:text-white border-muted-foreground/20">
-                                        <a href={`https://twitter.com/intent/tweet?text=${shareTitle}&url=${shareUrl}`} target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter">
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full border-muted-foreground/20 hover:bg-[#1DA1F2] hover:text-white"
+                                    >
+                                        <a
+                                            href={`https://twitter.com/intent/tweet?text=${shareTitle}&url=${shareUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="Share on Twitter"
+                                        >
                                             <Twitter className="h-4 w-4" />
                                         </a>
                                     </Button>
-                                    <Button onClick={copyToClipboard} variant="outline" className="flex-1 rounded-full border-muted-foreground/20 font-medium">
+                                    <Button
+                                        onClick={copyToClipboard}
+                                        variant="outline"
+                                        className="flex-1 rounded-full border-muted-foreground/20 font-medium"
+                                    >
                                         {copied ? (
-                                            <span className="flex items-center text-emerald-600"><Copy className="mr-2 h-4 w-4" /> Copied!</span>
+                                            <span className="flex items-center text-emerald-600">
+                                                <Copy className="mr-2 h-4 w-4" /> Copied!
+                                            </span>
                                         ) : (
-                                            <span className="flex items-center"><Link2 className="mr-2 h-4 w-4" /> Copy Link</span>
+                                            <span className="flex items-center">
+                                                <Link2 className="mr-2 h-4 w-4" /> Copy Link
+                                            </span>
                                         )}
                                     </Button>
                                 </div>
