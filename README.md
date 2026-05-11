@@ -1,8 +1,8 @@
-# JurnalMu - Muhammadiyah Journal Portal
+# JournalMu - Muhammadiyah Journal Portal
 
 <div align="center">
 
-![JurnalMu Landing Page](https://github.com/user-attachments/assets/e12c4942-2466-4e45-94bb-f8504e938e6c)
+![JurnalMu Landing Page](https://github.com/user-attachments/assets/3c6c0520-84a2-421d-b116-b87eea4669e1)
 
 **Platform Manajemen Jurnal Ilmiah untuk Perguruan Tinggi Muhammadiyah (PTM) se-Indonesia**
 
