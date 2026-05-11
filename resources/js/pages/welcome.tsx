@@ -1,10 +1,10 @@
 import logoUrl from '@/assets/logo_dark.png';
-import EventCard, { type EventCardProps } from '@/components/event-card';
+import { type EventCardProps } from '@/components/event-card';
 import JournalCard from '@/components/journal-card';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, CalendarDays, GraduationCap, LayoutDashboard, Library, Search, Clock, MapPin } from 'lucide-react';
+import { ArrowRight, BookOpen, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface WelcomeProps extends SharedData {
@@ -32,7 +32,8 @@ interface WelcomeProps extends SharedData {
 }
 
 export default function Welcome() {
-    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents } = usePage<WelcomeProps>().props;
+    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents } =
+        usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = () => {
@@ -247,10 +248,14 @@ export default function Welcome() {
                                     Upcoming Events
                                 </h2>
                                 <p className="mb-8 text-gray-600 dark:text-gray-400">
-                                    Discover our curated selection of academic conferences, seminars, and workshops. Join the scholarly community to expand your knowledge.
+                                    Discover our curated selection of academic conferences, seminars, and workshops. Join the scholarly community to
+                                    expand your knowledge.
                                 </p>
                                 <Link href={route('events.index')}>
-                                    <Button size="sm" className="group rounded-full bg-[#1A2A75] px-6 py-6 text-base font-semibold hover:bg-[#131f57]">
+                                    <Button
+                                        size="sm"
+                                        className="group rounded-full bg-[#1A2A75] px-6 py-6 text-base font-semibold hover:bg-[#131f57]"
+                                    >
                                         Explore All Events
                                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                                     </Button>
@@ -304,8 +309,8 @@ export default function Welcome() {
                                                             {event.location_type.toLowerCase() === 'online'
                                                                 ? 'Online'
                                                                 : event.location_type.toLowerCase() === 'hybrid'
-                                                                    ? `Hybrid - ${event.university?.name || 'TBA'}`
-                                                                    : event.university?.name || 'Venue TBA'}
+                                                                  ? `Hybrid - ${event.university?.name || 'TBA'}`
+                                                                  : event.university?.name || 'Venue TBA'}
                                                         </span>
                                                     </div>
                                                 </div>

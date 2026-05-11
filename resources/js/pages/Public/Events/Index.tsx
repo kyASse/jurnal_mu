@@ -1,25 +1,14 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from '@/components/ui/pagination';
-import { Progress } from '@/components/ui/progress';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PublicLayout from '@/layouts/public-layout';
 import { PaginatedData } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { CalendarDays, Clock, MapPin, Search } from 'lucide-react';
-import { FormEvent, useEffect, useState } from 'react';
+import { Head, router } from '@inertiajs/react';
+import { CalendarDays, Search } from 'lucide-react';
+import { FormEvent, useState } from 'react';
 
 import EventCard, { type EventCardProps as AgendaItem } from '@/components/event-card';
-
 
 interface Props {
     agendas: PaginatedData<AgendaItem>;

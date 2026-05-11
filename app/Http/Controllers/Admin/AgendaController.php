@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agenda;
+use App\Models\University;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -33,7 +34,7 @@ class AgendaController extends Controller
         if ($request->has('is_active') && $request->is_active !== null && $request->is_active !== '') {
             $query->where('is_active', $request->boolean('is_active'));
         }
-        
+
         if ($request->has('is_featured') && $request->is_featured !== null && $request->is_featured !== '') {
             $query->where('is_featured', $request->boolean('is_featured'));
         }
@@ -54,7 +55,7 @@ class AgendaController extends Controller
             ]);
 
         // Get universities for filter
-        $universities = \App\Models\University::select('id', 'name')->orderBy('name')->get();
+        $universities = University::select('id', 'name')->orderBy('name')->get();
 
         return Inertia::render('Admin/Events/Index', [
             'events' => $agendas,
@@ -68,18 +69,18 @@ class AgendaController extends Controller
      */
     public function toggleActive(Agenda $event)
     {
-        $event->update(['is_active' => !$event->is_active]);
-        
+        $event->update(['is_active' => ! $event->is_active]);
+
         return redirect()->back()->with('success', 'Status agenda berhasil diperbarui.');
     }
-    
+
     /**
      * Toggle the featured status of the agenda.
      */
     public function toggleFeatured(Agenda $event)
     {
-        $event->update(['is_featured' => !$event->is_featured]);
-        
+        $event->update(['is_featured' => ! $event->is_featured]);
+
         return redirect()->back()->with('success', 'Status featured agenda berhasil diperbarui.');
     }
 
@@ -89,7 +90,7 @@ class AgendaController extends Controller
     public function destroy(Agenda $event)
     {
         $event->delete();
-        
+
         return redirect()->back()->with('success', 'Agenda berhasil dihapus.');
     }
 }

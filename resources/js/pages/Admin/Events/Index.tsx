@@ -3,7 +3,7 @@
  * @features Display all events list for Super Admin with search, filter, and delete actions
  */
 import { Head, router } from '@inertiajs/react';
-import { CalendarDays, Search, Trash2, Star, CheckCircle, XCircle } from 'lucide-react';
+import { CalendarDays, Search, Star, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -163,14 +163,12 @@ export default function EventsIndex({ events, filters }: Props) {
                                             <TableCell>{event.university || 'N/A'}</TableCell>
                                             <TableCell>{new Date(event.date_start).toLocaleDateString()}</TableCell>
                                             <TableCell className="text-center">
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm" 
-                                                    onClick={() => toggleActive(event.id)}
-                                                    title="Toggle Active Status"
-                                                >
+                                                <Button variant="ghost" size="sm" onClick={() => toggleActive(event.id)} title="Toggle Active Status">
                                                     {event.is_active ? (
-                                                        <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                                                        <Badge
+                                                            variant="default"
+                                                            className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                                                        >
                                                             Active
                                                         </Badge>
                                                     ) : (
@@ -179,14 +177,14 @@ export default function EventsIndex({ events, filters }: Props) {
                                                 </Button>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm" 
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
                                                     onClick={() => toggleFeatured(event.id)}
                                                     title="Toggle Featured Status"
                                                 >
                                                     {event.is_featured ? (
-                                                        <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                                                        <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
                                                     ) : (
                                                         <Star className="h-5 w-5 text-gray-300" />
                                                     )}
@@ -230,26 +228,16 @@ export default function EventsIndex({ events, filters }: Props) {
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex gap-2">
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm" 
-                                                    className="px-0"
-                                                    onClick={() => toggleActive(event.id)}
-                                                >
+                                                <Button variant="ghost" size="sm" className="px-0" onClick={() => toggleActive(event.id)}>
                                                     {event.is_active ? (
                                                         <Badge className="bg-green-100 text-green-800">Active</Badge>
                                                     ) : (
                                                         <Badge variant="secondary">Draft</Badge>
                                                     )}
                                                 </Button>
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm" 
-                                                    className="px-0"
-                                                    onClick={() => toggleFeatured(event.id)}
-                                                >
+                                                <Button variant="ghost" size="sm" className="px-0" onClick={() => toggleFeatured(event.id)}>
                                                     {event.is_featured ? (
-                                                        <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                                                        <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
                                                     ) : (
                                                         <Star className="h-5 w-5 text-gray-300" />
                                                     )}

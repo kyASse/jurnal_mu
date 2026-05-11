@@ -4,10 +4,9 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TicketController extends Controller
 {
@@ -23,7 +22,7 @@ class TicketController extends Controller
             ->paginate(10);
 
         return Inertia::render('User/Tickets/Index', [
-            'tickets' => $tickets
+            'tickets' => $tickets,
         ]);
     }
 
@@ -76,7 +75,7 @@ class TicketController extends Controller
         $ticket->load(['messages.user', 'user']);
 
         return Inertia::render('User/Tickets/Show', [
-            'ticket' => $ticket
+            'ticket' => $ticket,
         ]);
     }
 
@@ -99,7 +98,7 @@ class TicketController extends Controller
             'message' => $validated['message'],
             'attachment_path' => $attachmentPath,
         ]);
-        
+
         // Ensure ticket status isn't closed if user replies.
         if ($ticket->status === 'closed') {
             $ticket->update(['status' => 'open']);

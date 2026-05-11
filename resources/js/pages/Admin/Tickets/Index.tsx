@@ -1,12 +1,12 @@
-import { Head, router } from '@inertiajs/react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Head, router } from '@inertiajs/react';
+import { AlertCircle, Eye } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -14,20 +14,29 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function AdminIndex({ tickets, filters }: any) {
-    const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
         switch (status) {
-            case 'open': return 'default';
-            case 'in_progress': return 'secondary';
-            case 'resolved': return 'outline';
-            case 'closed': return 'secondary';
-            default: return 'default';
+            case 'open':
+                return 'default';
+            case 'in_progress':
+                return 'secondary';
+            case 'resolved':
+                return 'outline';
+            case 'closed':
+                return 'secondary';
+            default:
+                return 'default';
         }
     };
 
     const handleFilterChange = (status: string) => {
-        router.get(route('admin.tickets.index'), {
-            status: status !== 'all' ? status : undefined
-        }, { preserveState: true, replace: true });
+        router.get(
+            route('admin.tickets.index'),
+            {
+                status: status !== 'all' ? status : undefined,
+            },
+            { preserveState: true, replace: true },
+        );
     };
 
     return (
@@ -35,10 +44,10 @@ export default function AdminIndex({ tickets, filters }: any) {
             <Head title="Manage Tickets" />
 
             <div className="flex flex-col gap-6 p-4 lg:p-6">
-                <div className="flex sm:items-center justify-between flex-col sm:flex-row gap-4">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">Support Tickets</h1>
-                        <p className="text-muted-foreground mt-1">Review and reply to user bug reports and support requests.</p>
+                        <p className="mt-1 text-muted-foreground">Review and reply to user bug reports and support requests.</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Select value={filters?.status || 'all'} onValueChange={handleFilterChange}>
@@ -57,8 +66,8 @@ export default function AdminIndex({ tickets, filters }: any) {
                 </div>
 
                 {/* Dashboard Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                     <Card>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Platform Tickets</CardTitle>
                             <AlertCircle className="h-4 w-4 text-muted-foreground" />
@@ -77,14 +86,14 @@ export default function AdminIndex({ tickets, filters }: any) {
                     </CardHeader>
                     <CardContent>
                         {tickets.data.length === 0 ? (
-                            <div className="text-center py-10">
+                            <div className="py-10 text-center">
                                 <h3 className="text-lg font-medium text-muted-foreground">No tickets found</h3>
-                                <p className="text-sm text-muted-foreground mt-1">There are no tickets matching your criteria.</p>
+                                <p className="mt-1 text-sm text-muted-foreground">There are no tickets matching your criteria.</p>
                             </div>
                         ) : (
                             <>
                                 {/* Desktop Table View */}
-                                <div className="hidden md:block overflow-x-auto">
+                                <div className="hidden overflow-x-auto md:block">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -106,15 +115,19 @@ export default function AdminIndex({ tickets, filters }: any) {
                                                     <TableCell className="max-w-[200px] truncate">{ticket.subject}</TableCell>
                                                     <TableCell className="capitalize">{ticket.category.replace('_', ' ')}</TableCell>
                                                     <TableCell className="capitalize">{ticket.priority}</TableCell>
-                                                    <TableCell className="text-muted-foreground text-sm">{new Date(ticket.created_at).toLocaleDateString()}</TableCell>
+                                                    <TableCell className="text-sm text-muted-foreground">
+                                                        {new Date(ticket.created_at).toLocaleDateString()}
+                                                    </TableCell>
                                                     <TableCell>
-                                                        <Badge variant={getStatusVariant(ticket.status)}>
-                                                            {ticket.status.replace('_', ' ')}
-                                                        </Badge>
+                                                        <Badge variant={getStatusVariant(ticket.status)}>{ticket.status.replace('_', ' ')}</Badge>
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <Button variant="ghost" size="sm" onClick={() => router.visit(route('admin.tickets.show', ticket.id))}>
-                                                            <Eye className="w-4 h-4 mr-2" /> Details
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => router.visit(route('admin.tickets.show', ticket.id))}
+                                                        >
+                                                            <Eye className="mr-2 h-4 w-4" /> Details
                                                         </Button>
                                                     </TableCell>
                                                 </TableRow>
@@ -126,23 +139,32 @@ export default function AdminIndex({ tickets, filters }: any) {
                                 {/* Mobile Card View */}
                                 <div className="grid grid-cols-1 gap-4 md:hidden">
                                     {tickets.data.map((ticket: any) => (
-                                        <div key={ticket.id} className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
-                                            <div className="flex justify-between items-start gap-2">
+                                        <div key={ticket.id} className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+                                            <div className="flex items-start justify-between gap-2">
                                                 <div>
-                                                    <span className="text-xs font-semibold text-muted-foreground block mb-1">#{ticket.id} • {new Date(ticket.created_at).toLocaleDateString()}</span>
-                                                    <h4 className="font-medium line-clamp-2 text-sm">{ticket.subject}</h4>
-                                                    <p className="text-xs text-muted-foreground mt-1">By: {ticket.user.name}</p>
+                                                    <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+                                                        #{ticket.id} • {new Date(ticket.created_at).toLocaleDateString()}
+                                                    </span>
+                                                    <h4 className="line-clamp-2 text-sm font-medium">{ticket.subject}</h4>
+                                                    <p className="mt-1 text-xs text-muted-foreground">By: {ticket.user.name}</p>
                                                 </div>
-                                                <Badge variant={getStatusVariant(ticket.status)}>
-                                                    {ticket.status.replace('_', ' ')}
+                                                <Badge variant={getStatusVariant(ticket.status)}>{ticket.status.replace('_', ' ')}</Badge>
+                                            </div>
+                                            <div className="mt-1 flex flex-wrap gap-2 text-xs">
+                                                <Badge variant="secondary" className="capitalize">
+                                                    {ticket.category.replace('_', ' ')}
+                                                </Badge>
+                                                <Badge variant="default" className="capitalize">
+                                                    {ticket.priority} Priority
                                                 </Badge>
                                             </div>
-                                            <div className="flex flex-wrap gap-2 text-xs mt-1">
-                                                <Badge variant="secondary" className="capitalize">{ticket.category.replace('_', ' ')}</Badge>
-                                                <Badge variant="default" className="capitalize">{ticket.priority} Priority</Badge>
-                                            </div>
-                                            <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => router.visit(route('admin.tickets.show', ticket.id))}>
-                                                <Eye className="w-4 h-4 mr-2" /> View Details
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="mt-2 w-full"
+                                                onClick={() => router.visit(route('admin.tickets.show', ticket.id))}
+                                            >
+                                                <Eye className="mr-2 h-4 w-4" /> View Details
                                             </Button>
                                         </div>
                                     ))}

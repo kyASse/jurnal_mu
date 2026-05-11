@@ -142,9 +142,7 @@ export default function EventCard({ agenda }: { agenda: EventCardProps }) {
                     {/* Capacity */}
                     {agenda.quota && (
                         <div className="border-t border-border/50 pt-2">
-                            <div className="flex items-center text-xs font-medium text-muted-foreground">
-                                Capacity: {agenda.quota} Participants
-                            </div>
+                            <div className="flex items-center text-xs font-medium text-muted-foreground">Capacity: {agenda.quota} Participants</div>
                         </div>
                     )}
                 </div>
