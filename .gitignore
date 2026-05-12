@@ -27,3 +27,5 @@ yarn-error.log
 /.zed
 docker-compose.yml
 Dockerfile
+/docker
+sail
