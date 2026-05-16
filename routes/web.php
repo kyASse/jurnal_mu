@@ -222,6 +222,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('universities', UniversityController::class);
         Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
             ->name('universities.toggle-active');
+        Route::post('universities/{university}/handle-pending-updates', [UniversityController::class, 'handlePendingUpdates'])
+            ->name('universities.handle-pending-updates');
 
         // Admin Kampus Management
         Route::resource('admin-kampus', AdminKampusController::class);

@@ -6,7 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PageProps, type University } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Building2, Save } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Building2, Save, AlertCircle, Clock } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -16,12 +18,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Edit({ university }: PageProps<{ university: University }>) {
     const { data, setData, put, processing, errors } = useForm({
+        name: university.name || '',
+        code: university.code || '',
+        ptm_code: university.ptm_code || '',
         profile_description: university.profile_description || '',
         website: university.website || '',
         email: university.email || '',
         phone: university.phone || '',
         address: university.address || '',
     });
+
+    const pendingUpdates = university.pending_updates || {};
+    const hasPendingUpdates = Object.keys(pendingUpdates).length > 0;
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -41,6 +49,21 @@ export default function Edit({ university }: PageProps<{ university: University 
                 </div>
 
                 <div className="grid gap-6">
+                    {hasPendingUpdates && (
+                        <Alert className="bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/50 dark:text-amber-200 dark:border-amber-900">
+                            <Clock className="h-4 w-4 stroke-amber-600 dark:stroke-amber-400" />
+                            <AlertTitle>Menunggu Persetujuan</AlertTitle>
+                            <AlertDescription>
+                                Perubahan data dasar universitas Anda (Nama, Singkatan, atau Kode) sedang menunggu persetujuan dari pihak Dikti.
+                                <ul className="mt-2 list-disc pl-5">
+                                    {pendingUpdates.name && <li>Nama: <span className="font-semibold">{pendingUpdates.name}</span></li>}
+                                    {pendingUpdates.code && <li>Singkatan: <span className="font-semibold">{pendingUpdates.code}</span></li>}
+                                    {pendingUpdates.ptm_code && <li>Kode PTM: <span className="font-semibold">{pendingUpdates.ptm_code}</span></li>}
+                                </ul>
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
@@ -48,26 +71,58 @@ export default function Edit({ university }: PageProps<{ university: University 
                                 Informasi Dasar
                             </CardTitle>
                             <CardDescription>
-                                Data dasar universitas. Untuk mengubah singkatan, kode, atau nama universitas, silakan hubungi pihak Dikti.
+                                Data dasar universitas. Mengubah bidang ini akan memerlukan persetujuan dari pihak Dikti sebelum diterapkan.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <div>
-                                    <Label>Kode PT</Label>
-                                    <Input type="text" className="mt-1 bg-neutral-100 dark:bg-neutral-800" value={university.code || ''} disabled />
-                                </div>
+                            <form id="university-form" onSubmit={submit} className="space-y-6">
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div>
+                                        <Label htmlFor="ptm_code" className="flex items-center gap-2">
+                                            Kode PTM
+                                            {pendingUpdates.ptm_code && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900">Pending</Badge>}
+                                        </Label>
+                                        <Input 
+                                            id="ptm_code"
+                                            type="text" 
+                                            className="mt-1" 
+                                            value={data.ptm_code} 
+                                            onChange={(e) => setData('ptm_code', e.target.value)}
+                                        />
+                                        <InputError message={errors.ptm_code} className="mt-2" />
+                                    </div>
 
-                                <div>
-                                    <Label>Singkatan</Label>
-                                    <Input type="text" className="mt-1 bg-neutral-100 dark:bg-neutral-800" value={university.short_name || ''} disabled />
-                                </div>
+                                    <div>
+                                        <Label htmlFor="code" className="flex items-center gap-2">
+                                            Singkatan
+                                            {pendingUpdates.code && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900">Pending</Badge>}
+                                        </Label>
+                                        <Input 
+                                            id="code"
+                                            type="text" 
+                                            className="mt-1" 
+                                            value={data.code} 
+                                            onChange={(e) => setData('code', e.target.value)}
+                                        />
+                                        <InputError message={errors.code} className="mt-2" />
+                                    </div>
 
-                                <div className="md:col-span-2">
-                                    <Label>Nama Universitas</Label>
-                                    <Input type="text" className="mt-1 bg-neutral-100 dark:bg-neutral-800" value={university.name || ''} disabled />
+                                    <div className="md:col-span-2">
+                                        <Label htmlFor="name" className="flex items-center gap-2">
+                                            Nama Universitas
+                                            {pendingUpdates.name && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900">Pending</Badge>}
+                                        </Label>
+                                        <Input 
+                                            id="name"
+                                            type="text" 
+                                            className="mt-1" 
+                                            value={data.name} 
+                                            onChange={(e) => setData('name', e.target.value)}
+                                        />
+                                        <InputError message={errors.name} className="mt-2" />
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </CardContent>
                     </Card>
 
@@ -82,12 +137,12 @@ export default function Edit({ university }: PageProps<{ university: University 
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={submit} className="space-y-6">
+                            <div className="space-y-6">
                                 <div>
                                     <Label htmlFor="profile_description">Deskripsi Singkat</Label>
                                     <textarea
                                         id="profile_description"
-                                        className="mt-1 block w-full rounded-md border-border bg-background shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                        className="mt-1 block w-full rounded-md border-border bg-background p-3 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                         rows={4}
                                         value={data.profile_description}
                                         onChange={(e) => setData('profile_description', e.target.value)}
@@ -137,7 +192,7 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         <Label htmlFor="address">Alamat Lengkap</Label>
                                         <textarea
                                             id="address"
-                                            className="mt-1 block w-full rounded-md border-border bg-background shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                            className="mt-1 block w-full rounded-md border-border bg-background p-3 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                             rows={3}
                                             value={data.address}
                                             onChange={(e) => setData('address', e.target.value)}
@@ -147,12 +202,12 @@ export default function Edit({ university }: PageProps<{ university: University 
                                 </div>
 
                                 <div className="flex items-center justify-end">
-                                    <Button disabled={processing} className="gap-2">
+                                    <Button disabled={processing} form="university-form" onClick={submit} className="gap-2">
                                         <Save className="h-4 w-4" />
                                         Simpan Perubahan
                                     </Button>
                                 </div>
-                            </form>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
