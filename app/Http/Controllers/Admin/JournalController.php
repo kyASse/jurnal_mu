@@ -139,6 +139,47 @@ class JournalController extends Controller
     }
 
     /**
+     * Show form to create a journal for Super Admin.
+     */
+    public function create(): Response
+    {
+        $this->authorize('create', Journal::class);
+
+        $universities = University::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'short_name']);
+        $users = \App\Models\User::orderBy('name')->get(['id', 'name', 'email', 'university_id']);
+        $scientificFields = ScientificField::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+
+        return Inertia::render('Admin/Journals/Create', [
+            'universities' => $universities,
+            'users' => $users,
+            'scientificFields' => $scientificFields,
+        ]);
+    }
+
+    /**
+     * Store a newly created journal by Super Admin.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $this->authorize('create', Journal::class);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'university_id' => 'required|exists:universities,id',
+            'user_id' => 'required|exists:users,id',
+            'scientific_field_id' => 'required|exists:scientific_fields,id',
+        ]);
+
+        $validated['approval_status'] = 'approved';
+        $validated['is_active'] = true;
+
+        $journal = Journal::create($validated);
+
+        return redirect()->route('admin.journals.show', $journal)
+            ->with('success', 'Jurnal berhasil dibuat.');
+    }
+
+    /**
      * Display the specified journal with its assessments.
      *
      * @route GET /admin/journals/{journal}

@@ -69,6 +69,16 @@ class DashboardController extends Controller
                 ->avg('journal_assessments.total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
 
+            $stats['pending_users_count'] = DB::table('users')
+                ->where('university_id', $user->university_id)
+                ->where('approval_status', 'pending')
+                ->count();
+
+            $stats['pending_journals_count'] = DB::table('journals')
+                ->where('university_id', $user->university_id)
+                ->where('approval_status', 'pending')
+                ->count();
+
         } else {
             // Regular user (Pengelola Jurnal) sees only their own journals
             $stats['total_journals'] = DB::table('journals')
