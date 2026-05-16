@@ -642,8 +642,19 @@ export default function JournalShow({ journal, articles, articlesCount, lastHarv
 
                                     {/* Error message */}
                                     {lastHarvestLog.status === 'failed' && lastHarvestLog.error_message && (
-                                        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
-                                            <span className="font-medium">Error:</span> {lastHarvestLog.error_message}
+                                        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                                            <div className="flex flex-col gap-2">
+                                                <div><span className="font-medium">Error sinkronisasi OAI-PMH:</span> {lastHarvestLog.error_message}</div>
+                                                <div className="mt-1">
+                                                    Terjadi kesalahan saat mengambil artikel. Silakan periksa kembali konfigurasi OAI-PMH URL Anda.{' '}
+                                                    <Link 
+                                                        href={route('admin-kampus.journals.edit', journal.id)} 
+                                                        className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                                                    >
+                                                        Edit Konfigurasi OAI-PMH <ExternalLink className="h-3 w-3" />
+                                                    </Link>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
