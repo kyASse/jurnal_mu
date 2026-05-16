@@ -594,8 +594,13 @@ export default function JournalShow({ journal, articles, lastHarvestLog, isHarve
 
                                             {/* Error message */}
                                             {lastHarvestLog.status === 'failed' && lastHarvestLog.error_message && (
-                                                <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
-                                                    <span className="font-medium">Error:</span> {lastHarvestLog.error_message}
+                                                <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                                                    <div className="flex flex-col gap-2">
+                                                        <div><span className="font-medium">Error sinkronisasi OAI-PMH:</span> {lastHarvestLog.error_message}</div>
+                                                        <div className="mt-1">
+                                                            Terjadi kesalahan saat mengambil artikel. Silakan hubungi pengelola jurnal atau admin kampus untuk memperbaiki URL OAI-PMH.
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
