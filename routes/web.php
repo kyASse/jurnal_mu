@@ -245,9 +245,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('reviewers', [App\Http\Controllers\Admin\ReviewerController::class, 'index'])
             ->name('reviewers.index');
 
-        // View all journals (read-only for monitoring)
+        // Journal Management
         Route::get('journals', [JournalController::class, 'index'])
             ->name('journals.index');
+        Route::get('journals/create', [JournalController::class, 'create'])
+            ->name('journals.create');
+        Route::post('journals', [JournalController::class, 'store'])
+            ->name('journals.store');
         Route::get('journals/{journal}', [JournalController::class, 'show'])
             ->name('journals.show');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])
@@ -381,6 +385,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.update');
         Route::delete('journals/{journal}', [App\Http\Controllers\AdminKampus\JournalController::class, 'destroy'])
             ->name('journals.destroy');
+
+        // University Profile Management
+        Route::get('university/edit', [App\Http\Controllers\AdminKampus\UniversityController::class, 'edit'])
+            ->name('university.edit');
+        Route::put('university', [App\Http\Controllers\AdminKampus\UniversityController::class, 'update'])
+            ->name('university.update');
 
         // Cover image upload (dedicated endpoint)
         Route::patch('journals/{journal}/cover', [App\Http\Controllers\AdminKampus\JournalController::class, 'uploadCover'])
