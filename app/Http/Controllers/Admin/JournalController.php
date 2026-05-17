@@ -149,10 +149,15 @@ class JournalController extends Controller
         $users = \App\Models\User::orderBy('name')->get(['id', 'name', 'email', 'university_id']);
         $scientificFields = ScientificField::where('is_active', true)->orderBy('name')->get(['id', 'name']);
 
+        $sintaRanks = collect(Journal::getSintaRankOptions())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
         return Inertia::render('Admin/Journals/Create', [
             'universities' => $universities,
             'users' => $users,
             'scientificFields' => $scientificFields,
+            'sintaRanks' => $sintaRanks,
         ]);
     }
 
@@ -168,6 +173,12 @@ class JournalController extends Controller
             'university_id' => 'required|exists:universities,id',
             'user_id' => 'required|exists:users,id',
             'scientific_field_id' => 'required|exists:scientific_fields,id',
+            'e_issn' => 'required|string|max:255',
+            'url' => 'required|url|max:255',
+            'sinta_rank' => 'required|string|max:255',
+            'frequency' => 'required|string|max:255',
+            'oai_urls' => 'required|array|min:1',
+            'oai_urls.*' => 'required|url|max:255',
         ]);
 
         $validated['approval_status'] = 'approved';
@@ -287,10 +298,10 @@ class JournalController extends Controller
             ],
             'articles' => $articles,
             'articlesCount' => $articlesCount,
-            'lastHarvestLog' => DB::table('oai_harvesting_logs')
+            'harvestLogs' => DB::table('oai_harvesting_logs')
                 ->where('journal_id', $journal->id)
                 ->orderByDesc('harvested_at')
-                ->first(),
+                ->get(),
             'isHarvestPending' => DB::table('jobs')
                 ->where('queue', 'harvesting')
                 ->where('payload', 'like', '%"journal_id":'.$journal->id.'%')
@@ -323,5 +334,22 @@ class JournalController extends Controller
         return redirect()
             ->back()
             ->with('success', $message);
+    }
+
+    /**
+     * @route PATCH /admin/journals/{journal}/oai-urls
+     */
+    public function updateOaiUrls(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        $validated = $request->validate([
+            'oai_urls' => 'required|array|min:1',
+            'oai_urls.*' => 'required|url|max:255',
+        ]);
+
+        $journal->update(['oai_urls' => $validated['oai_urls']]);
+
+        return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
     }
 }

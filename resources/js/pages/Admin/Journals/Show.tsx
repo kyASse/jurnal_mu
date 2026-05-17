@@ -17,6 +17,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -147,14 +149,18 @@ interface Journal {
 interface Props {
     journal: Journal;
     articles: PaginatedData<Article>;
-    lastHarvestLog: OaiHarvestingLog | null;
+    harvestLogs?: OaiHarvestingLog[];
     isHarvestPending: boolean;
 }
 
-export default function JournalShow({ journal, articles, lastHarvestLog, isHarvestPending }: Props) {
+export default function JournalShow({ journal, articles, harvestLogs = [], isHarvestPending }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [harvesting, setHarvesting] = useState(false);
     const [forceSyncing, setForceSyncing] = useState(false);
+    const [showEditOaiModal, setShowEditOaiModal] = useState(false);
+
+    const latestLog = harvestLogs && harvestLogs.length > 0 ? harvestLogs[0] : null;
+    const isFailedOrPartial = latestLog && (latestLog.status === 'failed' || latestLog.status === 'partial');
 
     const handleHarvest = () => {
         router.post(
@@ -507,6 +513,14 @@ export default function JournalShow({ journal, articles, lastHarvestLog, isHarve
                                 </div>
 
                                 <CardContent className="p-6">
+                                    <EditOaiUrlDialog
+                                        open={showEditOaiModal}
+                                        onOpenChange={setShowEditOaiModal}
+                                        journalId={journal.id}
+                                        initialUrls={journal.oai_urls ?? null}
+                                        updateRoute="admin.journals.update-oai-urls"
+                                    />
+                                    
                                     {/* OAI-PMH URLs */}
                                     {journal.oai_urls && journal.oai_urls.length > 0 ? (
                                         <div className="mb-4 flex items-start gap-2 rounded-md bg-muted/50 p-3 text-sm">
@@ -531,82 +545,90 @@ export default function JournalShow({ journal, articles, lastHarvestLog, isHarve
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="mb-4 flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
-                                            <AlertCircle className="h-4 w-4 shrink-0" />
-                                            <span>OAI-PMH URL belum dikonfigurasi.</span>
+                                        <div className="mb-4 flex items-center justify-between gap-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+                                            <div className="flex items-center gap-2">
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                                <span>OAI-PMH URL belum dikonfigurasi.</span>
+                                            </div>
+                                            <Button size="sm" onClick={() => setShowEditOaiModal(true)}>Konfigurasi URL</Button>
                                         </div>
                                     )}
 
-                                    {/* Last harvest log */}
-                                    {lastHarvestLog ? (
-                                        <div className="space-y-3">
-                                            <p className="text-sm font-medium text-foreground">Riwayat Harvest Terakhir</p>
-                                            <div className="flex flex-wrap items-center gap-4 rounded-md border border-sidebar-border/70 p-4 dark:border-sidebar-border">
-                                                {/* Status */}
-                                                <div className="flex items-center gap-1.5 text-sm">
-                                                    {lastHarvestLog.status === 'success' && (
-                                                        <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                                    )}
-                                                    {lastHarvestLog.status === 'partial' && <AlertCircle className="h-4 w-4 text-amber-500" />}
-                                                    {lastHarvestLog.status === 'failed' && <XCircle className="h-4 w-4 text-red-500" />}
-                                                    <Badge
-                                                        variant={
-                                                            lastHarvestLog.status === 'success'
-                                                                ? 'outline'
-                                                                : lastHarvestLog.status === 'partial'
-                                                                  ? 'default'
-                                                                  : 'destructive'
-                                                        }
-                                                        className={
-                                                            lastHarvestLog.status === 'success'
-                                                                ? 'border-green-300 text-green-700 dark:text-green-400'
-                                                                : ''
-                                                        }
-                                                    >
-                                                        {lastHarvestLog.status === 'success'
-                                                            ? 'Berhasil'
-                                                            : lastHarvestLog.status === 'partial'
-                                                              ? 'Sebagian'
-                                                              : 'Gagal'}
-                                                    </Badge>
-                                                </div>
-
-                                                {/* Stats */}
-                                                <div className="flex gap-4 text-sm text-muted-foreground">
-                                                    <span>
-                                                        Ditemukan: <span className="font-medium text-foreground">{lastHarvestLog.records_found}</span>
-                                                    </span>
-                                                    <span>
-                                                        Diunggah:{' '}
-                                                        <span className="font-medium text-foreground">{lastHarvestLog.records_imported}</span>
-                                                    </span>
-                                                </div>
-
-                                                {/* Timestamp */}
-                                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                                    <Clock className="h-3.5 w-3.5" />
-                                                    {new Date(lastHarvestLog.harvested_at).toLocaleString('id-ID', {
-                                                        dateStyle: 'medium',
-                                                        timeStyle: 'short',
-                                                    })}
-                                                </div>
+                                    {isFailedOrPartial && (
+                                        <div className="mb-4 flex items-center justify-between gap-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+                                            <div className="flex items-center gap-2">
+                                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                                <span>
+                                                    Proses harvest terakhir mengalami masalah. Anda dapat memperbaiki OAI-PMH URL jika URL sebelumnya salah atau tidak dapat diakses.
+                                                </span>
                                             </div>
+                                            <Button size="sm" variant="outline" className="bg-white text-red-600 hover:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900" onClick={() => setShowEditOaiModal(true)}>
+                                                Perbaiki OAI URL
+                                            </Button>
+                                        </div>
+                                    )}
 
-                                            {/* Error message */}
-                                            {lastHarvestLog.status === 'failed' && lastHarvestLog.error_message && (
-                                                <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
-                                                    <div className="flex flex-col gap-2">
-                                                        <div><span className="font-medium">Error sinkronisasi OAI-PMH:</span> {lastHarvestLog.error_message}</div>
-                                                        <div className="mt-1">
-                                                            Terjadi kesalahan saat mengambil artikel. Silakan hubungi pengelola jurnal atau admin kampus untuk memperbaiki URL OAI-PMH.
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
+                                    {/* Harvest Logs */}
+                                    {harvestLogs && harvestLogs.length > 0 ? (
+                                        <div className="space-y-3">
+                                            <p className="text-sm font-medium text-foreground">Riwayat Harvest</p>
+                                            <div className="rounded-md border">
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow>
+                                                            <TableHead>Waktu</TableHead>
+                                                            <TableHead>Status</TableHead>
+                                                            <TableHead>Ditemukan</TableHead>
+                                                            <TableHead>Diimpor</TableHead>
+                                                            <TableHead>Keterangan</TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {harvestLogs.map((log) => (
+                                                            <TableRow key={log.id}>
+                                                                <TableCell className="whitespace-nowrap">
+                                                                    {new Date(log.harvested_at).toLocaleString('id-ID', {
+                                                                        dateStyle: 'medium',
+                                                                        timeStyle: 'short',
+                                                                        timeZone: 'Asia/Jakarta',
+                                                                    })}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Badge
+                                                                        variant={
+                                                                            log.status === 'success'
+                                                                                ? 'outline'
+                                                                                : log.status === 'partial'
+                                                                                  ? 'default'
+                                                                                  : 'destructive'
+                                                                        }
+                                                                        className={log.status === 'success' ? 'border-green-300 text-green-700 dark:text-green-400' : ''}
+                                                                    >
+                                                                        {log.status === 'success'
+                                                                            ? 'Berhasil'
+                                                                            : log.status === 'partial'
+                                                                              ? 'Sebagian'
+                                                                              : 'Gagal'}
+                                                                    </Badge>
+                                                                </TableCell>
+                                                                <TableCell>{log.records_found ?? 0}</TableCell>
+                                                                <TableCell>{log.records_imported ?? 0}</TableCell>
+                                                                <TableCell className="max-w-xs truncate" title={log.error_message || '-'}>
+                                                                    {log.error_message ? (
+                                                                        <span className="text-red-600 dark:text-red-400">{log.error_message}</span>
+                                                                    ) : (
+                                                                        <span className="text-muted-foreground">-</span>
+                                                                    )}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </div>
                                         </div>
                                     ) : (
                                         <p className="text-sm text-muted-foreground">
-                                            Belum pernah di-harvest. Klik <strong>Sync Artikel</strong> untuk memulai.
+                                            Belum pernah di-harvest. Klik <strong>Sync Artikel</strong> untuk memulai sinkronisasi OAI.
                                         </p>
                                     )}
                                 </CardContent>

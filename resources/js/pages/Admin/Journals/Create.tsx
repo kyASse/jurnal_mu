@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PageProps, type ScientificField } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { BookOpen, Save } from 'lucide-react';
+import { BookOpen, Save, Trash2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UniversityCombobox, type University } from '@/components/ui/university-combobox';
 import { UserCombobox, type User } from '@/components/ui/user-combobox';
@@ -22,14 +22,20 @@ interface Props extends PageProps {
     universities: University[];
     users: User[];
     scientificFields: ScientificField[];
+    sintaRanks: Array<{ value: string; label: string }>;
 }
 
-export default function Create({ universities, users, scientificFields }: Props) {
+export default function Create({ universities, users, scientificFields, sintaRanks }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         university_id: '',
         user_id: '',
         scientific_field_id: '',
+        e_issn: '',
+        url: '',
+        sinta_rank: '',
+        frequency: '',
+        oai_urls: [''],
     });
 
     const submit: FormEventHandler = (e) => {
@@ -157,6 +163,113 @@ export default function Create({ universities, users, scientificFields }: Props)
                                                 </SelectContent>
                                             </Select>
                                             <InputError message={errors.scientific_field_id} className="mt-2" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="md:col-span-2 grid gap-4 md:grid-cols-2">
+                                        <div>
+                                            <Label htmlFor="e_issn">E-ISSN (Online) <span className="text-red-500">*</span></Label>
+                                            <Input
+                                                id="e_issn"
+                                                type="text"
+                                                className="mt-1"
+                                                value={data.e_issn}
+                                                onChange={(e) => setData('e_issn', e.target.value)}
+                                                required
+                                                placeholder="xxxx-xxxx"
+                                            />
+                                            <InputError message={errors.e_issn} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="url">Journal URL <span className="text-red-500">*</span></Label>
+                                            <Input
+                                                id="url"
+                                                type="url"
+                                                className="mt-1"
+                                                value={data.url}
+                                                onChange={(e) => setData('url', e.target.value)}
+                                                required
+                                                placeholder="https://journal.ac.id/..."
+                                            />
+                                            <InputError message={errors.url} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="sinta_rank">Peringkat Akreditasi <span className="text-red-500">*</span></Label>
+                                            <Select
+                                                value={data.sinta_rank}
+                                                onValueChange={(val) => setData('sinta_rank', val)}
+                                            >
+                                                <SelectTrigger className="mt-1">
+                                                    <SelectValue placeholder="Pilih Peringkat..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {sintaRanks.map((rank) => (
+                                                        <SelectItem key={rank.value} value={rank.value}>
+                                                            {rank.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.sinta_rank} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="frequency">Frekuensi Publikasi <span className="text-red-500">*</span></Label>
+                                            <Select value={data.frequency} onValueChange={(val) => setData('frequency', val)}>
+                                                <SelectTrigger className="mt-1">
+                                                    <SelectValue placeholder="Pilih Frekuensi..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Monthly">Monthly (Bulanan)</SelectItem>
+                                                    <SelectItem value="Bi-Monthly">Bi-Monthly (2 Bulanan)</SelectItem>
+                                                    <SelectItem value="Quarterly">Quarterly (Triwulan)</SelectItem>
+                                                    <SelectItem value="4-Monthly">4 Bulanan (3 Kali Terbit Per Tahun)</SelectItem>
+                                                    <SelectItem value="Semi-Annual">Semi-Annual (Semesteran)</SelectItem>
+                                                    <SelectItem value="Annual">Annual (Tahunan)</SelectItem>
+                                                    <SelectItem value="Other">Other</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.frequency} className="mt-2" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="md:col-span-2">
+                                        <div className="flex items-center justify-between">
+                                            <Label>OAI-PMH URLs <span className="text-red-500">*</span></Label>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setData('oai_urls', [...data.oai_urls, ''])}>
+                                                Tambah URL OAI
+                                            </Button>
+                                        </div>
+                                        <div className="mt-2 space-y-2">
+                                            {data.oai_urls.map((oaiUrl, index) => (
+                                                <div key={index} className="flex items-center gap-2">
+                                                    <Input
+                                                        type="url"
+                                                        value={oaiUrl}
+                                                        onChange={(e) => {
+                                                            const newUrls = [...data.oai_urls];
+                                                            newUrls[index] = e.target.value;
+                                                            setData('oai_urls', newUrls);
+                                                        }}
+                                                        placeholder="https://journal.ac.id/oai"
+                                                        required
+                                                    />
+                                                    {data.oai_urls.length > 1 && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-red-500 hover:text-red-700"
+                                                            onClick={() => {
+                                                                const newUrls = data.oai_urls.filter((_, i) => i !== index);
+                                                                setData('oai_urls', newUrls);
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            <InputError message={errors.oai_urls} className="mt-2" />
                                         </div>
                                     </div>
                                 </div>

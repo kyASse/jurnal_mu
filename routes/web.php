@@ -258,6 +258,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.show');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])
             ->name('journals.harvest');
+        Route::patch('journals/{journal}/oai-urls', [JournalController::class, 'updateOaiUrls'])
+            ->name('journals.update-oai-urls');
 
         // View all assessments (read-only for monitoring)
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
@@ -397,6 +399,8 @@ Route::middleware(['auth'])->group(function () {
         // Cover image upload (dedicated endpoint)
         Route::patch('journals/{journal}/cover', [App\Http\Controllers\AdminKampus\JournalController::class, 'uploadCover'])
             ->name('journals.upload-cover');
+        Route::patch('journals/{journal}/oai-urls', [App\Http\Controllers\AdminKampus\JournalController::class, 'updateOaiUrls'])
+            ->name('journals.update-oai-urls');
 
         // Import journals from CSV
         Route::get('journals/import/template', [App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
@@ -499,6 +503,8 @@ Route::middleware(['auth'])->group(function () {
         // Cover image upload (dedicated endpoint)
         Route::patch('journals/{journal}/cover', [UserJournalController::class, 'uploadCover'])
             ->name('journals.upload-cover');
+        Route::patch('journals/{journal}/oai-urls', [UserJournalController::class, 'updateOaiUrls'])
+            ->name('journals.update-oai-urls');
 
         // OAI-PMH Article Harvest
         Route::post('journals/{journal}/harvest', [UserJournalController::class, 'harvest'])
