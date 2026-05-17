@@ -110,6 +110,11 @@ export function AppSidebar() {
         // Build Admin Kampus menu items
         const adminKampusItems: NavItem[] = [
             {
+                title: 'Profil Universitas',
+                href: route('admin-kampus.university.edit'),
+                icon: Building2,
+            },
+            {
                 title: 'Pengelola Jurnal',
                 href: route('admin-kampus.users.index'),
                 icon: Users,
