@@ -35,7 +35,7 @@ class PublicEventController extends Controller
                 'title' => $agenda->title,
                 'slug' => $agenda->slug,
                 'type' => $agenda->type,
-                'description' => substr(strip_tags($agenda->description), 0, 150).'...',
+                'description' => \Illuminate\Support\Str::limit(strip_tags($agenda->description), 150),
                 'thumbnail_url' => $agenda->thumbnail_url,
                 'date_start' => $agenda->date_start?->format('Y-m-d'),
                 'time_start' => $agenda->time_start?->format('H:i'),
