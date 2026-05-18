@@ -190,6 +190,11 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                 </h1>
                                 <p className="mt-1 text-muted-foreground">View and monitor all journals across all universities</p>
                             </div>
+                            <Link href={route('admin.journals.create')}>
+                                <Button className="gap-2">
+                                    Tambah Jurnal
+                                </Button>
+                            </Link>
                         </div>
                     </div>
 

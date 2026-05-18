@@ -222,6 +222,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('universities', UniversityController::class);
         Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
             ->name('universities.toggle-active');
+        Route::post('universities/{university}/handle-pending-updates', [UniversityController::class, 'handlePendingUpdates'])
+            ->name('universities.handle-pending-updates');
 
         // Admin Kampus Management
         Route::resource('admin-kampus', AdminKampusController::class);
@@ -245,13 +247,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('reviewers', [App\Http\Controllers\Admin\ReviewerController::class, 'index'])
             ->name('reviewers.index');
 
-        // View all journals (read-only for monitoring)
+        // Journal Management
         Route::get('journals', [JournalController::class, 'index'])
             ->name('journals.index');
+        Route::get('journals/create', [JournalController::class, 'create'])
+            ->name('journals.create');
+        Route::post('journals', [JournalController::class, 'store'])
+            ->name('journals.store');
         Route::get('journals/{journal}', [JournalController::class, 'show'])
             ->name('journals.show');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])
             ->name('journals.harvest');
+        Route::patch('journals/{journal}/oai-urls', [JournalController::class, 'updateOaiUrls'])
+            ->name('journals.update-oai-urls');
 
         // View all assessments (read-only for monitoring)
         Route::get('assessments', [AdminAssessmentController::class, 'index'])
@@ -382,9 +390,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('journals/{journal}', [App\Http\Controllers\AdminKampus\JournalController::class, 'destroy'])
             ->name('journals.destroy');
 
+        // University Profile Management
+        Route::get('university/edit', [App\Http\Controllers\AdminKampus\UniversityController::class, 'edit'])
+            ->name('university.edit');
+        Route::put('university', [App\Http\Controllers\AdminKampus\UniversityController::class, 'update'])
+            ->name('university.update');
+
         // Cover image upload (dedicated endpoint)
         Route::patch('journals/{journal}/cover', [App\Http\Controllers\AdminKampus\JournalController::class, 'uploadCover'])
             ->name('journals.upload-cover');
+        Route::patch('journals/{journal}/oai-urls', [App\Http\Controllers\AdminKampus\JournalController::class, 'updateOaiUrls'])
+            ->name('journals.update-oai-urls');
 
         // Import journals from CSV
         Route::get('journals/import/template', [App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
@@ -487,6 +503,8 @@ Route::middleware(['auth'])->group(function () {
         // Cover image upload (dedicated endpoint)
         Route::patch('journals/{journal}/cover', [UserJournalController::class, 'uploadCover'])
             ->name('journals.upload-cover');
+        Route::patch('journals/{journal}/oai-urls', [UserJournalController::class, 'updateOaiUrls'])
+            ->name('journals.update-oai-urls');
 
         // OAI-PMH Article Harvest
         Route::post('journals/{journal}/harvest', [UserJournalController::class, 'harvest'])

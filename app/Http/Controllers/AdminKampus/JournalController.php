@@ -358,11 +358,11 @@ class JournalController extends Controller
             },
         ]);
 
-        // OAI-PMH: fetch last harvest log
-        $lastHarvestLog = DB::table('oai_harvesting_logs')
+        // OAI-PMH: fetch harvest logs
+        $harvestLogs = DB::table('oai_harvesting_logs')
             ->where('journal_id', $journal->id)
             ->orderByDesc('harvested_at')
-            ->first();
+            ->get();
 
         // OAI-PMH: check for pending queue job (best-effort UI hint; ShouldBeUnique on the job
         // is the authoritative duplicate prevention mechanism).
@@ -462,7 +462,7 @@ class JournalController extends Controller
             ],
             'articles' => $articles,
             'articlesCount' => $articlesCount,
-            'lastHarvestLog' => $lastHarvestLog ? (array) $lastHarvestLog : null,
+            'harvestLogs' => $harvestLogs,
             'isHarvestPending' => $isHarvestPending,
         ]);
     }
@@ -791,23 +791,20 @@ class JournalController extends Controller
                     ->with('import_errors', $summary['errors']);
             }
 
-            // If partial success (some errors), redirect with warning
             if ($summary['error_count'] > 0) {
                 return redirect()->route('admin-kampus.journals.index')
                     ->with('warning', "Import selesai dengan peringatan: {$summary['success_count']} jurnal berhasil diimport, {$summary['error_count']} baris gagal.")
                     ->with('import_errors', $summary['errors']);
             }
-
-            // All successful
-            return redirect()->route('admin-kampus.journals.index')
-                ->with('success', "Berhasil mengimport {$summary['success_count']} jurnal dari CSV.");
-
         } catch (\Exception $e) {
             DB::rollBack();
 
             return redirect()->route('admin-kampus.journals.import')
                 ->with('error', 'Terjadi kesalahan saat memproses file CSV: '.$e->getMessage());
         }
+
+        return redirect()->route('admin-kampus.journals.index')
+            ->with('success', "Import berhasil! {$summary['success_count']} jurnal telah ditambahkan.");
     }
 
     /**
@@ -936,5 +933,22 @@ class JournalController extends Controller
         // $newUser->notify(new JournalReassignedNotification($journal, 'assigned'));
 
         return back()->with('success', "Jurnal \"{$journal->name}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
+    }
+
+    /**
+     * @route PATCH /admin-kampus/journals/{journal}/oai-urls
+     */
+    public function updateOaiUrls(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        $validated = $request->validate([
+            'oai_urls' => 'required|array|min:1',
+            'oai_urls.*' => 'required|url|max:255',
+        ]);
+
+        $journal->update(['oai_urls' => $validated['oai_urls']]);
+
+        return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
     }
 }
