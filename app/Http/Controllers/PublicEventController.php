@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agenda;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,7 +35,7 @@ class PublicEventController extends Controller
                 'title' => $agenda->title,
                 'slug' => $agenda->slug,
                 'type' => $agenda->type,
-                'description' => \Illuminate\Support\Str::limit(strip_tags($agenda->description), 150),
+                'description' => Str::limit(strip_tags($agenda->description), 150),
                 'thumbnail_url' => $agenda->thumbnail_url,
                 'date_start' => $agenda->date_start?->format('Y-m-d'),
                 'time_start' => $agenda->time_start?->format('H:i'),

@@ -95,7 +95,7 @@ class UniversityController extends Controller
             $pendingUniversities = University::whereNotNull('pending_updates')
                 ->where('pending_updates', '!=', '[]')
                 ->get()
-                ->map(fn($university) => [
+                ->map(fn ($university) => [
                     'id' => $university->id,
                     'name' => $university->name,
                     'code' => $university->code,
@@ -340,9 +340,11 @@ class UniversityController extends Controller
         if ($validated['action'] === 'approve') {
             $university->update($university->pending_updates);
             $university->update(['pending_updates' => null]);
+
             return back()->with('success', 'Pembaruan profil universitas disetujui.');
         } else {
             $university->update(['pending_updates' => null]);
+
             return back()->with('success', 'Pembaruan profil universitas ditolak.');
         }
     }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Agenda extends Model
@@ -64,11 +65,11 @@ class Agenda extends Model
         });
 
         static::saved(function () {
-            \Illuminate\Support\Facades\Cache::forget('home_upcoming_events');
+            Cache::forget('home_upcoming_events');
         });
 
         static::deleted(function () {
-            \Illuminate\Support\Facades\Cache::forget('home_upcoming_events');
+            Cache::forget('home_upcoming_events');
         });
     }
 

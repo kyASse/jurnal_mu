@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
-use App\Models\University;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,12 +12,12 @@ class UniversityController extends Controller
     {
         $university = $request->user()->university;
 
-        if (!$university) {
+        if (! $university) {
             return redirect()->route('dashboard')->with('error', 'Universitas tidak ditemukan.');
         }
 
         return Inertia::render('AdminKampus/University/Edit', [
-            'university' => $university
+            'university' => $university,
         ]);
     }
 
@@ -26,7 +25,7 @@ class UniversityController extends Controller
     {
         $university = $request->user()->university;
 
-        if (!$university) {
+        if (! $university) {
             return redirect()->route('dashboard')->with('error', 'Universitas tidak ditemukan.');
         }
 
