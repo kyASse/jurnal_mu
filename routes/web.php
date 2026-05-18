@@ -452,15 +452,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Agenda Management
         Route::resource('events', App\Http\Controllers\AdminKampus\AgendaController::class)
-            ->except(['show'])
-            ->names([
-                'index' => 'events.index',
-                'create' => 'events.create',
-                'store' => 'events.store',
-                'edit' => 'events.edit',
-                'update' => 'events.update',
-                'destroy' => 'events.destroy',
-            ]);
+            ->except(['show']);
 
         // Support / Ticketing System for Admin Kampus
         Route::resource('tickets', App\Http\Controllers\AdminKampus\TicketController::class)->except(['edit', 'update']);

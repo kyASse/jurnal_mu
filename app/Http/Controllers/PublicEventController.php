@@ -64,10 +64,20 @@ class PublicEventController extends Controller
      */
     public function show(string $slug): Response
     {
-        $agenda = Agenda::with('university:id,name,short_name,logo_url,website')
-            ->active()
-            ->where('slug', $slug)
-            ->firstOrFail();
+        $query = Agenda::with('university:id,name,short_name,logo_url,website')
+            ->active();
+
+        // Try finding by slug first
+        $agenda = (clone $query)->where('slug', $slug)->first();
+
+        // If not found by slug and $slug is numeric, try finding by ID as a fallback
+        if (! $agenda && is_numeric($slug)) {
+            $agenda = $query->find($slug);
+        }
+
+        if (! $agenda) {
+            abort(404);
+        }
 
         return Inertia::render('Public/Events/Show', [
             'agenda' => [
