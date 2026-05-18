@@ -87,6 +87,7 @@ export interface University {
     cluster?: string;
     profile_description?: string;
     is_active: boolean;
+    pending_updates?: Record<string, string>;
     users_count?: number;
     journals_count?: number;
     full_address?: string;

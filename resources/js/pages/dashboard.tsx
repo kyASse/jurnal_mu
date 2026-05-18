@@ -101,6 +101,41 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                         </Link>
                     )}
 
+                    {/* Pending Users & Journals (Admin Kampus Only) */}
+                    {auth.user?.role?.name === 'Admin Kampus' && stats.pending_users_count !== undefined && stats.pending_journals_count !== undefined && (
+                        <>
+                            <Link href="/admin-kampus/users" className="block">
+                                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 transition-all hover:border-orange-500 hover:shadow-md dark:border-sidebar-border dark:bg-neutral-950 dark:hover:border-orange-400">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground">Pending User</p>
+                                            <h3 className="mt-2 text-3xl font-bold">{stats.pending_users_count}</h3>
+                                            <p className="mt-1 text-xs text-muted-foreground">Click to review</p>
+                                        </div>
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
+                                            <UserPlus className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link href="/admin-kampus/journals" className="block">
+                                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 transition-all hover:border-amber-500 hover:shadow-md dark:border-sidebar-border dark:bg-neutral-950 dark:hover:border-amber-400">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground">Pending Journal</p>
+                                            <h3 className="mt-2 text-3xl font-bold">{stats.pending_journals_count}</h3>
+                                            <p className="mt-1 text-xs text-muted-foreground">Click to review</p>
+                                        </div>
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20">
+                                            <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        </>
+                    )}
+
                     {/* User Role: Approval Status Breakdown */}
                     {isUser && stats.journals_by_status && (
                         <>
@@ -145,6 +180,13 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                         </>
                     )}
                 </div>
+
+                {/* Journal Statistics Visualization */}
+                {stats.total_journals > 0 && statistics && (
+                    <div className="mt-2">
+                        <StatisticsDashboard statistics={statistics} />
+                    </div>
+                )}
 
                 {/* University Distribution Table (Super Admin Only) */}
                 {isSuperAdmin && stats.universities_distribution && stats.universities_distribution.length > 0 && (
@@ -191,13 +233,6 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                     </div>
                 )}
 
-                {/* Journal Statistics Visualization */}
-                {stats.total_journals > 0 && statistics && (
-                    <div className="mt-2">
-                        <StatisticsDashboard statistics={statistics} />
-                    </div>
-                )}
-
                 {/* Empty State */}
                 {stats.total_journals === 0 && (
                     <div className="relative min-h-[400px] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-neutral-950">
@@ -210,8 +245,8 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                                     {isSuperAdmin
                                         ? 'Belum ada jurnal yang terdaftar di sistem.'
                                         : auth.user?.role?.name === 'Admin Kampus'
-                                          ? 'Belum ada jurnal yang terdaftar di universitas Anda.'
-                                          : 'Anda belum mengelola jurnal. Mulai dengan menambahkan jurnal baru.'}
+                                            ? 'Belum ada jurnal yang terdaftar di universitas Anda.'
+                                            : 'Anda belum mengelola jurnal. Mulai dengan menambahkan jurnal baru.'}
                                 </p>
                             </div>
                         </div>

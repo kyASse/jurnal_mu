@@ -17,8 +17,7 @@ class PublicEventController extends Controller
         $query = Agenda::query()
             ->with('university:id,name,logo_url')
             ->active() // Only active events
-            ->where('date_start', '>=', now()->toDateString()) // Upcoming events
-            ->orderBy('date_start', 'asc');
+            ->orderBy('date_start', 'desc');
 
         if ($request->filled('search')) {
             $query->where('title', 'like', "%{$request->search}%");
