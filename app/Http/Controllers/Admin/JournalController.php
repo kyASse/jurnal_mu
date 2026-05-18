@@ -7,6 +7,7 @@ use App\Jobs\HarvestJournalArticlesJob;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -139,6 +140,58 @@ class JournalController extends Controller
     }
 
     /**
+     * Show form to create a journal for Super Admin.
+     */
+    public function create(): Response
+    {
+        $this->authorize('create', Journal::class);
+
+        $universities = University::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'short_name']);
+        $users = User::orderBy('name')->get(['id', 'name', 'email', 'university_id']);
+        $scientificFields = ScientificField::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+
+        $sintaRanks = collect(Journal::getSintaRankOptions())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
+        return Inertia::render('Admin/Journals/Create', [
+            'universities' => $universities,
+            'users' => $users,
+            'scientificFields' => $scientificFields,
+            'sintaRanks' => $sintaRanks,
+        ]);
+    }
+
+    /**
+     * Store a newly created journal by Super Admin.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $this->authorize('create', Journal::class);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'university_id' => 'required|exists:universities,id',
+            'user_id' => 'required|exists:users,id',
+            'scientific_field_id' => 'required|exists:scientific_fields,id',
+            'e_issn' => 'required|string|max:255',
+            'url' => 'required|url|max:255',
+            'sinta_rank' => 'required|string|max:255',
+            'frequency' => 'required|string|max:255',
+            'oai_urls' => 'required|array|min:1',
+            'oai_urls.*' => 'required|url|max:255',
+        ]);
+
+        $validated['approval_status'] = 'approved';
+        $validated['is_active'] = true;
+
+        $journal = Journal::create($validated);
+
+        return redirect()->route('admin.journals.show', $journal)
+            ->with('success', 'Jurnal berhasil dibuat.');
+    }
+
+    /**
      * Display the specified journal with its assessments.
      *
      * @route GET /admin/journals/{journal}
@@ -246,10 +299,10 @@ class JournalController extends Controller
             ],
             'articles' => $articles,
             'articlesCount' => $articlesCount,
-            'lastHarvestLog' => DB::table('oai_harvesting_logs')
+            'harvestLogs' => DB::table('oai_harvesting_logs')
                 ->where('journal_id', $journal->id)
                 ->orderByDesc('harvested_at')
-                ->first(),
+                ->get(),
             'isHarvestPending' => DB::table('jobs')
                 ->where('queue', 'harvesting')
                 ->where('payload', 'like', '%"journal_id":'.$journal->id.'%')
@@ -282,5 +335,22 @@ class JournalController extends Controller
         return redirect()
             ->back()
             ->with('success', $message);
+    }
+
+    /**
+     * @route PATCH /admin/journals/{journal}/oai-urls
+     */
+    public function updateOaiUrls(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        $validated = $request->validate([
+            'oai_urls' => 'required|array|min:1',
+            'oai_urls.*' => 'required|url|max:255',
+        ]);
+
+        $journal->update(['oai_urls' => $validated['oai_urls']]);
+
+        return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
     }
 }

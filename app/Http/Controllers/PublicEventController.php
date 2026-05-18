@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agenda;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,8 +18,7 @@ class PublicEventController extends Controller
         $query = Agenda::query()
             ->with('university:id,name,logo_url')
             ->active() // Only active events
-            ->where('date_start', '>=', now()->toDateString()) // Upcoming events
-            ->orderBy('date_start', 'asc');
+            ->orderBy('date_start', 'desc');
 
         if ($request->filled('search')) {
             $query->where('title', 'like', "%{$request->search}%");
@@ -35,7 +35,7 @@ class PublicEventController extends Controller
                 'title' => $agenda->title,
                 'slug' => $agenda->slug,
                 'type' => $agenda->type,
-                'description' => \Illuminate\Support\Str::limit(strip_tags($agenda->description), 150),
+                'description' => Str::limit(strip_tags($agenda->description), 150),
                 'thumbnail_url' => $agenda->thumbnail_url,
                 'date_start' => $agenda->date_start?->format('Y-m-d'),
                 'time_start' => $agenda->time_start?->format('H:i'),
@@ -65,10 +65,20 @@ class PublicEventController extends Controller
      */
     public function show(string $slug): Response
     {
-        $agenda = Agenda::with('university:id,name,short_name,logo_url,website')
-            ->active()
-            ->where('slug', $slug)
-            ->firstOrFail();
+        $query = Agenda::with('university:id,name,short_name,logo_url,website')
+            ->active();
+
+        // Try finding by slug first
+        $agenda = (clone $query)->where('slug', $slug)->first();
+
+        // If not found by slug and $slug is numeric, try finding by ID as a fallback
+        if (! $agenda && is_numeric($slug)) {
+            $agenda = $query->find($slug);
+        }
+
+        if (! $agenda) {
+            abort(404);
+        }
 
         return Inertia::render('Public/Events/Show', [
             'agenda' => [

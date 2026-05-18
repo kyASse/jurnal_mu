@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Agenda extends Model
@@ -57,10 +58,18 @@ class Agenda extends Model
     {
         parent::boot();
 
-        static::creating(function ($agenda) {
+        static::saving(function ($agenda) {
             if (! $agenda->slug) {
                 $agenda->slug = static::generateUniqueSlug($agenda->title);
             }
+        });
+
+        static::saved(function () {
+            Cache::forget('home_upcoming_events');
+        });
+
+        static::deleted(function () {
+            Cache::forget('home_upcoming_events');
         });
     }
 

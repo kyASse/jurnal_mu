@@ -65,6 +65,7 @@ class UniversityController extends Controller
                     'cluster' => $university->cluster,
                     'profile_description' => $university->profile_description,
                     'is_active' => $university->is_active,
+                    'pending_updates' => $university->pending_updates,
                     'users_count' => $university->users_count,
                     'journals_count' => $university->journals_count,
                     'full_address' => $university->full_address,
@@ -88,8 +89,25 @@ class UniversityController extends Controller
                 ]);
         }
 
+        // Get pending updates for Super Admin
+        $pendingUniversities = [];
+        if ($request->user()->isSuperAdmin()) {
+            $pendingUniversities = University::whereNotNull('pending_updates')
+                ->where('pending_updates', '!=', '[]')
+                ->get()
+                ->map(fn ($university) => [
+                    'id' => $university->id,
+                    'name' => $university->name,
+                    'code' => $university->code,
+                    'ptm_code' => $university->ptm_code,
+                    'short_name' => $university->short_name,
+                    'pending_updates' => $university->pending_updates,
+                ]);
+        }
+
         return Inertia::render('Admin/Universities/Index', [
             'universities' => $universities,
+            'pendingUniversities' => $pendingUniversities,
             'filters' => $request->only(['search', 'is_active', 'accreditation_status', 'cluster']),
             'can' => [
                 'create' => $request->user()->can('create', University::class),
@@ -302,5 +320,32 @@ class UniversityController extends Controller
         $status = $university->is_active ? 'activated' : 'deactivated';
 
         return back()->with('success', "University {$status} successfully.");
+    }
+
+    /**
+     * Approve or reject pending profile updates.
+     */
+    public function handlePendingUpdates(Request $request, University $university)
+    {
+        $this->authorize('update', $university);
+
+        $validated = $request->validate([
+            'action' => 'required|in:approve,reject',
+        ]);
+
+        if (empty($university->pending_updates)) {
+            return back()->with('error', 'Tidak ada pembaruan profil yang menunggu persetujuan.');
+        }
+
+        if ($validated['action'] === 'approve') {
+            $university->update($university->pending_updates);
+            $university->update(['pending_updates' => null]);
+
+            return back()->with('success', 'Pembaruan profil universitas disetujui.');
+        } else {
+            $university->update(['pending_updates' => null]);
+
+            return back()->with('success', 'Pembaruan profil universitas ditolak.');
+        }
     }
 }

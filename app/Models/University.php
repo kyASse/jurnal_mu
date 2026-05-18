@@ -32,6 +32,7 @@ class University extends Model
         'cluster',
         'profile_description',
         'is_active',
+        'pending_updates',
     ];
 
     /**
@@ -41,6 +42,7 @@ class University extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'pending_updates' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

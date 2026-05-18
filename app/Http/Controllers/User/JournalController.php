@@ -127,11 +127,11 @@ class JournalController extends Controller
             'assessments' => fn ($q) => $q->latest()->limit(10),
         ]);
 
-        // OAI-PMH: fetch last harvest log
-        $lastHarvestLog = DB::table('oai_harvesting_logs')
+        // OAI-PMH: fetch harvest logs
+        $harvestLogs = DB::table('oai_harvesting_logs')
             ->where('journal_id', $journal->id)
             ->orderByDesc('harvested_at')
-            ->first();
+            ->get();
 
         // OAI-PMH: check for pending queue job
         $queueConfig = config('queue.connections.database', []);
@@ -236,7 +236,7 @@ class JournalController extends Controller
                 'latest_score' => $journal->assessments()->latest()->first()?->total_score,
                 'total_articles' => $articlesCount,
             ],
-            'lastHarvestLog' => $lastHarvestLog,
+            'harvestLogs' => $harvestLogs,
             'isHarvestPending' => $isHarvestPending,
         ]);
     }
@@ -358,5 +358,22 @@ class JournalController extends Controller
         return redirect()
             ->back()
             ->with('success', $message);
+    }
+
+    /**
+     * @route PATCH /user/journals/{journal}/oai-urls
+     */
+    public function updateOaiUrls(Request $request, Journal $journal): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        $validated = $request->validate([
+            'oai_urls' => 'required|array|min:1',
+            'oai_urls.*' => 'required|url|max:255',
+        ]);
+
+        $journal->update(['oai_urls' => $validated['oai_urls']]);
+
+        return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
     }
 }
