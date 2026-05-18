@@ -57,10 +57,18 @@ class Agenda extends Model
     {
         parent::boot();
 
-        static::creating(function ($agenda) {
+        static::saving(function ($agenda) {
             if (! $agenda->slug) {
                 $agenda->slug = static::generateUniqueSlug($agenda->title);
             }
+        });
+
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_upcoming_events');
+        });
+
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('home_upcoming_events');
         });
     }
 
