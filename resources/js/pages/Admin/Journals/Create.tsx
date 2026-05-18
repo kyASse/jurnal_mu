@@ -1,15 +1,15 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UniversityCombobox, type University } from '@/components/ui/university-combobox';
+import { UserCombobox, type User } from '@/components/ui/user-combobox';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PageProps, type ScientificField } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { BookOpen, Save, Trash2 } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UniversityCombobox, type University } from '@/components/ui/university-combobox';
-import { UserCombobox, type User } from '@/components/ui/user-combobox';
 import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -44,9 +44,7 @@ export default function Create({ universities, users, scientificFields, sintaRan
     };
 
     // Filter users based on selected university
-    const filteredUsers = data.university_id
-        ? users.filter((u) => u.university_id?.toString() === data.university_id)
-        : users;
+    const filteredUsers = data.university_id ? users.filter((u) => u.university_id?.toString() === data.university_id) : users;
 
     const handleUniversityChange = (val: string) => {
         // If university changes, clear selected user if it doesn't belong to the new university
@@ -92,9 +90,7 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                 <BookOpen className="h-5 w-5" />
                                 Informasi Dasar Jurnal
                             </CardTitle>
-                            <CardDescription>
-                                Masukkan informasi wajib untuk membuat jurnal baru.
-                            </CardDescription>
+                            <CardDescription>Masukkan informasi wajib untuk membuat jurnal baru.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={submit} className="space-y-6">
@@ -147,10 +143,7 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                     <div className="md:col-span-2">
                                         <Label htmlFor="scientific_field_id">Bidang Keilmuan</Label>
                                         <div className="mt-1">
-                                            <Select
-                                                value={data.scientific_field_id}
-                                                onValueChange={(val) => setData('scientific_field_id', val)}
-                                            >
+                                            <Select value={data.scientific_field_id} onValueChange={(val) => setData('scientific_field_id', val)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Pilih Bidang Keilmuan..." />
                                                 </SelectTrigger>
@@ -165,10 +158,12 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                             <InputError message={errors.scientific_field_id} className="mt-2" />
                                         </div>
                                     </div>
-                                    
-                                    <div className="md:col-span-2 grid gap-4 md:grid-cols-2">
+
+                                    <div className="grid gap-4 md:col-span-2 md:grid-cols-2">
                                         <div>
-                                            <Label htmlFor="e_issn">E-ISSN (Online) <span className="text-red-500">*</span></Label>
+                                            <Label htmlFor="e_issn">
+                                                E-ISSN (Online) <span className="text-red-500">*</span>
+                                            </Label>
                                             <Input
                                                 id="e_issn"
                                                 type="text"
@@ -181,7 +176,9 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                             <InputError message={errors.e_issn} className="mt-2" />
                                         </div>
                                         <div>
-                                            <Label htmlFor="url">Journal URL <span className="text-red-500">*</span></Label>
+                                            <Label htmlFor="url">
+                                                Journal URL <span className="text-red-500">*</span>
+                                            </Label>
                                             <Input
                                                 id="url"
                                                 type="url"
@@ -194,11 +191,10 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                             <InputError message={errors.url} className="mt-2" />
                                         </div>
                                         <div>
-                                            <Label htmlFor="sinta_rank">Peringkat Akreditasi <span className="text-red-500">*</span></Label>
-                                            <Select
-                                                value={data.sinta_rank}
-                                                onValueChange={(val) => setData('sinta_rank', val)}
-                                            >
+                                            <Label htmlFor="sinta_rank">
+                                                Peringkat Akreditasi <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Select value={data.sinta_rank} onValueChange={(val) => setData('sinta_rank', val)}>
                                                 <SelectTrigger className="mt-1">
                                                     <SelectValue placeholder="Pilih Peringkat..." />
                                                 </SelectTrigger>
@@ -213,7 +209,9 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                             <InputError message={errors.sinta_rank} className="mt-2" />
                                         </div>
                                         <div>
-                                            <Label htmlFor="frequency">Frekuensi Publikasi <span className="text-red-500">*</span></Label>
+                                            <Label htmlFor="frequency">
+                                                Frekuensi Publikasi <span className="text-red-500">*</span>
+                                            </Label>
                                             <Select value={data.frequency} onValueChange={(val) => setData('frequency', val)}>
                                                 <SelectTrigger className="mt-1">
                                                     <SelectValue placeholder="Pilih Frekuensi..." />
@@ -231,11 +229,18 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                             <InputError message={errors.frequency} className="mt-2" />
                                         </div>
                                     </div>
-                                    
+
                                     <div className="md:col-span-2">
                                         <div className="flex items-center justify-between">
-                                            <Label>OAI-PMH URLs <span className="text-red-500">*</span></Label>
-                                            <Button type="button" variant="outline" size="sm" onClick={() => setData('oai_urls', [...data.oai_urls, ''])}>
+                                            <Label>
+                                                OAI-PMH URLs <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setData('oai_urls', [...data.oai_urls, ''])}
+                                            >
                                                 Tambah URL OAI
                                             </Button>
                                         </div>

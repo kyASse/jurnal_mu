@@ -1,14 +1,14 @@
 import InputError from '@/components/input-error';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PageProps, type University } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2, Save, AlertCircle, Clock } from 'lucide-react';
+import { Building2, Clock, Save } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -50,15 +50,27 @@ export default function Edit({ university }: PageProps<{ university: University 
 
                 <div className="grid gap-6">
                     {hasPendingUpdates && (
-                        <Alert className="bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/50 dark:text-amber-200 dark:border-amber-900">
+                        <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
                             <Clock className="h-4 w-4 stroke-amber-600 dark:stroke-amber-400" />
                             <AlertTitle>Menunggu Persetujuan</AlertTitle>
                             <AlertDescription>
                                 Perubahan data dasar universitas Anda (Nama, Singkatan, atau Kode) sedang menunggu persetujuan dari pihak Dikti.
                                 <ul className="mt-2 list-disc pl-5">
-                                    {pendingUpdates.name && <li>Nama: <span className="font-semibold">{pendingUpdates.name}</span></li>}
-                                    {pendingUpdates.code && <li>Singkatan: <span className="font-semibold">{pendingUpdates.code}</span></li>}
-                                    {pendingUpdates.ptm_code && <li>Kode PTM: <span className="font-semibold">{pendingUpdates.ptm_code}</span></li>}
+                                    {pendingUpdates.name && (
+                                        <li>
+                                            Nama: <span className="font-semibold">{pendingUpdates.name}</span>
+                                        </li>
+                                    )}
+                                    {pendingUpdates.code && (
+                                        <li>
+                                            Singkatan: <span className="font-semibold">{pendingUpdates.code}</span>
+                                        </li>
+                                    )}
+                                    {pendingUpdates.ptm_code && (
+                                        <li>
+                                            Kode PTM: <span className="font-semibold">{pendingUpdates.ptm_code}</span>
+                                        </li>
+                                    )}
                                 </ul>
                             </AlertDescription>
                         </Alert>
@@ -80,13 +92,20 @@ export default function Edit({ university }: PageProps<{ university: University 
                                     <div>
                                         <Label htmlFor="ptm_code" className="flex items-center gap-2">
                                             Kode PTM
-                                            {pendingUpdates.ptm_code && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900">Pending</Badge>}
+                                            {pendingUpdates.ptm_code && (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900 dark:bg-amber-950/30"
+                                                >
+                                                    Pending
+                                                </Badge>
+                                            )}
                                         </Label>
-                                        <Input 
+                                        <Input
                                             id="ptm_code"
-                                            type="text" 
-                                            className="mt-1" 
-                                            value={data.ptm_code} 
+                                            type="text"
+                                            className="mt-1"
+                                            value={data.ptm_code}
                                             onChange={(e) => setData('ptm_code', e.target.value)}
                                         />
                                         <InputError message={errors.ptm_code} className="mt-2" />
@@ -95,13 +114,20 @@ export default function Edit({ university }: PageProps<{ university: University 
                                     <div>
                                         <Label htmlFor="code" className="flex items-center gap-2">
                                             Singkatan
-                                            {pendingUpdates.code && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900">Pending</Badge>}
+                                            {pendingUpdates.code && (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900 dark:bg-amber-950/30"
+                                                >
+                                                    Pending
+                                                </Badge>
+                                            )}
                                         </Label>
-                                        <Input 
+                                        <Input
                                             id="code"
-                                            type="text" 
-                                            className="mt-1" 
-                                            value={data.code} 
+                                            type="text"
+                                            className="mt-1"
+                                            value={data.code}
                                             onChange={(e) => setData('code', e.target.value)}
                                         />
                                         <InputError message={errors.code} className="mt-2" />
@@ -110,13 +136,20 @@ export default function Edit({ university }: PageProps<{ university: University 
                                     <div className="md:col-span-2">
                                         <Label htmlFor="name" className="flex items-center gap-2">
                                             Nama Universitas
-                                            {pendingUpdates.name && <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900">Pending</Badge>}
+                                            {pendingUpdates.name && (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900 dark:bg-amber-950/30"
+                                                >
+                                                    Pending
+                                                </Badge>
+                                            )}
                                         </Label>
-                                        <Input 
+                                        <Input
                                             id="name"
-                                            type="text" 
-                                            className="mt-1" 
-                                            value={data.name} 
+                                            type="text"
+                                            className="mt-1"
+                                            value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                         />
                                         <InputError message={errors.name} className="mt-2" />
@@ -132,9 +165,7 @@ export default function Edit({ university }: PageProps<{ university: University 
                                 <Building2 className="h-5 w-5" />
                                 Informasi Kontak & Detail
                             </CardTitle>
-                            <CardDescription>
-                                Perbarui informasi detail universitas Anda.
-                            </CardDescription>
+                            <CardDescription>Perbarui informasi detail universitas Anda.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-6">

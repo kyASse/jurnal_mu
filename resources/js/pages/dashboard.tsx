@@ -30,6 +30,8 @@ interface DashboardProps extends PageProps {
         total_assessments: number;
         average_score: number;
         pending_lppm_count?: number;
+        pending_users_count?: number;
+        pending_journals_count?: number;
         universities_distribution?: UniversityDistribution[];
         journals_by_status?: JournalsByStatus;
     };
@@ -102,39 +104,41 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                     )}
 
                     {/* Pending Users & Journals (Admin Kampus Only) */}
-                    {auth.user?.role?.name === 'Admin Kampus' && stats.pending_users_count !== undefined && stats.pending_journals_count !== undefined && (
-                        <>
-                            <Link href="/admin-kampus/users" className="block">
-                                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 transition-all hover:border-orange-500 hover:shadow-md dark:border-sidebar-border dark:bg-neutral-950 dark:hover:border-orange-400">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">Pending User</p>
-                                            <h3 className="mt-2 text-3xl font-bold">{stats.pending_users_count}</h3>
-                                            <p className="mt-1 text-xs text-muted-foreground">Click to review</p>
-                                        </div>
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
-                                            <UserPlus className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                    {auth.user?.role?.name === 'Admin Kampus' &&
+                        stats.pending_users_count !== undefined &&
+                        stats.pending_journals_count !== undefined && (
+                            <>
+                                <Link href="/admin-kampus/users" className="block">
+                                    <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 transition-all hover:border-orange-500 hover:shadow-md dark:border-sidebar-border dark:bg-neutral-950 dark:hover:border-orange-400">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-medium text-muted-foreground">Pending User</p>
+                                                <h3 className="mt-2 text-3xl font-bold">{stats.pending_users_count}</h3>
+                                                <p className="mt-1 text-xs text-muted-foreground">Click to review</p>
+                                            </div>
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
+                                                <UserPlus className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </Link>
+                                </Link>
 
-                            <Link href="/admin-kampus/journals" className="block">
-                                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 transition-all hover:border-amber-500 hover:shadow-md dark:border-sidebar-border dark:bg-neutral-950 dark:hover:border-amber-400">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">Pending Journal</p>
-                                            <h3 className="mt-2 text-3xl font-bold">{stats.pending_journals_count}</h3>
-                                            <p className="mt-1 text-xs text-muted-foreground">Click to review</p>
-                                        </div>
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20">
-                                            <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                                <Link href="/admin-kampus/journals" className="block">
+                                    <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 transition-all hover:border-amber-500 hover:shadow-md dark:border-sidebar-border dark:bg-neutral-950 dark:hover:border-amber-400">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-medium text-muted-foreground">Pending Journal</p>
+                                                <h3 className="mt-2 text-3xl font-bold">{stats.pending_journals_count}</h3>
+                                                <p className="mt-1 text-xs text-muted-foreground">Click to review</p>
+                                            </div>
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20">
+                                                <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </Link>
-                        </>
-                    )}
+                                </Link>
+                            </>
+                        )}
 
                     {/* User Role: Approval Status Breakdown */}
                     {isUser && stats.journals_by_status && (
@@ -245,8 +249,8 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                                     {isSuperAdmin
                                         ? 'Belum ada jurnal yang terdaftar di sistem.'
                                         : auth.user?.role?.name === 'Admin Kampus'
-                                            ? 'Belum ada jurnal yang terdaftar di universitas Anda.'
-                                            : 'Anda belum mengelola jurnal. Mulai dengan menambahkan jurnal baru.'}
+                                          ? 'Belum ada jurnal yang terdaftar di universitas Anda.'
+                                          : 'Anda belum mengelola jurnal. Mulai dengan menambahkan jurnal baru.'}
                                 </p>
                             </div>
                         </div>

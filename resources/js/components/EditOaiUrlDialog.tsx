@@ -1,12 +1,5 @@
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from '@inertiajs/react';
@@ -70,7 +63,9 @@ export function EditOaiUrlDialog({ open, onOpenChange, journalId, initialUrls, u
 
                     <div className="grid gap-4 py-4">
                         <div className="space-y-4">
-                            <Label>OAI-PMH URLs <span className="text-red-500">*</span></Label>
+                            <Label>
+                                OAI-PMH URLs <span className="text-red-500">*</span>
+                            </Label>
                             {data.oai_urls.map((url, index) => (
                                 <div key={index} className="space-y-1">
                                     <div className="flex items-center gap-2">
@@ -93,19 +88,13 @@ export function EditOaiUrlDialog({ open, onOpenChange, journalId, initialUrls, u
                                             </Button>
                                         )}
                                     </div>
-                                    {errors[`oai_urls.${index}`] && (
-                                        <p className="text-sm text-red-500">{errors[`oai_urls.${index}`]}</p>
+                                    {(errors as any)[`oai_urls.${index}`] && (
+                                        <p className="text-sm text-red-500">{(errors as any)[`oai_urls.${index}`]}</p>
                                     )}
                                 </div>
                             ))}
                             {errors.oai_urls && <p className="text-sm text-red-500">{errors.oai_urls}</p>}
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={handleAddUrl}
-                                className="w-full border-dashed"
-                            >
+                            <Button type="button" variant="outline" size="sm" onClick={handleAddUrl} className="w-full border-dashed">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Tambah URL
                             </Button>

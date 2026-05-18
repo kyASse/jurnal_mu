@@ -6,6 +6,7 @@
  * @route GET /admin/journals/{id}
  */
 import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
+import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,11 +18,10 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type OaiHarvestingLog } from '@/types';
@@ -33,7 +33,6 @@ import {
     BookOpen,
     Building2,
     Calendar,
-    CheckCircle2,
     Clock,
     Database,
     ExternalLink,
@@ -43,7 +42,6 @@ import {
     RefreshCw,
     Trash2,
     User,
-    XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -520,7 +518,7 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                         initialUrls={journal.oai_urls ?? null}
                                         updateRoute="admin.journals.update-oai-urls"
                                     />
-                                    
+
                                     {/* OAI-PMH URLs */}
                                     {journal.oai_urls && journal.oai_urls.length > 0 ? (
                                         <div className="mb-4 flex items-start gap-2 rounded-md bg-muted/50 p-3 text-sm">
@@ -550,7 +548,9 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                                 <AlertCircle className="h-4 w-4 shrink-0" />
                                                 <span>OAI-PMH URL belum dikonfigurasi.</span>
                                             </div>
-                                            <Button size="sm" onClick={() => setShowEditOaiModal(true)}>Konfigurasi URL</Button>
+                                            <Button size="sm" onClick={() => setShowEditOaiModal(true)}>
+                                                Konfigurasi URL
+                                            </Button>
                                         </div>
                                     )}
 
@@ -559,10 +559,16 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                             <div className="flex items-center gap-2">
                                                 <AlertCircle className="h-4 w-4 shrink-0" />
                                                 <span>
-                                                    Proses harvest terakhir mengalami masalah. Anda dapat memperbaiki OAI-PMH URL jika URL sebelumnya salah atau tidak dapat diakses.
+                                                    Proses harvest terakhir mengalami masalah. Anda dapat memperbaiki OAI-PMH URL jika URL sebelumnya
+                                                    salah atau tidak dapat diakses.
                                                 </span>
                                             </div>
-                                            <Button size="sm" variant="outline" className="bg-white text-red-600 hover:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900" onClick={() => setShowEditOaiModal(true)}>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="bg-white text-red-600 hover:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900"
+                                                onClick={() => setShowEditOaiModal(true)}
+                                            >
                                                 Perbaiki OAI URL
                                             </Button>
                                         </div>
@@ -602,7 +608,11 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                                                                   ? 'default'
                                                                                   : 'destructive'
                                                                         }
-                                                                        className={log.status === 'success' ? 'border-green-300 text-green-700 dark:text-green-400' : ''}
+                                                                        className={
+                                                                            log.status === 'success'
+                                                                                ? 'border-green-300 text-green-700 dark:text-green-400'
+                                                                                : ''
+                                                                        }
                                                                     >
                                                                         {log.status === 'success'
                                                                             ? 'Berhasil'

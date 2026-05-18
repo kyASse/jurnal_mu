@@ -6,6 +6,7 @@
  * @route GET /user/journals/{id}
  */
 import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
+import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
 import { JournalCoverUpload } from '@/components/JournalCoverUpload';
 import {
     AlertDialog,
@@ -21,9 +22,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type OaiHarvestingLog, type SharedData } from '@/types';
@@ -34,7 +33,6 @@ import {
     BookOpen,
     Camera,
     CheckCircle,
-    CheckCircle2,
     Clock,
     Database,
     Edit,
@@ -155,7 +153,7 @@ export default function JournalShow({ journal, articles, statistics, harvestLogs
     const coverForm = useForm({ cover_image: null as File | null });
     const [harvesting, setHarvesting] = useState(false);
     const [forceSyncing, setForceSyncing] = useState(false);
-    
+
     const latestLog = harvestLogs && harvestLogs.length > 0 ? harvestLogs[0] : null;
     const isFailedOrPartial = latestLog && (latestLog.status === 'failed' || latestLog.status === 'partial');
 
@@ -738,7 +736,9 @@ export default function JournalShow({ journal, articles, statistics, harvestLogs
                                     <AlertCircle className="h-4 w-4 shrink-0" />
                                     <span>OAI-PMH URL belum dikonfigurasi.</span>
                                 </div>
-                                <Button size="sm" onClick={() => setShowEditOaiModal(true)}>Konfigurasi URL</Button>
+                                <Button size="sm" onClick={() => setShowEditOaiModal(true)}>
+                                    Konfigurasi URL
+                                </Button>
                             </div>
                         )}
 
@@ -747,10 +747,16 @@ export default function JournalShow({ journal, articles, statistics, harvestLogs
                                 <div className="flex items-center gap-2">
                                     <AlertCircle className="h-4 w-4 shrink-0" />
                                     <span>
-                                        Proses harvest terakhir mengalami masalah. Anda dapat memperbaiki OAI-PMH URL jika URL sebelumnya salah atau tidak dapat diakses.
+                                        Proses harvest terakhir mengalami masalah. Anda dapat memperbaiki OAI-PMH URL jika URL sebelumnya salah atau
+                                        tidak dapat diakses.
                                     </span>
                                 </div>
-                                <Button size="sm" variant="outline" className="bg-white text-red-600 hover:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900" onClick={() => setShowEditOaiModal(true)}>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="bg-white text-red-600 hover:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900"
+                                    onClick={() => setShowEditOaiModal(true)}
+                                >
                                     Perbaiki OAI URL
                                 </Button>
                             </div>
@@ -790,13 +796,11 @@ export default function JournalShow({ journal, articles, statistics, harvestLogs
                                                                       ? 'default'
                                                                       : 'destructive'
                                                             }
-                                                            className={log.status === 'success' ? 'border-green-300 text-green-700 dark:text-green-400' : ''}
+                                                            className={
+                                                                log.status === 'success' ? 'border-green-300 text-green-700 dark:text-green-400' : ''
+                                                            }
                                                         >
-                                                            {log.status === 'success'
-                                                                ? 'Berhasil'
-                                                                : log.status === 'partial'
-                                                                  ? 'Sebagian'
-                                                                  : 'Gagal'}
+                                                            {log.status === 'success' ? 'Berhasil' : log.status === 'partial' ? 'Sebagian' : 'Gagal'}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell>{log.records_found ?? 0}</TableCell>
