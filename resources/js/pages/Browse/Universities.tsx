@@ -1,293 +1,178 @@
-/**
- * Browse Universities Component
- *
- * @description
- * A public-facing page for browsing journals grouped by university.
- * Users can view all universities with their journal counts, select a university
- * to see all its approved journals, or use the filter dropdown for quick navigation.
- *
- * @features
- * - University grid/list showing name, code, and journal count
- * - Searchable university filter dropdown
- * - Expandable view showing all journals for selected university
- * - Pagination for journals with "View More" button
- * - Only shows approved, active journals
- * - Cached university statistics for performance
- *
- * @route GET /browse/universities
- * @route GET /browse/universities?university_id=5 (selected university)
- */
-import JournalCard from '@/components/journal-card';
+import PublicLayout from '@/layouts/public-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Head, Link, router } from '@inertiajs/react';
-import { BookOpen, Building2, ChevronLeft, ChevronRight, Home } from 'lucide-react';
-import { useState } from 'react';
+import { BookOpen, Building2, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useDebounce } from 'use-debounce';
 
-interface Journal {
-    id: number;
-    title: string;
-    issn: string | null;
-    e_issn: string | null;
-    url: string | null;
-    scientific_field: {
-        id: number;
-        name: string;
-    } | null;
-    sinta_rank: number | null;
-    sinta_rank_label: string | null;
-    is_indexed_in_scopus: boolean;
-}
-
-interface UniversityStat {
+interface University {
     id: number;
     name: string;
+    short_name: string | null;
     code: string;
-    short_name: string;
+    city: string | null;
+    province: string | null;
+    logo_url: string | null;
+    accreditation_status: string | null;
     journals_count: number;
 }
 
-interface SelectedUniversity {
-    id: number;
-    name: string;
-    code: string;
-    short_name: string;
-}
-
-interface PaginatedJournals {
-    data: Journal[];
+interface PaginatedUniversities {
+    data: University[];
     current_page: number;
     last_page: number;
-    per_page: number;
-    total: number;
-    links: Array<{
-        url: string | null;
-        label: string;
-        active: boolean;
-    }>;
+    links: any[];
 }
 
 interface Props {
-    universityStats: UniversityStat[];
-    selectedUniversity: SelectedUniversity | null;
-    journals: PaginatedJournals | null;
+    universities: PaginatedUniversities;
     filters: {
-        university_id?: string;
+        search?: string;
+        accreditation?: string;
+        sort?: string;
     };
+    accreditationOptions: string[];
 }
 
-export default function BrowseUniversities({ universityStats, selectedUniversity, journals, filters }: Props) {
-    const [universityFilter, setUniversityFilter] = useState(filters.university_id || '');
+export default function BrowseUniversities({ universities, filters, accreditationOptions }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
+    const [debouncedSearch] = useDebounce(search, 500);
+    const [accreditation, setAccreditation] = useState(filters.accreditation || 'all');
+    const [sort, setSort] = useState(filters.sort || 'name');
 
-    const handleUniversityChange = (value: string) => {
-        setUniversityFilter(value);
-        if (value && value !== 'all') {
-            router.get(route('browse.universities'), { university_id: value }, { preserveState: true });
-        } else {
-            router.get(route('browse.universities'), {}, { preserveState: true });
-        }
-    };
+    useEffect(() => {
+        const query: any = {};
+        if (debouncedSearch) query.search = debouncedSearch;
+        if (accreditation !== 'all') query.accreditation = accreditation;
+        if (sort !== 'name') query.sort = sort;
 
-    const handleUniversityCardClick = (universityId: number) => {
-        setUniversityFilter(universityId.toString());
-        router.get(route('browse.universities'), { university_id: universityId }, { preserveState: true });
-    };
+        router.get(route('browse.universities'), query, {
+            preserveState: true,
+            replace: true,
+        });
+    }, [debouncedSearch, accreditation, sort]);
 
     const handlePageChange = (url: string | null) => {
         if (!url) return;
-        router.get(url, {}, { preserveScroll: true, preserveState: true });
+        router.get(url);
     };
 
     return (
-        <>
-            <Head title="Browse by University" />
+        <PublicLayout>
+            <Head title="Browse Universities - JurnalMu" />
 
-            <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-                {/* Header */}
-                <div className="border-b bg-card/50 backdrop-blur-sm">
-                    <div className="container mx-auto px-4 py-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="text-3xl font-bold">Browse by University</h1>
-                                <p className="mt-1 text-muted-foreground">Explore journals from Muhammadiyah universities across Indonesia</p>
-                            </div>
-                            <Link href={route('home')}>
-                                <Button variant="outline">
-                                    <Home className="mr-2 h-4 w-4" />
-                                    Home
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
+            <div className="container mx-auto max-w-7xl px-4 py-8">
+                <div className="mb-8 text-center sm:text-left">
+                    <h1 className="text-3xl font-bold font-heading text-[#079C4E]" style={{ fontFamily: '"El Messiri", sans-serif' }}>
+                        Perguruan Tinggi Muhammadiyah 'Aisyiyah
+                    </h1>
+                    <p className="mt-2 text-muted-foreground">Jelajahi profil dan pangkalan data jurnal ilmiah kampus PTMA se-Indonesia</p>
                 </div>
 
-                <div className="container mx-auto px-4 py-8">
-                    <div className="space-y-8">
-                        {/* University Filter Dropdown */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Select University</CardTitle>
-                                <CardDescription>Choose a university to view all its journals, or browse the list below</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <UniversityFilterCombobox
-                                    universities={universityStats.map((uni) => ({
-                                        id: uni.id,
-                                        name: uni.name,
-                                        code: uni.code,
-                                        short_name: uni.short_name,
-                                    }))}
-                                    value={universityFilter || 'all'}
-                                    onValueChange={handleUniversityChange}
-                                    placeholder="All Universities"
-                                    className="h-12"
-                                />
-                            </CardContent>
-                        </Card>
+                {/* Filters Bar */}
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div className="relative">
+                        <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Cari Universitas, Nama Singkat atau Kode..."
+                            className="pl-9"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
 
-                        {/* Selected University Journals View */}
-                        {selectedUniversity && journals ? (
-                            <div className="space-y-6">
-                                <Card className="border-2 border-primary/20 bg-card/50">
-                                    <CardHeader>
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <CardTitle className="text-2xl">{selectedUniversity.name}</CardTitle>
-                                                <CardDescription className="mt-2">
-                                                    <Badge variant="secondary" className="font-mono">
-                                                        {selectedUniversity.code}
-                                                    </Badge>
-                                                    <span className="ml-2">
-                                                        {journals.total} {journals.total === 1 ? 'journal' : 'journals'} available
-                                                    </span>
-                                                </CardDescription>
-                                            </div>
-                                            <Button variant="outline" size="sm" onClick={() => handleUniversityChange('all')}>
-                                                <ChevronLeft className="mr-2 h-4 w-4" />
-                                                Back to All
-                                            </Button>
+                    <Select value={accreditation} onValueChange={setAccreditation}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Semua Akreditasi" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Semua Akreditasi</SelectItem>
+                            {accreditationOptions.map((opt) => (
+                                <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={sort} onValueChange={setSort}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Urutkan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="name">Nama (A-Z)</SelectItem>
+                            <SelectItem value="journals_count">Jumlah Jurnal Terbanyak</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* University Cards Grid */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {universities.data.map((uni) => (
+                        <Link key={uni.id} href={route('browse.universities.show', uni.id)}>
+                            <Card className="h-full border transition-all hover:border-[#079C4E]/50 hover:shadow-md cursor-pointer flex flex-col justify-between">
+                                <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-3">
+                                    {uni.logo_url ? (
+                                        <img
+                                            src={uni.logo_url}
+                                            alt={uni.name}
+                                            className="h-12 w-12 rounded-lg object-contain border bg-white p-1"
+                                        />
+                                    ) : (
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-50 text-[#079C4E] border border-emerald-100">
+                                            <Building2 className="h-6 w-6" />
                                         </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        {journals.data.length === 0 ? (
-                                            <div className="py-12 text-center">
-                                                <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                                                <p className="mt-4 text-muted-foreground">No journals available yet</p>
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-6">
-                                                {/* Journals Grid */}
-                                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                                    {journals.data.map((journal) => (
-                                                        <JournalCard
-                                                            key={journal.id}
-                                                            id={journal.id}
-                                                            title={journal.title}
-                                                            issn={journal.issn}
-                                                            e_issn={journal.e_issn}
-                                                            sinta_rank={journal.sinta_rank_label}
-                                                            external_url={journal.url}
-                                                        />
-                                                    ))}
-                                                </div>
-
-                                                {/* Pagination */}
-                                                {journals.last_page > 1 && (
-                                                    <div className="flex items-center justify-center gap-2 pt-4">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handlePageChange(
-                                                                    journals.links.find((link) => link.label === '&laquo; Previous')?.url || null,
-                                                                )
-                                                            }
-                                                            disabled={journals.current_page === 1}
-                                                        >
-                                                            <ChevronLeft className="mr-2 h-4 w-4" />
-                                                            Previous
-                                                        </Button>
-
-                                                        <div className="flex items-center gap-2">
-                                                            {journals.links
-                                                                .filter((link) => !link.label.includes('Previous') && !link.label.includes('Next'))
-                                                                .map((link, index) => (
-                                                                    <Button
-                                                                        key={index}
-                                                                        variant={link.active ? 'default' : 'outline'}
-                                                                        size="sm"
-                                                                        onClick={() => handlePageChange(link.url)}
-                                                                        disabled={!link.url}
-                                                                    >
-                                                                        {link.label}
-                                                                    </Button>
-                                                                ))}
-                                                        </div>
-
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handlePageChange(
-                                                                    journals.links.find((link) => link.label === 'Next &raquo;')?.url || null,
-                                                                )
-                                                            }
-                                                            disabled={journals.current_page === journals.last_page}
-                                                        >
-                                                            Next
-                                                            <ChevronRight className="ml-2 h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                        <CardTitle className="text-base font-bold line-clamp-2 leading-tight">
+                                            {uni.name}
+                                        </CardTitle>
+                                        <span className="font-mono text-xs text-muted-foreground">Code: {uni.code}</span>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="pt-0 flex flex-col gap-2">
+                                    <div className="flex flex-wrap gap-1">
+                                        {uni.accreditation_status && (
+                                            <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 font-bold border-emerald-100">
+                                                {uni.accreditation_status}
+                                            </Badge>
                                         )}
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        ) : (
-                            /* University Grid View */
-                            <div>
-                                <h2 className="mb-4 text-xl font-semibold">All Universities ({universityStats.length})</h2>
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                    {universityStats.map((university) => (
-                                        <Card
-                                            key={university.id}
-                                            className="group cursor-pointer transition-all hover:border-primary/50 hover:shadow-lg"
-                                            onClick={() => handleUniversityCardClick(university.id)}
-                                        >
-                                            <CardHeader>
-                                                <div className="flex items-start gap-3">
-                                                    <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20">
-                                                        <Building2 className="h-5 w-5 text-primary" />
-                                                    </div>
-                                                    <div className="flex-1 space-y-1">
-                                                        <CardTitle className="text-base leading-tight group-hover:text-primary">
-                                                            {university.short_name || university.name}
-                                                        </CardTitle>
-                                                        <Badge variant="outline" className="font-mono text-xs">
-                                                            {university.code}
-                                                        </Badge>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-muted-foreground">Journals</span>
-                                                    <Badge variant="secondary" className="font-semibold">
-                                                        {university.journals_count}
-                                                    </Badge>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                                        {(uni.city || uni.province) && (
+                                            <Badge variant="outline" className="text-xs max-w-full truncate">
+                                                {uni.city || uni.province}
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <div className="mt-4 flex items-center justify-between border-t pt-3 text-sm">
+                                        <span className="text-muted-foreground flex items-center gap-1">
+                                            <BookOpen className="h-4 w-4" /> Jurnal
+                                        </span>
+                                        <span className="font-semibold text-[#079C4E]">{uni.journals_count} Jurnal</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
                 </div>
+
+                {/* Pagination Links */}
+                {universities.last_page > 1 && (
+                    <div className="mt-8 flex justify-center gap-1">
+                        {universities.links.map((link, idx) => (
+                            <Button
+                                key={idx}
+                                variant={link.active ? 'default' : 'outline'}
+                                className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068442]' : ''}
+                                onClick={() => handlePageChange(link.url)}
+                                disabled={!link.url}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
-        </>
+        </PublicLayout>
     );
 }
