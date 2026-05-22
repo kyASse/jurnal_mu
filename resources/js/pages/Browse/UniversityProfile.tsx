@@ -1,9 +1,11 @@
 import PublicLayout from '@/layouts/public-layout';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Head, Link, router } from '@inertiajs/react';
 import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 interface Props {
     university: {
@@ -127,6 +129,73 @@ export default function UniversityProfile({ university, stats, journals, article
                                 <p className="text-sm font-medium text-muted-foreground">Cluster PT</p>
                                 <h3 className="text-2xl font-bold text-gray-900">{university.cluster || '-'}</h3>
                             </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Sinta Chart and Registered Journals Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    {/* Sinta Breakdown Chart */}
+                    <Card className="lg:col-span-1">
+                        <CardHeader>
+                            <CardTitle className="text-lg">Klasifikasi SINTA Jurnal</CardTitle>
+                            <CardDescription>Distribusi akreditasi jurnal ilmiah terdaftar</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center">
+                            <ReactApexChart
+                                options={{
+                                    chart: { type: 'donut', fontFamily: 'inherit' },
+                                    labels: ['Sinta 1', 'Sinta 2', 'Sinta 3', 'Sinta 4', 'Sinta 5', 'Sinta 6', 'Tidak Terakreditasi'],
+                                    colors: ['#079C4E', '#10b981', '#3b82f6', '#60a5fa', '#f59e0b', '#fca5a5', '#9ca3af'],
+                                    legend: { position: 'bottom' },
+                                    dataLabels: { enabled: false }
+                                }}
+                                series={[
+                                    stats.sinta_breakdown.S1 || 0,
+                                    stats.sinta_breakdown.S2 || 0,
+                                    stats.sinta_breakdown.S3 || 0,
+                                    stats.sinta_breakdown.S4 || 0,
+                                    stats.sinta_breakdown.S5 || 0,
+                                    stats.sinta_breakdown.S6 || 0,
+                                    stats.sinta_breakdown.TT || 0
+                                ]}
+                                type="donut"
+                                height={250}
+                            />
+                        </CardContent>
+                    </Card>
+
+                    {/* Registered Jurnal List */}
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <CardTitle className="text-lg">Jurnal Terdaftar ({journals.length})</CardTitle>
+                            <CardDescription>Jurnal ilmiah Perguruan Tinggi yang sudah terverifikasi</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {journals.length === 0 ? (
+                                <div className="py-8 text-center text-muted-foreground">Belum ada jurnal terdaftar</div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2">
+                                    {journals.map((journal) => (
+                                        <Link key={journal.id} href={route('journals.show', journal.id)}>
+                                            <div className="flex items-center gap-3 p-3 border rounded-lg hover:border-[#079C4E] hover:bg-emerald-50/20 transition-all cursor-pointer">
+                                                <div className="h-10 w-8 bg-gray-100 border flex items-center justify-center rounded text-[8px] font-bold text-gray-400 overflow-hidden">
+                                                    {journal.cover_image_url ? (
+                                                        <img src={journal.cover_image_url} alt={journal.title} className="h-full w-full object-cover" />
+                                                    ) : 'COVER'}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="text-sm font-bold text-gray-900 truncate">{journal.title}</h4>
+                                                    <p className="text-xs text-muted-foreground truncate">{journal.scientific_field || 'Bidang Umum'}</p>
+                                                </div>
+                                                {journal.sinta_rank_label && (
+                                                    <Badge className="bg-[#079C4E] text-white text-xs">{journal.sinta_rank_label}</Badge>
+                                                )}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
