@@ -33,12 +33,34 @@ class UniversityController extends Controller
             'name' => 'nullable|string|max:255',
             'code' => 'nullable|string|max:20',
             'ptm_code' => 'nullable|string|max:20',
+            'short_name' => 'nullable|string|max:100',
             'profile_description' => 'nullable|string',
             'website' => 'nullable|url|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:10',
+            'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'accreditation_status' => 'nullable|string|max:50',
+            'cluster' => 'nullable|string|max:50',
         ]);
+
+        if ($request->hasFile('logo_file')) {
+            // Delete old logo if it exists in storage
+            if ($university->logo_url && \Illuminate\Support\Str::startsWith($university->logo_url, '/storage/logos/')) {
+                $oldPath = str_replace('/storage/', '', $university->logo_url);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+
+            $file = $request->file('logo_file');
+            $filename = 'logo_' . $university->id . '_' . time() . '.' . $file->extension();
+            $path = $file->storeAs('logos', $filename, 'public');
+            $validated['logo_url'] = '/storage/' . $path;
+        }
+
+        unset($validated['logo_file']);
 
         $pendingUpdates = $university->pending_updates ?? [];
         $hasPendingUpdates = false;
