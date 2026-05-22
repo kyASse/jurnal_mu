@@ -2,9 +2,13 @@ import PublicLayout from '@/layouts/public-layout';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Head, Link, router } from '@inertiajs/react';
-import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
+import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Phone, ShieldCheck, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useDebounce } from 'use-debounce';
 import ReactApexChart from 'react-apexcharts';
 
 interface Props {
@@ -37,6 +41,30 @@ interface Props {
 }
 
 export default function UniversityProfile({ university, stats, journals, articles, years, filters }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
+    const [debouncedSearch] = useDebounce(search, 500);
+    const [journalId, setJournalId] = useState(filters.journal_id || 'all');
+    const [year, setYear] = useState(filters.year || 'all');
+
+    // Trigger search update
+    useEffect(() => {
+        const query: any = {};
+        if (debouncedSearch) query.search = debouncedSearch;
+        if (journalId !== 'all') query.journal_id = journalId;
+        if (year !== 'all') query.year = year;
+
+        router.get(route('browse.universities.show', university.id), query, {
+            preserveState: true,
+            replace: true,
+            preserveScroll: true
+        });
+    }, [debouncedSearch, journalId, year]);
+
+    const handlePageChange = (url: string | null) => {
+        if (!url) return;
+        router.get(url, {}, { preserveScroll: true });
+    };
+
     return (
         <PublicLayout>
             <Head title={`${university.name} - JurnalMu`} />
@@ -199,6 +227,115 @@ export default function UniversityProfile({ university, stats, journals, article
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Articles Database Section */}
+                <Card className="mt-8">
+                    <CardHeader>
+                        <CardTitle className="text-xl">Database Artikel Ilmiah</CardTitle>
+                        <CardDescription>Telusuri artikel ilmiah yang diterbitkan oleh jurnal milik Perguruan Tinggi ini</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {/* Article Filters Bar */}
+                        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <div className="relative">
+                                <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Cari Judul Artikel..."
+                                    className="pl-9"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </div>
+
+                            <Select value={journalId} onValueChange={setJournalId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Semua Jurnal" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Jurnal</SelectItem>
+                                    {journals.map((j) => (
+                                        <SelectItem key={j.id} value={j.id.toString()}>{j.title}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select value={year} onValueChange={setYear}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Semua Tahun Terbit" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Tahun Terbit</SelectItem>
+                                    {years.map((y) => (
+                                        <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Articles Table */}
+                        {articles.data.length === 0 ? (
+                            <div className="py-12 text-center text-muted-foreground">Artikel tidak ditemukan</div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Artikel & Penulis</TableHead>
+                                            <TableHead>Jurnal</TableHead>
+                                            <TableHead>Tahun Terbit</TableHead>
+                                            <TableHead className="text-right">Aksi</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {articles.data.map((article: any) => (
+                                            <TableRow key={article.id}>
+                                                <TableCell className="max-w-[450px]">
+                                                    <div className="font-bold text-gray-900 line-clamp-2">{article.title}</div>
+                                                    <div className="text-xs text-muted-foreground mt-1 truncate">
+                                                        {Array.isArray(article.authors) ? article.authors.join(', ') : (article.authors || 'Penulis Tidak Diketahui')}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {article.journal && (
+                                                        <Link href={route('journals.show', article.journal.id)} className="text-[#079C4E] hover:underline font-semibold text-xs">
+                                                            {article.journal.title}
+                                                        </Link>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {article.publication_date ? new Date(article.publication_date).getFullYear() : '-'}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {article.article_url && (
+                                                        <a href={article.article_url} target="_blank" rel="noopener noreferrer">
+                                                            <Button size="sm" className="bg-[#079C4E] hover:bg-[#068442] text-white">Buka Artikel</Button>
+                                                        </a>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
+
+                        {/* Pagination */}
+                        {articles.last_page > 1 && (
+                            <div className="mt-6 flex justify-center gap-1">
+                                {articles.links.map((link: any, idx: number) => (
+                                    <Button
+                                        key={idx}
+                                        variant={link.active ? 'default' : 'outline'}
+                                        className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068442]' : ''}
+                                        onClick={() => handlePageChange(link.url)}
+                                        disabled={!link.url}
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </PublicLayout>
     );
