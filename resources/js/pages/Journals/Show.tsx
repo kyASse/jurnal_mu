@@ -27,8 +27,8 @@ import {
     Target,
     User,
 } from 'lucide-react';
-import React, { useState } from 'react';
-import Chart from 'react-apexcharts';
+import React, { useState, useEffect } from 'react';
+
 
 interface JournalsShowProps extends SharedData {
     journal: Journal & {
