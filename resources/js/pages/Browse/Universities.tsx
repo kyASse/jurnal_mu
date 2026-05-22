@@ -37,12 +37,13 @@ interface Props {
     };
     accreditationOptions: string[];
 }
-
 export default function BrowseUniversities({ universities, filters, accreditationOptions }: Props) {
-    const [search, setSearch] = useState(filters.search || '');
+    const safeFilters: any = (filters && typeof filters === 'object' && !Array.isArray(filters)) ? filters : {};
+    const [search, setSearch] = useState(safeFilters.search ? String(safeFilters.search) : '');
     const [debouncedSearch] = useDebounce(search, 500);
-    const [accreditation, setAccreditation] = useState(filters.accreditation || 'all');
-    const [sort, setSort] = useState(filters.sort || 'name');
+    const [accreditation, setAccreditation] = useState(safeFilters.accreditation ? String(safeFilters.accreditation) : 'all');
+    const [sort, setSort] = useState(safeFilters.sort ? String(safeFilters.sort) : 'name');
+
 
     useEffect(() => {
         const query: any = {};
