@@ -9,7 +9,6 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Phone, ShieldCheck, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
-import ReactApexChart from 'react-apexcharts';
 
 interface Props {
     university: {
@@ -41,10 +40,18 @@ interface Props {
 }
 
 export default function UniversityProfile({ university, stats, journals, articles, years, filters }: Props) {
-    const [search, setSearch] = useState(filters.search || '');
+    const safeFilters: any = (filters && typeof filters === 'object' && !Array.isArray(filters)) ? filters : {};
+    const [search, setSearch] = useState(safeFilters.search ? String(safeFilters.search) : '');
     const [debouncedSearch] = useDebounce(search, 500);
-    const [journalId, setJournalId] = useState(filters.journal_id || 'all');
-    const [year, setYear] = useState(filters.year || 'all');
+    const [journalId, setJournalId] = useState(safeFilters.journal_id ? String(safeFilters.journal_id) : 'all');
+    const [year, setYear] = useState(safeFilters.year ? String(safeFilters.year) : 'all');
+    const [ReactApexChart, setReactApexChart] = useState<any>(null);
+
+    useEffect(() => {
+        import('react-apexcharts').then((mod) => {
+            setReactApexChart(() => mod.default);
+        });
+    }, []);
 
     // Trigger search update
     useEffect(() => {
@@ -169,27 +176,34 @@ export default function UniversityProfile({ university, stats, journals, article
                             <CardTitle className="text-lg">Klasifikasi SINTA Jurnal</CardTitle>
                             <CardDescription>Distribusi akreditasi jurnal ilmiah terdaftar</CardDescription>
                         </CardHeader>
-                        <CardContent className="flex flex-col items-center">
-                            <ReactApexChart
-                                options={{
-                                    chart: { type: 'donut', fontFamily: 'inherit' },
-                                    labels: ['Sinta 1', 'Sinta 2', 'Sinta 3', 'Sinta 4', 'Sinta 5', 'Sinta 6', 'Tidak Terakreditasi'],
-                                    colors: ['#079C4E', '#10b981', '#3b82f6', '#60a5fa', '#f59e0b', '#fca5a5', '#9ca3af'],
-                                    legend: { position: 'bottom' },
-                                    dataLabels: { enabled: false }
-                                }}
-                                series={[
-                                    stats.sinta_breakdown.S1 || 0,
-                                    stats.sinta_breakdown.S2 || 0,
-                                    stats.sinta_breakdown.S3 || 0,
-                                    stats.sinta_breakdown.S4 || 0,
-                                    stats.sinta_breakdown.S5 || 0,
-                                    stats.sinta_breakdown.S6 || 0,
-                                    stats.sinta_breakdown.TT || 0
-                                ]}
-                                type="donut"
-                                height={250}
-                            />
+                        <CardContent className="flex flex-col items-center w-full">
+                            {ReactApexChart ? (
+                                <ReactApexChart
+                                    options={{
+                                        chart: { type: 'donut', fontFamily: 'inherit' },
+                                        labels: ['Sinta 1', 'Sinta 2', 'Sinta 3', 'Sinta 4', 'Sinta 5', 'Sinta 6', 'Tidak Terakreditasi'],
+                                        colors: ['#079C4E', '#10b981', '#3b82f6', '#60a5fa', '#f59e0b', '#fca5a5', '#9ca3af'],
+                                        legend: { position: 'bottom' },
+                                        dataLabels: { enabled: false }
+                                    }}
+                                    series={[
+                                        stats?.sinta_breakdown?.S1 || 0,
+                                        stats?.sinta_breakdown?.S2 || 0,
+                                        stats?.sinta_breakdown?.S3 || 0,
+                                        stats?.sinta_breakdown?.S4 || 0,
+                                        stats?.sinta_breakdown?.S5 || 0,
+                                        stats?.sinta_breakdown?.S6 || 0,
+                                        stats?.sinta_breakdown?.TT || 0
+                                    ]}
+                                    type="donut"
+                                    height={250}
+                                    width="100%"
+                                />
+                            ) : (
+                                <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                                    Memuat Grafik...
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -273,7 +287,7 @@ export default function UniversityProfile({ university, stats, journals, article
                         </div>
 
                         {/* Articles Table */}
-                        {articles.data.length === 0 ? (
+                        {(!articles?.data || articles.data.length === 0) ? (
                             <div className="py-12 text-center text-muted-foreground">Artikel tidak ditemukan</div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -287,7 +301,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {articles.data.map((article: any) => (
+                                        {(articles?.data || []).map((article: any) => (
                                             <TableRow key={article.id}>
                                                 <TableCell className="max-w-[450px]">
                                                     <div className="font-bold text-gray-900 line-clamp-2">{article.title}</div>
@@ -320,9 +334,9 @@ export default function UniversityProfile({ university, stats, journals, article
                         )}
 
                         {/* Pagination */}
-                        {articles.last_page > 1 && (
+                        {articles?.last_page > 1 && (
                             <div className="mt-6 flex justify-center gap-1">
-                                {articles.links.map((link: any, idx: number) => (
+                                {(articles?.links || []).map((link: any, idx: number) => (
                                     <Button
                                         key={idx}
                                         variant={link.active ? 'default' : 'outline'}
