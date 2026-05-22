@@ -46,12 +46,24 @@ return new class extends Migration
         END");
 
         // Drop old column and rename new one
+        try {
+            Schema::table('journals', function (Blueprint $table) {
+                $table->dropIndex('journals_sinta_rank_index');
+            });
+        } catch (\Throwable $e) {
+            // Index might not exist or already dropped
+        }
+
         Schema::table('journals', function (Blueprint $table) {
             $table->dropColumn('sinta_rank');
         });
 
         Schema::table('journals', function (Blueprint $table) {
             $table->renameColumn('sinta_rank_new', 'sinta_rank');
+        });
+
+        Schema::table('journals', function (Blueprint $table) {
+            $table->index('sinta_rank');
         });
 
         // Step 3: Make e_issn and oai_pmh_url NOT NULL with defaults
@@ -97,12 +109,24 @@ return new class extends Migration
             ELSE NULL
         END");
 
+        try {
+            Schema::table('journals', function (Blueprint $table) {
+                $table->dropIndex('journals_sinta_rank_index');
+            });
+        } catch (\Throwable $e) {
+            // Index might not exist or already dropped
+        }
+
         Schema::table('journals', function (Blueprint $table) {
             $table->dropColumn('sinta_rank');
         });
 
         Schema::table('journals', function (Blueprint $table) {
             $table->renameColumn('sinta_rank_old', 'sinta_rank');
+        });
+
+        Schema::table('journals', function (Blueprint $table) {
+            $table->index('sinta_rank');
         });
 
         // Step 3: Make e_issn and oai_pmh_url nullable again
