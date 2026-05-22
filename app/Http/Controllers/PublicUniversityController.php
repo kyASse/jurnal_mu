@@ -54,7 +54,7 @@ class PublicUniversityController extends Controller
 
         return Inertia::render('Browse/Universities', [
             'universities' => $universities,
-            'filters' => $request->only(['search', 'accreditation', 'sort']),
+            'filters' => (object) $request->only(['search', 'accreditation', 'sort']),
             'accreditationOptions' => $accreditationOptions,
         ]);
     }
@@ -180,7 +180,7 @@ class PublicUniversityController extends Controller
             'journals' => $journals,
             'articles' => $articles,
             'years' => $years,
-            'filters' => $request->only(['search', 'journal_id', 'year']),
+            'filters' => (object) $request->only(['search', 'journal_id', 'year']),
         ]);
     }
 }

@@ -339,10 +339,7 @@ class Journal extends Model
             return $query;
         }
 
-        return $query->whereNotNull('indexations')
-            ->where(function ($q) use ($platform) {
-                $q->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.\"$platform\"')");
-            });
+        return $query->whereNotNull("indexations->{$platform}");
     }
 
     /**
@@ -351,8 +348,7 @@ class Journal extends Model
      */
     public function scopeIndexedInScopus($query)
     {
-        return $query->whereNotNull('indexations')
-            ->whereRaw("JSON_CONTAINS_PATH(indexations, 'one', '$.Scopus')");
+        return $query->whereNotNull('indexations->Scopus');
     }
 
     /**
