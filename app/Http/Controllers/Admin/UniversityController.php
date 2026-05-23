@@ -269,11 +269,32 @@ class UniversityController extends Controller
             'email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'logo_url' => 'nullable|url|max:500',
+            'logo_file' => 'nullable|image|max:2048',
             'accreditation_status' => 'nullable|string|max:50',
             'cluster' => 'nullable|string|max:50',
             'profile_description' => 'nullable|string|max:250',
             'is_active' => 'boolean',
         ]);
+
+        if ($request->hasFile('logo_file')) {
+            // Delete the old logo file if it exists in storage (path starts with '/storage/logos/')
+            if ($university->logo_url && \Illuminate\Support\Str::startsWith($university->logo_url, '/storage/logos/')) {
+                $oldPath = str_replace('/storage/', '', $university->logo_url);
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldPath)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            // Store the new logo file under 'logos' directory in the 'public' disk
+            $file = $request->file('logo_file');
+            $path = $file->store('logos', 'public');
+
+            // Save the URL path '/storage/logos/filename' into the logo_url field
+            $validated['logo_url'] = '/storage/' . $path;
+        }
+
+        // Unset logo_file from the validated fields before calling update
+        unset($validated['logo_file']);
 
         // Update university
         $university->update($validated);
