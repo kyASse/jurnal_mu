@@ -74,7 +74,7 @@ class PublicUniversityController extends Controller
         $scopusCount = Journal::where('university_id', $university->id)
             ->where('is_active', true)
             ->where('approval_status', 'approved')
-            ->where('is_indexed_in_scopus', true)
+            ->indexedInScopus()
             ->count();
 
         $totalArticles = Article::whereIn('journal_id', function ($query) use ($university) {
