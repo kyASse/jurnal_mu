@@ -71,3 +71,46 @@ it('filters journals by indexation including names with spaces', function () {
         ->where('journals.data.0.title', 'Scopus Journal')
     );
 });
+
+it('loads the public browse universities page with paginated stats and journals', function () {
+    $university = University::factory()->create([
+        'name' => 'Universitas Muhammadiyah Yogyakarta',
+        'is_active' => true,
+        'logo_url' => '/storage/logos/umy.png',
+    ]);
+
+    $journal = Journal::factory()->create([
+        'title' => 'Journal of Technology',
+        'university_id' => $university->id,
+        'is_active' => true,
+        'approval_status' => 'approved',
+    ]);
+
+    // Request browse universities page
+    $response = $this->get(route('browse.universities'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Browse/Universities')
+        ->has('universityStats.data', 1)
+        ->where('universityStats.data.0.name', 'Universitas Muhammadiyah Yogyakarta')
+        ->where('universityStats.data.0.logo_url', '/storage/logos/umy.png')
+        ->where('universityStats.data.0.journals_count', 1)
+        ->where('selectedUniversity', null)
+        ->where('journals', null)
+    );
+
+    // Request with specific university
+    $response = $this->get(route('browse.universities', ['university_id' => $university->id]));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Browse/Universities')
+        ->has('universityStats.data', 1)
+        ->where('selectedUniversity.name', 'Universitas Muhammadiyah Yogyakarta')
+        ->where('selectedUniversity.logo_url', '/storage/logos/umy.png')
+        ->has('journals.data', 1)
+        ->where('journals.data.0.title', 'Journal of Technology')
+    );
+});
+
