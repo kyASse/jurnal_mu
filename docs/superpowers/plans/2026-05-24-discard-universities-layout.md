@@ -1,50 +1,58 @@
-# Discard Universities layout Implementation Plan
+# Discard Universities layout and Redirect Card Click Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Revert Browse/Universities.tsx to the in-place selection view from commit `ab9dc8e`.
+**Goal:** Restore the 434-line premium list layout for Browse/Universities.tsx and redirect card click to the university profile page.
 
-**Architecture:** Discard card redirect navigation changes in Browse/Universities.tsx using git checkout from the previous working commit `ab9dc8e` where in-place selection is fully functional.
+**Architecture:** Change `handleUniversityCardClick` inside `Browse/Universities.tsx` to navigate to the profile route `browse.universities.show` using Inertia `router.visit()`.
 
-**Tech Stack:** Git, React, TypeScript
+**Tech Stack:** React, TypeScript, Laravel, Inertia.js
 
 ---
 
-### Task 1: Revert Browse/Universities.tsx layout
+### Task 1: Revert Universities.tsx to in-place selection layout
 
 **Files:**
 - Modify: `resources/js/pages/Browse/Universities.tsx`
 
-- [ ] **Step 1: Checkout previous state from commit ab9dc8e**
+- [x] **Step 1: Checkout ab9dc8e version of Universities.tsx** (Done)
 
-Run:
-```bash
-git checkout ab9dc8e -- resources/js/pages/Browse/Universities.tsx
+- [ ] **Step 2: Modify handleUniversityCardClick to redirect**
+
+In `resources/js/pages/Browse/Universities.tsx:107-110`, replace:
+```typescript
+    const handleUniversityCardClick = (universityId: number) => {
+        setUniversityFilter(universityId.toString());
+        router.get(route('browse.universities'), { university_id: universityId }, { preserveState: true });
+    };
+```
+with:
+```typescript
+    const handleUniversityCardClick = (universityId: number) => {
+        router.visit(route('browse.universities.show', universityId));
+    };
 ```
 
-Expected: Command runs successfully.
-
-- [ ] **Step 2: Commit reverted layout**
-
-Run:
-```bash
-git commit -m "style: revert Browse/Universities.tsx layout to in-place selection"
-```
-
-Expected: Commit succeeds.
-
----
-
-### Task 2: Verification and asset build
-
-**Files:**
-- None
-
-- [ ] **Step 1: Run Vite production build**
+- [ ] **Step 3: Run Vite build to verify compilation**
 
 Run:
 ```bash
 npm run build
 ```
+Expected: Exit code 0, build passes.
 
-Expected: Build completes successfully with no errors.
+- [ ] **Step 4: Run PublicUniversityTest to verify behavior**
+
+Run:
+```bash
+docker exec -i jurnal-mu-app php artisan test --filter=PublicUniversityTest
+```
+Expected: Tests pass.
+
+- [ ] **Step 5: Commit changes**
+
+Run:
+```bash
+git add resources/js/pages/Browse/Universities.tsx
+git commit -m "feat: redirect university card click to profile page in premium layout"
+```
