@@ -6,6 +6,7 @@
  * @route GET /admin-kampus/journals/{id}
  */
 import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
+import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
 import { JournalCoverUpload } from '@/components/JournalCoverUpload';
 import {
     AlertDialog,
@@ -18,13 +19,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PaginationLink } from '@/components/ui/pagination';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type OaiHarvestingLog } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
@@ -36,7 +35,6 @@ import {
     Building2,
     Calendar,
     Camera,
-    CheckCircle2,
     Clock,
     Database,
     ExternalLink,
@@ -156,7 +154,6 @@ interface Props {
     journal: Journal;
     articles: PaginatedData<Article>;
     articlesCount: number;
-    articlesCount: number;
     harvestLogs?: OaiHarvestingLog[];
     isHarvestPending: boolean;
 }
@@ -167,7 +164,7 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
     const [forceSyncing, setForceSyncing] = useState(false);
     const [showCoverForm, setShowCoverForm] = useState(false);
     const [showEditOaiModal, setShowEditOaiModal] = useState(false);
-    
+
     const latestLog = harvestLogs && harvestLogs.length > 0 ? harvestLogs[0] : null;
     const isFailedOrPartial = latestLog && (latestLog.status === 'failed' || latestLog.status === 'partial');
     const coverForm = useForm({ cover_image: null as File | null });
@@ -567,7 +564,7 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
                                 initialUrls={journal.oai_urls ?? null}
                                 updateRoute="admin-kampus.journals.update-oai-urls"
                             />
-                            
+
                             {/* OAI-PMH URLs */}
                             {journal.oai_urls && journal.oai_urls.length > 0 ? (
                                 <div className="mb-4 flex items-start gap-2 rounded-md bg-muted/50 p-3 text-sm">
@@ -597,7 +594,9 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
                                         <AlertCircle className="h-4 w-4 shrink-0" />
                                         <span>OAI-PMH URL belum dikonfigurasi.</span>
                                     </div>
-                                    <Button size="sm" onClick={() => setShowEditOaiModal(true)}>Konfigurasi URL</Button>
+                                    <Button size="sm" onClick={() => setShowEditOaiModal(true)}>
+                                        Konfigurasi URL
+                                    </Button>
                                 </div>
                             )}
 
@@ -606,10 +605,16 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
                                     <div className="flex items-center gap-2">
                                         <AlertCircle className="h-4 w-4 shrink-0" />
                                         <span>
-                                            Proses harvest terakhir mengalami masalah. Anda dapat memperbaiki OAI-PMH URL jika URL sebelumnya salah atau tidak dapat diakses.
+                                            Proses harvest terakhir mengalami masalah. Anda dapat memperbaiki OAI-PMH URL jika URL sebelumnya salah
+                                            atau tidak dapat diakses.
                                         </span>
                                     </div>
-                                    <Button size="sm" variant="outline" className="bg-white text-red-600 hover:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900" onClick={() => setShowEditOaiModal(true)}>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="bg-white text-red-600 hover:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900"
+                                        onClick={() => setShowEditOaiModal(true)}
+                                    >
                                         Perbaiki OAI URL
                                     </Button>
                                 </div>
@@ -649,7 +654,11 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
                                                                           ? 'default'
                                                                           : 'destructive'
                                                                 }
-                                                                className={log.status === 'success' ? 'border-green-300 text-green-700 dark:text-green-400' : ''}
+                                                                className={
+                                                                    log.status === 'success'
+                                                                        ? 'border-green-300 text-green-700 dark:text-green-400'
+                                                                        : ''
+                                                                }
                                                             >
                                                                 {log.status === 'success'
                                                                     ? 'Berhasil'

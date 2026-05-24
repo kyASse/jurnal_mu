@@ -48,7 +48,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Image as ImageIcon, UploadCloud, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface University {
@@ -91,7 +91,8 @@ export default function UniversitiesEdit({ university }: Props) {
         },
     ];
 
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
+        _method: 'PUT',
         code: university.code || '',
         ptm_code: university.ptm_code || '',
         name: university.name || '',
@@ -104,6 +105,7 @@ export default function UniversitiesEdit({ university }: Props) {
         email: university.email || '',
         website: university.website || '',
         logo_url: university.logo_url || '',
+        logo_file: null as File | null,
         accreditation_status: university.accreditation_status || '',
         cluster: university.cluster || '',
         profile_description: university.profile_description || '',
@@ -112,7 +114,7 @@ export default function UniversitiesEdit({ university }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin.universities.update', university.id), {
+        post(route('admin.universities.update', university.id), {
             onSuccess: () => {
                 toast.success('University updated successfully');
             },
@@ -306,15 +308,71 @@ export default function UniversitiesEdit({ university }: Props) {
                             </div>
 
                             <div>
-                                <Label htmlFor="logo_url">Logo URL (Optional)</Label>
-                                <Input
-                                    id="logo_url"
-                                    type="url"
-                                    value={data.logo_url}
-                                    onChange={(e) => setData('logo_url', e.target.value)}
-                                    placeholder="https://example.com/logo.png"
-                                    className="mt-2"
-                                />
+                                <Label htmlFor="logo_file">Logo Universitas</Label>
+                                <div className="mt-2">
+                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                                        {/* Logo Preview */}
+                                        {data.logo_file || data.logo_url ? (
+                                            <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl border border-sidebar-border bg-neutral-50 p-2 dark:bg-neutral-900">
+                                                <img
+                                                    src={data.logo_file ? URL.createObjectURL(data.logo_file) : data.logo_url}
+                                                    alt="Logo Preview"
+                                                    className="h-full w-full object-contain"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setData((prev) => ({
+                                                            ...prev,
+                                                            logo_file: null,
+                                                            logo_url: '',
+                                                        }));
+                                                    }}
+                                                    className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 focus:outline-none"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex h-28 w-28 flex-shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-sidebar-border bg-neutral-50 text-muted-foreground dark:bg-neutral-900">
+                                                <ImageIcon className="h-8 w-8 stroke-neutral-400" />
+                                            </div>
+                                        )}
+
+                                        {/* Dropzone area */}
+                                        <div
+                                            className="relative flex flex-1 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 px-6 py-4 text-center transition hover:bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-950/20 dark:hover:bg-neutral-950/40"
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                const file = e.dataTransfer.files?.[0];
+                                                if (file && file.type.startsWith('image/')) {
+                                                    setData('logo_file', file);
+                                                } else {
+                                                    toast.error('Harap unggah file gambar saja.');
+                                                }
+                                            }}
+                                            onClick={() => document.getElementById('logo-file-input')?.click()}
+                                        >
+                                            <input
+                                                id="logo-file-input"
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) setData('logo_file', file);
+                                                }}
+                                            />
+                                            <UploadCloud className="mb-2 h-8 w-8 text-neutral-400 dark:text-neutral-600" />
+                                            <p className="text-sm font-medium text-foreground">
+                                                Tarik & lepas file di sini, atau klik untuk memilih file
+                                            </p>
+                                            <p className="mt-1 text-xs text-muted-foreground">PNG, JPG, JPEG atau GIF (Maks. 2MB)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {errors.logo_file && <p className="mt-1 text-sm text-red-600">{errors.logo_file}</p>}
                                 {errors.logo_url && <p className="mt-1 text-sm text-red-600">{errors.logo_url}</p>}
                             </div>
                         </div>

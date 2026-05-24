@@ -7,6 +7,7 @@ use App\Jobs\HarvestJournalArticlesJob;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -146,7 +147,7 @@ class JournalController extends Controller
         $this->authorize('create', Journal::class);
 
         $universities = University::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'short_name']);
-        $users = \App\Models\User::orderBy('name')->get(['id', 'name', 'email', 'university_id']);
+        $users = User::orderBy('name')->get(['id', 'name', 'email', 'university_id']);
         $scientificFields = ScientificField::where('is_active', true)->orderBy('name')->get(['id', 'name']);
 
         $sintaRanks = collect(Journal::getSintaRankOptions())

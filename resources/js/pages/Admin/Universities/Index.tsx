@@ -57,7 +57,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, Building2, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, Users, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import {
+    AlertCircle,
+    BookOpen,
+    Building2,
+    CheckCircle,
+    ChevronLeft,
+    ChevronRight,
+    Edit,
+    Eye,
+    Plus,
+    Search,
+    Trash2,
+    Users,
+    XCircle,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -179,14 +193,18 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
     };
 
     const handleApproval = (id: number, action: 'approve' | 'reject') => {
-        router.post(route('admin.universities.handle-pending-updates', id), { action }, {
-            onSuccess: () => {
-                toast.success(`Profile update ${action}d successfully`);
+        router.post(
+            route('admin.universities.handle-pending-updates', id),
+            { action },
+            {
+                onSuccess: () => {
+                    toast.success(`Profile update ${action}d successfully`);
+                },
+                onError: () => {
+                    toast.error(`Failed to ${action} profile update`);
+                },
             },
-            onError: () => {
-                toast.error(`Failed to ${action} profile update`);
-            },
-        });
+        );
     };
 
     return (
@@ -245,29 +263,38 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                             <ul className="space-y-2">
                                                 {uni.pending_updates.name && (
                                                     <li>
-                                                        <span className="text-muted-foreground block text-xs">Nama Baru:</span>
+                                                        <span className="block text-xs text-muted-foreground">Nama Baru:</span>
                                                         <span className="font-medium">{uni.pending_updates.name}</span>
                                                     </li>
                                                 )}
                                                 {uni.pending_updates.code && (
                                                     <li>
-                                                        <span className="text-muted-foreground block text-xs">Singkatan Baru:</span>
+                                                        <span className="block text-xs text-muted-foreground">Singkatan Baru:</span>
                                                         <span className="font-medium">{uni.pending_updates.code}</span>
                                                     </li>
                                                 )}
                                                 {uni.pending_updates.ptm_code && (
                                                     <li>
-                                                        <span className="text-muted-foreground block text-xs">Kode PTM Baru:</span>
+                                                        <span className="block text-xs text-muted-foreground">Kode PTM Baru:</span>
                                                         <span className="font-medium">{uni.pending_updates.ptm_code}</span>
                                                     </li>
                                                 )}
                                             </ul>
                                         </CardContent>
                                         <CardFooter className="flex justify-end gap-2 pt-0">
-                                            <Button size="sm" variant="outline" onClick={() => handleApproval(uni.id, 'reject')} className="text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/50 gap-1">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleApproval(uni.id, 'reject')}
+                                                className="gap-1 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/50"
+                                            >
                                                 <XCircle className="h-4 w-4" /> Tolak
                                             </Button>
-                                            <Button size="sm" onClick={() => handleApproval(uni.id, 'approve')} className="bg-green-600 hover:bg-green-700 text-white gap-1">
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleApproval(uni.id, 'approve')}
+                                                className="gap-1 bg-green-600 text-white hover:bg-green-700"
+                                            >
                                                 <CheckCircle className="h-4 w-4" /> Setujui
                                             </Button>
                                         </CardFooter>
