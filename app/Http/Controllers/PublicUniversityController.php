@@ -17,6 +17,10 @@ class PublicUniversityController extends Controller
     {
         $query = University::query()
             ->where('is_active', true)
+            ->whereHas('journals', function ($q) {
+                $q->where('is_active', true)
+                  ->where('approval_status', 'approved');
+            })
             ->withCount(['journals' => function ($q) {
                 $q->where('is_active', true)
                   ->where('approval_status', 'approved');
