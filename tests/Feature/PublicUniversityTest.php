@@ -26,7 +26,8 @@ it('loads public universities listing successfully with filters', function () {
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Browse/Universities')
-        ->has('universities.data', 2)
+        ->has('universityStats.data', 2)
+        ->has('universities', 2)
         ->has('accreditationOptions')
     );
 });

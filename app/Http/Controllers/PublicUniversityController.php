@@ -47,13 +47,18 @@ class PublicUniversityController extends Controller
 
         $universities = $query->paginate(12)->withQueryString();
 
+        $universitiesList = University::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code', 'short_name']);
+
         // Get available accreditations for filter options
         $accreditationOptions = University::whereNotNull('accreditation_status')
             ->distinct()
             ->pluck('accreditation_status');
 
         return Inertia::render('Browse/Universities', [
-            'universities' => $universities,
+            'universityStats' => $universities,
+            'universities' => $universitiesList,
             'filters' => (object) $request->only(['search', 'accreditation', 'sort']),
             'accreditationOptions' => $accreditationOptions,
         ]);
