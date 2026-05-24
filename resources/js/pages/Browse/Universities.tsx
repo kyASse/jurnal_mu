@@ -2,9 +2,10 @@ import PublicNavbar from '@/components/public-navbar';
 import PublicFooter from '@/components/public-footer';
 import JournalCard from '@/components/journal-card';
 import { Button } from '@/components/ui/button';
-import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Head, Link, router } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface Journal {
@@ -75,8 +76,11 @@ interface Props {
     }>;
     selectedUniversity: SelectedUniversity | null;
     journals: PaginatedJournals | null;
+    accreditationOptions: string[];
     filters: {
-        university_id?: string;
+        search?: string;
+        accreditation?: string;
+        sort?: string;
     };
 }
 
@@ -92,16 +96,29 @@ function getInitials(name: string, shortName?: string | null): string {
     }
 }
 
-export default function BrowseUniversities({ universityStats, universities, selectedUniversity, journals, filters }: Props) {
-    const [universityFilter, setUniversityFilter] = useState(filters.university_id || '');
+export default function BrowseUniversities({ universityStats, universities, selectedUniversity, journals, accreditationOptions, filters }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
+    const [accreditationFilter, setAccreditationFilter] = useState(filters.accreditation || '');
+    const [sortFilter, setSortFilter] = useState(filters.sort || 'name');
 
-    const handleUniversityChange = (value: string) => {
-        setUniversityFilter(value);
-        if (value && value !== 'all') {
-            router.get(route('browse.universities'), { university_id: value }, { preserveState: true });
-        } else {
-            router.get(route('browse.universities'), {}, { preserveState: true });
-        }
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route('browse.universities'),
+            {
+                search,
+                accreditation: accreditationFilter,
+                sort: sortFilter,
+            },
+            { preserveState: true }
+        );
+    };
+
+    const handleClearFilters = () => {
+        setSearch('');
+        setAccreditationFilter('');
+        setSortFilter('name');
+        router.get(route('browse.universities'));
     };
 
     const handleUniversityCardClick = (universityId: number) => {
@@ -167,7 +184,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                     <div className="shrink-0">
                                         <Button
                                             variant="secondary"
-                                            onClick={() => handleUniversityChange('all')}
+                                            onClick={handleClearFilters}
                                             className="bg-white/10 border border-white/20 text-white hover:bg-white/20 font-semibold"
                                         >
                                             <ChevronLeft className="mr-2 h-4 w-4" />
@@ -191,33 +208,69 @@ export default function BrowseUniversities({ universityStats, universities, sele
                         </div>
                     </div>
 
-                    {/* Filter Card */}
+                    {/* Filters Section */}
                     <div className="relative z-20 mx-auto -mt-8 mb-8 max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="rounded-2xl bg-white p-5 shadow-xl dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800">
-                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                                <div className="space-y-1">
-                                    <h2 className="text-base font-bold text-gray-900 dark:text-white font-heading animate-fade-in" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
-                                        Select a University
-                                    </h2>
-                                    <p className="text-xs text-gray-500">
-                                        Quickly jump to a university to see its complete list of approved journals
-                                    </p>
-                                </div>
-                                <div className="w-full md:w-96 shrink-0">
-                                    <UniversityFilterCombobox
-                                        universities={universities.map((uni) => ({
-                                            id: uni.id,
-                                            name: uni.name,
-                                            code: uni.code,
-                                            short_name: uni.short_name,
-                                        }))}
-                                        value={universityFilter || 'all'}
-                                        onValueChange={handleUniversityChange}
-                                        placeholder="All Universities"
-                                        className="h-12"
+                        <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800">
+                            <form onSubmit={handleSearch} className="space-y-4">
+                                {/* Search */}
+                                <div className="relative">
+                                    <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Search by university name, code, or short name..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="h-12 pl-12 text-base"
                                     />
                                 </div>
-                            </div>
+
+                                {/* Filters Row */}
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                    {/* Accreditation Filter */}
+                                    <Select
+                                        value={accreditationFilter || 'all'}
+                                        onValueChange={(value) => setAccreditationFilter(value === 'all' ? '' : value)}
+                                    >
+                                        <SelectTrigger className="h-12">
+                                            <SelectValue placeholder="All Accreditations" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Accreditations</SelectItem>
+                                            {accreditationOptions.map((opt) => (
+                                                <SelectItem key={opt} value={opt}>
+                                                    {opt}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Sort Filter */}
+                                    <Select
+                                        value={sortFilter || 'name'}
+                                        onValueChange={(value) => setSortFilter(value)}
+                                    >
+                                        <SelectTrigger className="h-12">
+                                            <SelectValue placeholder="Sort By" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="name">Sort by Name (A-Z)</SelectItem>
+                                            <SelectItem value="journals_count">Sort by Journals Count (High-Low)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex flex-col gap-2 sm:flex-row">
+                                        <Button type="submit" className="h-12 w-full bg-[#079C4E] hover:bg-[#068A42] text-white font-semibold sm:flex-1">
+                                            Search
+                                        </Button>
+                                        {(search || accreditationFilter || sortFilter !== 'name') && (
+                                            <Button type="button" variant="outline" onClick={handleClearFilters} className="h-12 w-full sm:w-auto font-semibold">
+                                                Clear
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -233,7 +286,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                             This university does not have any active, approved journals at the moment.
                                         </p>
                                         <Button
-                                            onClick={() => handleUniversityChange('all')}
+                                            onClick={handleClearFilters}
                                             className="mt-6 bg-[#079C4E] hover:bg-[#068A42]"
                                         >
                                             Browse Other Universities
@@ -248,6 +301,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                     key={journal.id}
                                                     id={journal.id}
                                                     title={journal.title}
+                                                    sinta_rank={journal.sinta_rank_label}
                                                     issn={journal.issn}
                                                     e_issn={journal.e_issn}
                                                     university={selectedUniversity.name}
