@@ -30,7 +30,6 @@ use App\Http\Controllers\Dikti\AssessmentController as DiktiAssessmentController
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\PublicJournalController;
-use App\Http\Controllers\PublicUniversityController;
 use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\ReviewerController as MainReviewerController;
 use App\Http\Controllers\SupportController;
@@ -92,8 +91,8 @@ Route::get('/journals/{journal}', [PublicJournalController::class, 'show'])
     ->name('journals.show');
 
 // Browse journals by university
-Route::get('/browse/universities', [PublicUniversityController::class, 'index'])->name('browse.universities');
-Route::get('/browse/universities/{university}', [PublicUniversityController::class, 'show'])->name('browse.universities.show');
+Route::get('/browse/universities', [PublicJournalController::class, 'browseUniversities'])
+    ->name('browse.universities');
 
 // Public access to view events
 Route::get('/events', [PublicEventController::class, 'index'])
