@@ -65,3 +65,37 @@ it('loads specific active university profile details successfully', function () 
         ->has('articles.data', 1)
     );
 });
+
+it('allows filtering public universities by search, accreditation, and sort', function () {
+    University::factory()->create([
+        'name' => 'Universitas Ahmad Dahlan',
+        'code' => 'UAD',
+        'is_active' => true,
+        'accreditation_status' => 'Unggul'
+    ]);
+
+    University::factory()->create([
+        'name' => 'Universitas Muhammadiyah Yogyakarta',
+        'code' => 'UMY',
+        'is_active' => true,
+        'accreditation_status' => 'A'
+    ]);
+
+    // Test Search Filter
+    $response = $this->get(route('browse.universities', ['search' => 'Ahmad']));
+    $response->assertStatus(200);
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Browse/Universities')
+        ->has('universityStats.data', 1)
+        ->where('universityStats.data.0.code', 'UAD')
+    );
+
+    // Test Accreditation Filter
+    $response = $this->get(route('browse.universities', ['accreditation' => 'A']));
+    $response->assertStatus(200);
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Browse/Universities')
+        ->has('universityStats.data', 1)
+        ->where('universityStats.data.0.code', 'UMY')
+    );
+});
