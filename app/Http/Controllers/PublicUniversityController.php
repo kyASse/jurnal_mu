@@ -52,6 +52,10 @@ class PublicUniversityController extends Controller
         $universities = $query->paginate(12)->withQueryString();
 
         $universitiesList = University::where('is_active', true)
+            ->whereHas('journals', function ($q) {
+                $q->where('is_active', true)
+                  ->where('approval_status', 'approved');
+            })
             ->orderBy('name')
             ->get(['id', 'name', 'code', 'short_name']);
 

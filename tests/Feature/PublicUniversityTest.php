@@ -6,18 +6,36 @@ use App\Models\Article;
 use Inertia\Testing\AssertableInertia;
 
 it('loads public universities listing successfully with filters', function () {
-    University::factory()->create([
+    $uniA = University::factory()->create([
         'name' => 'Universitas Muhammadiyah A',
         'code' => '051001',
         'is_active' => true,
         'accreditation_status' => 'Unggul'
     ]);
+    Journal::factory()->create([
+        'university_id' => $uniA->id,
+        'is_active' => true,
+        'approval_status' => 'approved'
+    ]);
 
-    University::factory()->create([
+    $uniB = University::factory()->create([
         'name' => 'Universitas Muhammadiyah B',
         'code' => '051002',
         'is_active' => true,
         'accreditation_status' => 'A'
+    ]);
+    Journal::factory()->create([
+        'university_id' => $uniB->id,
+        'is_active' => true,
+        'approval_status' => 'approved'
+    ]);
+
+    // Create a university with NO approved journals (should be filtered out)
+    $uniC = University::factory()->create([
+        'name' => 'Universitas Muhammadiyah C',
+        'code' => '051003',
+        'is_active' => true,
+        'accreditation_status' => 'B'
     ]);
 
     // Request listing page
@@ -67,18 +85,28 @@ it('loads specific active university profile details successfully', function () 
 });
 
 it('allows filtering public universities by search, accreditation, and sort', function () {
-    University::factory()->create([
+    $uniA = University::factory()->create([
         'name' => 'Universitas Ahmad Dahlan',
         'code' => 'UAD',
         'is_active' => true,
         'accreditation_status' => 'Unggul'
     ]);
+    Journal::factory()->create([
+        'university_id' => $uniA->id,
+        'is_active' => true,
+        'approval_status' => 'approved'
+    ]);
 
-    University::factory()->create([
+    $uniB = University::factory()->create([
         'name' => 'Universitas Muhammadiyah Yogyakarta',
         'code' => 'UMY',
         'is_active' => true,
         'accreditation_status' => 'A'
+    ]);
+    Journal::factory()->create([
+        'university_id' => $uniB->id,
+        'is_active' => true,
+        'approval_status' => 'approved'
     ]);
 
     // Test Search Filter
