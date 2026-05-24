@@ -105,8 +105,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
     };
 
     const handleUniversityCardClick = (universityId: number) => {
-        setUniversityFilter(universityId.toString());
-        router.get(route('browse.universities'), { university_id: universityId }, { preserveState: true });
+        router.visit(route('browse.universities.show', universityId));
     };
 
     return (
