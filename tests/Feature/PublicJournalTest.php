@@ -71,4 +71,3 @@ it('filters journals by indexation including names with spaces', function () {
         ->where('journals.data.0.title', 'Scopus Journal')
     );
 });
-

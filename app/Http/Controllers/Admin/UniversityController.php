@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\University;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -278,10 +280,10 @@ class UniversityController extends Controller
 
         if ($request->hasFile('logo_file')) {
             // Delete the old logo file if it exists in storage (path starts with '/storage/logos/')
-            if ($university->logo_url && \Illuminate\Support\Str::startsWith($university->logo_url, '/storage/logos/')) {
+            if ($university->logo_url && Str::startsWith($university->logo_url, '/storage/logos/')) {
                 $oldPath = str_replace('/storage/', '', $university->logo_url);
-                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldPath)) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
                 }
             }
 
@@ -290,7 +292,7 @@ class UniversityController extends Controller
             $path = $file->store('logos', 'public');
 
             // Save the URL path '/storage/logos/filename' into the logo_url field
-            $validated['logo_url'] = '/storage/' . $path;
+            $validated['logo_url'] = '/storage/'.$path;
         }
 
         // Unset logo_file from the validated fields before calling update

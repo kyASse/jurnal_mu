@@ -289,7 +289,7 @@ describe('StatisticsDashboard', () => {
             renderWithProviders(<StatisticsDashboard statistics={mockData} />);
 
             await waitFor(() => {
-                console.log("DOM CONTENT IS:", screen.debug(undefined, 100000));
+                console.log('DOM CONTENT IS:', screen.debug(undefined, 100000));
                 // Error boundary should catch and display fallback
                 expect(screen.getByText(/chart failed to load/i)).toBeInTheDocument();
             });

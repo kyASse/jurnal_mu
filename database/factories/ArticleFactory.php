@@ -20,7 +20,7 @@ class ArticleFactory extends Factory
     {
         return [
             'journal_id' => Journal::factory(),
-            'oai_identifier' => 'oai:jurnalmu.test:' . $this->faker->uuid(),
+            'oai_identifier' => 'oai:jurnalmu.test:'.$this->faker->uuid(),
             'oai_datestamp' => now(),
             'title' => $this->faker->sentence(6),
             'abstract' => $this->faker->paragraph(),
@@ -29,7 +29,7 @@ class ArticleFactory extends Factory
             'publication_date' => $this->faker->date(),
             'volume' => (string) $this->faker->numberBetween(1, 20),
             'issue' => (string) $this->faker->numberBetween(1, 4),
-            'pages' => $this->faker->numberBetween(1, 10) . '-' . $this->faker->numberBetween(11, 20),
+            'pages' => $this->faker->numberBetween(1, 10).'-'.$this->faker->numberBetween(11, 20),
             'article_url' => $this->faker->url(),
             'pdf_url' => $this->faker->url(),
         ];

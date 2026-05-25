@@ -23,7 +23,7 @@ return new class extends Migration
             if (Schema::hasColumn('journals', 'accreditation_expiry_date')) {
                 try {
                     $table->dropIndex('journals_accreditation_expiry_date_index');
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     // Safe to ignore
                 }
             }

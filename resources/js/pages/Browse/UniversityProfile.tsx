@@ -1,13 +1,13 @@
-import PublicLayout from '@/layouts/public-layout';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import PublicLayout from '@/layouts/public-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Phone, ShieldCheck, Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Search, ShieldCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
 interface Props {
@@ -40,7 +40,7 @@ interface Props {
 }
 
 export default function UniversityProfile({ university, stats, journals, articles, years, filters }: Props) {
-    const safeFilters: any = (filters && typeof filters === 'object' && !Array.isArray(filters)) ? filters : {};
+    const safeFilters: any = filters && typeof filters === 'object' && !Array.isArray(filters) ? filters : {};
     const [search, setSearch] = useState(safeFilters.search ? String(safeFilters.search) : '');
     const [debouncedSearch] = useDebounce(search, 500);
     const [journalId, setJournalId] = useState(safeFilters.journal_id ? String(safeFilters.journal_id) : 'all');
@@ -63,7 +63,7 @@ export default function UniversityProfile({ university, stats, journals, article
         router.get(route('browse.universities.show', university.id), query, {
             preserveState: true,
             replace: true,
-            preserveScroll: true
+            preserveScroll: true,
         });
     }, [debouncedSearch, journalId, year]);
 
@@ -78,41 +78,52 @@ export default function UniversityProfile({ university, stats, journals, article
 
             {/* Header Hero Section */}
             <div className="bg-gradient-to-r from-[#079C4E] to-[#056f37] py-12 text-white">
-                <div className="container mx-auto max-w-7xl px-4 flex flex-col md:flex-row items-center gap-6">
+                <div className="container mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 md:flex-row">
                     {university.logo_url ? (
                         <img
                             src={university.logo_url}
                             alt={university.name}
-                            className="h-24 w-24 rounded-2xl object-contain bg-white p-2 border-2 border-white/20 shadow-lg"
+                            className="h-24 w-24 rounded-2xl border-2 border-white/20 bg-white object-contain p-2 shadow-lg"
                         />
                     ) : (
-                        <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-white/10 text-white border-2 border-white/20 shadow-lg">
+                        <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-2 border-white/20 bg-white/10 text-white shadow-lg">
                             <Building2 className="h-12 w-12" />
                         </div>
                     )}
                     <div className="flex-1 text-center md:text-left">
-                        <div className="flex flex-col md:flex-row md:items-center gap-3">
-                            <h1 className="text-3xl font-bold font-heading" style={{ fontFamily: '"El Messiri", sans-serif' }}>
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                            <h1 className="font-heading text-3xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
                                 {university.name}
                             </h1>
                             {university.accreditation_status && (
-                                <Badge className="bg-[#FCEE1F] text-black font-extrabold self-center md:self-start border-none">
+                                <Badge className="self-center border-none bg-[#FCEE1F] font-extrabold text-black md:self-start">
                                     {university.accreditation_status}
                                 </Badge>
                             )}
                         </div>
-                        <p className="mt-2 text-white/90">Kode PT: {university.code} {university.short_name && `• ${university.short_name}`}</p>
-                        <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4 text-sm text-white/80">
+                        <p className="mt-2 text-white/90">
+                            Kode PT: {university.code} {university.short_name && `• ${university.short_name}`}
+                        </p>
+                        <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm text-white/80 md:justify-start">
                             {(university.address || university.city) && (
-                                <span className="flex items-center gap-1"><MapPin className="h-4 w-4 text-[#FCEE1F]" /> {university.address || university.city}</span>
+                                <span className="flex items-center gap-1">
+                                    <MapPin className="h-4 w-4 text-[#FCEE1F]" /> {university.address || university.city}
+                                </span>
                             )}
                             {university.website && (
-                                <a href={university.website.startsWith('http') ? university.website : `https://${university.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white underline">
+                                <a
+                                    href={university.website.startsWith('http') ? university.website : `https://${university.website}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 underline hover:text-white"
+                                >
                                     <Globe className="h-4 w-4 text-[#FCEE1F]" /> {university.website}
                                 </a>
                             )}
                             {university.email && (
-                                <span className="flex items-center gap-1"><Mail className="h-4 w-4 text-[#FCEE1F]" /> {university.email}</span>
+                                <span className="flex items-center gap-1">
+                                    <Mail className="h-4 w-4 text-[#FCEE1F]" /> {university.email}
+                                </span>
                             )}
                         </div>
                     </div>
@@ -121,9 +132,9 @@ export default function UniversityProfile({ university, stats, journals, article
 
             <div className="container mx-auto max-w-7xl px-4 py-8">
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <Card>
-                        <CardContent className="pt-6 flex items-center gap-4">
+                        <CardContent className="flex items-center gap-4 pt-6">
                             <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
                                 <BookOpen className="h-6 w-6" />
                             </div>
@@ -134,7 +145,7 @@ export default function UniversityProfile({ university, stats, journals, article
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardContent className="pt-6 flex items-center gap-4">
+                        <CardContent className="flex items-center gap-4 pt-6">
                             <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
                                 <FileText className="h-6 w-6" />
                             </div>
@@ -145,7 +156,7 @@ export default function UniversityProfile({ university, stats, journals, article
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardContent className="pt-6 flex items-center gap-4">
+                        <CardContent className="flex items-center gap-4 pt-6">
                             <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
                                 <Award className="h-6 w-6" />
                             </div>
@@ -156,7 +167,7 @@ export default function UniversityProfile({ university, stats, journals, article
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardContent className="pt-6 flex items-center gap-4">
+                        <CardContent className="flex items-center gap-4 pt-6">
                             <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
                                 <ShieldCheck className="h-6 w-6" />
                             </div>
@@ -169,14 +180,14 @@ export default function UniversityProfile({ university, stats, journals, article
                 </div>
 
                 {/* Sinta Chart and Registered Journals Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Sinta Breakdown Chart */}
                     <Card className="lg:col-span-1">
                         <CardHeader>
                             <CardTitle className="text-lg">Klasifikasi SINTA Jurnal</CardTitle>
                             <CardDescription>Distribusi akreditasi jurnal ilmiah terdaftar</CardDescription>
                         </CardHeader>
-                        <CardContent className="flex flex-col items-center w-full">
+                        <CardContent className="flex w-full flex-col items-center">
                             {ReactApexChart ? (
                                 <ReactApexChart
                                     options={{
@@ -184,7 +195,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                         labels: ['Sinta 1', 'Sinta 2', 'Sinta 3', 'Sinta 4', 'Sinta 5', 'Sinta 6', 'Tidak Terakreditasi'],
                                         colors: ['#079C4E', '#10b981', '#3b82f6', '#60a5fa', '#f59e0b', '#fca5a5', '#9ca3af'],
                                         legend: { position: 'bottom' },
-                                        dataLabels: { enabled: false }
+                                        dataLabels: { enabled: false },
                                     }}
                                     series={[
                                         stats?.sinta_breakdown?.S1 || 0,
@@ -193,16 +204,14 @@ export default function UniversityProfile({ university, stats, journals, article
                                         stats?.sinta_breakdown?.S4 || 0,
                                         stats?.sinta_breakdown?.S5 || 0,
                                         stats?.sinta_breakdown?.S6 || 0,
-                                        stats?.sinta_breakdown?.TT || 0
+                                        stats?.sinta_breakdown?.TT || 0,
                                     ]}
                                     type="donut"
                                     height={250}
                                     width="100%"
                                 />
                             ) : (
-                                <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
-                                    Memuat Grafik...
-                                </div>
+                                <div className="flex h-[250px] items-center justify-center text-sm text-muted-foreground">Memuat Grafik...</div>
                             )}
                         </CardContent>
                     </Card>
@@ -217,21 +226,29 @@ export default function UniversityProfile({ university, stats, journals, article
                             {journals.length === 0 ? (
                                 <div className="py-8 text-center text-muted-foreground">Belum ada jurnal terdaftar</div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2">
+                                <div className="grid max-h-[300px] grid-cols-1 gap-4 overflow-y-auto pr-2 sm:grid-cols-2">
                                     {journals.map((journal) => (
                                         <Link key={journal.id} href={route('journals.show', journal.id)}>
-                                            <div className="flex items-center gap-3 p-3 border rounded-lg hover:border-[#079C4E] hover:bg-emerald-50/20 transition-all cursor-pointer">
-                                                <div className="h-10 w-8 bg-gray-100 border flex items-center justify-center rounded text-[8px] font-bold text-gray-400 overflow-hidden">
+                                            <div className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all hover:border-[#079C4E] hover:bg-emerald-50/20">
+                                                <div className="flex h-10 w-8 items-center justify-center overflow-hidden rounded border bg-gray-100 text-[8px] font-bold text-gray-400">
                                                     {journal.cover_image_url ? (
-                                                        <img src={journal.cover_image_url} alt={journal.title} className="h-full w-full object-cover" />
-                                                    ) : 'COVER'}
+                                                        <img
+                                                            src={journal.cover_image_url}
+                                                            alt={journal.title}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        'COVER'
+                                                    )}
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="text-sm font-bold text-gray-900 truncate">{journal.title}</h4>
-                                                    <p className="text-xs text-muted-foreground truncate">{journal.scientific_field || 'Bidang Umum'}</p>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="truncate text-sm font-bold text-gray-900">{journal.title}</h4>
+                                                    <p className="truncate text-xs text-muted-foreground">
+                                                        {journal.scientific_field || 'Bidang Umum'}
+                                                    </p>
                                                 </div>
                                                 {journal.sinta_rank_label && (
-                                                    <Badge className="bg-[#079C4E] text-white text-xs">{journal.sinta_rank_label}</Badge>
+                                                    <Badge className="bg-[#079C4E] text-xs text-white">{journal.sinta_rank_label}</Badge>
                                                 )}
                                             </div>
                                         </Link>
@@ -268,7 +285,9 @@ export default function UniversityProfile({ university, stats, journals, article
                                 <SelectContent>
                                     <SelectItem value="all">Semua Jurnal</SelectItem>
                                     {journals.map((j) => (
-                                        <SelectItem key={j.id} value={j.id.toString()}>{j.title}</SelectItem>
+                                        <SelectItem key={j.id} value={j.id.toString()}>
+                                            {j.title}
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -280,14 +299,16 @@ export default function UniversityProfile({ university, stats, journals, article
                                 <SelectContent>
                                     <SelectItem value="all">Semua Tahun Terbit</SelectItem>
                                     {years.map((y) => (
-                                        <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
+                                        <SelectItem key={y} value={y.toString()}>
+                                            {y}
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
 
                         {/* Articles Table */}
-                        {(!articles?.data || articles.data.length === 0) ? (
+                        {!articles?.data || articles.data.length === 0 ? (
                             <div className="py-12 text-center text-muted-foreground">Artikel tidak ditemukan</div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -304,14 +325,19 @@ export default function UniversityProfile({ university, stats, journals, article
                                         {(articles?.data || []).map((article: any) => (
                                             <TableRow key={article.id}>
                                                 <TableCell className="max-w-[450px]">
-                                                    <div className="font-bold text-gray-900 line-clamp-2">{article.title}</div>
-                                                    <div className="text-xs text-muted-foreground mt-1 truncate">
-                                                        {Array.isArray(article.authors) ? article.authors.join(', ') : (article.authors || 'Penulis Tidak Diketahui')}
+                                                    <div className="line-clamp-2 font-bold text-gray-900">{article.title}</div>
+                                                    <div className="mt-1 truncate text-xs text-muted-foreground">
+                                                        {Array.isArray(article.authors)
+                                                            ? article.authors.join(', ')
+                                                            : article.authors || 'Penulis Tidak Diketahui'}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
                                                     {article.journal && (
-                                                        <Link href={route('journals.show', article.journal.id)} className="text-[#079C4E] hover:underline font-semibold text-xs">
+                                                        <Link
+                                                            href={route('journals.show', article.journal.id)}
+                                                            className="text-xs font-semibold text-[#079C4E] hover:underline"
+                                                        >
                                                             {article.journal.title}
                                                         </Link>
                                                     )}
@@ -322,7 +348,9 @@ export default function UniversityProfile({ university, stats, journals, article
                                                 <TableCell className="text-right">
                                                     {article.article_url && (
                                                         <a href={article.article_url} target="_blank" rel="noopener noreferrer">
-                                                            <Button size="sm" className="bg-[#079C4E] hover:bg-[#068442] text-white">Buka Artikel</Button>
+                                                            <Button size="sm" className="bg-[#079C4E] text-white hover:bg-[#068442]">
+                                                                Buka Artikel
+                                                            </Button>
                                                         </a>
                                                     )}
                                                 </TableCell>

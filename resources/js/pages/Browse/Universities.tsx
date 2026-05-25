@@ -1,10 +1,10 @@
-import PublicNavbar from '@/components/public-navbar';
-import PublicFooter from '@/components/public-footer';
 import JournalCard from '@/components/journal-card';
+import PublicFooter from '@/components/public-footer';
+import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Head, Link, router } from '@inertiajs/react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Head, router } from '@inertiajs/react';
 import { BookOpen, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -110,7 +110,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                 accreditation: accreditationFilter,
                 sort: sortFilter,
             },
-            { preserveState: true }
+            { preserveState: true },
         );
     };
 
@@ -154,20 +154,21 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                     className="h-full w-full object-contain"
                                                 />
                                             ) : (
-                                                <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[#079C4E] to-[#10816F] font-heading text-xl font-bold text-white" style={{ fontFamily: '"El Messiri", serif' }}>
+                                                <div
+                                                    className="font-heading flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[#079C4E] to-[#10816F] text-xl font-bold text-white"
+                                                    style={{ fontFamily: '"El Messiri", serif' }}
+                                                >
                                                     {getInitials(selectedUniversity.name, selectedUniversity.short_name)}
                                                 </div>
                                             )}
                                         </div>
                                         <div>
                                             <div className="flex flex-wrap items-center gap-2">
-                                                <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-[#FCEE1F] ring-1 ring-emerald-500/30">
+                                                <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-bold tracking-wider text-[#FCEE1F] uppercase ring-1 ring-emerald-500/30">
                                                     {selectedUniversity.code}
                                                 </span>
                                                 {selectedUniversity.short_name && (
-                                                    <span className="text-sm font-semibold text-emerald-100">
-                                                        {selectedUniversity.short_name}
-                                                    </span>
+                                                    <span className="text-sm font-semibold text-emerald-100">{selectedUniversity.short_name}</span>
                                                 )}
                                             </div>
                                             <h1
@@ -176,8 +177,9 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                             >
                                                 {selectedUniversity.name}
                                             </h1>
-                                            <p className="mt-1 text-sm text-emerald-50 font-medium">
-                                                Explore {journals?.total || 0} approved {journals?.total === 1 ? 'journal' : 'journals'} from this university
+                                            <p className="mt-1 text-sm font-medium text-emerald-50">
+                                                Explore {journals?.total || 0} approved {journals?.total === 1 ? 'journal' : 'journals'} from this
+                                                university
                                             </p>
                                         </div>
                                     </div>
@@ -185,7 +187,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                         <Button
                                             variant="secondary"
                                             onClick={handleClearFilters}
-                                            className="bg-white/10 border border-white/20 text-white hover:bg-white/20 font-semibold"
+                                            className="border border-white/20 bg-white/10 font-semibold text-white hover:bg-white/20"
                                         >
                                             <ChevronLeft className="mr-2 h-4 w-4" />
                                             Back to Universities
@@ -210,7 +212,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
 
                     {/* Filters Section */}
                     <div className="relative z-20 mx-auto -mt-8 mb-8 max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800">
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
                             <form onSubmit={handleSearch} className="space-y-4">
                                 {/* Search */}
                                 <div className="relative">
@@ -245,10 +247,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                     </Select>
 
                                     {/* Sort Filter */}
-                                    <Select
-                                        value={sortFilter || 'name'}
-                                        onValueChange={(value) => setSortFilter(value)}
-                                    >
+                                    <Select value={sortFilter || 'name'} onValueChange={(value) => setSortFilter(value)}>
                                         <SelectTrigger className="h-12">
                                             <SelectValue placeholder="Sort By" />
                                         </SelectTrigger>
@@ -260,11 +259,19 @@ export default function BrowseUniversities({ universityStats, universities, sele
 
                                     {/* Action Buttons */}
                                     <div className="flex flex-col gap-2 sm:flex-row">
-                                        <Button type="submit" className="h-12 w-full bg-[#079C4E] hover:bg-[#068A42] text-white font-semibold sm:flex-1">
+                                        <Button
+                                            type="submit"
+                                            className="h-12 w-full bg-[#079C4E] font-semibold text-white hover:bg-[#068A42] sm:flex-1"
+                                        >
                                             Search
                                         </Button>
                                         {(search || accreditationFilter || sortFilter !== 'name') && (
-                                            <Button type="button" variant="outline" onClick={handleClearFilters} className="h-12 w-full sm:w-auto font-semibold">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={handleClearFilters}
+                                                className="h-12 w-full font-semibold sm:w-auto"
+                                            >
                                                 Clear
                                             </Button>
                                         )}
@@ -285,17 +292,14 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                         <p className="mt-1 text-sm text-gray-500">
                                             This university does not have any active, approved journals at the moment.
                                         </p>
-                                        <Button
-                                            onClick={handleClearFilters}
-                                            className="mt-6 bg-[#079C4E] hover:bg-[#068A42]"
-                                        >
+                                        <Button onClick={handleClearFilters} className="mt-6 bg-[#079C4E] hover:bg-[#068A42]">
                                             Browse Other Universities
                                         </Button>
                                     </div>
                                 ) : (
                                     <div className="space-y-10">
                                         {/* 3-column Grid for Journals */}
-                                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
+                                        <div className="animate-fade-in grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                                             {journals.data.map((journal) => (
                                                 <JournalCard
                                                     key={journal.id}
@@ -348,7 +352,9 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                         }
                                                         if (link.label === '...') {
                                                             return (
-                                                                <span key={index} className="px-2 py-1 text-sm text-gray-400">...</span>
+                                                                <span key={index} className="px-2 py-1 text-sm text-gray-400">
+                                                                    ...
+                                                                </span>
                                                             );
                                                         }
                                                         return (
@@ -358,7 +364,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                                 size="sm"
                                                                 disabled={!link.url}
                                                                 onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
-                                                                className={link.active ? 'bg-[#079C4E] hover:bg-[#068A42] text-white' : ''}
+                                                                className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068A42]' : ''}
                                                             >
                                                                 {link.label}
                                                             </Button>
@@ -389,16 +395,22 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                             className="h-full w-full object-contain"
                                                         />
                                                     ) : (
-                                                        <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[#079C4E] to-[#10816F] font-heading text-lg font-bold text-white" style={{ fontFamily: '"El Messiri", serif' }}>
+                                                        <div
+                                                            className="font-heading flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[#079C4E] to-[#10816F] text-lg font-bold text-white"
+                                                            style={{ fontFamily: '"El Messiri", serif' }}
+                                                        >
                                                             {getInitials(university.name, university.short_name)}
                                                         </div>
                                                     )}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <h3 className="font-heading truncate text-lg font-bold leading-snug text-gray-900 group-hover:text-[#079C4E] transition-colors dark:text-white" style={{ fontFamily: '"El Messiri", serif' }}>
+                                                    <h3
+                                                        className="font-heading truncate text-lg leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white"
+                                                        style={{ fontFamily: '"El Messiri", serif' }}
+                                                    >
                                                         {university.name}
                                                     </h3>
-                                                    <span className="inline-block mt-1 font-mono text-xs font-semibold text-gray-400 uppercase">
+                                                    <span className="mt-1 inline-block font-mono text-xs font-semibold text-gray-400 uppercase">
                                                         {university.code}
                                                     </span>
                                                 </div>
@@ -407,8 +419,8 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                             <div className="my-4 border-t border-gray-100 dark:border-zinc-800" />
 
                                             <div className="flex items-center justify-between">
-                                                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Approved Journals</span>
-                                                <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-[#079C4E] dark:bg-emerald-500/10 transition-colors group-hover:bg-[#079C4E] group-hover:text-white">
+                                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Approved Journals</span>
+                                                <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-[#079C4E] transition-colors group-hover:bg-[#079C4E] group-hover:text-white dark:bg-emerald-500/10">
                                                     <BookOpen className="h-3.5 w-3.5" />
                                                     {university.journals_count} {university.journals_count === 1 ? 'Journal' : 'Journals'}
                                                 </span>
@@ -455,7 +467,9 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                 }
                                                 if (link.label === '...') {
                                                     return (
-                                                        <span key={index} className="px-2 py-1 text-sm text-gray-400">...</span>
+                                                        <span key={index} className="px-2 py-1 text-sm text-gray-400">
+                                                            ...
+                                                        </span>
                                                     );
                                                 }
                                                 return (
@@ -465,7 +479,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                         size="sm"
                                                         disabled={!link.url}
                                                         onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
-                                                        className={link.active ? 'bg-[#079C4E] hover:bg-[#068A42] text-white' : ''}
+                                                        className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068A42]' : ''}
                                                     >
                                                         {link.label}
                                                     </Button>

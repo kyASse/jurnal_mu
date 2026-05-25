@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\University;
-use App\Models\Journal;
 use App\Models\Article;
-use App\Models\User;
+use App\Models\Journal;
 use App\Models\ScientificField;
+use App\Models\University;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class UadSeeder extends Seeder
 {
@@ -41,12 +40,13 @@ class UadSeeder extends Seeder
         );
 
         // Get an associated user
-        $user = User::where('email', 'andi.prasetyo@uad.ac.id')->first() 
+        $user = User::where('email', 'andi.prasetyo@uad.ac.id')->first()
             ?? User::where('email', 'dewi.kartika@uad.ac.id')->first()
             ?? User::first();
 
-        if (!$user) {
+        if (! $user) {
             $this->command->error('❌ No user found to associate with journals. Please run general seeders first.');
+
             return;
         }
 
@@ -115,7 +115,7 @@ class UadSeeder extends Seeder
                 'email' => 'jpp@uad.ac.id',
                 'is_active' => true,
                 'approval_status' => 'approved',
-            ]
+            ],
         ];
 
         $seededJournals = [];
@@ -170,7 +170,7 @@ class UadSeeder extends Seeder
                 'issue' => '1',
                 'pages' => '30-42',
                 'article_url' => 'https://journal.uad.ac.id/index.php/JPP/article/view/6543',
-            ]
+            ],
         ];
 
         // Associate articles to corresponding seeded journals
@@ -188,7 +188,7 @@ class UadSeeder extends Seeder
                 ['doi' => $artData['doi']],
                 array_merge($artData, [
                     'journal_id' => $journal->id,
-                    'oai_identifier' => 'oai:journal.uad.ac.id:' . str_replace('/', '_', $artData['doi']),
+                    'oai_identifier' => 'oai:journal.uad.ac.id:'.str_replace('/', '_', $artData['doi']),
                     'oai_datestamp' => now(),
                     'last_harvested_at' => now(),
                 ])

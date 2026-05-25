@@ -1,7 +1,7 @@
-import PublicNavbar from '@/components/public-navbar';
-import PublicFooter from '@/components/public-footer';
 import { type EventCardProps } from '@/components/event-card';
 import JournalCard from '@/components/journal-card';
+import PublicFooter from '@/components/public-footer';
+import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';

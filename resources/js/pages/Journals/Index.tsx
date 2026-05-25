@@ -16,16 +16,16 @@
  *
  * @route GET /journals
  */
-import PublicNavbar from '@/components/public-navbar';
-import PublicFooter from '@/components/public-footer';
 import JournalCard from '@/components/journal-card';
+import PublicFooter from '@/components/public-footer';
+import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
 import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, Home, Search } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface Journal {

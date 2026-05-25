@@ -4,6 +4,8 @@ namespace App\Http\Controllers\AdminKampus;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class UniversityController extends Controller
@@ -49,15 +51,15 @@ class UniversityController extends Controller
 
         if ($request->hasFile('logo_file')) {
             // Delete old logo if it exists in storage
-            if ($university->logo_url && \Illuminate\Support\Str::startsWith($university->logo_url, '/storage/logos/')) {
+            if ($university->logo_url && Str::startsWith($university->logo_url, '/storage/logos/')) {
                 $oldPath = str_replace('/storage/', '', $university->logo_url);
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                Storage::disk('public')->delete($oldPath);
             }
 
             $file = $request->file('logo_file');
-            $filename = 'logo_' . $university->id . '_' . time() . '.' . $file->extension();
+            $filename = 'logo_'.$university->id.'_'.time().'.'.$file->extension();
             $path = $file->storeAs('logos', $filename, 'public');
-            $validated['logo_url'] = '/storage/' . $path;
+            $validated['logo_url'] = '/storage/'.$path;
         }
 
         unset($validated['logo_file']);

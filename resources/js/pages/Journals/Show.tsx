@@ -27,8 +27,7 @@ import {
     Target,
     User,
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-
+import React, { useState } from 'react';
 
 interface JournalsShowProps extends SharedData {
     journal: Journal & {
@@ -57,6 +56,13 @@ export default function JournalsShow() {
     const [showAbout, setShowAbout] = useState(false);
     const [showScope, setShowScope] = useState(false);
     const [isOaiExpanded, setIsOaiExpanded] = useState(false);
+    const [ReactApexChart, setReactApexChart] = useState<any>(null);
+
+    React.useEffect(() => {
+        import('react-apexcharts').then((mod) => {
+            setReactApexChart(() => mod.default);
+        });
+    }, []);
 
     // Dynamic year range from article data
     const minYear =
@@ -384,7 +390,11 @@ export default function JournalsShow() {
                             <h3 className="mb-3 text-xs font-bold tracking-wide text-muted-foreground uppercase">Article Per Year (5 Year)</h3>
                             {articlesByYear.length > 0 ? (
                                 <div className="h-40 w-full">
-                                    <Chart options={chartOptions} series={chartSeries} type="bar" height="100%" />
+                                    {ReactApexChart ? (
+                                        <ReactApexChart options={chartOptions} series={chartSeries} type="bar" height="100%" />
+                                    ) : (
+                                        <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Loading Chart...</div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="flex h-40 flex-col items-center justify-center gap-2 text-muted-foreground">

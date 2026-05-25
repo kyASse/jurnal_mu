@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\University;
-use App\Models\Journal;
 use App\Models\Article;
+use App\Models\Journal;
+use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -19,11 +19,11 @@ class PublicUniversityController extends Controller
             ->where('is_active', true)
             ->whereHas('journals', function ($q) {
                 $q->where('is_active', true)
-                  ->where('approval_status', 'approved');
+                    ->where('approval_status', 'approved');
             })
             ->withCount(['journals' => function ($q) {
                 $q->where('is_active', true)
-                  ->where('approval_status', 'approved');
+                    ->where('approval_status', 'approved');
             }]);
 
         // Apply Search Filter
@@ -31,8 +31,8 @@ class PublicUniversityController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('short_name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%");
+                    ->orWhere('short_name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
             });
         }
 
@@ -54,7 +54,7 @@ class PublicUniversityController extends Controller
         $universitiesList = University::where('is_active', true)
             ->whereHas('journals', function ($q) {
                 $q->where('is_active', true)
-                  ->where('approval_status', 'approved');
+                    ->where('approval_status', 'approved');
             })
             ->orderBy('name')
             ->get(['id', 'name', 'code', 'short_name']);
@@ -64,7 +64,7 @@ class PublicUniversityController extends Controller
             ->whereNotNull('accreditation_status')
             ->whereHas('journals', function ($q) {
                 $q->where('is_active', true)
-                  ->where('approval_status', 'approved');
+                    ->where('approval_status', 'approved');
             })
             ->distinct()
             ->pluck('accreditation_status');
@@ -79,7 +79,7 @@ class PublicUniversityController extends Controller
 
     public function show(University $university, Request $request): Response
     {
-        if (!$university->is_active || !$university->journals()->where('is_active', true)->where('approval_status', 'approved')->exists()) {
+        if (! $university->is_active || ! $university->journals()->where('is_active', true)->where('approval_status', 'approved')->exists()) {
             abort(404);
         }
 
@@ -131,7 +131,7 @@ class PublicUniversityController extends Controller
             ->with(['scientificField'])
             ->orderBy('title')
             ->get()
-            ->map(fn($j) => [
+            ->map(fn ($j) => [
                 'id' => $j->id,
                 'title' => $j->title,
                 'sinta_rank_label' => $j->sinta_rank_label,
@@ -171,8 +171,8 @@ class PublicUniversityController extends Controller
         $driver = DB::connection()->getDriverName();
         $yearExpression = match ($driver) {
             'sqlite' => "strftime('%Y', publication_date) as year",
-            'pgsql' => "extract(year from publication_date) as year",
-            default => "YEAR(publication_date) as year",
+            'pgsql' => 'extract(year from publication_date) as year',
+            default => 'YEAR(publication_date) as year',
         };
 
         $years = Article::whereIn('journal_id', function ($query) use ($university) {
@@ -182,12 +182,12 @@ class PublicUniversityController extends Controller
                 ->where('is_active', true)
                 ->where('approval_status', 'approved');
         })
-        ->whereNotNull('publication_date')
-        ->selectRaw($yearExpression)
-        ->distinct()
-        ->orderBy('year', 'desc')
-        ->pluck('year')
-        ->toArray();
+            ->whereNotNull('publication_date')
+            ->selectRaw($yearExpression)
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
 
         return Inertia::render('Browse/UniversityProfile', [
             'university' => $university,

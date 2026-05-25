@@ -74,7 +74,7 @@ it('deletes the old logo file when a new one is uploaded', function () {
 
     // Store a fake file first
     $oldFilePath = Storage::disk('public')->putFile('logos', UploadedFile::fake()->image('old_logo.png'));
-    $oldLogoUrl = '/storage/' . $oldFilePath;
+    $oldLogoUrl = '/storage/'.$oldFilePath;
 
     $this->university->update([
         'logo_url' => $oldLogoUrl,
@@ -98,7 +98,7 @@ it('deletes the old logo file when a new one is uploaded', function () {
     $response->assertRedirect();
 
     $this->university->refresh();
-    
+
     // Assert old file deleted
     Storage::disk('public')->assertMissing($oldFilePath);
 

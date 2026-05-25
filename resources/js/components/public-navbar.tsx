@@ -1,8 +1,8 @@
 import logoUrl from '@/assets/logo_dark.png';
+import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Home, LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
 
 export default function PublicNavbar() {
     const { auth } = usePage<SharedData>().props;
@@ -17,7 +17,7 @@ export default function PublicNavbar() {
                         </div>
                         <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
                             Journal MU
-                          </span>
+                        </span>
                     </Link>
                 </div>
 
@@ -48,9 +48,7 @@ export default function PublicNavbar() {
                                 </Button>
                             </Link>
                             <Link href={route('register')}>
-                                <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">
-                                    Register
-                                </Button>
+                                <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">Register</Button>
                             </Link>
                         </>
                     )}
