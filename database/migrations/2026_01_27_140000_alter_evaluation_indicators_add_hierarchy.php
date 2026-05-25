@@ -36,18 +36,20 @@ return new class extends Migration
 
             // Add index for performance
             $table->index('sub_category_id');
+
+            // Make category and sub_category nullable for new indicators created via hierarchy (cross-database support)
+            $table->string('category', 100)->nullable()->change();
+            $table->string('sub_category', 100)->nullable()->change();
         });
 
-        // Update column comments to mark old columns as DEPRECATED
-        DB::statement("ALTER TABLE evaluation_indicators 
-            MODIFY category VARCHAR(100) NULL COMMENT 'DEPRECATED v1.1 - Use sub_category_id relation. Remove in v1.2'");
+        // Update column comments to mark old columns as DEPRECATED (only for MySQL which supports comments this way)
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE evaluation_indicators 
+                MODIFY category VARCHAR(100) NULL COMMENT 'DEPRECATED v1.1 - Use sub_category_id relation. Remove in v1.2'");
 
-        DB::statement("ALTER TABLE evaluation_indicators 
-            MODIFY sub_category VARCHAR(100) NULL COMMENT 'DEPRECATED v1.1 - Use sub_category_id relation. Remove in v1.2'");
-
-        // Make category nullable for new indicators created via hierarchy
-        DB::statement('ALTER TABLE evaluation_indicators 
-            MODIFY category VARCHAR(100) NULL');
+            DB::statement("ALTER TABLE evaluation_indicators 
+                MODIFY sub_category VARCHAR(100) NULL COMMENT 'DEPRECATED v1.1 - Use sub_category_id relation. Remove in v1.2'");
+        }
     }
 
     /**
@@ -68,13 +70,19 @@ return new class extends Migration
             $table->dropForeign(['sub_category_id']);
             $table->dropIndex(['sub_category_id']);
             $table->dropColumn('sub_category_id');
+
+            // Revert nullability (cross-database support)
+            $table->string('category', 100)->nullable(false)->change();
+            $table->string('sub_category', 100)->nullable()->change();
         });
 
         // Revert comments to v1.0 state (remove DEPRECATED warnings)
-        DB::statement("ALTER TABLE evaluation_indicators 
-            MODIFY category VARCHAR(100) NOT NULL COMMENT 'Kategori utama, e.g., Kelengkapan Administrasi'");
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE evaluation_indicators 
+                MODIFY category VARCHAR(100) NOT NULL COMMENT 'Kategori utama, e.g., Kelengkapan Administrasi'");
 
-        DB::statement("ALTER TABLE evaluation_indicators 
-            MODIFY sub_category VARCHAR(100) NULL COMMENT 'Sub-kategori (optional)'");
+            DB::statement("ALTER TABLE evaluation_indicators 
+                MODIFY sub_category VARCHAR(100) NULL COMMENT 'Sub-kategori (optional)'");
+        }
     }
 };

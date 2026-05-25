@@ -4,7 +4,7 @@ import laravel from 'laravel-vite-plugin';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
@@ -22,12 +22,12 @@ export default defineConfig({
             port: 5173,
         },
     },
-    build:{
+    build: {
         outDir: 'build',
         emptyOutDir: true,
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
-            output: {
+            output: isSsrBuild ? {} : {
                 manualChunks: {
                     // Vendor code splitting
                     'vendor-react': ['react', 'react-dom', '@inertiajs/react'],
@@ -47,4 +47,5 @@ export default defineConfig({
             '@': resolve(__dirname, 'resources/js'),
         },
     },
-});
+}));
+

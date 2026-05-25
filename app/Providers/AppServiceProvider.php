@@ -38,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\Vite::useHotFile(base_path('public/hot'));
+
         // Register policies
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Journal::class, JournalPolicy::class);
