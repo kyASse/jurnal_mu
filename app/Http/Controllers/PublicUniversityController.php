@@ -60,7 +60,12 @@ class PublicUniversityController extends Controller
             ->get(['id', 'name', 'code', 'short_name']);
 
         // Get available accreditations for filter options
-        $accreditationOptions = University::whereNotNull('accreditation_status')
+        $accreditationOptions = University::where('is_active', true)
+            ->whereNotNull('accreditation_status')
+            ->whereHas('journals', function ($q) {
+                $q->where('is_active', true)
+                  ->where('approval_status', 'approved');
+            })
             ->distinct()
             ->pluck('accreditation_status');
 
@@ -74,7 +79,7 @@ class PublicUniversityController extends Controller
 
     public function show(University $university, Request $request): Response
     {
-        if (!$university->is_active) {
+        if (!$university->is_active || !$university->journals()->where('is_active', true)->where('approval_status', 'approved')->exists()) {
             abort(404);
         }
 
@@ -173,7 +178,9 @@ class PublicUniversityController extends Controller
         $years = Article::whereIn('journal_id', function ($query) use ($university) {
             $query->select('id')
                 ->from('journals')
-                ->where('university_id', $university->id);
+                ->where('university_id', $university->id)
+                ->where('is_active', true)
+                ->where('approval_status', 'approved');
         })
         ->whereNotNull('publication_date')
         ->selectRaw($yearExpression)

@@ -127,3 +127,13 @@ it('allows filtering public universities by search, accreditation, and sort', fu
         ->where('universityStats.data.0.code', 'UMY')
     );
 });
+
+it('returns 404 for university profile without approved journals', function () {
+    $university = University::factory()->create([
+        'name' => 'University Without Approved Journals',
+        'is_active' => true,
+    ]);
+
+    $response = $this->get(route('browse.universities.show', $university->id));
+    $response->assertStatus(404);
+});

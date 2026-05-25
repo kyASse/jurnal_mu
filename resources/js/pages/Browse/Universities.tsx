@@ -301,7 +301,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                     key={journal.id}
                                                     id={journal.id}
                                                     title={journal.title}
-                                                    sinta_rank={journal.sinta_rank_label}
+                                                    sinta_rank={journal.sinta_rank ? `sinta_${journal.sinta_rank}` : null}
                                                     issn={journal.issn}
                                                     e_issn={journal.e_issn}
                                                     university={selectedUniversity.name}
