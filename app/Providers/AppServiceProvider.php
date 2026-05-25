@@ -21,6 +21,7 @@ use App\Policies\JournalPolicy;
 use App\Policies\UniversityPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -38,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Vite::useHotFile(base_path('public/hot'));
+
         // Register policies
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Journal::class, JournalPolicy::class);

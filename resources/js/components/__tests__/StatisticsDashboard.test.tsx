@@ -3,12 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 import StatisticsDashboard from '../StatisticsDashboard';
 
 // Mock ApexCharts
+const mockChartRender = vi.fn(({ options, series, type }) => (
+    <div data-testid={`chart-${type}`} data-options={JSON.stringify(options)} data-series={JSON.stringify(series)}>
+        Mocked Chart
+    </div>
+));
+
 vi.mock('react-apexcharts', () => ({
-    default: vi.fn(({ options, series, type }) => (
-        <div data-testid={`chart-${type}`} data-options={JSON.stringify(options)} data-series={JSON.stringify(series)}>
-            Mocked Chart
-        </div>
-    )),
+    default: vi.fn((props) => mockChartRender(props)),
 }));
 
 // Mock next-themes useTheme hook
@@ -277,11 +279,9 @@ describe('StatisticsDashboard', () => {
     describe('Error Boundary', () => {
         it('shows error message when chart fails to render', async () => {
             // Mock Chart component to throw error
-            vi.mock('react-apexcharts', () => ({
-                default: vi.fn(() => {
-                    throw new Error('Chart rendering failed');
-                }),
-            }));
+            mockChartRender.mockImplementationOnce(() => {
+                throw new Error('Chart rendering failed');
+            });
 
             const mockData = createMockStatistics();
             const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -289,6 +289,7 @@ describe('StatisticsDashboard', () => {
             renderWithProviders(<StatisticsDashboard statistics={mockData} />);
 
             await waitFor(() => {
+                console.log('DOM CONTENT IS:', screen.debug(undefined, 100000));
                 // Error boundary should catch and display fallback
                 expect(screen.getByText(/chart failed to load/i)).toBeInTheDocument();
             });

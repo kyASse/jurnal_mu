@@ -281,19 +281,28 @@ class PublicJournalController extends Controller
      */
     public function browseUniversities(Request $request): Response
     {
-        // Get university statistics (cached for 1 hour)
-        $universityStats = Cache::remember('browse.universities.stats', 3600, function () {
-            return University::where('is_active', true)
-                ->withCount([
-                    'journals' => function ($query) {
-                        $query->where('is_active', true)
-                            ->where('approval_status', 'approved');
-                    },
-                ])
-                ->having('journals_count', '>', 0)
-                ->orderBy('name')
-                ->get(['id', 'name', 'code', 'short_name']);
-        });
+        // Query active universities with approved journals count
+        $universityQuery = University::where('is_active', true)
+            ->withCount([
+                'journals' => function ($query) {
+                    $query->where('is_active', true)
+                        ->where('approval_status', 'approved');
+                },
+            ])
+            ->having('journals_count', '>', 0)
+            ->orderBy('name');
+
+        // Paginate results (12 items per page) to match journals layout
+        $universityStats = $universityQuery->paginate(12)
+            ->withQueryString()
+            ->through(fn ($uni) => [
+                'id' => $uni->id,
+                'name' => $uni->name,
+                'code' => $uni->code,
+                'short_name' => $uni->short_name,
+                'logo_url' => $uni->logo_url,
+                'journals_count' => $uni->journals_count,
+            ]);
 
         // If specific university selected, show its journals
         $selectedUniversity = null;
@@ -329,13 +338,25 @@ class PublicJournalController extends Controller
             }
         }
 
+        $universities = Cache::remember('universities.with.journals', 3600, function () {
+            return University::where('is_active', true)
+                ->whereHas('journals', function ($query) {
+                    $query->where('is_active', true)
+                        ->where('approval_status', 'approved');
+                })
+                ->orderBy('name')
+                ->get(['id', 'name', 'code', 'short_name']);
+        });
+
         return Inertia::render('Browse/Universities', [
             'universityStats' => $universityStats,
+            'universities' => $universities,
             'selectedUniversity' => $selectedUniversity ? [
                 'id' => $selectedUniversity->id,
                 'name' => $selectedUniversity->name,
                 'code' => $selectedUniversity->code,
                 'short_name' => $selectedUniversity->short_name,
+                'logo_url' => $selectedUniversity->logo_url,
             ] : null,
             'journals' => $journals,
             'filters' => $request->only(['university_id']),
