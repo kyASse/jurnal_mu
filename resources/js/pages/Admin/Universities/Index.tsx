@@ -114,7 +114,7 @@ interface PendingUniversity {
     id: number;
     name: string;
     code: string;
-    short_name: string;
+    short_name?: string | null;
     pending_updates: Record<string, string>;
 }
 
@@ -159,7 +159,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
         if (!query) return true;
         return (
             uni.name.toLowerCase().includes(query) ||
-            uni.short_name.toLowerCase().includes(query) ||
+            (uni.short_name && uni.short_name.toLowerCase().includes(query)) ||
             uni.code.toLowerCase().includes(query) ||
             (uni.pending_updates.name && uni.pending_updates.name.toLowerCase().includes(query)) ||
             (uni.pending_updates.code && uni.pending_updates.code.toLowerCase().includes(query)) ||
