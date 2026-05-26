@@ -64,6 +64,7 @@ import {
     CheckCircle,
     ChevronLeft,
     ChevronRight,
+    Clock,
     Edit,
     Eye,
     Plus,
@@ -149,6 +150,28 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
     const [accreditationFilter, setAccreditationFilter] = useState(filters.accreditation_status || '');
     const [clusterFilter, setClusterFilter] = useState(filters.cluster || '');
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; universityId?: number; universityName?: string }>({ open: false });
+    const [pendingSearch, setPendingSearch] = useState('');
+    const [pendingPage, setPendingPage] = useState(1);
+    const pendingPerPage = 5;
+
+    const filteredPending = pendingUniversities.filter((uni) => {
+        const query = pendingSearch.toLowerCase().trim();
+        if (!query) return true;
+        return (
+            uni.name.toLowerCase().includes(query) ||
+            uni.short_name.toLowerCase().includes(query) ||
+            uni.code.toLowerCase().includes(query) ||
+            (uni.pending_updates.name && uni.pending_updates.name.toLowerCase().includes(query)) ||
+            (uni.pending_updates.code && uni.pending_updates.code.toLowerCase().includes(query)) ||
+            (uni.pending_updates.ptm_code && uni.pending_updates.ptm_code.toLowerCase().includes(query))
+        );
+    });
+
+    const totalPendingPages = Math.ceil(filteredPending.length / pendingPerPage);
+    const paginatedPending = filteredPending.slice(
+        (pendingPage - 1) * pendingPerPage,
+        pendingPage * pendingPerPage
+    );
 
     // Convert flash messages to toast notifications
     useEffect(() => {
