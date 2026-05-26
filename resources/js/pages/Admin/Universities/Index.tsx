@@ -162,9 +162,9 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
             uni.name.toLowerCase().includes(query) ||
             (uni.short_name && uni.short_name.toLowerCase().includes(query)) ||
             uni.code.toLowerCase().includes(query) ||
-            (uni.pending_updates.name && uni.pending_updates.name.toLowerCase().includes(query)) ||
-            (uni.pending_updates.code && uni.pending_updates.code.toLowerCase().includes(query)) ||
-            (uni.pending_updates.ptm_code && uni.pending_updates.ptm_code.toLowerCase().includes(query))
+            (uni.pending_updates && 'name' in uni.pending_updates && uni.pending_updates.name?.toLowerCase().includes(query)) ||
+            (uni.pending_updates && 'code' in uni.pending_updates && uni.pending_updates.code?.toLowerCase().includes(query)) ||
+            (uni.pending_updates && 'ptm_code' in uni.pending_updates && uni.pending_updates.ptm_code?.toLowerCase().includes(query))
         );
     });
 
@@ -258,18 +258,6 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                         </div>
                     </div>
 
-                    {/* Flash Messages */}
-                    {flash?.success && (
-                        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-300">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash?.error && (
-                        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300">
-                            {flash.error}
-                        </div>
-                    )}
-
                     {/* Pending Updates Section */}
                     <div className="mb-8 rounded-xl border border-sidebar-border bg-card p-6 shadow-sm">
                         <div className="mb-6 flex items-center justify-between">
@@ -347,25 +335,25 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                 </TableCell>
                                                 <TableCell>
                                                     <ul className="space-y-1 text-sm">
-                                                        {uni.pending_updates.name && (
+                                                        {'name' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs text-muted-foreground font-semibold">Nama: </span>
                                                                 <span className="line-through text-red-500 mr-2">{uni.name}</span>
-                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.name}</span>
+                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.name || 'Dihapus'}</span>
                                                             </li>
                                                         )}
-                                                        {uni.pending_updates.code && (
+                                                        {'code' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs text-muted-foreground font-semibold">Singkatan: </span>
                                                                 <span className="line-through text-red-500 mr-2">{uni.code}</span>
-                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.code}</span>
+                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.code || 'Dihapus'}</span>
                                                             </li>
                                                         )}
-                                                        {uni.pending_updates.ptm_code && (
+                                                        {'ptm_code' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs text-muted-foreground font-semibold">Kode PTM: </span>
                                                                 <span className="line-through text-red-500 mr-2">{uni.ptm_code || '-'}</span>
-                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.ptm_code}</span>
+                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.ptm_code || '-'}</span>
                                                             </li>
                                                         )}
                                                     </ul>
