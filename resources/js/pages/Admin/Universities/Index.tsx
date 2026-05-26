@@ -262,9 +262,9 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                             <div>
                                 <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
                                     <AlertCircle className="h-6 w-6 text-amber-500" />
-                                    Persetujuan Perubahan Profil Universitas
+                                    University Profile Changes Approval
                                 </h2>
-                                <p className="mt-1 text-sm text-muted-foreground">Setujui atau tolak perubahan informasi/profil dari universitas</p>
+                                <p className="mt-1 text-sm text-muted-foreground">Approve or reject university profile changes</p>
                             </div>
                             {pendingUniversities.length > 0 && (
                                 <Badge
@@ -272,7 +272,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                     className="border-amber-200 bg-amber-50 px-3 py-1.5 text-sm text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/10 dark:text-amber-400"
                                 >
                                     <Clock className="mr-1.5 h-3.5 w-3.5" />
-                                    {pendingUniversities.length} Menunggu
+                                    {pendingUniversities.length} Pending
                                 </Badge>
                             )}
                         </div>
@@ -283,7 +283,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                                 <Input
                                     type="text"
-                                    placeholder="Cari perubahan universitas..."
+                                    placeholder="Search university changes..."
                                     value={pendingSearch}
                                     onChange={(e) => {
                                         setPendingSearch(e.target.value);
@@ -304,9 +304,9 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-1/3">Universitas</TableHead>
-                                        <TableHead className="w-1/2">Perubahan yang Diajukan</TableHead>
-                                        <TableHead className="w-[150px] text-right">Aksi</TableHead>
+                                        <TableHead className="w-1/3">University</TableHead>
+                                        <TableHead className="w-1/2">Proposed Changes</TableHead>
+                                        <TableHead className="w-[150px] text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -314,8 +314,8 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                         <TableRow>
                                             <TableCell colSpan={3} className="py-8 text-center text-muted-foreground">
                                                 {pendingUniversities.length === 0
-                                                    ? 'Tidak ada perubahan profil universitas yang menunggu persetujuan.'
-                                                    : 'Tidak ada perubahan profil universitas yang cocok dengan pencarian.'}
+                                                    ? 'No pending university profile changes.'
+                                                    : 'No pending university profile changes match search query.'}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -331,25 +331,25 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                     <ul className="space-y-1 text-sm">
                                                         {'name' in uni.pending_updates && (
                                                             <li>
-                                                                <span className="text-xs font-semibold text-muted-foreground">Nama: </span>
+                                                                <span className="text-xs font-semibold text-muted-foreground">Name: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.name}</span>
                                                                 <span className="font-medium text-green-600 dark:text-green-400">
-                                                                    {uni.pending_updates.name || 'Dihapus'}
+                                                                    {uni.pending_updates.name || 'Deleted'}
                                                                 </span>
                                                             </li>
                                                         )}
                                                         {'code' in uni.pending_updates && (
                                                             <li>
-                                                                <span className="text-xs font-semibold text-muted-foreground">Singkatan: </span>
+                                                                <span className="text-xs font-semibold text-muted-foreground">Abbreviation: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.code}</span>
                                                                 <span className="font-medium text-green-600 dark:text-green-400">
-                                                                    {uni.pending_updates.code || 'Dihapus'}
+                                                                    {uni.pending_updates.code || 'Deleted'}
                                                                 </span>
                                                             </li>
                                                         )}
                                                         {'ptm_code' in uni.pending_updates && (
                                                             <li>
-                                                                <span className="text-xs font-semibold text-muted-foreground">Kode PTM: </span>
+                                                                <span className="text-xs font-semibold text-muted-foreground">PTM Code: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.ptm_code || '-'}</span>
                                                                 <span className="font-medium text-green-600 dark:text-green-400">
                                                                     {uni.pending_updates.ptm_code || '-'}
@@ -366,14 +366,14 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                             onClick={() => handleApproval(uni.id, 'reject')}
                                                             className="h-8 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/50"
                                                         >
-                                                            <XCircle className="mr-1 h-3.5 w-3.5" /> Tolak
+                                                            <XCircle className="mr-1 h-3.5 w-3.5" /> Reject
                                                         </Button>
                                                         <Button
                                                             size="sm"
                                                             onClick={() => handleApproval(uni.id, 'approve')}
                                                             className="h-8 bg-green-600 text-white hover:bg-green-700"
                                                         >
-                                                            <CheckCircle className="mr-1 h-3.5 w-3.5" /> Setujui
+                                                            <CheckCircle className="mr-1 h-3.5 w-3.5" /> Approve
                                                         </Button>
                                                     </div>
                                                 </TableCell>
@@ -388,7 +388,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                         {totalPendingPages > 1 && (
                             <div className="mt-4 flex items-center justify-between">
                                 <span className="text-sm text-muted-foreground">
-                                    Halaman {pendingPage} dari {totalPendingPages}
+                                    Page {pendingPage} of {totalPendingPages}
                                 </span>
                                 <div className="flex gap-1">
                                     <Button
@@ -397,7 +397,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                         onClick={() => setPendingPage((p) => Math.max(p - 1, 1))}
                                         disabled={pendingPage === 1}
                                     >
-                                        Sebelumnya
+                                        Previous
                                     </Button>
                                     {Array.from({ length: totalPendingPages }, (_, idx) => idx + 1).map((page) => (
                                         <Button
@@ -415,7 +415,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                         onClick={() => setPendingPage((p) => Math.min(p + 1, totalPendingPages))}
                                         disabled={pendingPage === totalPendingPages}
                                     >
-                                        Selanjutnya
+                                        Next
                                     </Button>
                                 </div>
                             </div>
