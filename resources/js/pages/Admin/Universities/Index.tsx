@@ -169,10 +169,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
     });
 
     const totalPendingPages = Math.ceil(filteredPending.length / pendingPerPage);
-    const paginatedPending = filteredPending.slice(
-        (pendingPage - 1) * pendingPerPage,
-        pendingPage * pendingPerPage
-    );
+    const paginatedPending = filteredPending.slice((pendingPage - 1) * pendingPerPage, pendingPage * pendingPerPage);
 
     // Convert flash messages to toast notifications
     useEffect(() => {
@@ -266,12 +263,13 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                     <AlertCircle className="h-6 w-6 text-amber-500" />
                                     Persetujuan Perubahan Profil Universitas
                                 </h2>
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                    Setujui atau tolak perubahan informasi/profil dari universitas
-                                </p>
+                                <p className="mt-1 text-sm text-muted-foreground">Setujui atau tolak perubahan informasi/profil dari universitas</p>
                             </div>
                             {pendingUniversities.length > 0 && (
-                                <Badge variant="outline" className="px-3 py-1.5 text-sm bg-amber-50 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-400">
+                                <Badge
+                                    variant="outline"
+                                    className="border-amber-200 bg-amber-50 px-3 py-1.5 text-sm text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/10 dark:text-amber-400"
+                                >
                                     <Clock className="mr-1.5 h-3.5 w-3.5" />
                                     {pendingUniversities.length} Menunggu
                                 </Badge>
@@ -290,16 +288,11 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                         setPendingSearch(e.target.value);
                                         setPendingPage(1);
                                     }}
-                                    className="pl-9 h-9"
+                                    className="h-9 pl-9"
                                 />
                             </div>
                             {pendingSearch && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setPendingSearch('')}
-                                    className="h-9"
-                                >
+                                <Button variant="ghost" size="sm" onClick={() => setPendingSearch('')} className="h-9">
                                     Clear
                                 </Button>
                             )}
@@ -337,23 +330,29 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                     <ul className="space-y-1 text-sm">
                                                         {'name' in uni.pending_updates && (
                                                             <li>
-                                                                <span className="text-xs text-muted-foreground font-semibold">Nama: </span>
-                                                                <span className="line-through text-red-500 mr-2">{uni.name}</span>
-                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.name || 'Dihapus'}</span>
+                                                                <span className="text-xs font-semibold text-muted-foreground">Nama: </span>
+                                                                <span className="mr-2 text-red-500 line-through">{uni.name}</span>
+                                                                <span className="font-medium text-green-600 dark:text-green-400">
+                                                                    {uni.pending_updates.name || 'Dihapus'}
+                                                                </span>
                                                             </li>
                                                         )}
                                                         {'code' in uni.pending_updates && (
                                                             <li>
-                                                                <span className="text-xs text-muted-foreground font-semibold">Singkatan: </span>
-                                                                <span className="line-through text-red-500 mr-2">{uni.code}</span>
-                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.code || 'Dihapus'}</span>
+                                                                <span className="text-xs font-semibold text-muted-foreground">Singkatan: </span>
+                                                                <span className="mr-2 text-red-500 line-through">{uni.code}</span>
+                                                                <span className="font-medium text-green-600 dark:text-green-400">
+                                                                    {uni.pending_updates.code || 'Dihapus'}
+                                                                </span>
                                                             </li>
                                                         )}
                                                         {'ptm_code' in uni.pending_updates && (
                                                             <li>
-                                                                <span className="text-xs text-muted-foreground font-semibold">Kode PTM: </span>
-                                                                <span className="line-through text-red-500 mr-2">{uni.ptm_code || '-'}</span>
-                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.ptm_code || '-'}</span>
+                                                                <span className="text-xs font-semibold text-muted-foreground">Kode PTM: </span>
+                                                                <span className="mr-2 text-red-500 line-through">{uni.ptm_code || '-'}</span>
+                                                                <span className="font-medium text-green-600 dark:text-green-400">
+                                                                    {uni.pending_updates.ptm_code || '-'}
+                                                                </span>
                                                             </li>
                                                         )}
                                                     </ul>
@@ -371,7 +370,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                         <Button
                                                             size="sm"
                                                             onClick={() => handleApproval(uni.id, 'approve')}
-                                                            className="h-8 bg-green-600 hover:bg-green-700 text-white"
+                                                            className="h-8 bg-green-600 text-white hover:bg-green-700"
                                                         >
                                                             <CheckCircle className="mr-1 h-3.5 w-3.5" /> Setujui
                                                         </Button>
