@@ -114,6 +114,7 @@ interface PendingUniversity {
     id: number;
     name: string;
     code: string;
+    ptm_code?: string;
     short_name?: string | null;
     pending_updates: Record<string, string>;
 }
@@ -270,62 +271,168 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                     )}
 
                     {/* Pending Updates Section */}
-                    {pendingUniversities.length > 0 && (
-                        <div className="mb-8">
-                            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-foreground">
-                                <AlertCircle className="h-6 w-6 text-amber-500" />
-                                Menunggu Persetujuan
-                            </h2>
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {pendingUniversities.map((uni) => (
-                                    <Card key={uni.id} className="border-amber-200 bg-amber-50/30 dark:border-amber-900/50 dark:bg-amber-950/10">
-                                        <CardHeader className="pb-3">
-                                            <CardTitle className="text-lg">{uni.name}</CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="pb-3 text-sm">
-                                            <ul className="space-y-2">
-                                                {uni.pending_updates.name && (
-                                                    <li>
-                                                        <span className="block text-xs text-muted-foreground">Nama Baru:</span>
-                                                        <span className="font-medium">{uni.pending_updates.name}</span>
-                                                    </li>
-                                                )}
-                                                {uni.pending_updates.code && (
-                                                    <li>
-                                                        <span className="block text-xs text-muted-foreground">Singkatan Baru:</span>
-                                                        <span className="font-medium">{uni.pending_updates.code}</span>
-                                                    </li>
-                                                )}
-                                                {uni.pending_updates.ptm_code && (
-                                                    <li>
-                                                        <span className="block text-xs text-muted-foreground">Kode PTM Baru:</span>
-                                                        <span className="font-medium">{uni.pending_updates.ptm_code}</span>
-                                                    </li>
-                                                )}
-                                            </ul>
-                                        </CardContent>
-                                        <CardFooter className="flex justify-end gap-2 pt-0">
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => handleApproval(uni.id, 'reject')}
-                                                className="gap-1 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/50"
-                                            >
-                                                <XCircle className="h-4 w-4" /> Tolak
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                onClick={() => handleApproval(uni.id, 'approve')}
-                                                className="gap-1 bg-green-600 text-white hover:bg-green-700"
-                                            >
-                                                <CheckCircle className="h-4 w-4" /> Setujui
-                                            </Button>
-                                        </CardFooter>
-                                    </Card>
-                                ))}
+                    <div className="mb-8 rounded-xl border border-sidebar-border bg-card p-6 shadow-sm">
+                        <div className="mb-6 flex items-center justify-between">
+                            <div>
+                                <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
+                                    <AlertCircle className="h-6 w-6 text-amber-500" />
+                                    Persetujuan Perubahan Profil Universitas
+                                </h2>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    Setujui atau tolak perubahan informasi/profil dari universitas
+                                </p>
                             </div>
+                            {pendingUniversities.length > 0 && (
+                                <Badge variant="outline" className="px-3 py-1.5 text-sm bg-amber-50 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-400">
+                                    <Clock className="mr-1.5 h-3.5 w-3.5" />
+                                    {pendingUniversities.length} Menunggu
+                                </Badge>
+                            )}
                         </div>
-                    )}
+
+                        {/* Search Input */}
+                        <div className="mb-4 flex max-w-sm gap-2">
+                            <div className="relative flex-1">
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                <Input
+                                    type="text"
+                                    placeholder="Cari perubahan universitas..."
+                                    value={pendingSearch}
+                                    onChange={(e) => {
+                                        setPendingSearch(e.target.value);
+                                        setPendingPage(1);
+                                    }}
+                                    className="pl-9 h-9"
+                                />
+                            </div>
+                            {pendingSearch && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setPendingSearch('')}
+                                    className="h-9"
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </div>
+
+                        {/* Table */}
+                        <div className="overflow-x-auto rounded-lg border border-sidebar-border/70">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-1/3">Universitas</TableHead>
+                                        <TableHead className="w-1/2">Perubahan yang Diajukan</TableHead>
+                                        <TableHead className="w-[150px] text-right">Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {paginatedPending.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={3} className="py-8 text-center text-muted-foreground">
+                                                {pendingUniversities.length === 0
+                                                    ? 'Tidak ada perubahan profil universitas yang menunggu persetujuan.'
+                                                    : 'Tidak ada perubahan profil universitas yang cocok dengan pencarian.'}
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        paginatedPending.map((uni) => (
+                                            <TableRow key={uni.id}>
+                                                <TableCell>
+                                                    <div className="font-medium">{uni.name}</div>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        Code: {uni.code} | PTM Code: {uni.ptm_code || '-'}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <ul className="space-y-1 text-sm">
+                                                        {uni.pending_updates.name && (
+                                                            <li>
+                                                                <span className="text-xs text-muted-foreground font-semibold">Nama: </span>
+                                                                <span className="line-through text-red-500 mr-2">{uni.name}</span>
+                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.name}</span>
+                                                            </li>
+                                                        )}
+                                                        {uni.pending_updates.code && (
+                                                            <li>
+                                                                <span className="text-xs text-muted-foreground font-semibold">Singkatan: </span>
+                                                                <span className="line-through text-red-500 mr-2">{uni.code}</span>
+                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.code}</span>
+                                                            </li>
+                                                        )}
+                                                        {uni.pending_updates.ptm_code && (
+                                                            <li>
+                                                                <span className="text-xs text-muted-foreground font-semibold">Kode PTM: </span>
+                                                                <span className="line-through text-red-500 mr-2">{uni.ptm_code || '-'}</span>
+                                                                <span className="text-green-600 dark:text-green-400 font-medium">{uni.pending_updates.ptm_code}</span>
+                                                            </li>
+                                                        )}
+                                                    </ul>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => handleApproval(uni.id, 'reject')}
+                                                            className="h-8 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/50"
+                                                        >
+                                                            <XCircle className="mr-1 h-3.5 w-3.5" /> Tolak
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            onClick={() => handleApproval(uni.id, 'approve')}
+                                                            className="h-8 bg-green-600 hover:bg-green-700 text-white"
+                                                        >
+                                                            <CheckCircle className="mr-1 h-3.5 w-3.5" /> Setujui
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+
+                        {/* Pagination Controls */}
+                        {totalPendingPages > 1 && (
+                            <div className="mt-4 flex items-center justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Halaman {pendingPage} dari {totalPendingPages}
+                                </span>
+                                <div className="flex gap-1">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setPendingPage((p) => Math.max(p - 1, 1))}
+                                        disabled={pendingPage === 1}
+                                    >
+                                        Sebelumnya
+                                    </Button>
+                                    {Array.from({ length: totalPendingPages }, (_, idx) => idx + 1).map((page) => (
+                                        <Button
+                                            key={page}
+                                            variant={pendingPage === page ? 'default' : 'outline'}
+                                            size="sm"
+                                            onClick={() => setPendingPage(page)}
+                                        >
+                                            {page}
+                                        </Button>
+                                    ))}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setPendingPage((p) => Math.min(p + 1, totalPendingPages))}
+                                        disabled={pendingPage === totalPendingPages}
+                                    >
+                                        Selanjutnya
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Filters */}
                     <div className="mb-6 rounded-lg border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
