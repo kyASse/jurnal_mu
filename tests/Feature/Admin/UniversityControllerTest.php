@@ -153,3 +153,32 @@ it('allows super admin to reject pending university updates', function () {
     expect($this->university->pending_updates)->toBeNull();
 });
 
+it('passes pending universities list to super admin', function () {
+    $this->university->update([
+        'pending_updates' => [
+            'name' => 'Pending Name',
+        ]
+    ]);
+
+    $response = $this->actingAs($this->superAdmin)
+        ->get(route('admin.universities.index'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->has('pendingUniversities', 1)
+    );
+});
+
+it('does not allow non-super admins to access universities index', function () {
+    $nonSuperAdmin = User::factory()->create([
+        'role_id' => Role::where('name', Role::ADMIN_KAMPUS)->value('id'),
+        'university_id' => $this->university->id,
+    ]);
+
+    $response = $this->actingAs($nonSuperAdmin)
+        ->get(route('admin.universities.index'));
+
+    $response->assertStatus(403);
+});
+
+

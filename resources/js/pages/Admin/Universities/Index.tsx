@@ -218,6 +218,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
             route('admin.universities.handle-pending-updates', id),
             { action },
             {
+                preserveScroll: true,
                 onSuccess: () => {
                     toast.success(`Profile update ${action}d successfully`);
                 },
