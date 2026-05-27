@@ -61,7 +61,9 @@ class OAIPMHHarvester
                 while ($url !== null && $pageCount < $maxPages) {
                     $pageCount++;
 
-                    $response = Http::timeout(60)->get($url);
+                    $response = Http::withHeaders([
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    ])->timeout(60)->get($url);
 
                     if (! $response->successful()) {
                         throw new \Exception("Failed to harvest from OAI-PMH endpoint ({$oai_url}): HTTP {$response->status()}");

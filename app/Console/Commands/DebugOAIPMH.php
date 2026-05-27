@@ -19,7 +19,9 @@ class DebugOAIPMH extends Command
         $this->info("Fetching: $url");
         $this->newLine();
 
-        $response = Http::timeout(30)->get($url);
+        $response = Http::withHeaders([
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        ])->timeout(30)->get($url);
 
         if (! $response->successful()) {
             $this->error("Failed: HTTP {$response->status()}");
