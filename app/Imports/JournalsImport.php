@@ -62,6 +62,15 @@ class JournalsImport
             return strtolower($h);
         }, $headers);
 
+        // Validate required headers
+        $requiredHeaders = ['title', 'e_issn', 'url', 'oai_url'];
+        $missingHeaders = array_diff($requiredHeaders, $headers);
+
+        if (! empty($missingHeaders)) {
+            fclose($file);
+            throw new \Exception('Kolom wajib berikut tidak ditemukan dalam file CSV: ' . implode(', ', $missingHeaders));
+        }
+
         $rowNumber = 1; // Start from 1 (header is row 0)
 
         // Process each data row
@@ -142,7 +151,7 @@ class JournalsImport
                 'title' => $validated['title'],
                 'issn' => $validated['issn'] ?? null,
                 'e_issn' => $validated['e_issn'],
-                'publisher' => $validated['publisher'],
+                'publisher' => $validated['publisher'] ?? null,
                 'first_published_year' => $validated['publication_year'] ?? null,
                 'sinta_rank' => $sintaRank,
                 'url' => $validated['url'] ?? null,
@@ -173,14 +182,24 @@ class JournalsImport
      */
     protected function mapSintaRank($value): string
     {
-        if (empty($value)) {
+        if ($value === null || $value === '') {
             return 'non_sinta';
         }
 
-        $intVal = (int) $value;
+        $trimmed = strtolower(trim((string) $value));
 
-        if ($intVal >= 1 && $intVal <= 6) {
-            return 'sinta_'.$intVal;
+        if ($trimmed === '' || $trimmed === 'non_sinta') {
+            return 'non_sinta';
+        }
+
+        // If matches sinta_X or sinta X (where X is 1-6) -> return sinta_X
+        if (preg_match('/^sinta[_\s]?([1-6])$/', $trimmed, $matches)) {
+            return 'sinta_' . $matches[1];
+        }
+
+        // If matches integer 1..6 -> return sinta_X
+        if (preg_match('/^([1-6])$/', $trimmed, $matches)) {
+            return 'sinta_' . $matches[1];
         }
 
         return 'non_sinta';
@@ -193,23 +212,23 @@ class JournalsImport
     {
         return [
             'title' => 'required|string|max:255',
-            'publisher' => 'required|string|max:500',
+            'publisher' => 'nullable|string|max:500',
             'issn' => [
                 'nullable',
                 'string',
                 'max:20',
-                'regex:/^\d{4}-\d{4}$/',
+                'regex:/^\d{4}-\d{3}[\dX]$/i',
             ],
             'e_issn' => [
                 'required',
                 'string',
                 'max:20',
-                'regex:/^\d{4}-\d{4}$/',
+                'regex:/^\d{4}-\d{3}[\dX]$/i',
             ],
             'publication_year' => 'nullable|integer|min:1900|max:'.(now()->year + 1),
-            'sinta_rank' => 'nullable|integer|min:1|max:6',
-            'url' => 'nullable|url|max:500',
-            'oai_url' => 'nullable|url|max:500',
+            'sinta_rank' => 'nullable|string|in:1,2,3,4,5,6,sinta_1,sinta_2,sinta_3,sinta_4,sinta_5,sinta_6,non_sinta',
+            'url' => 'required|url|max:500',
+            'oai_url' => 'required|url|max:500',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
         ];
@@ -222,13 +241,14 @@ class JournalsImport
     {
         return [
             'title.required' => 'Judul jurnal wajib diisi.',
-            'publisher.required' => 'Penerbit wajib diisi.',
             'e_issn.required' => 'E-ISSN wajib diisi.',
-            'issn.regex' => 'Format ISSN harus: 1234-5678',
-            'e_issn.regex' => 'Format E-ISSN harus: 1234-5678',
+            'issn.regex' => 'Format ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
+            'e_issn.regex' => 'Format E-ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
             'publication_year.integer' => 'Tahun terbit harus berupa angka.',
-            'sinta_rank.integer' => 'Ranking SINTA harus berupa angka 1-6.',
+            'sinta_rank.in' => 'Ranking SINTA tidak valid.',
+            'url.required' => 'URL jurnal wajib diisi.',
             'url.url' => 'URL tidak valid.',
+            'oai_url.required' => 'URL OAI-PMH wajib diisi.',
             'oai_url.url' => 'URL OAI-PMH tidak valid.',
             'email.email' => 'Format email tidak valid.',
         ];
