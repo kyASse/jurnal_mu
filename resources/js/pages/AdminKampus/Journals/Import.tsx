@@ -14,7 +14,8 @@ import { BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react'; // Add usePage import
 import { AlertCircle, ArrowLeft, CheckCircle2, Download, Info, Upload, X } from 'lucide-react';
 import Papa from 'papaparse';
-import { FormEventHandler, useRef, useState } from 'react';
+import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -59,6 +60,21 @@ export default function Import({ errors, flash }: Props) {
     const [fileError, setFileError] = useState<string>('');
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.warning) {
+            toast.warning(flash.warning);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+        if (errors?.csv_file) {
+            toast.error(errors.csv_file);
+        }
+    }, [flash, errors]);
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     const ALLOWED_FILE_TYPES = ['text/csv', 'text/plain', 'application/vnd.ms-excel'];
@@ -109,7 +125,9 @@ export default function Import({ errors, flash }: Props) {
                 const missingFields = requiredFields.filter((f) => !fields.includes(f));
 
                 if (missingFields.length > 0) {
-                    setFileError(`Kolom CSV wajib tidak ditemukan: ${missingFields.join(', ')}`);
+                    const errorMsg = `Kolom CSV wajib tidak ditemukan: ${missingFields.join(', ')}`;
+                    setFileError(errorMsg);
+                    toast.error(errorMsg);
                     setSelectedFile(null);
                     setPreviewData([]);
                     if (fileInputRef.current) {
@@ -226,24 +244,37 @@ export default function Import({ errors, flash }: Props) {
 
                         {/* Import Errors */}
                         {flash?.import_errors && flash.import_errors.length > 0 && (
-                            <Alert variant="destructive">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>Detail Error Import</AlertTitle>
-                                <AlertDescription>
-                                    <div className="mt-2 max-h-60 space-y-2 overflow-y-auto">
-                                        {flash.import_errors.map((error, index) => (
-                                            <div key={index} className="text-sm">
-                                                <strong>Baris {error.row}:</strong>
-                                                <ul className="ml-4 list-disc">
-                                                    {error.errors.map((msg, idx) => (
-                                                        <li key={idx}>{msg}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        ))}
+                            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 dark:border-destructive/30 dark:bg-destructive/10">
+                                <div className="flex items-center gap-3 border-b border-destructive/10 pb-4 mb-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive dark:bg-destructive/20">
+                                        <AlertCircle className="h-5 w-5" />
                                     </div>
-                                </AlertDescription>
-                            </Alert>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-destructive dark:text-red-400">
+                                            Detail Error Import
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground mt-0.5">
+                                            Ditemukan <span className="font-bold text-destructive dark:text-red-400">{flash.import_errors.length}</span> baris data yang memiliki kesalahan validasi.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
+                                    {flash.import_errors.map((error, index) => (
+                                        <div key={index} className="flex flex-col sm:flex-row sm:gap-4 items-start border-b border-destructive/5 last:border-0 pb-3 last:pb-0">
+                                            <span className="inline-flex items-center rounded-md bg-destructive/10 px-2.5 py-1 text-xs font-bold text-destructive dark:bg-destructive/20 dark:text-red-400 whitespace-nowrap mb-2 sm:mb-0">
+                                                Baris {error.row}
+                                            </span>
+                                            <ul className="list-disc pl-4 text-sm text-foreground space-y-1">
+                                                {error.errors.map((msg, idx) => (
+                                                    <li key={idx} className="leading-relaxed">
+                                                        {msg}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         )}
                     </div>
 
