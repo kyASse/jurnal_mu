@@ -932,7 +932,7 @@ class JournalController extends Controller
         // $oldUser->notify(new JournalReassignedNotification($journal, 'removed'));
         // $newUser->notify(new JournalReassignedNotification($journal, 'assigned'));
 
-        return back()->with('success', "Jurnal \"{$journal->name}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
+        return back()->with('success', "Jurnal \"{$journal->title}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
     }
 
     /**
