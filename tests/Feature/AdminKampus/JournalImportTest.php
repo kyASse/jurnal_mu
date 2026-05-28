@@ -74,3 +74,26 @@ test('berhasil_import_jurnal_dengan_format_valid', function () {
         'url' => 'https://example.com/b',
     ]);
 });
+
+test('import_jurnal_dengan_peringatan_jika_sebagian_baris_gagal', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+
+    $header = "title,publisher,issn,e_issn,publication_year,sinta_rank,url,oai_url,email,phone\n";
+    $row1 = "Jurnal Sukses,Penerbit A,1234-5678,9876-5432,2025,2,https://example.com/a,https://example.com/a/oai,,\n";
+    $row2 = "Jurnal Gagal,Penerbit B,invalid-issn,3333-4444,2024,,https://example.com/b,https://example.com/b/oai,,\n";
+
+    $file = UploadedFile::fake()->createWithContent('import.csv', $header . $row1 . $row2);
+
+    $this->actingAs($adminKampus)
+        ->post(route('admin-kampus.journals.import.process'), [
+            'csv_file' => $file,
+        ])
+        ->assertRedirect(route('admin-kampus.journals.import'))
+        ->assertSessionHas('warning')
+        ->assertSessionHas('import_errors');
+
+    $this->assertDatabaseHas('journals', ['title' => 'Jurnal Sukses']);
+    $this->assertDatabaseMissing('journals', ['title' => 'Jurnal Gagal']);
+});
+

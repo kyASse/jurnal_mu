@@ -792,7 +792,7 @@ class JournalController extends Controller
             }
 
             if ($summary['error_count'] > 0) {
-                return redirect()->route('admin-kampus.journals.index')
+                return redirect()->route('admin-kampus.journals.import')
                     ->with('warning', "Import selesai dengan peringatan: {$summary['success_count']} jurnal berhasil diimport, {$summary['error_count']} baris gagal.")
                     ->with('import_errors', $summary['errors']);
             }
