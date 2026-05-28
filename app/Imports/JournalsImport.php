@@ -84,24 +84,14 @@ class JournalsImport
 
             // Combine headers with data
             if (count($headers) !== count($data)) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'errors' => ['Jumlah kolom tidak sesuai dengan header'],
-                ];
-                $this->errorCount++;
-
+                $this->addError($rowNumber, ['Jumlah kolom tidak sesuai dengan header']);
                 continue;
             }
 
             $row = array_combine($headers, $data);
 
             if ($row === false) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'errors' => ['Jumlah kolom tidak sesuai dengan header'],
-                ];
-                $this->errorCount++;
-
+                $this->addError($rowNumber, ['Jumlah kolom tidak sesuai dengan header']);
                 continue;
             }
 
@@ -109,6 +99,21 @@ class JournalsImport
         }
 
         fclose($file);
+    }
+
+    /**
+     * Helper to collect error records (capped at 50 to avoid session bloat)
+     */
+    protected function addError(int $rowNumber, array $errors): void
+    {
+        $this->errorCount++;
+
+        if (count($this->errors) < 50) {
+            $this->errors[] = [
+                'row' => $rowNumber,
+                'errors' => $errors,
+            ];
+        }
     }
 
     /**
@@ -121,12 +126,7 @@ class JournalsImport
             $validator = Validator::make($row, $this->rules(), $this->messages());
 
             if ($validator->fails()) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'errors' => $validator->errors()->all(),
-                ];
-                $this->errorCount++;
-
+                $this->addError($rowNumber, $validator->errors()->all());
                 return;
             }
 
@@ -134,12 +134,7 @@ class JournalsImport
 
             // Check for duplicate ISSN/E-ISSN within same university
             if ($this->isDuplicateIssn($validated)) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'errors' => ['ISSN atau E-ISSN sudah terdaftar untuk universitas ini.'],
-                ];
-                $this->errorCount++;
-
+                $this->addError($rowNumber, ['ISSN atau E-ISSN sudah terdaftar untuk universitas ini.']);
                 return;
             }
 
@@ -169,11 +164,7 @@ class JournalsImport
             $this->successCount++;
 
         } catch (\Exception $e) {
-            $this->errors[] = [
-                'row' => $rowNumber,
-                'errors' => ['Error: '.$e->getMessage()],
-            ];
-            $this->errorCount++;
+            $this->addError($rowNumber, ['Error: '.$e->getMessage()]);
         }
     }
 
