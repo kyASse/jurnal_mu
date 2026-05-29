@@ -370,9 +370,15 @@ class JournalController extends Controller
         $users = User::orderBy('name')
             ->get(['id', 'name', 'email', 'university_id']);
 
+        $csvImports = \App\Models\CsvImport::with(['user:id,name', 'university:id,name'])
+            ->latest()
+            ->take(15)
+            ->get();
+
         return Inertia::render('Admin/Journals/Import', [
             'universities' => $universities,
             'users' => $users,
+            'csvImports' => $csvImports,
         ]);
     }
 
@@ -390,53 +396,27 @@ class JournalController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
-
             $file = $request->file('csv_file');
-            $filePath = $file->getRealPath();
+            $originalName = $file->getClientOriginalName();
+            $filePath = $file->store('imports');
 
-            $import = new JournalsImport((int)$validated['university_id'], (int)$validated['user_id']);
-            $import->import($filePath);
+            $csvImport = \App\Models\CsvImport::create([
+                'user_id' => (int)$validated['user_id'],
+                'university_id' => (int)$validated['university_id'],
+                'filename' => $originalName,
+                'filepath' => $filePath,
+                'status' => 'pending',
+            ]);
 
-            $summary = $import->getSummary();
-
-            DB::commit();
-
-            if ($summary['success_count'] === 0 && $summary['error_count'] > 0) {
-                $allAreDuplicates = true;
-                foreach ($summary['errors'] as $rowError) {
-                    foreach ($rowError['errors'] as $errorMsg) {
-                        if (stripos($errorMsg, 'sudah terdaftar') === false && stripos($errorMsg, 'duplikat') === false) {
-                            $allAreDuplicates = false;
-                            break 2;
-                        }
-                    }
-                }
-
-                $errorMessage = $allAreDuplicates 
-                    ? 'Semua data gagal diimport karena jurnal/ISSN sudah terdaftar.'
-                    : 'Semua data gagal diimport. Silakan periksa isi dan format CSV Anda.';
-
-                return redirect()->route('admin.journals.import')
-                    ->with('error', $errorMessage)
-                    ->with('import_errors', $summary['errors']);
-            }
-
-            if ($summary['error_count'] > 0) {
-                return redirect()->route('admin.journals.import')
-                    ->with('warning', "Import selesai dengan peringatan: {$summary['success_count']} jurnal berhasil diimport, {$summary['error_count']} baris gagal.")
-                    ->with('import_errors', $summary['errors']);
-            }
+            \App\Jobs\ProcessCsvImportJob::dispatch($csvImport->id);
 
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return redirect()->route('admin.journals.import')
-                ->with('error', 'Terjadi kesalahan saat memproses file CSV: '.$e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat mengunggah file CSV: '.$e->getMessage());
         }
 
-        return redirect()->route('admin.journals.index')
-            ->with('success', "Import berhasil! {$summary['success_count']} jurnal telah ditambahkan.");
+        return redirect()->route('admin.journals.import')
+            ->with('success', 'File CSV berhasil diunggah dan sedang diproses di background.');
     }
 
     /**
