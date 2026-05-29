@@ -34,7 +34,7 @@ class JournalApprovalController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+                $q->where('title', 'like', "%{$search}%")
                     ->orWhere('issn', 'like', "%{$search}%")
                     ->orWhere('e_issn', 'like', "%{$search}%");
             });
@@ -91,7 +91,7 @@ class JournalApprovalController extends Controller
 
         return redirect()
             ->route('admin-kampus.journals.pending')
-            ->with('success', "Jurnal \"{$journal->name}\" berhasil disetujui dan sekarang terlihat di platform.");
+            ->with('success', "Jurnal \"{$journal->title}\" berhasil disetujui dan sekarang terlihat di platform.");
     }
 
     /**
@@ -136,6 +136,6 @@ class JournalApprovalController extends Controller
 
         return redirect()
             ->route('admin-kampus.journals.pending')
-            ->with('success', "Jurnal \"{$journal->name}\" ditolak. Pengelola jurnal telah diberi notifikasi.");
+            ->with('success', "Jurnal \"{$journal->title}\" ditolak. Pengelola jurnal telah diberi notifikasi.");
     }
 }
