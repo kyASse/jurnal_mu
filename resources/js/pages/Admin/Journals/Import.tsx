@@ -1,7 +1,24 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { UniversityCombobox, type University } from '@/components/ui/university-combobox';
 import { UserCombobox, type User } from '@/components/ui/user-combobox';
 import AppLayout from '@/layouts/app-layout';
@@ -17,6 +34,29 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Jurnal', href: '/admin/journals' },
     { title: 'Import Jurnal', href: '/admin/journals/import/form' },
 ];
+
+interface CsvImport {
+    id: number;
+    filename: string;
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    total_rows: number;
+    processed_rows: number;
+    success_count: number;
+    error_count: number;
+    errors: Array<{
+        row: number;
+        errors: string[];
+    }> | null;
+    created_at: string;
+    user?: {
+        id: number;
+        name: string;
+    };
+    university?: {
+        id: number;
+        name: string;
+    };
+}
 
 interface Props {
     universities: University[];
@@ -35,13 +75,56 @@ interface Props {
             errors: string[];
         }>;
     };
+    csvImports?: CsvImport[];
 }
 
 interface CsvRow {
     [key: string]: string;
 }
 
-export default function Import({ universities, users, errors, flash }: Props) {
+const getStatusBadge = (status: CsvImport['status'], errorCount: number) => {
+    switch (status) {
+        case 'pending':
+            return (
+                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800">
+                    Pending
+                </Badge>
+            );
+        case 'processing':
+            return (
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800 animate-pulse">
+                    Processing
+                </Badge>
+            );
+        case 'completed':
+            if (errorCount > 0) {
+                return (
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800">
+                        Selesai (Ada Error)
+                    </Badge>
+                );
+            }
+            return (
+                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800">
+                    Sukses
+                </Badge>
+            );
+        case 'failed':
+            return (
+                <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-800">
+                    Gagal
+                </Badge>
+            );
+        default:
+            return (
+                <Badge variant="outline">
+                    {status}
+                </Badge>
+            );
+    }
+};
+
+export default function Import({ universities, users, errors, flash, csvImports }: Props) {
     const [selectedUniversityId, setSelectedUniversityId] = useState<string>('');
     const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -49,6 +132,7 @@ export default function Import({ universities, users, errors, flash }: Props) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [fileError, setFileError] = useState<string>('');
     const [isDragging, setIsDragging] = useState(false);
+    const [selectedImportErrors, setSelectedImportErrors] = useState<CsvImport | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -533,6 +617,114 @@ export default function Import({ universities, users, errors, flash }: Props) {
                             </Card>
                         </div>
                     </div>
+
+                    {/* Import History Card */}
+                    <Card className="mt-6">
+                        <CardHeader>
+                            <CardTitle>Riwayat Import Jurnal</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Nama File</TableHead>
+                                        <TableHead>Universitas Target</TableHead>
+                                        <TableHead>User Pengunggah</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Jumlah Baris</TableHead>
+                                        <TableHead>Tanggal</TableHead>
+                                        <TableHead className="text-right">Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {!csvImports || csvImports.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                                                Belum ada riwayat import jurnal.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        csvImports.map((item) => (
+                                            <TableRow key={item.id}>
+                                                <TableCell className="font-medium max-w-[150px] truncate" title={item.filename}>
+                                                    {item.filename}
+                                                </TableCell>
+                                                <TableCell className="max-w-[150px] truncate" title={item.university?.name}>
+                                                    {item.university?.name || '-'}
+                                                </TableCell>
+                                                <TableCell>{item.user?.name || '-'}</TableCell>
+                                                <TableCell>{getStatusBadge(item.status, item.error_count)}</TableCell>
+                                                <TableCell>
+                                                    <div className="text-xs space-y-0.5">
+                                                        <div>Sukses: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{item.success_count}</span></div>
+                                                        <div>Error: <span className={`font-semibold ${item.error_count > 0 ? 'text-destructive dark:text-red-400' : 'text-muted-foreground'}`}>{item.error_count}</span></div>
+                                                        <div>Total: {item.total_rows}</div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="whitespace-nowrap">
+                                                    {new Date(item.created_at).toLocaleDateString('id-ID', {
+                                                        day: '2-digit',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {((item.status === 'completed' && item.error_count > 0) || item.status === 'failed') ? (
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => setSelectedImportErrors(item)}
+                                                        >
+                                                            Lihat Detail
+                                                        </Button>
+                                                    ) : (
+                                                        <span className="text-muted-foreground text-xs">-</span>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+
+                    {/* Dialog Modal for Error Logs */}
+                    <Dialog open={selectedImportErrors !== null} onOpenChange={(open) => !open && setSelectedImportErrors(null)}>
+                        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+                            <DialogHeader>
+                                <DialogTitle>Detail Error - {selectedImportErrors?.filename}</DialogTitle>
+                                <DialogDescription>
+                                    Daftar kesalahan validasi baris demi baris pada proses import ini.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="overflow-y-auto pr-2 my-4 flex-1 space-y-4 max-h-[50vh]">
+                                {selectedImportErrors?.errors && selectedImportErrors.errors.length > 0 ? (
+                                    selectedImportErrors.errors.map((err, idx) => (
+                                        <div key={idx} className="flex flex-col sm:flex-row sm:gap-4 items-start border-b border-muted pb-3 last:border-0">
+                                            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 whitespace-nowrap mb-2 sm:mb-0">
+                                                Baris {err.row}
+                                            </Badge>
+                                            <ul className="list-disc pl-4 text-sm text-foreground space-y-1">
+                                                {err.errors.map((msg, subIdx) => (
+                                                    <li key={subIdx} className="leading-relaxed">
+                                                        {msg}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-muted-foreground text-center py-4">Tidak ada detail error yang tercatat atau file gagal diproses tanpa detail baris.</p>
+                                )}
+                            </div>
+                            <DialogFooter>
+                                <Button onClick={() => setSelectedImportErrors(null)}>Tutup</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
         </AppLayout>
