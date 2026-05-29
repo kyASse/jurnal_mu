@@ -141,7 +141,7 @@ test('import_gagal_jika_issn_duplikat', function () {
         ]);
 
     $response->assertRedirect(route('admin-kampus.journals.import'))
-        ->assertSessionHas('error')
+        ->assertSessionHas('error', 'Semua data gagal diimport karena jurnal/ISSN sudah terdaftar.')
         ->assertSessionHas('import_errors');
 
     $importErrors = session('import_errors');

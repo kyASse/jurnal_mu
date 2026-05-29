@@ -786,8 +786,22 @@ class JournalController extends Controller
 
             // If all rows have errors, return with error
             if ($summary['success_count'] === 0 && $summary['error_count'] > 0) {
+                $allAreDuplicates = true;
+                foreach ($summary['errors'] as $rowError) {
+                    foreach ($rowError['errors'] as $errorMsg) {
+                        if (stripos($errorMsg, 'sudah terdaftar') === false && stripos($errorMsg, 'duplikat') === false) {
+                            $allAreDuplicates = false;
+                            break 2;
+                        }
+                    }
+                }
+
+                $errorMessage = $allAreDuplicates 
+                    ? 'Semua data gagal diimport karena jurnal/ISSN sudah terdaftar.'
+                    : 'Semua data gagal diimport. Silakan periksa isi dan format CSV Anda.';
+
                 return redirect()->route('admin-kampus.journals.import')
-                    ->with('error', 'Semua data gagal diimport. Silakan periksa format CSV Anda.')
+                    ->with('error', $errorMessage)
                     ->with('import_errors', $summary['errors']);
             }
 
