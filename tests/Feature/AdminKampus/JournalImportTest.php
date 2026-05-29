@@ -97,3 +97,54 @@ test('import_jurnal_dengan_peringatan_jika_sebagian_baris_gagal', function () {
     $this->assertDatabaseMissing('journals', ['title' => 'Jurnal Gagal']);
 });
 
+test('user_provided_csv_passes', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+
+    $header = "title,publisher,issn,e_issn,publication_year,sinta_rank,url,oai_url,email,phone\n";
+    $row = "\"Legality : Jurnal Ilmiah Hukum\",\"Universitas Muhammadiyah Malang\",0854-6509,2549-4600,2016,,https://ejournal.umm.ac.id/index.php/legality,https://ejournal.umm.ac.id/index.php/legality/oai,legality@umm.ac.id,+62 877-8714-6248\n";
+
+    $file = UploadedFile::fake()->createWithContent('import.csv', $header . $row);
+
+    $this->actingAs($adminKampus)
+        ->post(route('admin-kampus.journals.import.process'), [
+            'csv_file' => $file,
+        ])
+        ->assertRedirect(route('admin-kampus.journals.index'))
+        ->assertSessionHas('success');
+});
+
+test('import_gagal_jika_issn_duplikat', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+
+    // Create duplicate journal first
+    Journal::create([
+        'university_id' => $university->id,
+        'user_id' => $adminKampus->id,
+        'title' => 'Legality : Jurnal Ilmiah Hukum',
+        'issn' => '0854-6509',
+        'e_issn' => '2549-4600',
+        'url' => 'https://ejournal.umm.ac.id/index.php/legality',
+        'oai_urls' => ['https://ejournal.umm.ac.id/index.php/legality/oai'],
+        'approval_status' => 'approved',
+    ]);
+
+    $header = "title,publisher,issn,e_issn,publication_year,sinta_rank,url,oai_url,email,phone\n";
+    $row = "\"Legality : Jurnal Ilmiah Hukum\",\"Universitas Muhammadiyah Malang\",0854-6509,2549-4600,2016,,https://ejournal.umm.ac.id/index.php/legality,https://ejournal.umm.ac.id/index.php/legality/oai,legality@umm.ac.id,+62 877-8714-6248\n";
+
+    $file = UploadedFile::fake()->createWithContent('import.csv', $header . $row);
+
+    $response = $this->actingAs($adminKampus)
+        ->post(route('admin-kampus.journals.import.process'), [
+            'csv_file' => $file,
+        ]);
+
+    $response->assertRedirect(route('admin-kampus.journals.import'))
+        ->assertSessionHas('error')
+        ->assertSessionHas('import_errors');
+
+    $importErrors = session('import_errors');
+    expect($importErrors[0]['errors'][0])->toContain('ISSN atau E-ISSN sudah terdaftar');
+});
+
