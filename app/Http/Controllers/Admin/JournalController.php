@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\JournalsImport;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Jobs\HarvestJournalArticlesJob;
 use App\Models\Journal;
 use App\Models\ScientificField;
@@ -352,5 +354,138 @@ class JournalController extends Controller
         $journal->update(['oai_urls' => $validated['oai_urls']]);
 
         return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
+    }
+
+    /**
+     * Show the journal import form.
+     */
+    public function import(): Response
+    {
+        $this->authorize('create', Journal::class);
+
+        $universities = University::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
+        $users = User::orderBy('name')
+            ->get(['id', 'name', 'email', 'university_id']);
+
+        return Inertia::render('Admin/Journals/Import', [
+            'universities' => $universities,
+            'users' => $users,
+        ]);
+    }
+
+    /**
+     * Process the CSV import.
+     */
+    public function processImport(Request $request): RedirectResponse
+    {
+        $this->authorize('create', Journal::class);
+
+        $validated = $request->validate([
+            'university_id' => 'required|exists:universities,id',
+            'user_id' => 'required|exists:users,id',
+            'csv_file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $file = $request->file('csv_file');
+            $filePath = $file->getRealPath();
+
+            $import = new JournalsImport((int)$validated['university_id'], (int)$validated['user_id']);
+            $import->import($filePath);
+
+            $summary = $import->getSummary();
+
+            DB::commit();
+
+            if ($summary['success_count'] === 0 && $summary['error_count'] > 0) {
+                $allAreDuplicates = true;
+                foreach ($summary['errors'] as $rowError) {
+                    foreach ($rowError['errors'] as $errorMsg) {
+                        if (stripos($errorMsg, 'sudah terdaftar') === false && stripos($errorMsg, 'duplikat') === false) {
+                            $allAreDuplicates = false;
+                            break 2;
+                        }
+                    }
+                }
+
+                $errorMessage = $allAreDuplicates 
+                    ? 'Semua data gagal diimport karena jurnal/ISSN sudah terdaftar.'
+                    : 'Semua data gagal diimport. Silakan periksa isi dan format CSV Anda.';
+
+                return redirect()->route('admin.journals.import')
+                    ->with('error', $errorMessage)
+                    ->with('import_errors', $summary['errors']);
+            }
+
+            if ($summary['error_count'] > 0) {
+                return redirect()->route('admin.journals.import')
+                    ->with('warning', "Import selesai dengan peringatan: {$summary['success_count']} jurnal berhasil diimport, {$summary['error_count']} baris gagal.")
+                    ->with('import_errors', $summary['errors']);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->route('admin.journals.import')
+                ->with('error', 'Terjadi kesalahan saat memproses file CSV: '.$e->getMessage());
+        }
+
+        return redirect()->route('admin.journals.index')
+            ->with('success', "Import berhasil! {$summary['success_count']} jurnal telah ditambahkan.");
+    }
+
+    /**
+     * Download CSV template for journal import.
+     */
+    public function downloadTemplate(): StreamedResponse
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="template_import_jurnal.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            
+            // Write CSV headers
+            fputcsv($file, [
+                'title',
+                'publisher',
+                'issn',
+                'e_issn',
+                'publication_year',
+                'sinta_rank',
+                'url',
+                'oai_url',
+                'email',
+                'phone'
+            ]);
+            
+            // Write a sample row
+            fputcsv($file, [
+                'Jurnal Pendidikan dan Kebudayaan',
+                'Universitas Negeri Kebangsaan',
+                '2085-0001',
+                '2085-0002',
+                '2024',
+                'sinta_2',
+                'https://jurnal.negerikebangsaan.ac.id/index.php/jpk',
+                'https://jurnal.negerikebangsaan.ac.id/index.php/jpk/oai',
+                'jpk@negerikebangsaan.ac.id',
+                '081234567890'
+            ]);
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
