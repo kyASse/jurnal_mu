@@ -37,7 +37,7 @@ it('allows admin kampus to view their university edit profile page', function ()
 
 it('allows admin kampus to update non-restricted fields directly', function () {
     Storage::fake('public');
-    $file = UploadedFile::fake()->image('logo_kampus.png');
+    $file = UploadedFile::fake()->create('logo_kampus.png', 100, 'image/png');
 
     $payload = [
         'short_name' => 'NEW SHORT',
@@ -107,3 +107,64 @@ it('puts restricted fields in pending_updates when updated by admin kampus', fun
     expect($this->university->pending_updates)->toHaveKey('code', 'PROP');
     expect($this->university->pending_updates)->toHaveKey('ptm_code', 'PTM999');
 });
+
+it('preserves existing pending_updates when updating non-restricted fields', function () {
+    // Set initial pending_updates
+    $this->university->update([
+        'pending_updates' => [
+            'name' => 'Proposed University Name',
+            'code' => 'PROP',
+        ]
+    ]);
+
+    // Send payload with the pending values (since frontend initializes form with pending values if they exist)
+    $payload = [
+        'name' => 'Proposed University Name',
+        'code' => 'PROP',
+        'short_name' => 'NEW SHORT',
+    ];
+
+    $response = $this->actingAs($this->adminKampus)
+        ->put(route('admin-kampus.university.update'), $payload);
+
+    $response->assertRedirect();
+
+    $this->university->refresh();
+
+    // Check directly updated fields
+    expect($this->university->short_name)->toBe('NEW SHORT');
+
+    // pending_updates should be preserved
+    expect($this->university->pending_updates)->toHaveKey('name', 'Proposed University Name');
+    expect($this->university->pending_updates)->toHaveKey('code', 'PROP');
+});
+
+it('clears pending_updates when restricted fields are changed back to original database values', function () {
+    // Set initial pending_updates
+    $this->university->update([
+        'pending_updates' => [
+            'name' => 'Proposed University Name',
+        ]
+    ]);
+
+    // Send payload where name is changed back to the database value
+    $payload = [
+        'name' => 'Original University Name',
+        'short_name' => 'NEW SHORT',
+    ];
+
+    $response = $this->actingAs($this->adminKampus)
+        ->put(route('admin-kampus.university.update'), $payload);
+
+    $response->assertRedirect();
+
+    $this->university->refresh();
+
+    // Check directly updated fields
+    expect($this->university->short_name)->toBe('NEW SHORT');
+
+    // pending_updates should be empty or null because name was changed back to original
+    expect($this->university->pending_updates)->toBeEmpty();
+});
+
+

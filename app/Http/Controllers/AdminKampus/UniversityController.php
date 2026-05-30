@@ -64,21 +64,23 @@ class UniversityController extends Controller
 
         unset($validated['logo_file']);
 
-        $pendingUpdates = $university->pending_updates ?? [];
-        $hasPendingUpdates = false;
-
-        // Check if restricted fields are modified
+        $oldPendingUpdates = $university->pending_updates ?? [];
+        $pendingUpdates = $oldPendingUpdates;
         $restrictedFields = ['name', 'code', 'ptm_code'];
+
         foreach ($restrictedFields as $field) {
-            if (isset($validated[$field]) && $validated[$field] !== $university->$field) {
-                $pendingUpdates[$field] = $validated[$field];
-                $hasPendingUpdates = true;
+            if (array_key_exists($field, $validated)) {
+                if ($validated[$field] !== null && $validated[$field] !== $university->$field) {
+                    $pendingUpdates[$field] = $validated[$field];
+                } else {
+                    unset($pendingUpdates[$field]);
+                }
+                unset($validated[$field]); // Remove from direct update
             }
-            unset($validated[$field]); // Remove from direct update
         }
 
-        if ($hasPendingUpdates) {
-            $validated['pending_updates'] = $pendingUpdates;
+        if ($pendingUpdates !== $oldPendingUpdates) {
+            $validated['pending_updates'] = empty($pendingUpdates) ? null : $pendingUpdates;
             $message = 'Profil Universitas berhasil diperbarui. Perubahan nama, singkatan, atau kode universitas sedang menunggu persetujuan Dikti.';
         } else {
             $message = 'Profil Universitas berhasil diperbarui.';
