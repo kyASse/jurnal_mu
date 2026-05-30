@@ -188,3 +188,41 @@ it('tracks clearing a restricted field as a pending update of null', function ()
     // pending_updates should contain the cleared ptm_code (null value)
     expect($this->university->pending_updates)->toHaveKey('ptm_code', null);
 });
+
+it('fails validation when fields exceed database limits', function () {
+    $payload = [
+        'name' => str_repeat('A', 151), // limit 150
+        'short_name' => str_repeat('B', 21), // limit 20
+        'ptm_code' => str_repeat('C', 11), // limit 10
+        'profile_description' => str_repeat('D', 251), // limit 250
+        'phone' => str_repeat('1', 21), // limit 20
+    ];
+
+    $response = $this->actingAs($this->adminKampus)
+        ->from(route('admin-kampus.university.edit'))
+        ->put(route('admin-kampus.university.update'), $payload);
+
+    $response->assertSessionHasErrors([
+        'name',
+        'short_name',
+        'ptm_code',
+        'profile_description',
+        'phone',
+    ]);
+});
+
+it('fails validation when accreditation or cluster have invalid values', function () {
+    $payload = [
+        'accreditation_status' => 'Sangat Luar Biasa', // invalid enum option
+        'cluster' => 'Super Unggul', // invalid enum option
+    ];
+
+    $response = $this->actingAs($this->adminKampus)
+        ->from(route('admin-kampus.university.edit'))
+        ->put(route('admin-kampus.university.update'), $payload);
+
+    $response->assertSessionHasErrors([
+        'accreditation_status',
+        'cluster',
+    ]);
+});
