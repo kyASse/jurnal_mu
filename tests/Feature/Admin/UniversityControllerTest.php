@@ -29,7 +29,7 @@ beforeEach(function () {
 it('allows super admin to update university details and upload a logo', function () {
     Storage::fake('public');
 
-    $file = UploadedFile::fake()->image('univ_logo.png');
+    $file = UploadedFile::fake()->create('univ_logo.png', 100, 'image/png');
 
     $payload = [
         'name' => 'Updated University Name',
@@ -73,7 +73,7 @@ it('deletes the old logo file when a new one is uploaded', function () {
     Storage::fake('public');
 
     // Store a fake file first
-    $oldFilePath = Storage::disk('public')->putFile('logos', UploadedFile::fake()->image('old_logo.png'));
+    $oldFilePath = Storage::disk('public')->putFile('logos', UploadedFile::fake()->create('old_logo.png', 100, 'image/png'));
     $oldLogoUrl = '/storage/'.$oldFilePath;
 
     $this->university->update([
@@ -82,7 +82,7 @@ it('deletes the old logo file when a new one is uploaded', function () {
 
     Storage::disk('public')->assertExists($oldFilePath);
 
-    $newFile = UploadedFile::fake()->image('new_logo.png');
+    $newFile = UploadedFile::fake()->create('new_logo.png', 100, 'image/png');
 
     $payload = [
         'name' => $this->university->name,
