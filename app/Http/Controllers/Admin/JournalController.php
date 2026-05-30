@@ -177,12 +177,15 @@ class JournalController extends Controller
             'university_id' => 'required|exists:universities,id',
             'user_id' => 'required|exists:users,id',
             'scientific_field_id' => 'required|exists:scientific_fields,id',
-            'e_issn' => 'required|string|max:255',
+            'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i|unique:journals,e_issn',
             'url' => 'required|url|max:255',
             'sinta_rank' => 'required|string|max:255',
             'frequency' => 'required|string|max:255',
             'oai_urls' => 'required|array|min:1',
             'oai_urls.*' => 'required|url|max:255',
+        ], [
+            'e_issn.regex' => 'Format E-ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
+            'e_issn.unique' => 'E-ISSN sudah terdaftar.',
         ]);
 
         $validated['approval_status'] = 'approved';
