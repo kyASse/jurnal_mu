@@ -257,6 +257,14 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.create');
         Route::post('journals', [JournalController::class, 'store'])
             ->name('journals.store');
+        // Import journals from CSV
+        Route::get('journals/import/template', [JournalController::class, 'downloadTemplate'])
+            ->name('journals.import.template');
+        Route::get('journals/import/form', [JournalController::class, 'import'])
+            ->name('journals.import');
+        Route::post('journals/import/process', [JournalController::class, 'processImport'])
+            ->name('journals.import.process');
+
         Route::get('journals/{journal}', [JournalController::class, 'show'])
             ->name('journals.show');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])

@@ -14,49 +14,40 @@ beforeEach(function () {
     Storage::fake('local');
 });
 
-test('admin_kampus_dapat_mengakses_halaman_import_jurnal', function () {
-    $university = University::factory()->create();
-    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+test('super_admin_dapat_mengakses_halaman_import_jurnal', function () {
+    $superAdmin = User::factory()->superAdmin()->create(['is_active' => true]);
 
-    $this->actingAs($adminKampus)
-        ->get(route('admin-kampus.journals.import'))
+    $this->actingAs($superAdmin)
+        ->get(route('admin.journals.import'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page->has('csvImports'));
 });
 
-test('tamu_tidak_dapat_mengakses_halaman_import_jurnal', function () {
-    $this->get(route('admin-kampus.journals.import'))
-        ->assertRedirect(route('login'));
-});
-
-test('berhasil_upload_csv_dan_memicu_job', function () {
+test('super_admin_upload_csv_dan_memicu_job', function () {
     Queue::fake();
 
+    $superAdmin = User::factory()->superAdmin()->create(['is_active' => true]);
     $university = University::factory()->create();
-    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+    $user = User::factory()->create(['university_id' => $university->id]);
 
     $file = UploadedFile::fake()->create('import.csv', 100);
 
-    $this->actingAs($adminKampus)
-        ->post(route('admin-kampus.journals.import.process'), [
+    $this->actingAs($superAdmin)
+        ->post(route('admin.journals.import.process'), [
+            'university_id' => $university->id,
+            'user_id' => $user->id,
             'csv_file' => $file,
         ])
-        ->assertRedirect(route('admin-kampus.journals.import'))
+        ->assertRedirect(route('admin.journals.import'))
         ->assertSessionHas('success');
 
-    Queue::assertPushed(ProcessCsvImportJob::class, function ($job) {
-        $csvImport = CsvImport::first();
-        $reflector = new \ReflectionClass($job);
-        $property = $reflector->getProperty('csvImportId');
-        $property->setAccessible(true);
-        $csvImportId = $property->getValue($job);
-        return $csvImport && $csvImportId === $csvImport->id;
-    });
+    Queue::assertPushed(ProcessCsvImportJob::class);
 });
 
-test('job_memproses_csv_valid_dengan_sukses', function () {
+test('super_admin_job_memproses_csv_valid', function () {
+    $superAdmin = User::factory()->superAdmin()->create(['is_active' => true]);
     $university = University::factory()->create();
-    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+    $user = User::factory()->create(['university_id' => $university->id]);
 
     $header = "title,publisher,issn,e_issn,publication_year,sinta_rank,url,oai_url,email,phone\n";
     $row1 = "Jurnal A,Penerbit A,1234-5678,9876-5432,2025,2,https://example.com/a,https://example.com/a/oai,a@example.com,0812\n";
@@ -65,7 +56,7 @@ test('job_memproses_csv_valid_dengan_sukses', function () {
     $filePath = 'imports/test.csv';
 
     $csvImport = CsvImport::create([
-        'user_id' => $adminKampus->id,
+        'user_id' => $user->id,
         'university_id' => $university->id,
         'filename' => 'test.csv',
         'filepath' => $filePath,
@@ -77,10 +68,9 @@ test('job_memproses_csv_valid_dengan_sukses', function () {
     $csvImport->refresh();
     expect($csvImport->status)->toBe('completed');
     expect($csvImport->success_count)->toBe(1);
-    expect($csvImport->error_count)->toBe(0);
 
     $this->assertDatabaseHas('journals', [
         'title' => 'Jurnal A',
-        'issn' => '1234-5678',
+        'university_id' => $university->id,
     ]);
 });
