@@ -12,9 +12,10 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react'; // Add usePage import
-import { AlertCircle, ArrowLeft, CheckCircle2, Download, Info, Upload } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Download, Info, Upload, X } from 'lucide-react';
 import Papa from 'papaparse';
-import { FormEventHandler, useRef, useState } from 'react';
+import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -57,26 +58,45 @@ export default function Import({ errors, flash }: Props) {
     const [previewData, setPreviewData] = useState<CsvRow[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [fileError, setFileError] = useState<string>('');
+    const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.warning) {
+            toast.warning(flash.warning);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+        if (errors?.csv_file) {
+            toast.error(errors.csv_file);
+        }
+    }, [flash, errors]);
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     const ALLOWED_FILE_TYPES = ['text/csv', 'text/plain', 'application/vnd.ms-excel'];
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+    const formatFileSize = (bytes: number) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
 
-        if (!file) {
-            setSelectedFile(null);
-            setPreviewData([]);
-            setFileError('');
-            return;
-        }
-
+    const processFile = (file: File) => {
         // Validate file type
-        if (!ALLOWED_FILE_TYPES.includes(file.type) && !file.name.endsWith('.csv')) {
+        const isCsv = file.name.endsWith('.csv') || ALLOWED_FILE_TYPES.includes(file.type);
+        if (!isCsv) {
             setFileError('File harus berformat CSV (.csv)');
             setSelectedFile(null);
             setPreviewData([]);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
             return;
         }
 
@@ -85,25 +105,69 @@ export default function Import({ errors, flash }: Props) {
             setFileError('Ukuran file maksimal 5MB');
             setSelectedFile(null);
             setPreviewData([]);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
             return;
         }
 
         setFileError('');
-        setSelectedFile(file);
 
-        // Parse CSV for preview
+        // Parse CSV for preview and client-side validation
         Papa.parse(file, {
             header: true,
             preview: 5, // Preview first 5 rows
             skipEmptyLines: true,
+            transformHeader: (h) => h.trim().toLowerCase(),
             complete: (results) => {
+                const fields = results.meta.fields || [];
+                const requiredFields = ['title', 'e_issn', 'url', 'oai_url'];
+                const missingFields = requiredFields.filter((f) => !fields.includes(f));
+
+                if (missingFields.length > 0) {
+                    const errorMsg = `Kolom CSV wajib tidak ditemukan: ${missingFields.join(', ')}`;
+                    setFileError(errorMsg);
+                    toast.error(errorMsg);
+                    setSelectedFile(null);
+                    setPreviewData([]);
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                    return;
+                }
+
+                setSelectedFile(file);
                 setPreviewData(results.data as CsvRow[]);
             },
             error: (error) => {
                 setFileError('Gagal membaca file CSV: ' + error.message);
+                setSelectedFile(null);
                 setPreviewData([]);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
             },
         });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (!file) {
+            handleClearFile();
+            return;
+        }
+
+        processFile(file);
+    };
+
+    const handleClearFile = () => {
+        setSelectedFile(null);
+        setPreviewData([]);
+        setFileError('');
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const handleDownloadTemplate = () => {
@@ -130,9 +194,9 @@ export default function Import({ errors, flash }: Props) {
         });
     };
 
-    const requiredColumns = ['title', 'publisher', 'e_issn'];
+    const requiredColumns = ['title', 'e_issn', 'url', 'oai_url'];
 
-    const optionalColumns = ['issn', 'publication_year', 'sinta_rank', 'url', 'oai_url', 'email', 'phone'];
+    const optionalColumns = ['publisher', 'issn', 'publication_year', 'sinta_rank', 'email', 'phone'];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -180,24 +244,37 @@ export default function Import({ errors, flash }: Props) {
 
                         {/* Import Errors */}
                         {flash?.import_errors && flash.import_errors.length > 0 && (
-                            <Alert variant="destructive">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>Detail Error Import</AlertTitle>
-                                <AlertDescription>
-                                    <div className="mt-2 max-h-60 space-y-2 overflow-y-auto">
-                                        {flash.import_errors.map((error, index) => (
-                                            <div key={index} className="text-sm">
-                                                <strong>Baris {error.row}:</strong>
-                                                <ul className="ml-4 list-disc">
-                                                    {error.errors.map((msg, idx) => (
-                                                        <li key={idx}>{msg}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        ))}
+                            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 dark:border-destructive/30 dark:bg-destructive/10">
+                                <div className="flex items-center gap-3 border-b border-destructive/10 pb-4 mb-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive dark:bg-destructive/20">
+                                        <AlertCircle className="h-5 w-5" />
                                     </div>
-                                </AlertDescription>
-                            </Alert>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-destructive dark:text-red-400">
+                                            Detail Error Import
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground mt-0.5">
+                                            Ditemukan <span className="font-bold text-destructive dark:text-red-400">{flash.import_errors.length}</span> baris data yang memiliki kesalahan validasi.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
+                                    {flash.import_errors.map((error, index) => (
+                                        <div key={index} className="flex flex-col sm:flex-row sm:gap-4 items-start border-b border-destructive/5 last:border-0 pb-3 last:pb-0">
+                                            <span className="inline-flex items-center rounded-md bg-destructive/10 px-2.5 py-1 text-xs font-bold text-destructive dark:bg-destructive/20 dark:text-red-400 whitespace-nowrap mb-2 sm:mb-0">
+                                                Baris {error.row}
+                                            </span>
+                                            <ul className="list-disc pl-4 text-sm text-foreground space-y-1">
+                                                {error.errors.map((msg, idx) => (
+                                                    <li key={idx} className="leading-relaxed">
+                                                        {msg}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         )}
                     </div>
 
@@ -219,28 +296,97 @@ export default function Import({ errors, flash }: Props) {
                                         </Alert>
 
                                         {/* File Upload */}
-                                        <div className="space-y-2">
-                                            <Label htmlFor="csv_file">
-                                                File CSV <span className="text-destructive">*</span>
-                                            </Label>
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    id="csv_file"
-                                                    ref={fileInputRef}
-                                                    type="file"
-                                                    accept=".csv,text/csv"
-                                                    onChange={handleFileChange}
-                                                    className={errors?.csv_file || fileError ? 'border-destructive' : ''}
-                                                />
-                                                <Button type="button" variant="outline" onClick={handleDownloadTemplate} className="shrink-0 gap-2">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <Label htmlFor="csv_file">
+                                                    File CSV <span className="text-destructive">*</span>
+                                                </Label>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={handleDownloadTemplate}
+                                                    className="gap-2"
+                                                >
                                                     <Download className="h-4 w-4" />
                                                     Download Template
                                                 </Button>
                                             </div>
-                                            {(errors?.csv_file || fileError) && (
-                                                <p className="text-sm text-destructive">{errors?.csv_file || fileError}</p>
+
+                                            <input
+                                                id="csv_file"
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept=".csv,text/csv"
+                                                onChange={handleFileChange}
+                                                className="hidden"
+                                            />
+
+                                            {!selectedFile ? (
+                                                <div
+                                                    onDragOver={(e) => {
+                                                        e.preventDefault();
+                                                        setIsDragging(true);
+                                                    }}
+                                                    onDragLeave={(e) => {
+                                                        e.preventDefault();
+                                                        setIsDragging(false);
+                                                    }}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        setIsDragging(false);
+                                                        const file = e.dataTransfer.files?.[0];
+                                                        if (file) {
+                                                            processFile(file);
+                                                        }
+                                                    }}
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-all duration-200 ${
+                                                        isDragging
+                                                            ? 'border-primary bg-primary/5 text-primary'
+                                                            : 'border-muted-foreground/25 hover:border-primary hover:bg-muted/50'
+                                                    } ${errors?.csv_file || fileError ? 'border-destructive/50 bg-destructive/5' : ''}`}
+                                                >
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                                        <Upload className="h-6 w-6 text-muted-foreground" />
+                                                    </div>
+                                                    <div className="mt-4 flex text-sm leading-6 text-muted-foreground">
+                                                        <span className="font-semibold text-primary hover:text-primary/80">Pilih file</span>
+                                                        <span className="pl-1">atau seret dan lepas di sini</span>
+                                                    </div>
+                                                    <p className="mt-1 text-xs text-muted-foreground">Maksimal ukuran file 5MB, format CSV (.csv)</p>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-between rounded-lg border border-sidebar-border bg-muted/30 p-4 dark:border-sidebar-border dark:bg-neutral-900">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                                            <Upload className="h-5 w-5" />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <p className="text-sm font-medium text-foreground max-w-[200px] sm:max-w-xs md:max-w-md truncate">
+                                                                {selectedFile.name}
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {formatFileSize(selectedFile.size)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={handleClearFile}
+                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive gap-1"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                        Batal
+                                                    </Button>
+                                                </div>
                                             )}
-                                            <p className="text-sm text-muted-foreground">Maksimal ukuran file 5MB, dengan format CSV (.csv).</p>
+
+                                            {(errors?.csv_file || fileError) && (
+                                                <p className="text-sm text-destructive font-medium">{errors?.csv_file || fileError}</p>
+                                            )}
                                         </div>
 
                                         {/* CSV Preview */}
@@ -347,7 +493,7 @@ export default function Import({ errors, flash }: Props) {
                                         <strong className="text-foreground">ISSN Format:</strong> 1234-5678
                                     </div>
                                     <div>
-                                        <strong className="text-foreground">Tanggal:</strong> YYYY-MM-DD (contoh: 2026-12-31)
+                                        <strong className="text-foreground">Tahun Terbit:</strong> YYYY (contoh: 2026)
                                     </div>
                                     <div>
                                         <strong className="text-foreground">SINTA Rank:</strong> angka 1-6 atau kosong (non_sinta)
