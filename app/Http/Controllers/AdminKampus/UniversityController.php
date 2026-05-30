@@ -70,7 +70,7 @@ class UniversityController extends Controller
 
         foreach ($restrictedFields as $field) {
             if (array_key_exists($field, $validated)) {
-                if ($validated[$field] !== null && $validated[$field] !== $university->$field) {
+                if ($validated[$field] !== $university->$field) {
                     $pendingUpdates[$field] = $validated[$field];
                 } else {
                     unset($pendingUpdates[$field]);

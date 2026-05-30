@@ -167,4 +167,26 @@ it('clears pending_updates when restricted fields are changed back to original d
     expect($this->university->pending_updates)->toBeEmpty();
 });
 
+it('tracks clearing a restricted field as a pending update of null', function () {
+    // Database has ptm_code = 'PTM123'
+    // Payload sets ptm_code = null (cleared)
+    $payload = [
+        'ptm_code' => null,
+        'short_name' => 'NEW SHORT',
+    ];
+
+    $response = $this->actingAs($this->adminKampus)
+        ->put(route('admin-kampus.university.update'), $payload);
+
+    $response->assertRedirect();
+
+    $this->university->refresh();
+
+    // Check directly updated fields
+    expect($this->university->short_name)->toBe('NEW SHORT');
+
+    // pending_updates should contain the cleared ptm_code (null value)
+    expect($this->university->pending_updates)->toHaveKey('ptm_code', null);
+});
+
 
