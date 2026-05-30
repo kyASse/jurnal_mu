@@ -14,7 +14,7 @@ interface StatisticsDashboardProps {
  * Error Boundary for Chart Rendering
  * Catches errors in chart components and displays fallback UI
  */
-class ChartErrorBoundary extends Component<{ children: ReactNode; fallback?: ReactNode }, { hasError: boolean; error?: Error }> {
+export class ChartErrorBoundary extends Component<{ children: ReactNode; fallback?: ReactNode }, { hasError: boolean; error?: Error }> {
     constructor(props: { children: ReactNode; fallback?: ReactNode }) {
         super(props);
         this.state = { hasError: false };

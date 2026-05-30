@@ -137,3 +137,52 @@ it('returns 404 for university profile without approved journals', function () {
     $response = $this->get(route('browse.universities.show', $university->id));
     $response->assertStatus(404);
 });
+
+it('passes correct chartData to public university profile view', function () {
+    $university = University::factory()->create([
+        'name' => 'Chart Test University',
+        'is_active' => true,
+    ]);
+
+    $journal1 = Journal::factory()->create([
+        'university_id' => $university->id,
+        'title' => 'Journal 1',
+        'is_active' => true,
+        'approval_status' => 'approved',
+        'first_published_year' => 2022,
+    ]);
+
+    $journal2 = Journal::factory()->create([
+        'university_id' => $university->id,
+        'title' => 'Journal 2',
+        'is_active' => true,
+        'approval_status' => 'approved',
+        'first_published_year' => null, // fallback to article
+    ]);
+
+    Article::factory()->create([
+        'journal_id' => $journal2->id,
+        'publication_date' => '2024-06-15',
+    ]);
+
+    Article::factory()->create([
+        'journal_id' => $journal1->id,
+        'publication_date' => '2024-08-20',
+    ]);
+
+    Article::factory()->create([
+        'journal_id' => $journal1->id,
+        'publication_date' => '2025-01-10',
+    ]);
+
+    $response = $this->get(route('browse.universities.show', $university->id));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Browse/UniversityProfile')
+        ->has('chartData')
+        ->where('chartData.years', [2022, 2023, 2024, 2025, 2026])
+        ->where('chartData.journals', [1, 1, 2, 2, 2])
+        ->where('chartData.articles', [0, 0, 2, 1, 0])
+    );
+});

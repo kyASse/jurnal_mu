@@ -28,7 +28,7 @@ import { UniversityFilterCombobox } from '@/components/ui/university-filter-comb
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -190,9 +190,17 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                 </h1>
                                 <p className="mt-1 text-muted-foreground">View and monitor all journals across all universities</p>
                             </div>
-                            <Link href={route('admin.journals.create')}>
-                                <Button className="gap-2">Tambah Jurnal</Button>
-                            </Link>
+                            <div className="flex gap-2">
+                                <Link href={route('admin.journals.import')}>
+                                    <Button variant="outline" className="gap-2">
+                                        <Upload className="h-4 w-4" />
+                                        Import Jurnal
+                                    </Button>
+                                </Link>
+                                <Link href={route('admin.journals.create')}>
+                                    <Button className="gap-2">Tambah Jurnal</Button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
 

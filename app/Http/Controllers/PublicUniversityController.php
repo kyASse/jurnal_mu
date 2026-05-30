@@ -189,6 +189,74 @@ class PublicUniversityController extends Controller
             ->pluck('year')
             ->toArray();
 
+        // Calculate chartData: Journal growth & Article publication trends
+        $universityJournals = Journal::where('university_id', $university->id)
+            ->where('is_active', true)
+            ->where('approval_status', 'approved')
+            ->get(['id', 'first_published_year']);
+
+        $driver = DB::connection()->getDriverName();
+        $yearRaw = match ($driver) {
+            'sqlite' => "strftime('%Y', publication_date)",
+            'pgsql' => 'extract(year from publication_date)',
+            default => 'YEAR(publication_date)',
+        };
+
+        $journalMinYears = DB::table('articles')
+            ->select('journal_id', DB::raw("MIN($yearRaw) as min_year"))
+            ->whereIn('journal_id', $universityJournals->pluck('id'))
+            ->whereNotNull('publication_date')
+            ->groupBy('journal_id')
+            ->pluck('min_year', 'journal_id')
+            ->toArray();
+
+        $establishedYears = [];
+        foreach ($universityJournals as $journal) {
+            $minArticleYear = $journalMinYears[$journal->id] ?? null;
+            $establishedYear = $journal->first_published_year ?? $minArticleYear;
+            if ($establishedYear && (int) $establishedYear > 1900) {
+                $establishedYears[] = (int) $establishedYear;
+                $journal->established_year = (int) $establishedYear;
+            } else {
+                $establishedYears[] = (int) date('Y');
+                $journal->established_year = (int) date('Y');
+            }
+        }
+
+        $startYear = ! empty($establishedYears) ? min($establishedYears) : (int) date('Y') - 4;
+        $endYear = (int) date('Y');
+        if ($startYear < 1900) {
+            $startYear = 2020;
+        }
+        $yearsRange = range($startYear, $endYear);
+
+        $articleCountsByYear = DB::table('articles')
+            ->select(DB::raw("$yearRaw as year"), DB::raw('count(*) as total'))
+            ->whereIn('journal_id', $universityJournals->pluck('id'))
+            ->whereNotNull('publication_date')
+            ->groupBy('year')
+            ->pluck('total', 'year')
+            ->toArray();
+
+        $chartData = [
+            'years' => [],
+            'journals' => [],
+            'articles' => [],
+        ];
+
+        foreach ($yearsRange as $year) {
+            $cumulativeJournals = 0;
+            foreach ($universityJournals as $journal) {
+                if ($journal->established_year <= $year) {
+                    $cumulativeJournals++;
+                }
+            }
+
+            $chartData['years'][] = (int) $year;
+            $chartData['journals'][] = $cumulativeJournals;
+            $chartData['articles'][] = (int) ($articleCountsByYear[$year] ?? 0);
+        }
+
         return Inertia::render('Browse/UniversityProfile', [
             'university' => $university,
             'stats' => [
@@ -201,6 +269,7 @@ class PublicUniversityController extends Controller
             'articles' => $articles,
             'years' => $years,
             'filters' => (object) $request->only(['search', 'journal_id', 'year']),
+            'chartData' => $chartData,
         ]);
     }
 }

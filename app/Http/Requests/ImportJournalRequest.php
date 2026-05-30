@@ -12,7 +12,9 @@ class ImportJournalRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->isAdminKampus() && $this->user()->is_active;
+        $user = $this->user();
+
+        return ($user->isAdminKampus() || $user->isSuperAdmin()) && $user->is_active;
     }
 
     /**

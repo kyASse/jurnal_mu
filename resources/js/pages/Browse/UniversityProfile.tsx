@@ -10,6 +10,12 @@ import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Search, Shie
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
+interface ChartData {
+    years: number[];
+    journals: number[];
+    articles: number[];
+}
+
 interface Props {
     university: {
         id: number;
@@ -37,9 +43,10 @@ interface Props {
     articles: any;
     years: number[];
     filters: any;
+    chartData: ChartData;
 }
 
-export default function UniversityProfile({ university, stats, journals, articles, years, filters }: Props) {
+export default function UniversityProfile({ university, stats, journals, articles, years, filters, chartData }: Props) {
     const safeFilters: any = filters && typeof filters === 'object' && !Array.isArray(filters) ? filters : {};
     const [search, setSearch] = useState(safeFilters.search ? String(safeFilters.search) : '');
     const [debouncedSearch] = useDebounce(search, 500);
@@ -52,6 +59,84 @@ export default function UniversityProfile({ university, stats, journals, article
             setReactApexChart(() => mod.default);
         });
     }, []);
+
+    const chartSeries = [
+        {
+            name: 'Jurnal (Kumulatif)',
+            type: 'line',
+            data: chartData?.journals || [],
+        },
+        {
+            name: 'Artikel Terbit',
+            type: 'column',
+            data: chartData?.articles || [],
+        },
+    ];
+
+    const chartOptions: any = {
+        chart: {
+            height: 350,
+            type: 'line',
+            stacked: false,
+            fontFamily: 'inherit',
+            toolbar: {
+                show: false,
+            },
+        },
+        stroke: {
+            width: [4, 0],
+            curve: 'smooth',
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: '50%',
+            },
+        },
+        colors: ['#079C4E', '#3b82f6'],
+        fill: {
+            opacity: [1, 0.85],
+        },
+        labels: (chartData?.years || []).map(String),
+        markers: {
+            size: [4, 0],
+        },
+        xaxis: {
+            type: 'category',
+        },
+        yaxis: [
+            {
+                title: {
+                    text: 'Jurnal (Kumulatif)',
+                    style: {
+                        color: '#079C4E',
+                    },
+                },
+                labels: {
+                    style: {
+                        colors: '#079C4E',
+                    },
+                },
+            },
+            {
+                opposite: true,
+                title: {
+                    text: 'Artikel Terbit',
+                    style: {
+                        color: '#3b82f6',
+                    },
+                },
+                labels: {
+                    style: {
+                        colors: '#3b82f6',
+                    },
+                },
+            },
+        ],
+        tooltip: {
+            shared: true,
+            intersect: false,
+        },
+    };
 
     // Trigger search update
     useEffect(() => {
@@ -178,6 +263,21 @@ export default function UniversityProfile({ university, stats, journals, article
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Development Trend Chart */}
+                <Card className="mb-8">
+                    <CardHeader>
+                        <CardTitle className="text-lg">Tren Perkembangan Jurnal & Artikel</CardTitle>
+                        <CardDescription>Visualisasi pertumbuhan kumulatif jumlah jurnal dan publikasi artikel setiap tahun</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {ReactApexChart ? (
+                            <ReactApexChart options={chartOptions} series={chartSeries} type="line" height={350} width="100%" />
+                        ) : (
+                            <div className="flex h-[350px] items-center justify-center text-sm text-muted-foreground">Memuat Grafik...</div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* Sinta Chart and Registered Journals Section */}
                 <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">

@@ -1,9 +1,3 @@
-/**
- * @description Admin Kampus - Import Journals from CSV
- * @route GET /admin-kampus/journals/import/form
- * @features Upload CSV file, auto-assign to current admin, preview data, download template, batch import with validation
- */
-
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,27 +5,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { UniversityCombobox, type University } from '@/components/ui/university-combobox';
+import { UserCombobox, type User } from '@/components/ui/user-combobox';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react'; // Add usePage import
+import { Head, Link, router } from '@inertiajs/react';
 import { AlertCircle, ArrowLeft, CheckCircle2, Download, Info, Upload, X } from 'lucide-react';
 import Papa from 'papaparse';
-import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import React, { FormEventHandler, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-    {
-        title: 'Journals',
-        href: '/admin-kampus/journals',
-    },
-    {
-        title: 'Import',
-        href: '/admin-kampus/journals/import',
-    },
+    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Jurnal', href: '/admin/journals' },
+    { title: 'Import Jurnal', href: '/admin/journals/import/form' },
 ];
 
 interface CsvImport {
@@ -58,8 +45,11 @@ interface CsvImport {
 }
 
 interface Props {
-    // scientificFields are still passed if needed for reference, or can be optional
+    universities: University[];
+    users: User[];
     errors?: {
+        university_id?: string;
+        user_id?: string;
         csv_file?: string;
     };
     flash?: {
@@ -131,8 +121,9 @@ const getStatusBadge = (status: CsvImport['status'], errorCount: number) => {
     }
 };
 
-export default function Import({ errors, flash, csvImports }: Props) {
-    const { auth } = usePage().props as any; // Get auth user info
+export default function Import({ universities, users, errors, flash, csvImports }: Props) {
+    const [selectedUniversityId, setSelectedUniversityId] = useState<string>('');
+    const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewData, setPreviewData] = useState<CsvRow[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -154,6 +145,12 @@ export default function Import({ errors, flash, csvImports }: Props) {
         if (errors?.csv_file) {
             toast.error(errors.csv_file);
         }
+        if (errors?.university_id) {
+            toast.error(errors.university_id);
+        }
+        if (errors?.user_id) {
+            toast.error(errors.user_id);
+        }
     }, [flash, errors]);
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -167,8 +164,18 @@ export default function Import({ errors, flash, csvImports }: Props) {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
+    const filteredUsers = selectedUniversityId ? users.filter((u) => u.university_id?.toString() === selectedUniversityId) : [];
+
+    const handleUniversityChange = (val: string) => {
+        setSelectedUniversityId(val);
+        setSelectedUserId('');
+    };
+
+    const handleUserChange = (val: string) => {
+        setSelectedUserId(val);
+    };
+
     const processFile = (file: File) => {
-        // Validate file type
         const isCsv = file.name.endsWith('.csv') || ALLOWED_FILE_TYPES.includes(file.type);
         if (!isCsv) {
             setFileError('File harus berformat CSV (.csv)');
@@ -180,7 +187,6 @@ export default function Import({ errors, flash, csvImports }: Props) {
             return;
         }
 
-        // Validate file size
         if (file.size > MAX_FILE_SIZE) {
             setFileError('Ukuran file maksimal 5MB');
             setSelectedFile(null);
@@ -193,10 +199,9 @@ export default function Import({ errors, flash, csvImports }: Props) {
 
         setFileError('');
 
-        // Parse CSV for preview and client-side validation
         Papa.parse(file, {
             header: true,
-            preview: 5, // Preview first 5 rows
+            preview: 5,
             skipEmptyLines: true,
             transformHeader: (h) => h.trim().toLowerCase(),
             complete: (results) => {
@@ -232,12 +237,10 @@ export default function Import({ errors, flash, csvImports }: Props) {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-
         if (!file) {
             handleClearFile();
             return;
         }
-
         processFile(file);
     };
 
@@ -251,11 +254,21 @@ export default function Import({ errors, flash, csvImports }: Props) {
     };
 
     const handleDownloadTemplate = () => {
-        window.location.href = route('admin-kampus.journals.import.template');
+        window.location.href = route('admin.journals.import.template');
     };
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
+
+        if (!selectedUniversityId) {
+            toast.error('Silakan pilih Universitas terlebih dahulu');
+            return;
+        }
+
+        if (!selectedUserId) {
+            toast.error('Silakan pilih User Pengelola terlebih dahulu');
+            return;
+        }
 
         if (!selectedFile) {
             setFileError('File CSV harus diunggah');
@@ -265,18 +278,16 @@ export default function Import({ errors, flash, csvImports }: Props) {
         setIsProcessing(true);
 
         const formData = new FormData();
+        formData.append('university_id', selectedUniversityId);
+        formData.append('user_id', selectedUserId);
         formData.append('csv_file', selectedFile);
 
-        router.post(route('admin-kampus.journals.import.process'), formData, {
+        router.post(route('admin.journals.import.process'), formData, {
             forceFormData: true,
             onFinish: () => setIsProcessing(false),
             onError: () => setIsProcessing(false),
         });
     };
-
-    const requiredColumns = ['title', 'e_issn', 'url', 'oai_url'];
-
-    const optionalColumns = ['publisher', 'issn', 'publication_year', 'sinta_rank', 'email', 'phone'];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -284,16 +295,17 @@ export default function Import({ errors, flash, csvImports }: Props) {
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 sm:p-6">
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-neutral-950">
-                    {/* Header */}
                     <div className="mb-6">
-                        <Link href={route('admin-kampus.journals.index')}>
+                        <Link href={route('admin.journals.index')}>
                             <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-primary">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Kembali ke Daftar Jurnal
                             </Button>
                         </Link>
                         <h1 className="text-3xl font-bold text-foreground">Import Jurnal</h1>
-                        <p className="mt-1 text-muted-foreground">Unggah file CSV untuk menambahkan data jurnal secara massal ke dalam sistem.</p>
+                        <p className="mt-1 text-muted-foreground">
+                            Unggah file CSV untuk menambahkan data jurnal secara massal ke universitas terpilih.
+                        </p>
                     </div>
 
                     {/* Flash Messages */}
@@ -322,10 +334,9 @@ export default function Import({ errors, flash, csvImports }: Props) {
                             </Alert>
                         )}
 
-                        {/* Import Errors */}
                         {flash?.import_errors && flash.import_errors.length > 0 && (
                             <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 dark:border-destructive/30 dark:bg-destructive/10">
-                                <div className="mb-4 flex items-center gap-3 border-b border-destructive/10 pb-4 duration-200 animate-in fade-in slide-in-from-top-1">
+                                <div className="mb-4 flex items-center gap-3 border-b border-destructive/10 pb-4">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive dark:bg-destructive/20">
                                         <AlertCircle className="h-5 w-5" />
                                     </div>
@@ -361,24 +372,40 @@ export default function Import({ errors, flash, csvImports }: Props) {
                         )}
                     </div>
 
-                    {/* Main Content */}
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        {/* Import Form */}
                         <div className="lg:col-span-2">
                             <Card>
                                 <CardContent className="pt-6">
                                     <form onSubmit={handleSubmit} className="space-y-6">
-                                        {/* Auto-Assign Info */}
-                                        <Alert>
-                                            <Info className="h-4 w-4" />
-                                            <AlertTitle>Informasi Pengelola</AlertTitle>
-                                            <AlertDescription>
-                                                Semua jurnal yang diimport akan ditugaskan kepada Anda (<strong>{auth.user.name}</strong>) sebagai
-                                                pengelola awal. Anda dapat menugaskan ulang jurnal ke pengelola lain setelah import selesai.
-                                            </AlertDescription>
-                                        </Alert>
+                                        {/* Select Target University */}
+                                        <div className="space-y-2">
+                                            <Label>
+                                                Pilih Universitas Target <span className="text-destructive">*</span>
+                                            </Label>
+                                            <UniversityCombobox
+                                                universities={universities}
+                                                value={selectedUniversityId}
+                                                onValueChange={handleUniversityChange}
+                                            />
+                                            {errors?.university_id && <p className="text-sm text-destructive">{errors.university_id}</p>}
+                                        </div>
 
-                                        {/* File Upload */}
+                                        {/* Select User Manager */}
+                                        <div className="space-y-2">
+                                            <Label>
+                                                Pilih User Pengelola <span className="text-destructive">*</span>
+                                            </Label>
+                                            <UserCombobox
+                                                users={filteredUsers}
+                                                value={selectedUserId}
+                                                onValueChange={handleUserChange}
+                                                disabled={!selectedUniversityId}
+                                                placeholder={selectedUniversityId ? 'Pilih Pengelola Jurnal...' : 'Pilih Universitas Terlebih Dahulu'}
+                                            />
+                                            {errors?.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
+                                        </div>
+
+                                        {/* File Upload Dropzone */}
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <Label htmlFor="csv_file">
@@ -516,7 +543,7 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                             <Button
                                                 type="button"
                                                 variant="outline"
-                                                onClick={() => router.visit(route('admin-kampus.journals.index'))}
+                                                onClick={() => router.visit(route('admin.journals.index'))}
                                                 disabled={isProcessing}
                                                 className="w-full sm:w-auto"
                                             >
@@ -530,7 +557,6 @@ export default function Import({ errors, flash, csvImports }: Props) {
 
                         {/* Guidelines */}
                         <div className="space-y-6">
-                            {/* Format Guidelines */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-base">
@@ -542,23 +568,26 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                     <div>
                                         <h4 className="mb-2 font-medium">Kolom Wajib:</h4>
                                         <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-                                            {requiredColumns.map((col) => (
-                                                <li key={col}>{col}</li>
-                                            ))}
+                                            <li>title</li>
+                                            <li>e_issn</li>
+                                            <li>url</li>
+                                            <li>oai_url</li>
                                         </ul>
                                     </div>
                                     <div>
                                         <h4 className="mb-2 font-medium">Kolom Opsional:</h4>
                                         <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-                                            {optionalColumns.map((col) => (
-                                                <li key={col}>{col}</li>
-                                            ))}
+                                            <li>publisher</li>
+                                            <li>issn</li>
+                                            <li>publication_year</li>
+                                            <li>sinta_rank</li>
+                                            <li>email</li>
+                                            <li>phone</li>
                                         </ul>
                                     </div>
                                 </CardContent>
                             </Card>
 
-                            {/* Format Notes */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="text-base">Catatan Penting</CardTitle>
@@ -591,6 +620,7 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Nama File</TableHead>
+                                        <TableHead>Universitas Target</TableHead>
                                         <TableHead>User Pengunggah</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Jumlah Baris</TableHead>
@@ -601,15 +631,18 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                 <TableBody>
                                     {!csvImports || csvImports.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                                            <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                                                 Belum ada riwayat import jurnal.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
                                         csvImports.map((item) => (
                                             <TableRow key={item.id}>
-                                                <TableCell className="max-w-[200px] truncate font-medium" title={item.filename}>
+                                                <TableCell className="max-w-[150px] truncate font-medium" title={item.filename}>
                                                     {item.filename}
+                                                </TableCell>
+                                                <TableCell className="max-w-[150px] truncate" title={item.university?.name}>
+                                                    {item.university?.name || '-'}
                                                 </TableCell>
                                                 <TableCell>{item.user?.name || '-'}</TableCell>
                                                 <TableCell>{getStatusBadge(item.status, item.error_count)}</TableCell>

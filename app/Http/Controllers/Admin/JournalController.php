@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\HarvestJournalArticlesJob;
+use App\Jobs\ProcessCsvImportJob;
+use App\Models\CsvImport;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * JournalController - Super Admin
@@ -352,5 +355,118 @@ class JournalController extends Controller
         $journal->update(['oai_urls' => $validated['oai_urls']]);
 
         return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
+    }
+
+    /**
+     * Show the journal import form.
+     */
+    public function import(): Response
+    {
+        $this->authorize('create', Journal::class);
+
+        $universities = University::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
+        $users = User::orderBy('name')
+            ->get(['id', 'name', 'email', 'university_id']);
+
+        $csvImports = CsvImport::with(['user:id,name', 'university:id,name'])
+            ->latest()
+            ->take(15)
+            ->get();
+
+        return Inertia::render('Admin/Journals/Import', [
+            'universities' => $universities,
+            'users' => $users,
+            'csvImports' => $csvImports,
+        ]);
+    }
+
+    /**
+     * Process the CSV import.
+     */
+    public function processImport(Request $request): RedirectResponse
+    {
+        $this->authorize('create', Journal::class);
+
+        $validated = $request->validate([
+            'university_id' => 'required|exists:universities,id',
+            'user_id' => 'required|exists:users,id',
+            'csv_file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        try {
+            $file = $request->file('csv_file');
+            $originalName = $file->getClientOriginalName();
+            $filePath = $file->store('imports');
+
+            $csvImport = CsvImport::create([
+                'user_id' => (int) $validated['user_id'],
+                'university_id' => (int) $validated['university_id'],
+                'filename' => $originalName,
+                'filepath' => $filePath,
+                'status' => 'pending',
+            ]);
+
+            ProcessCsvImportJob::dispatch($csvImport->id);
+
+        } catch (\Exception $e) {
+            return redirect()->route('admin.journals.import')
+                ->with('error', 'Terjadi kesalahan saat mengunggah file CSV: '.$e->getMessage());
+        }
+
+        return redirect()->route('admin.journals.import')
+            ->with('success', 'File CSV berhasil diunggah dan sedang diproses di background.');
+    }
+
+    /**
+     * Download CSV template for journal import.
+     */
+    public function downloadTemplate(): StreamedResponse
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="template_import_jurnal.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+
+            // Write CSV headers
+            fputcsv($file, [
+                'title',
+                'publisher',
+                'issn',
+                'e_issn',
+                'publication_year',
+                'sinta_rank',
+                'url',
+                'oai_url',
+                'email',
+                'phone',
+            ]);
+
+            // Write a sample row
+            fputcsv($file, [
+                'Jurnal Pendidikan dan Kebudayaan',
+                'Universitas Negeri Kebangsaan',
+                '2085-0001',
+                '2085-0002',
+                '2024',
+                'sinta_2',
+                'https://jurnal.negerikebangsaan.ac.id/index.php/jpk',
+                'https://jurnal.negerikebangsaan.ac.id/index.php/jpk/oai',
+                'jpk@negerikebangsaan.ac.id',
+                '081234567890',
+            ]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ImportJournalRequest;
 use App\Http\Requests\StoreJournalRequest;
 use App\Http\Requests\UpdateJournalRequest;
-use App\Imports\JournalsImport;
 use App\Jobs\HarvestJournalArticlesJob;
+use App\Jobs\ProcessCsvImportJob;
+use App\Models\CsvImport;
 use App\Models\Journal;
 use App\Models\Pembinaan;
 use App\Models\PembinaanRegistration;
@@ -751,17 +752,20 @@ class JournalController extends Controller
             ->orderBy('name')
             ->get();
 
+        $csvImports = CsvImport::where('university_id', $authUser->university_id)
+            ->with('user:id,name')
+            ->latest()
+            ->take(10)
+            ->get();
+
         return Inertia::render('AdminKampus/Journals/Import', [
             'scientificFields' => $scientificFields,
+            'csvImports' => $csvImports,
         ]);
     }
 
     /**
-     * Process the CSV import and create journals.
-     *
-     * @route POST /admin-kampus/journals/import/process
-     *
-     * @features Upload CSV, validate data, batch create journals, error reporting
+     * Process the CSV import via Queue.
      */
     public function processImport(ImportJournalRequest $request): RedirectResponse
     {
@@ -770,41 +774,27 @@ class JournalController extends Controller
         $authUser = $request->user();
 
         try {
-            DB::beginTransaction();
-
-            // Get the uploaded file path
             $file = $request->file('csv_file');
-            $filePath = $file->getRealPath();
+            $originalName = $file->getClientOriginalName();
+            $filePath = $file->store('imports');
 
-            // Process the CSV import - auto-assign to current LPPM user
-            $import = new JournalsImport($authUser->university_id, $authUser->id);
-            $import->import($filePath);
+            $csvImport = CsvImport::create([
+                'user_id' => $authUser->id,
+                'university_id' => $authUser->university_id,
+                'filename' => $originalName,
+                'filepath' => $filePath,
+                'status' => 'pending',
+            ]);
 
-            $summary = $import->getSummary();
+            ProcessCsvImportJob::dispatch($csvImport->id);
 
-            DB::commit();
-
-            // If all rows have errors, return with error
-            if ($summary['success_count'] === 0 && $summary['error_count'] > 0) {
-                return redirect()->route('admin-kampus.journals.import')
-                    ->with('error', 'Semua data gagal diimport. Silakan periksa format CSV Anda.')
-                    ->with('import_errors', $summary['errors']);
-            }
-
-            if ($summary['error_count'] > 0) {
-                return redirect()->route('admin-kampus.journals.index')
-                    ->with('warning', "Import selesai dengan peringatan: {$summary['success_count']} jurnal berhasil diimport, {$summary['error_count']} baris gagal.")
-                    ->with('import_errors', $summary['errors']);
-            }
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return redirect()->route('admin-kampus.journals.import')
-                ->with('error', 'Terjadi kesalahan saat memproses file CSV: '.$e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat mengunggah file CSV: '.$e->getMessage());
         }
 
-        return redirect()->route('admin-kampus.journals.index')
-            ->with('success', "Import berhasil! {$summary['success_count']} jurnal telah ditambahkan.");
+        return redirect()->route('admin-kampus.journals.import')
+            ->with('success', 'File CSV berhasil diunggah dan sedang diproses di background.');
     }
 
     /**
@@ -932,7 +922,7 @@ class JournalController extends Controller
         // $oldUser->notify(new JournalReassignedNotification($journal, 'removed'));
         // $newUser->notify(new JournalReassignedNotification($journal, 'assigned'));
 
-        return back()->with('success', "Jurnal \"{$journal->name}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
+        return back()->with('success', "Jurnal \"{$journal->title}\" berhasil di-reassign dari {$oldUser->name} ke {$newUser->name}.");
     }
 
     /**
