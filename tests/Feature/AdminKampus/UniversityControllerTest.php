@@ -114,7 +114,7 @@ it('preserves existing pending_updates when updating non-restricted fields', fun
         'pending_updates' => [
             'name' => 'Proposed University Name',
             'code' => 'PROP',
-        ]
+        ],
     ]);
 
     // Send payload with the pending values (since frontend initializes form with pending values if they exist)
@@ -144,7 +144,7 @@ it('clears pending_updates when restricted fields are changed back to original d
     $this->university->update([
         'pending_updates' => [
             'name' => 'Proposed University Name',
-        ]
+        ],
     ]);
 
     // Send payload where name is changed back to the database value
@@ -188,5 +188,3 @@ it('tracks clearing a restricted field as a pending update of null', function ()
     // pending_updates should contain the cleared ptm_code (null value)
     expect($this->university->pending_updates)->toHaveKey('ptm_code', null);
 });
-
-

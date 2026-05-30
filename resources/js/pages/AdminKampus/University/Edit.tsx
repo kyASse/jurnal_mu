@@ -23,10 +23,10 @@ export default function Edit({ university }: PageProps<{ university: University 
 
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
-        name: pendingUpdates.name !== undefined ? pendingUpdates.name : (university.name || ''),
+        name: pendingUpdates.name !== undefined ? pendingUpdates.name : university.name || '',
         short_name: university.short_name || '',
-        code: pendingUpdates.code !== undefined ? pendingUpdates.code : (university.code || ''),
-        ptm_code: pendingUpdates.ptm_code !== undefined ? pendingUpdates.ptm_code : (university.ptm_code || ''),
+        code: pendingUpdates.code !== undefined ? pendingUpdates.code : university.code || '',
+        ptm_code: pendingUpdates.ptm_code !== undefined ? pendingUpdates.ptm_code : university.ptm_code || '',
         profile_description: university.profile_description || '',
         website: university.website || '',
         email: university.email || '',

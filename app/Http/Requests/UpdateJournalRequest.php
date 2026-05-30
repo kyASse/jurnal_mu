@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Journal;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,7 +25,7 @@ class UpdateJournalRequest extends FormRequest
     public function rules(): array
     {
         $journal = $this->route('journal');
-        $id = $journal instanceof \App\Models\Journal ? $journal->id : $journal;
+        $id = $journal instanceof Journal ? $journal->id : $journal;
 
         return [
             // Basic Info
