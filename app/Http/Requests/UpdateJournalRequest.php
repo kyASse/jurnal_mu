@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Journal;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,11 +24,14 @@ class UpdateJournalRequest extends FormRequest
      */
     public function rules(): array
     {
+        $journal = $this->route('journal');
+        $id = $journal instanceof Journal ? $journal->id : $journal;
+
         return [
             // Basic Info
             'title' => 'required|string|max:255',
-            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i',
-            'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i',
+            'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i|unique:journals,issn,'.$id,
+            'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i|unique:journals,e_issn,'.$id,
             'url' => 'required|url|max:500',
 
             // Publication Details
@@ -84,8 +88,10 @@ class UpdateJournalRequest extends FormRequest
             'scientific_field_id.required' => 'Bidang ilmu wajib dipilih.',
             'scientific_field_id.exists' => 'Bidang ilmu tidak valid.',
             'issn.regex' => 'Format ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
+            'issn.unique' => 'ISSN sudah terdaftar.',
             'e_issn.required' => 'E-ISSN wajib diisi.',
             'e_issn.regex' => 'Format E-ISSN harus xxxx-xxxx (karakter terakhir boleh \'X\').',
+            'e_issn.unique' => 'E-ISSN sudah terdaftar.',
             'sinta_rank.required' => 'Peringkat akreditasi wajib dipilih.',
             'sinta_rank.in' => 'Peringkat akreditasi tidak valid.',
             'accreditation_end_year.gte' => 'Tahun akhir akreditasi harus setelah tahun mulai.',

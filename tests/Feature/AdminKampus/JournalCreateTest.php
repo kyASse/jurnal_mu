@@ -268,3 +268,102 @@ test('admin_kampus_dari_universitas_berbeda_tidak_bisa_assign_ke_user_universita
 
     $this->assertDatabaseCount('journals', 0);
 });
+
+test('gagal_simpan_jika_e_issn_atau_issn_sudah_terdaftar', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+    $field = ScientificField::factory()->create(['is_active' => true]);
+
+    Journal::create([
+        'university_id' => $university->id,
+        'user_id' => $adminKampus->id,
+        'title' => 'Existing Journal',
+        'issn' => '1234-5678',
+        'e_issn' => '9876-5432',
+        'url' => 'https://example.com/existing',
+        'oai_urls' => ['https://example.com/existing/oai'],
+        'approval_status' => 'approved',
+    ]);
+
+    // Try to create a new journal with same e_issn
+    $payload1 = array_merge(validJournalPayload($field->id), [
+        'e_issn' => '9876-5432',
+    ]);
+
+    $this->actingAs($adminKampus)
+        ->post(route('admin-kampus.journals.store'), $payload1)
+        ->assertSessionHasErrors(['e_issn']);
+
+    // Try to create a new journal with same issn
+    $payload2 = array_merge(validJournalPayload($field->id), [
+        'issn' => '1234-5678',
+    ]);
+
+    $this->actingAs($adminKampus)
+        ->post(route('admin-kampus.journals.store'), $payload2)
+        ->assertSessionHasErrors(['issn']);
+});
+
+test('gagal_update_jika_e_issn_atau_issn_sudah_digunakan_oleh_jurnal_lain', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+    $field = ScientificField::factory()->create(['is_active' => true]);
+
+    // Create journal 1 (the one we want to update)
+    $journal1 = Journal::create([
+        'university_id' => $university->id,
+        'user_id' => $adminKampus->id,
+        'title' => 'Journal 1',
+        'issn' => '1111-1111',
+        'e_issn' => '2222-2222',
+        'url' => 'https://example.com/journal1',
+        'oai_urls' => ['https://example.com/journal1/oai'],
+        'approval_status' => 'approved',
+    ]);
+
+    // Create journal 2 (has conflicting issn/e_issn)
+    Journal::create([
+        'university_id' => $university->id,
+        'user_id' => $adminKampus->id,
+        'title' => 'Journal 2',
+        'issn' => '3333-3333',
+        'e_issn' => '4444-4444',
+        'url' => 'https://example.com/journal2',
+        'oai_urls' => ['https://example.com/journal2/oai'],
+        'approval_status' => 'approved',
+    ]);
+
+    // Try to update journal 1 with journal 2's e_issn
+    $payload1 = array_merge(validJournalPayload($field->id), [
+        'title' => 'Journal 1 Updated',
+        'e_issn' => '4444-4444',
+    ]);
+
+    $this->actingAs($adminKampus)
+        ->put(route('admin-kampus.journals.update', $journal1->id), $payload1)
+        ->assertSessionHasErrors(['e_issn']);
+
+    // Try to update journal 1 with journal 2's issn
+    $payload2 = array_merge(validJournalPayload($field->id), [
+        'title' => 'Journal 1 Updated',
+        'issn' => '3333-3333',
+    ]);
+
+    $this->actingAs($adminKampus)
+        ->put(route('admin-kampus.journals.update', $journal1->id), $payload2)
+        ->assertSessionHasErrors(['issn']);
+
+    // Updating journal 1 keeping its own e_issn/issn should succeed
+    $payload3 = array_merge(validJournalPayload($field->id), [
+        'title' => 'Journal 1 Updated Successfully',
+        'issn' => '1111-1111',
+        'e_issn' => '2222-2222',
+    ]);
+
+    $this->actingAs($adminKampus)
+        ->put(route('admin-kampus.journals.update', $journal1->id), $payload3)
+        ->assertRedirect(route('admin-kampus.journals.index'));
+
+    $journal1->refresh();
+    expect($journal1->title)->toBe('Journal 1 Updated Successfully');
+});

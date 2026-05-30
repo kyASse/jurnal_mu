@@ -18,12 +18,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Edit({ university }: PageProps<{ university: University }>) {
+    const pendingUpdates = university.pending_updates || {};
+    const hasPendingUpdates = Object.keys(pendingUpdates).length > 0;
+
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
-        name: university.name || '',
+        name: pendingUpdates.name !== undefined ? pendingUpdates.name : university.name || '',
         short_name: university.short_name || '',
-        code: university.code || '',
-        ptm_code: university.ptm_code || '',
+        code: pendingUpdates.code !== undefined ? pendingUpdates.code : university.code || '',
+        ptm_code: pendingUpdates.ptm_code !== undefined ? pendingUpdates.ptm_code : university.ptm_code || '',
         profile_description: university.profile_description || '',
         website: university.website || '',
         email: university.email || '',
@@ -37,9 +40,6 @@ export default function Edit({ university }: PageProps<{ university: University 
         accreditation_status: university.accreditation_status || '',
         cluster: university.cluster || '',
     });
-
-    const pendingUpdates = university.pending_updates || {};
-    const hasPendingUpdates = Object.keys(pendingUpdates).length > 0;
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
