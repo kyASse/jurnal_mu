@@ -250,3 +250,29 @@ Run test command:
 - Upload CSV file and check if page immediately redirects back with success message.
 - Monitor the "Import History" section: check status changes from `pending` -> `processing` -> `completed`.
 - Verify the modal lists correct errors for files with duplicates or formatting issues.
+
+---
+
+## 4. Deployment & Queue Configuration (Hostinger Cron Jobs)
+
+To process the asynchronous CSV imports in the Hostinger shared hosting environment, the queue worker must run periodically. The import tasks are dispatched to the `default` queue.
+
+### 4.1 Combined Queue Worker (Recommended)
+To optimize server resources and conform to Hostinger's cron job limits, run a single combined cron job that handles both the `default` (CSV import) and `harvesting` (article synchronizations) queues. Passing the queue names separated by comma defines their priority (left-to-right):
+
+**Cron Job Command:**
+```bash
+/usr/bin/php /home/u347029080/domains/journalmu.org/public_html/artisan queue:work database --queue=default,harvesting --stop-when-empty --tries=3 --max-time=55
+```
+
+### 4.2 Separate Queue Worker (Alternative)
+If you prefer to execute the CSV import queue independently:
+
+**Cron Job Command:**
+```bash
+/usr/bin/php /home/u347029080/domains/journalmu.org/public_html/artisan queue:work database --queue=default --stop-when-empty --tries=3 --max-time=55
+```
+
+### 4.3 Schedule Settings
+- **Interval:** Run every **1 minute** (`* * * * *`).
+- **Options:** The `--stop-when-empty` and `--max-time=55` options ensure the process gracefully exits when no jobs are left or after 55 seconds, preventing memory leaks and process pileup on Hostinger shared hosting.
