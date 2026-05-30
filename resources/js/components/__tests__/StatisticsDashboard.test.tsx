@@ -1,6 +1,6 @@
 import { createEmptyStatistics, createMockStatistics, renderWithProviders, screen, waitFor } from '@/test-utils/test-helpers';
 import { describe, expect, it, vi } from 'vitest';
-import StatisticsDashboard from '../StatisticsDashboard';
+import StatisticsDashboard, { ChartErrorBoundary } from '../StatisticsDashboard';
 
 // Mock ApexCharts
 const mockChartRender = vi.fn(({ options, series, type }) => (
@@ -10,7 +10,7 @@ const mockChartRender = vi.fn(({ options, series, type }) => (
 ));
 
 vi.mock('react-apexcharts', () => ({
-    default: vi.fn((props) => mockChartRender(props)),
+    default: (props: any) => mockChartRender(props),
 }));
 
 // Mock next-themes useTheme hook
@@ -62,7 +62,7 @@ describe('StatisticsDashboard', () => {
             renderWithProviders(<StatisticsDashboard statistics={emptyData} />);
 
             expect(screen.getByText('Total Jurnal')).toBeInTheDocument();
-            expect(screen.getByText('0')).toBeInTheDocument();
+            expect(screen.getAllByText('0').length).toBe(4);
             expect(screen.getAllByText('Tidak ada data')).toHaveLength(3); // Three "Tidak ada data" messages
         });
 
@@ -81,7 +81,7 @@ describe('StatisticsDashboard', () => {
             renderWithProviders(<StatisticsDashboard statistics={mockData} />);
 
             await waitFor(() => {
-                expect(screen.getByTestId('chart-bar')).toBeInTheDocument(); // Indexation chart
+                expect(screen.getAllByTestId('chart-bar')[0]).toBeInTheDocument(); // Indexation chart
                 expect(screen.getByTestId('chart-donut')).toBeInTheDocument(); // Accreditation chart
                 expect(screen.getAllByTestId('chart-bar')).toHaveLength(2); // Indexation + Scientific Field
             });
@@ -277,22 +277,30 @@ describe('StatisticsDashboard', () => {
     });
 
     describe('Error Boundary', () => {
-        it('shows error message when chart fails to render', async () => {
-            // Mock Chart component to throw error
-            mockChartRender.mockImplementationOnce(() => {
-                throw new Error('Chart rendering failed');
-            });
+        it('renders children when no error occurs', () => {
+            renderWithProviders(
+                <ChartErrorBoundary>
+                    <div>Test Content</div>
+                </ChartErrorBoundary>,
+            );
+            expect(screen.getByText('Test Content')).toBeInTheDocument();
+        });
 
-            const mockData = createMockStatistics();
+        it('renders fallback error message when child component throws', () => {
+            const ThrowingComponent = () => {
+                throw new Error('Chart rendering failed');
+            };
+
             const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-            renderWithProviders(<StatisticsDashboard statistics={mockData} />);
+            renderWithProviders(
+                <ChartErrorBoundary>
+                    <ThrowingComponent />
+                </ChartErrorBoundary>,
+            );
 
-            await waitFor(() => {
-                console.log('DOM CONTENT IS:', screen.debug(undefined, 100000));
-                // Error boundary should catch and display fallback
-                expect(screen.getByText(/chart failed to load/i)).toBeInTheDocument();
-            });
+            expect(screen.getByText('Chart failed to load')).toBeInTheDocument();
+            expect(screen.getByText('Chart rendering failed')).toBeInTheDocument();
 
             consoleError.mockRestore();
         });
@@ -333,7 +341,7 @@ describe('StatisticsDashboard', () => {
 
             renderWithProviders(<StatisticsDashboard statistics={singleJournal} />);
 
-            expect(screen.getByText('1')).toBeInTheDocument();
+            expect(screen.getAllByText('1').length).toBe(3);
             expect(screen.getByText('100% dari total')).toBeInTheDocument();
         });
 

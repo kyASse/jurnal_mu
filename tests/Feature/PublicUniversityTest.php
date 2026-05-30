@@ -186,4 +186,3 @@ it('passes correct chartData to public university profile view', function () {
         ->where('chartData.articles', [0, 0, 2, 1, 0])
     );
 });
-

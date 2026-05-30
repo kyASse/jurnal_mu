@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Imports\JournalsImport;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Jobs\HarvestJournalArticlesJob;
+use App\Jobs\ProcessCsvImportJob;
+use App\Models\CsvImport;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * JournalController - Super Admin
@@ -370,7 +371,7 @@ class JournalController extends Controller
         $users = User::orderBy('name')
             ->get(['id', 'name', 'email', 'university_id']);
 
-        $csvImports = \App\Models\CsvImport::with(['user:id,name', 'university:id,name'])
+        $csvImports = CsvImport::with(['user:id,name', 'university:id,name'])
             ->latest()
             ->take(15)
             ->get();
@@ -400,15 +401,15 @@ class JournalController extends Controller
             $originalName = $file->getClientOriginalName();
             $filePath = $file->store('imports');
 
-            $csvImport = \App\Models\CsvImport::create([
-                'user_id' => (int)$validated['user_id'],
-                'university_id' => (int)$validated['university_id'],
+            $csvImport = CsvImport::create([
+                'user_id' => (int) $validated['user_id'],
+                'university_id' => (int) $validated['university_id'],
                 'filename' => $originalName,
                 'filepath' => $filePath,
                 'status' => 'pending',
             ]);
 
-            \App\Jobs\ProcessCsvImportJob::dispatch($csvImport->id);
+            ProcessCsvImportJob::dispatch($csvImport->id);
 
         } catch (\Exception $e) {
             return redirect()->route('admin.journals.import')
@@ -434,7 +435,7 @@ class JournalController extends Controller
 
         $callback = function () {
             $file = fopen('php://output', 'w');
-            
+
             // Write CSV headers
             fputcsv($file, [
                 'title',
@@ -446,9 +447,9 @@ class JournalController extends Controller
                 'url',
                 'oai_url',
                 'email',
-                'phone'
+                'phone',
             ]);
-            
+
             // Write a sample row
             fputcsv($file, [
                 'Jurnal Pendidikan dan Kebudayaan',
@@ -460,9 +461,9 @@ class JournalController extends Controller
                 'https://jurnal.negerikebangsaan.ac.id/index.php/jpk',
                 'https://jurnal.negerikebangsaan.ac.id/index.php/jpk/oai',
                 'jpk@negerikebangsaan.ac.id',
-                '081234567890'
+                '081234567890',
             ]);
-            
+
             fclose($file);
         };
 

@@ -68,7 +68,7 @@ class JournalsImport
 
         if (! empty($missingHeaders)) {
             fclose($file);
-            throw new \Exception('Kolom wajib berikut tidak ditemukan dalam file CSV: ' . implode(', ', $missingHeaders));
+            throw new \Exception('Kolom wajib berikut tidak ditemukan dalam file CSV: '.implode(', ', $missingHeaders));
         }
 
         $rowNumber = 1; // Start from 1 (header is row 0)
@@ -85,6 +85,7 @@ class JournalsImport
             // Combine headers with data
             if (count($headers) !== count($data)) {
                 $this->addError($rowNumber, ['Jumlah kolom tidak sesuai dengan header']);
+
                 continue;
             }
 
@@ -92,6 +93,7 @@ class JournalsImport
 
             if ($row === false) {
                 $this->addError($rowNumber, ['Jumlah kolom tidak sesuai dengan header']);
+
                 continue;
             }
 
@@ -127,6 +129,7 @@ class JournalsImport
 
             if ($validator->fails()) {
                 $this->addError($rowNumber, $validator->errors()->all());
+
                 return;
             }
 
@@ -135,6 +138,7 @@ class JournalsImport
             // Check for duplicate ISSN/E-ISSN within same university
             if ($this->isDuplicateIssn($validated)) {
                 $this->addError($rowNumber, ['ISSN atau E-ISSN sudah terdaftar untuk universitas ini.']);
+
                 return;
             }
 
@@ -185,12 +189,12 @@ class JournalsImport
 
         // If matches sinta_X or sinta X (where X is 1-6) -> return sinta_X
         if (preg_match('/^sinta[_\s]?([1-6])$/', $trimmed, $matches)) {
-            return 'sinta_' . $matches[1];
+            return 'sinta_'.$matches[1];
         }
 
         // If matches integer 1..6 -> return sinta_X
         if (preg_match('/^([1-6])$/', $trimmed, $matches)) {
-            return 'sinta_' . $matches[1];
+            return 'sinta_'.$matches[1];
         }
 
         return 'non_sinta';

@@ -198,8 +198,8 @@ class PublicUniversityController extends Controller
         $driver = DB::connection()->getDriverName();
         $yearRaw = match ($driver) {
             'sqlite' => "strftime('%Y', publication_date)",
-            'pgsql' => "extract(year from publication_date)",
-            default => "YEAR(publication_date)",
+            'pgsql' => 'extract(year from publication_date)',
+            default => 'YEAR(publication_date)',
         };
 
         $journalMinYears = DB::table('articles')
@@ -223,7 +223,7 @@ class PublicUniversityController extends Controller
             }
         }
 
-        $startYear = !empty($establishedYears) ? min($establishedYears) : (int) date('Y') - 4;
+        $startYear = ! empty($establishedYears) ? min($establishedYears) : (int) date('Y') - 4;
         $endYear = (int) date('Y');
         if ($startYear < 1900) {
             $startYear = 2020;

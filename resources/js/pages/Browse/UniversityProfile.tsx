@@ -64,13 +64,13 @@ export default function UniversityProfile({ university, stats, journals, article
         {
             name: 'Jurnal (Kumulatif)',
             type: 'line',
-            data: chartData?.journals || []
+            data: chartData?.journals || [],
         },
         {
             name: 'Artikel Terbit',
             type: 'column',
-            data: chartData?.articles || []
-        }
+            data: chartData?.articles || [],
+        },
     ];
 
     const chartOptions: any = {
@@ -80,17 +80,17 @@ export default function UniversityProfile({ university, stats, journals, article
             stacked: false,
             fontFamily: 'inherit',
             toolbar: {
-                show: false
-            }
+                show: false,
+            },
         },
         stroke: {
             width: [4, 0],
-            curve: 'smooth'
+            curve: 'smooth',
         },
         plotOptions: {
             bar: {
-                columnWidth: '50%'
-            }
+                columnWidth: '50%',
+            },
         },
         colors: ['#079C4E', '#3b82f6'],
         fill: {
@@ -98,44 +98,44 @@ export default function UniversityProfile({ university, stats, journals, article
         },
         labels: (chartData?.years || []).map(String),
         markers: {
-            size: [4, 0]
+            size: [4, 0],
         },
         xaxis: {
-            type: 'category'
+            type: 'category',
         },
         yaxis: [
             {
                 title: {
                     text: 'Jurnal (Kumulatif)',
                     style: {
-                        color: '#079C4E'
-                    }
+                        color: '#079C4E',
+                    },
                 },
                 labels: {
                     style: {
-                        colors: '#079C4E'
-                    }
-                }
+                        colors: '#079C4E',
+                    },
+                },
             },
             {
                 opposite: true,
                 title: {
                     text: 'Artikel Terbit',
                     style: {
-                        color: '#3b82f6'
-                    }
+                        color: '#3b82f6',
+                    },
                 },
                 labels: {
                     style: {
-                        colors: '#3b82f6'
-                    }
-                }
-            }
+                        colors: '#3b82f6',
+                    },
+                },
+            },
         ],
         tooltip: {
             shared: true,
             intersect: false,
-        }
+        },
     };
 
     // Trigger search update
@@ -272,17 +272,9 @@ export default function UniversityProfile({ university, stats, journals, article
                     </CardHeader>
                     <CardContent>
                         {ReactApexChart ? (
-                            <ReactApexChart
-                                options={chartOptions}
-                                series={chartSeries}
-                                type="line"
-                                height={350}
-                                width="100%"
-                            />
+                            <ReactApexChart options={chartOptions} series={chartSeries} type="line" height={350} width="100%" />
                         ) : (
-                            <div className="flex h-[350px] items-center justify-center text-sm text-muted-foreground">
-                                Memuat Grafik...
-                            </div>
+                            <div className="flex h-[350px] items-center justify-center text-sm text-muted-foreground">Memuat Grafik...</div>
                         )}
                     </CardContent>
                 </Card>

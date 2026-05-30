@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ImportJournalRequest;
 use App\Http\Requests\StoreJournalRequest;
 use App\Http\Requests\UpdateJournalRequest;
-use App\Imports\JournalsImport;
 use App\Jobs\HarvestJournalArticlesJob;
+use App\Jobs\ProcessCsvImportJob;
+use App\Models\CsvImport;
 use App\Models\Journal;
 use App\Models\Pembinaan;
 use App\Models\PembinaanRegistration;
@@ -751,7 +752,7 @@ class JournalController extends Controller
             ->orderBy('name')
             ->get();
 
-        $csvImports = \App\Models\CsvImport::where('university_id', $authUser->university_id)
+        $csvImports = CsvImport::where('university_id', $authUser->university_id)
             ->with('user:id,name')
             ->latest()
             ->take(10)
@@ -777,7 +778,7 @@ class JournalController extends Controller
             $originalName = $file->getClientOriginalName();
             $filePath = $file->store('imports');
 
-            $csvImport = \App\Models\CsvImport::create([
+            $csvImport = CsvImport::create([
                 'user_id' => $authUser->id,
                 'university_id' => $authUser->university_id,
                 'filename' => $originalName,
@@ -785,7 +786,7 @@ class JournalController extends Controller
                 'status' => 'pending',
             ]);
 
-            \App\Jobs\ProcessCsvImportJob::dispatch($csvImport->id);
+            ProcessCsvImportJob::dispatch($csvImport->id);
 
         } catch (\Exception $e) {
             return redirect()->route('admin-kampus.journals.import')

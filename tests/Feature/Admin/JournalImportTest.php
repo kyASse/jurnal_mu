@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\Journal;
+use App\Jobs\ProcessCsvImportJob;
+use App\Models\CsvImport;
 use App\Models\University;
 use App\Models\User;
-use App\Models\CsvImport;
-use App\Jobs\ProcessCsvImportJob;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -51,8 +50,8 @@ test('super_admin_job_memproses_csv_valid', function () {
 
     $header = "title,publisher,issn,e_issn,publication_year,sinta_rank,url,oai_url,email,phone\n";
     $row1 = "Jurnal A,Penerbit A,1234-5678,9876-5432,2025,2,https://example.com/a,https://example.com/a/oai,a@example.com,0812\n";
-    
-    Storage::put('imports/test.csv', $header . $row1);
+
+    Storage::put('imports/test.csv', $header.$row1);
     $filePath = 'imports/test.csv';
 
     $csvImport = CsvImport::create([

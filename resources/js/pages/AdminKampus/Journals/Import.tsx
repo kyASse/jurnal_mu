@@ -8,24 +8,9 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react'; // Add usePage import
@@ -97,41 +82,52 @@ const getStatusBadge = (status: CsvImport['status'], errorCount: number) => {
     switch (status) {
         case 'pending':
             return (
-                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800">
+                <Badge
+                    variant="outline"
+                    className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-400"
+                >
                     Pending
                 </Badge>
             );
         case 'processing':
             return (
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800 animate-pulse">
+                <Badge
+                    variant="outline"
+                    className="animate-pulse border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/20 dark:text-blue-400"
+                >
                     Processing
                 </Badge>
             );
         case 'completed':
             if (errorCount > 0) {
                 return (
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800">
+                    <Badge
+                        variant="outline"
+                        className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-400"
+                    >
                         Selesai (Ada Error)
                     </Badge>
                 );
             }
             return (
-                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800">
+                <Badge
+                    variant="outline"
+                    className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/20 dark:text-emerald-400"
+                >
                     Sukses
                 </Badge>
             );
         case 'failed':
             return (
-                <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-800">
+                <Badge
+                    variant="outline"
+                    className="border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/20 dark:text-rose-400"
+                >
                     Gagal
                 </Badge>
             );
         default:
-            return (
-                <Badge variant="outline">
-                    {status}
-                </Badge>
-            );
+            return <Badge variant="outline">{status}</Badge>;
     }
 };
 
@@ -329,26 +325,29 @@ export default function Import({ errors, flash, csvImports }: Props) {
                         {/* Import Errors */}
                         {flash?.import_errors && flash.import_errors.length > 0 && (
                             <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 dark:border-destructive/30 dark:bg-destructive/10">
-                                <div className="flex items-center gap-3 border-b border-destructive/10 pb-4 mb-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div className="mb-4 flex items-center gap-3 border-b border-destructive/10 pb-4 duration-200 animate-in fade-in slide-in-from-top-1">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive dark:bg-destructive/20">
                                         <AlertCircle className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-semibold text-destructive dark:text-red-400">
-                                            Detail Error Import
-                                        </h3>
-                                        <p className="text-sm text-muted-foreground mt-0.5">
-                                            Ditemukan <span className="font-bold text-destructive dark:text-red-400">{flash.import_errors.length}</span> baris data yang memiliki kesalahan validasi.
+                                        <h3 className="text-lg font-semibold text-destructive dark:text-red-400">Detail Error Import</h3>
+                                        <p className="mt-0.5 text-sm text-muted-foreground">
+                                            Ditemukan{' '}
+                                            <span className="font-bold text-destructive dark:text-red-400">{flash.import_errors.length}</span> baris
+                                            data yang memiliki kesalahan validasi.
                                         </p>
                                     </div>
                                 </div>
-                                <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
+                                <div className="max-h-80 space-y-4 overflow-y-auto pr-2">
                                     {flash.import_errors.map((error, index) => (
-                                        <div key={index} className="flex flex-col sm:flex-row sm:gap-4 items-start border-b border-destructive/5 last:border-0 pb-3 last:pb-0">
-                                            <span className="inline-flex items-center rounded-md bg-destructive/10 px-2.5 py-1 text-xs font-bold text-destructive dark:bg-destructive/20 dark:text-red-400 whitespace-nowrap mb-2 sm:mb-0">
+                                        <div
+                                            key={index}
+                                            className="flex flex-col items-start border-b border-destructive/5 pb-3 last:border-0 last:pb-0 sm:flex-row sm:gap-4"
+                                        >
+                                            <span className="mb-2 inline-flex items-center rounded-md bg-destructive/10 px-2.5 py-1 text-xs font-bold whitespace-nowrap text-destructive sm:mb-0 dark:bg-destructive/20 dark:text-red-400">
                                                 Baris {error.row}
                                             </span>
-                                            <ul className="list-disc pl-4 text-sm text-foreground space-y-1">
+                                            <ul className="list-disc space-y-1 pl-4 text-sm text-foreground">
                                                 {error.errors.map((msg, idx) => (
                                                     <li key={idx} className="leading-relaxed">
                                                         {msg}
@@ -385,13 +384,7 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                                 <Label htmlFor="csv_file">
                                                     File CSV <span className="text-destructive">*</span>
                                                 </Label>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={handleDownloadTemplate}
-                                                    className="gap-2"
-                                                >
+                                                <Button type="button" variant="outline" size="sm" onClick={handleDownloadTemplate} className="gap-2">
                                                     <Download className="h-4 w-4" />
                                                     Download Template
                                                 </Button>
@@ -425,7 +418,7 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                                         }
                                                     }}
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-all duration-200 ${
+                                                    className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-all duration-200 ${
                                                         isDragging
                                                             ? 'border-primary bg-primary/5 text-primary'
                                                             : 'border-muted-foreground/25 hover:border-primary hover:bg-muted/50'
@@ -447,12 +440,10 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                                             <Upload className="h-5 w-5" />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <p className="text-sm font-medium text-foreground max-w-[200px] sm:max-w-xs md:max-w-md truncate">
+                                                            <p className="max-w-[200px] truncate text-sm font-medium text-foreground sm:max-w-xs md:max-w-md">
                                                                 {selectedFile.name}
                                                             </p>
-                                                            <p className="text-xs text-muted-foreground">
-                                                                {formatFileSize(selectedFile.size)}
-                                                            </p>
+                                                            <p className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
                                                         </div>
                                                     </div>
                                                     <Button
@@ -460,7 +451,7 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={handleClearFile}
-                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive gap-1"
+                                                        className="gap-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                     >
                                                         <X className="h-4 w-4" />
                                                         Batal
@@ -469,7 +460,7 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                             )}
 
                                             {(errors?.csv_file || fileError) && (
-                                                <p className="text-sm text-destructive font-medium">{errors?.csv_file || fileError}</p>
+                                                <p className="text-sm font-medium text-destructive">{errors?.csv_file || fileError}</p>
                                             )}
                                         </div>
 
@@ -610,22 +601,34 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                 <TableBody>
                                     {!csvImports || csvImports.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                                            <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                                                 Belum ada riwayat import jurnal.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
                                         csvImports.map((item) => (
                                             <TableRow key={item.id}>
-                                                <TableCell className="font-medium max-w-[200px] truncate" title={item.filename}>
+                                                <TableCell className="max-w-[200px] truncate font-medium" title={item.filename}>
                                                     {item.filename}
                                                 </TableCell>
                                                 <TableCell>{item.user?.name || '-'}</TableCell>
                                                 <TableCell>{getStatusBadge(item.status, item.error_count)}</TableCell>
                                                 <TableCell>
-                                                    <div className="text-xs space-y-0.5">
-                                                        <div>Sukses: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{item.success_count}</span></div>
-                                                        <div>Error: <span className={`font-semibold ${item.error_count > 0 ? 'text-destructive dark:text-red-400' : 'text-muted-foreground'}`}>{item.error_count}</span></div>
+                                                    <div className="space-y-0.5 text-xs">
+                                                        <div>
+                                                            Sukses:{' '}
+                                                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                                                {item.success_count}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            Error:{' '}
+                                                            <span
+                                                                className={`font-semibold ${item.error_count > 0 ? 'text-destructive dark:text-red-400' : 'text-muted-foreground'}`}
+                                                            >
+                                                                {item.error_count}
+                                                            </span>
+                                                        </div>
                                                         <div>Total: {item.total_rows}</div>
                                                     </div>
                                                 </TableCell>
@@ -639,16 +642,12 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                                     })}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    {((item.status === 'completed' && item.error_count > 0) || item.status === 'failed') ? (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => setSelectedImportErrors(item)}
-                                                        >
+                                                    {(item.status === 'completed' && item.error_count > 0) || item.status === 'failed' ? (
+                                                        <Button variant="outline" size="sm" onClick={() => setSelectedImportErrors(item)}>
                                                             Lihat Detail
                                                         </Button>
                                                     ) : (
-                                                        <span className="text-muted-foreground text-xs">-</span>
+                                                        <span className="text-xs text-muted-foreground">-</span>
                                                     )}
                                                 </TableCell>
                                             </TableRow>
@@ -661,21 +660,25 @@ export default function Import({ errors, flash, csvImports }: Props) {
 
                     {/* Dialog Modal for Error Logs */}
                     <Dialog open={selectedImportErrors !== null} onOpenChange={(open) => !open && setSelectedImportErrors(null)}>
-                        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+                        <DialogContent className="flex max-h-[80vh] max-w-2xl flex-col">
                             <DialogHeader>
                                 <DialogTitle>Detail Error - {selectedImportErrors?.filename}</DialogTitle>
-                                <DialogDescription>
-                                    Daftar kesalahan validasi baris demi baris pada proses import ini.
-                                </DialogDescription>
+                                <DialogDescription>Daftar kesalahan validasi baris demi baris pada proses import ini.</DialogDescription>
                             </DialogHeader>
-                            <div className="overflow-y-auto pr-2 my-4 flex-1 space-y-4 max-h-[50vh]">
+                            <div className="my-4 max-h-[50vh] flex-1 space-y-4 overflow-y-auto pr-2">
                                 {selectedImportErrors?.errors && selectedImportErrors.errors.length > 0 ? (
                                     selectedImportErrors.errors.map((err, idx) => (
-                                        <div key={idx} className="flex flex-col sm:flex-row sm:gap-4 items-start border-b border-muted pb-3 last:border-0">
-                                            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 whitespace-nowrap mb-2 sm:mb-0">
+                                        <div
+                                            key={idx}
+                                            className="flex flex-col items-start border-b border-muted pb-3 last:border-0 sm:flex-row sm:gap-4"
+                                        >
+                                            <Badge
+                                                variant="outline"
+                                                className="mb-2 border-destructive/20 bg-destructive/10 whitespace-nowrap text-destructive sm:mb-0"
+                                            >
                                                 Baris {err.row}
                                             </Badge>
-                                            <ul className="list-disc pl-4 text-sm text-foreground space-y-1">
+                                            <ul className="list-disc space-y-1 pl-4 text-sm text-foreground">
                                                 {err.errors.map((msg, subIdx) => (
                                                     <li key={subIdx} className="leading-relaxed">
                                                         {msg}
@@ -685,7 +688,9 @@ export default function Import({ errors, flash, csvImports }: Props) {
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-muted-foreground text-center py-4">Tidak ada detail error yang tercatat atau file gagal diproses tanpa detail baris.</p>
+                                    <p className="py-4 text-center text-sm text-muted-foreground">
+                                        Tidak ada detail error yang tercatat atau file gagal diproses tanpa detail baris.
+                                    </p>
                                 )}
                             </div>
                             <DialogFooter>

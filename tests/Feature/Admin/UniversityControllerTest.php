@@ -113,7 +113,7 @@ it('allows super admin to approve pending university updates', function () {
             'name' => 'Pending Approved Name',
             'code' => 'PAPP',
             'ptm_code' => 'PTM999',
-        ]
+        ],
     ]);
 
     $response = $this->actingAs($this->superAdmin)
@@ -136,7 +136,7 @@ it('allows super admin to reject pending university updates', function () {
             'name' => 'Pending Rejected Name',
             'code' => 'PREJ',
             'ptm_code' => 'PTM888',
-        ]
+        ],
     ]);
 
     $response = $this->actingAs($this->superAdmin)
@@ -157,7 +157,7 @@ it('passes pending universities list to super admin', function () {
     $this->university->update([
         'pending_updates' => [
             'name' => 'Pending Name',
-        ]
+        ],
     ]);
 
     $response = $this->actingAs($this->superAdmin)
@@ -180,5 +180,3 @@ it('does not allow non-super admins to access universities index', function () {
 
     $response->assertStatus(403);
 });
-
-
