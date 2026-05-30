@@ -268,3 +268,38 @@ test('admin_kampus_dari_universitas_berbeda_tidak_bisa_assign_ke_user_universita
 
     $this->assertDatabaseCount('journals', 0);
 });
+
+test('gagal_simpan_jika_e_issn_atau_issn_sudah_terdaftar', function () {
+    $university = University::factory()->create();
+    $adminKampus = User::factory()->adminKampus($university->id)->create(['is_active' => true]);
+    $field = ScientificField::factory()->create(['is_active' => true]);
+
+    Journal::create([
+        'university_id' => $university->id,
+        'user_id' => $adminKampus->id,
+        'title' => 'Existing Journal',
+        'issn' => '1234-5678',
+        'e_issn' => '9876-5432',
+        'url' => 'https://example.com/existing',
+        'oai_urls' => ['https://example.com/existing/oai'],
+        'approval_status' => 'approved',
+    ]);
+
+    // Try to create a new journal with same e_issn
+    $payload1 = array_merge(validJournalPayload($field->id), [
+        'e_issn' => '9876-5432',
+    ]);
+
+    $this->actingAs($adminKampus)
+        ->post(route('admin-kampus.journals.store'), $payload1)
+        ->assertSessionHasErrors(['e_issn']);
+
+    // Try to create a new journal with same issn
+    $payload2 = array_merge(validJournalPayload($field->id), [
+        'issn' => '1234-5678',
+    ]);
+
+    $this->actingAs($adminKampus)
+        ->post(route('admin-kampus.journals.store'), $payload2)
+        ->assertSessionHasErrors(['issn']);
+});
