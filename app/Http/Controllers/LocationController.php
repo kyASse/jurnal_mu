@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Province;
-use App\Models\City;
 use Illuminate\Http\JsonResponse;
 
 class LocationController extends Controller
@@ -15,10 +14,11 @@ class LocationController extends Controller
         );
     }
 
-    public function cities(int $provinceId): JsonResponse
+    public function cities(Province $province): JsonResponse
     {
         return response()->json(
-            City::where('province_id', $provinceId)->orderBy('name')->get(['id', 'name'])
+            $province->cities()->orderBy('name')->get(['id', 'name'])
         );
     }
 }
+
