@@ -218,9 +218,24 @@ class JournalController extends Controller
             ->orderBy('name')
             ->get();
 
+        $statusCountsData = Journal::query()
+            ->forUniversity($authUser->university_id)
+            ->selectRaw("approval_status, count(*) as count")
+            ->groupBy('approval_status')
+            ->pluck('count', 'approval_status')
+            ->toArray();
+
+        $statusCounts = [
+            'all' => Journal::forUniversity($authUser->university_id)->count(),
+            'pending' => $statusCountsData['pending'] ?? 0,
+            'approved' => $statusCountsData['approved'] ?? 0,
+            'rejected' => $statusCountsData['rejected'] ?? 0,
+        ];
+
         return Inertia::render('AdminKampus/Journals/Index', [
             'journals' => $journals,
             'statistics' => $statistics,
+            'statusCounts' => $statusCounts,
             'filters' => $request->only([
                 'search',
                 'sinta_rank',
