@@ -23,37 +23,11 @@ class JournalApprovalController extends Controller
      *
      * @route GET /admin-kampus/journals/pending
      */
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
-        $query = Journal::query()
-            ->where('university_id', auth()->user()->university_id)
-            ->where('approval_status', 'pending')
-            ->with(['user', 'scientificField', 'university']);
-
-        // Search filter
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('issn', 'like', "%{$search}%")
-                    ->orWhere('e_issn', 'like', "%{$search}%");
-            });
-        }
-
-        // Sort
-        $sortField = $request->get('sort', 'created_at');
-        $sortDirection = $request->get('direction', 'desc');
-        $query->orderBy($sortField, $sortDirection);
-
-        $journals = $query->paginate(15)->withQueryString();
-
-        return Inertia::render('AdminKampus/Journals/PendingApproval', [
-            'journals' => $journals,
-            'filters' => [
-                'search' => $request->search,
-                'sort' => $sortField,
-                'direction' => $sortDirection,
-            ],
+        return redirect()->route('admin-kampus.journals.index', [
+            'approval_status' => 'pending',
+            'search' => $request->search,
         ]);
     }
 
@@ -90,7 +64,7 @@ class JournalApprovalController extends Controller
         // $journal->user->notify(new JournalApprovedNotification($journal));
 
         return redirect()
-            ->route('admin-kampus.journals.pending')
+            ->route('admin-kampus.journals.index')
             ->with('success', "Jurnal \"{$journal->title}\" berhasil disetujui dan sekarang terlihat di platform.");
     }
 
@@ -135,7 +109,7 @@ class JournalApprovalController extends Controller
         // $journal->user->notify(new JournalRejectedNotification($journal, $request->reason));
 
         return redirect()
-            ->route('admin-kampus.journals.pending')
+            ->route('admin-kampus.journals.index')
             ->with('success', "Jurnal \"{$journal->title}\" ditolak. Pengelola jurnal telah diberi notifikasi.");
     }
 }
