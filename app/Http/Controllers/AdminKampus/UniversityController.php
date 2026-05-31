@@ -37,16 +37,16 @@ class UniversityController extends Controller
             'ptm_code' => 'nullable|string|max:10',
             'short_name' => 'nullable|string|max:20',
             'profile_description' => 'nullable|string|max:250',
-            'website' => 'nullable|url|max:255',
-            'email' => 'nullable|email|max:255',
+            'website' => 'nullable|string|max:255',
+            'email' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:10',
             'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'accreditation_status' => 'nullable|string|in:Unggul,Baik Sekali,Baik,Cukup',
-            'cluster' => 'nullable|string|in:Mandiri,Utama,Madya',
+            'accreditation_status' => 'nullable|string|in:Unggul,Baik Sekali,Baik,Cukup,A,B,C,-',
+            'cluster' => 'nullable|string|in:Mandiri,Utama,Madya,Pratama,Binaan',
         ]);
 
         if ($request->hasFile('logo_file')) {

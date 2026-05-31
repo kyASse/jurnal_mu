@@ -283,7 +283,7 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         </div>
                                     </div>
 
-                                    <div>
+                                     <div>
                                         <Label htmlFor="accreditation_status">Status Akreditasi</Label>
                                         <select
                                             id="accreditation_status"
@@ -296,11 +296,15 @@ export default function Edit({ university }: PageProps<{ university: University 
                                             <option value="Baik Sekali">Baik Sekali</option>
                                             <option value="Baik">Baik</option>
                                             <option value="Cukup">Cukup</option>
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+                                            <option value="-">-</option>
                                         </select>
                                         <InputError message={errors.accreditation_status} className="mt-2" />
-                                    </div>
+                                     </div>
 
-                                    <div>
+                                     <div>
                                         <Label htmlFor="cluster">Klaster</Label>
                                         <select
                                             id="cluster"
@@ -312,9 +316,10 @@ export default function Edit({ university }: PageProps<{ university: University 
                                             <option value="Mandiri">Mandiri</option>
                                             <option value="Utama">Utama</option>
                                             <option value="Madya">Madya</option>
+                                            <option value="Pratama">Pratama</option>
                                         </select>
                                         <InputError message={errors.cluster} className="mt-2" />
-                                    </div>
+                                     </div>
 
                                     <div className="md:col-span-2">
                                         <Label htmlFor="logo_file">Logo Universitas</Label>
