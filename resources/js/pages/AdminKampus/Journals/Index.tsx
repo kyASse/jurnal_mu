@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -104,6 +105,13 @@ interface FilterOption {
     label: string;
 }
 
+interface StatusCounts {
+    all: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+}
+
 interface Props {
     journals: {
         data: Journal[];
@@ -137,6 +145,7 @@ interface Props {
     participationOptions: FilterOption[];
     approvalStatusOptions: FilterOption[];
     universityUsers?: UniversityUser[];
+    statusCounts: StatusCounts;
 }
 
 export default function JournalsIndex({
@@ -150,6 +159,7 @@ export default function JournalsIndex({
     participationOptions,
     approvalStatusOptions,
     universityUsers = [],
+    statusCounts,
 }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [search, setSearch] = useState(filters.search || '');
@@ -272,6 +282,25 @@ export default function JournalsIndex({
         });
     };
 
+    const handleTabChange = (value: string) => {
+        const status = value === 'all' ? '' : value;
+        setApprovalStatusFilter(status);
+        router.get(
+            route('admin-kampus.journals.index'),
+            {
+                search,
+                sinta_rank: sintaRankFilter,
+                scientific_field_id: scientificFieldFilter,
+                indexation: indexationFilter,
+                pembinaan_period: pembinaanPeriodFilter,
+                pembinaan_year: pembinaanYearFilter,
+                participation: participationFilter,
+                approval_status: status,
+            },
+            { preserveState: true },
+        );
+    };
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(
@@ -372,6 +401,36 @@ export default function JournalsIndex({
                         </div>
                     )}
 
+                    {/* Tabs for Approval Status */}
+                    <Tabs value={approvalStatusFilter || 'all'} onValueChange={handleTabChange} className="mb-6">
+                        <TabsList className="grid w-full grid-cols-4 md:inline-flex md:w-auto">
+                            <TabsTrigger value="all" className="gap-2">
+                                All Journals
+                                <Badge variant="secondary" className="ml-1 bg-muted-foreground/10 text-muted-foreground">
+                                    {statusCounts.all}
+                                </Badge>
+                            </TabsTrigger>
+                            <TabsTrigger value="pending" className="gap-2 text-yellow-600 dark:text-yellow-400">
+                                Pending
+                                <Badge variant="secondary" className="ml-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                    {statusCounts.pending}
+                                </Badge>
+                            </TabsTrigger>
+                            <TabsTrigger value="approved" className="gap-2 text-green-600 dark:text-green-400">
+                                Approved
+                                <Badge variant="secondary" className="ml-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                    {statusCounts.approved}
+                                </Badge>
+                            </TabsTrigger>
+                            <TabsTrigger value="rejected" className="gap-2 text-red-600 dark:text-red-400">
+                                Rejected
+                                <Badge variant="secondary" className="ml-1 bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                    {statusCounts.rejected}
+                                </Badge>
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+
                     {/* Filters */}
                     <div className="mb-6 rounded-xl border border-sidebar-border/70 bg-card p-4 shadow-sm dark:border-sidebar-border">
                         <form onSubmit={handleSearch} className="flex flex-col gap-4">
@@ -450,24 +509,6 @@ export default function JournalsIndex({
                                     <SelectContent>
                                         <SelectItem value="all">All Indexations</SelectItem>
                                         {indexationOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value.toString()}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Approval Status Filter */}
-                                <Select
-                                    value={approvalStatusFilter || 'all'}
-                                    onValueChange={(value) => setApprovalStatusFilter(value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-56">
-                                        <SelectValue placeholder="All Approval Status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Approval Status</SelectItem>
-                                        {approvalStatusOptions.map((option) => (
                                             <SelectItem key={option.value} value={option.value.toString()}>
                                                 {option.label}
                                             </SelectItem>
@@ -637,6 +678,28 @@ export default function JournalsIndex({
                                         })()}
 
                                         <div className="flex items-center gap-2">
+                                            {journal.approval_status === 'pending' && (
+                                                <>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleApprove(journal)}
+                                                        className="h-8 border-green-200 bg-green-50 px-2.5 text-green-700 hover:bg-green-100 dark:border-green-900/30 dark:bg-green-950/20"
+                                                        title="Approve Journal"
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleReject(journal)}
+                                                        className="h-8 border-red-200 bg-red-50 px-2.5 text-red-700 hover:bg-red-100 dark:border-red-900/30 dark:bg-red-950/20"
+                                                        title="Reject Journal"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </>
+                                            )}
                                             <Button
                                                 variant="outline"
                                                 size="sm"
@@ -657,25 +720,6 @@ export default function JournalsIndex({
                                                         <Pencil className="mr-2 h-4 w-4" />
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    {journal.approval_status === 'pending' && (
-                                                        <>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleApprove(journal)}
-                                                                className="text-green-600 dark:text-green-400"
-                                                            >
-                                                                <Check className="mr-2 h-4 w-4" />
-                                                                Approve
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleReject(journal)}
-                                                                className="text-red-600 dark:text-red-400"
-                                                            >
-                                                                <X className="mr-2 h-4 w-4" />
-                                                                Reject
-                                                            </DropdownMenuItem>
-                                                        </>
-                                                    )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem onClick={() => handleReassign(journal)}>
                                                         <RefreshCw className="mr-2 h-4 w-4" />
@@ -804,66 +848,72 @@ export default function JournalsIndex({
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="sm">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem
-                                                            onClick={() => router.visit(route('admin-kampus.journals.show', journal.id))}
-                                                        >
-                                                            <Eye className="mr-2 h-4 w-4" />
-                                                            View Details
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onClick={() => router.visit(route('admin-kampus.journals.edit', journal.id))}
-                                                        >
-                                                            <Pencil className="mr-2 h-4 w-4" />
-                                                            Edit
-                                                        </DropdownMenuItem>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {journal.approval_status === 'pending' && (
+                                                        <>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => handleApprove(journal)}
+                                                                className="h-8 border-green-200 bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 dark:border-green-900/30 dark:bg-green-950/20 dark:text-green-400 dark:hover:bg-green-900/30"
+                                                                title="Approve Journal"
+                                                            >
+                                                                <Check className="mr-1 h-4 w-4" />
+                                                                Approve
+                                                            </Button>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => handleReject(journal)}
+                                                                className="h-8 border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30"
+                                                                title="Reject Journal"
+                                                            >
+                                                                <X className="mr-1 h-4 w-4" />
+                                                                Reject
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="sm">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem
+                                                                onClick={() => router.visit(route('admin-kampus.journals.show', journal.id))}
+                                                            >
+                                                                <Eye className="mr-2 h-4 w-4" />
+                                                                View Details
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => router.visit(route('admin-kampus.journals.edit', journal.id))}
+                                                            >
+                                                                <Pencil className="mr-2 h-4 w-4" />
+                                                                Edit
+                                                            </DropdownMenuItem>
 
-                                                        {journal.approval_status === 'pending' && (
-                                                            <>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handleApprove(journal)}
-                                                                    className="text-green-600 dark:text-green-400"
-                                                                >
-                                                                    <Check className="mr-2 h-4 w-4" />
-                                                                    Approve
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handleReject(journal)}
-                                                                    className="text-red-600 dark:text-red-400"
-                                                                >
-                                                                    <X className="mr-2 h-4 w-4" />
-                                                                    Reject
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        )}
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem onClick={() => handleReassign(journal)}>
+                                                                <RefreshCw className="mr-2 h-4 w-4" />
+                                                                Reassign Manager
+                                                            </DropdownMenuItem>
 
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem onClick={() => handleReassign(journal)}>
-                                                            <RefreshCw className="mr-2 h-4 w-4" />
-                                                            Reassign Manager
-                                                        </DropdownMenuItem>
-
-                                                        {journal.approval_status !== 'approved' && (
-                                                            <>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handleDelete(journal)}
-                                                                    className="text-red-600 dark:text-red-400"
-                                                                >
-                                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                                    Delete
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                            {journal.approval_status !== 'approved' && (
+                                                                <>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => handleDelete(journal)}
+                                                                        className="text-red-600 dark:text-red-400"
+                                                                    >
+                                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                                        Delete
+                                                                    </DropdownMenuItem>
+                                                                </>
+                                                            )}
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))

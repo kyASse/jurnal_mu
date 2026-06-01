@@ -226,3 +226,22 @@ it('fails validation when accreditation or cluster have invalid values', functio
         'cluster',
     ]);
 });
+
+it('allows updating profile when university has legacy or pending accreditation status', function ($status) {
+    $this->university->update([
+        'accreditation_status' => $status,
+    ]);
+
+    $payload = [
+        'short_name' => 'NEW SHORT',
+        'accreditation_status' => $status,
+    ];
+
+    $response = $this->actingAs($this->adminKampus)
+        ->put(route('admin-kampus.university.update'), $payload);
+
+    $response->assertRedirect();
+    $this->university->refresh();
+    expect($this->university->short_name)->toBe('NEW SHORT');
+    expect($this->university->accreditation_status)->toBe($status);
+})->with(['A', 'B', 'C', '-', 'Unggul', 'Baik Sekali', 'Baik', 'Cukup']);

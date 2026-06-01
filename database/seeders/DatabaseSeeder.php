@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,              // 1. Roles (no dependencies)
             ScientificFieldSeeder::class,   // 2. Scientific Fields (no dependencies)
+            IndonesianRegionsSeeder::class, // Add this (no dependencies)
             UniversitySeeder::class,        // 3. Universities (no dependencies)
             UserSeeder::class,              // 4. Users (depends on: roles, universities)
             EvaluationIndicatorSeeder::class, // 5. Evaluation Indicators (v1.0 legacy data)
