@@ -72,9 +72,7 @@ export default function Edit({ university }: PageProps<{ university: University 
             return;
         }
 
-        const matchedProvince = provinces.find(
-            (p) => p.name.toLowerCase() === data.province.toLowerCase()
-        );
+        const matchedProvince = provinces.find((p) => p.name.toLowerCase() === data.province.toLowerCase());
 
         if (matchedProvince) {
             setIsLoadingCities(true);
@@ -371,7 +369,7 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         </div>
                                     </div>
 
-                                     <div>
+                                    <div>
                                         <Label htmlFor="accreditation_status">Status Akreditasi</Label>
                                         <select
                                             id="accreditation_status"
@@ -390,9 +388,9 @@ export default function Edit({ university }: PageProps<{ university: University 
                                             <option value="-">-</option>
                                         </select>
                                         <InputError message={errors.accreditation_status} className="mt-2" />
-                                     </div>
+                                    </div>
 
-                                     <div>
+                                    <div>
                                         <Label htmlFor="cluster">Klaster</Label>
                                         <select
                                             id="cluster"
@@ -407,7 +405,7 @@ export default function Edit({ university }: PageProps<{ university: University 
                                             <option value="Pratama">Pratama</option>
                                         </select>
                                         <InputError message={errors.cluster} className="mt-2" />
-                                     </div>
+                                    </div>
 
                                     <div className="md:col-span-2">
                                         <Label htmlFor="logo_file">Logo Universitas</Label>

@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Journal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Inertia\Inertia;
-use Inertia\Response;
 
 /**
  * Handle journal submission approval workflow for Admin Kampus.

@@ -220,7 +220,7 @@ class JournalController extends Controller
 
         $statusCountsData = Journal::query()
             ->forUniversity($authUser->university_id)
-            ->selectRaw("approval_status, count(*) as count")
+            ->selectRaw('approval_status, count(*) as count')
             ->groupBy('approval_status')
             ->pluck('count', 'approval_status')
             ->toArray();

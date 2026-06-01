@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Province;
 use App\Models\City;
+use App\Models\Province;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -19,7 +19,7 @@ afterEach(function () {
 test('province can be created and has correct fillable attributes', function () {
     Province::reguard();
 
-    $province = new Province();
+    $province = new Province;
     $province->id = 1;
     $province->fill([
         'name' => 'Jawa Barat',
@@ -40,7 +40,7 @@ test('city can be created and has correct fillable attributes', function () {
 
     City::reguard();
 
-    $city = new City();
+    $city = new City;
     $city->id = 10;
     $city->fill([
         'province_id' => $province->id,

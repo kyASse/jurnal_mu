@@ -403,7 +403,7 @@ export default function JournalsIndex({
 
                     {/* Tabs for Approval Status */}
                     <Tabs value={approvalStatusFilter || 'all'} onValueChange={handleTabChange} className="mb-6">
-                        <TabsList className="grid w-full grid-cols-4 md:w-auto md:inline-flex">
+                        <TabsList className="grid w-full grid-cols-4 md:inline-flex md:w-auto">
                             <TabsTrigger value="all" className="gap-2">
                                 All Journals
                                 <Badge variant="secondary" className="ml-1 bg-muted-foreground/10 text-muted-foreground">
@@ -892,13 +892,13 @@ export default function JournalsIndex({
                                                                 <Pencil className="mr-2 h-4 w-4" />
                                                                 Edit
                                                             </DropdownMenuItem>
-    
+
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem onClick={() => handleReassign(journal)}>
                                                                 <RefreshCw className="mr-2 h-4 w-4" />
                                                                 Reassign Manager
                                                             </DropdownMenuItem>
-    
+
                                                             {journal.approval_status !== 'approved' && (
                                                                 <>
                                                                     <DropdownMenuSeparator />

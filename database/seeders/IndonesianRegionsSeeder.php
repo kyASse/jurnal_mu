@@ -17,6 +17,7 @@ class IndonesianRegionsSeeder extends Seeder
             if ($this->command) {
                 $this->command->error("JSON file not found at: {$jsonPath}");
             }
+
             return;
         }
 
@@ -38,7 +39,7 @@ class IndonesianRegionsSeeder extends Seeder
                             ['id' => (int) $cityData['id']],
                             [
                                 'province_id' => $province->id,
-                                'name'        => $cityData['name'],
+                                'name' => $cityData['name'],
                             ]
                         );
                     }

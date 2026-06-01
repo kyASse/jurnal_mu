@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 class FetchIndonesianRegionsCommand extends Command
 {
     protected $signature = 'regions:fetch';
+
     protected $description = 'Fetch Indonesian provinces and cities from BPS API and save to JSON dataset';
 
     private const BASE_URL = 'https://api-regional-indonesia.vercel.app/api';
@@ -15,9 +16,10 @@ class FetchIndonesianRegionsCommand extends Command
     {
         $this->info('Fetching provinces...');
 
-        $provincesRaw = $this->fetchJson(self::BASE_URL . '/provinces?sort=name');
+        $provincesRaw = $this->fetchJson(self::BASE_URL.'/provinces?sort=name');
         if ($provincesRaw === null) {
             $this->error('Failed to fetch provinces. Aborting.');
+
             return self::FAILURE;
         }
 
@@ -29,24 +31,25 @@ class FetchIndonesianRegionsCommand extends Command
 
             $this->info("Fetching cities for {$provinceName}...");
 
-            $citiesRaw = $this->fetchJson(self::BASE_URL . "/cities/{$provinceId}?sort=name");
+            $citiesRaw = $this->fetchJson(self::BASE_URL."/cities/{$provinceId}?sort=name");
             if ($citiesRaw === null) {
                 $this->error("Failed to fetch cities for province {$provinceName} (ID: {$provinceId}). Aborting.");
+
                 return self::FAILURE;
             }
 
             $cities = array_map(function (array $city): array {
                 return [
-                    'id'   => $city['id'],
+                    'id' => $city['id'],
                     'name' => $this->stripCityPrefix($city['name']),
                 ];
             }, $citiesRaw);
 
-            $this->line("  → {$provinceName}: " . count($cities) . ' cities');
+            $this->line("  → {$provinceName}: ".count($cities).' cities');
 
             $regions[] = [
-                'id'     => $provinceId,
-                'name'   => $provinceName,
+                'id' => $provinceId,
+                'name' => $provinceName,
                 'cities' => $cities,
             ];
         }
@@ -55,7 +58,7 @@ class FetchIndonesianRegionsCommand extends Command
         file_put_contents($outputPath, json_encode($regions, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         $totalCities = array_sum(array_map(fn ($r) => count($r['cities']), $regions));
-        $this->info('Done! Saved ' . count($regions) . " provinces and {$totalCities} cities to {$outputPath}");
+        $this->info('Done! Saved '.count($regions)." provinces and {$totalCities} cities to {$outputPath}");
 
         return self::SUCCESS;
     }
@@ -71,7 +74,7 @@ class FetchIndonesianRegionsCommand extends Command
 
         $decoded = json_decode($raw, true);
 
-        if (!isset($decoded['data']) || !is_array($decoded['data'])) {
+        if (! isset($decoded['data']) || ! is_array($decoded['data'])) {
             return null;
         }
 

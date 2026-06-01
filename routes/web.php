@@ -28,6 +28,7 @@ use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Dikti\AssessmentController as DiktiAssessmentController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\PublicJournalController;
 use App\Http\Controllers\PublicUniversityController;
@@ -471,9 +472,9 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('tickets/{ticket}/status', [App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
 
         // API Location lookup
-        Route::get('locations/provinces', [App\Http\Controllers\LocationController::class, 'provinces'])
+        Route::get('locations/provinces', [LocationController::class, 'provinces'])
             ->name('locations.provinces');
-        Route::get('locations/provinces/{province}/cities', [App\Http\Controllers\LocationController::class, 'cities'])
+        Route::get('locations/provinces/{province}/cities', [LocationController::class, 'cities'])
             ->name('locations.cities');
     });
 

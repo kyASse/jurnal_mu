@@ -245,4 +245,3 @@ it('allows updating profile when university has legacy or pending accreditation 
     expect($this->university->short_name)->toBe('NEW SHORT');
     expect($this->university->accreditation_status)->toBe($status);
 })->with(['A', 'B', 'C', '-', 'Unggul', 'Baik Sekali', 'Baik', 'Cukup']);
-

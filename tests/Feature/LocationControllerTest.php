@@ -49,7 +49,7 @@ test('admin-kampus can list provinces ordered by name', function () {
         ->assertJson([
             ['name' => 'DKI Jakarta'],
             ['name' => 'Jawa Barat'],
-            ['name' => 'Jawa Timur']
+            ['name' => 'Jawa Timur'],
         ]);
 });
 
@@ -71,7 +71,7 @@ test('admin-kampus can list cities of a province ordered by name', function () {
         ->assertJsonCount(2)
         ->assertJson([
             ['name' => 'Bandung'],
-            ['name' => 'Bogor']
+            ['name' => 'Bogor'],
         ]);
 });
 

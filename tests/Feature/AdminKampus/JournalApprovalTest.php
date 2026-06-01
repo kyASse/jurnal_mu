@@ -14,10 +14,15 @@ class JournalApprovalTest extends TestCase
     use RefreshDatabase;
 
     protected User $adminKampus;
+
     protected User $otherAdminKampus;
+
     protected University $university;
+
     protected University $otherUniversity;
+
     protected Journal $pendingJournal;
+
     protected Journal $otherPendingJournal;
 
     protected function setUp(): void
