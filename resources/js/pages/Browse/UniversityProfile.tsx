@@ -53,6 +53,7 @@ export default function UniversityProfile({ university, stats, journals, article
     const [journalId, setJournalId] = useState(safeFilters.journal_id ? String(safeFilters.journal_id) : 'all');
     const [year, setYear] = useState(safeFilters.year ? String(safeFilters.year) : 'all');
     const [ReactApexChart, setReactApexChart] = useState<any>(null);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
     useEffect(() => {
         import('react-apexcharts').then((mod) => {
@@ -263,6 +264,37 @@ export default function UniversityProfile({ university, stats, journals, article
                         </CardContent>
                     </Card>
                 </div>
+
+                {university.profile_description && (
+                    <Card className="mb-8">
+                        <CardHeader>
+                            <CardTitle className="text-lg">Profil Universitas</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+                                {(() => {
+                                    const text = university.profile_description;
+                                    const limit = 300;
+                                    if (text.length <= limit) {
+                                        return text;
+                                    }
+                                    return (
+                                        <>
+                                            {isDescriptionExpanded ? text : `${text.slice(0, limit)}...`}
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                                className="ml-2 font-bold text-[#079C4E] hover:underline focus:outline-none"
+                                            >
+                                                {isDescriptionExpanded ? 'Lihat Lebih Sedikit' : 'Baca Selengkapnya'}
+                                            </button>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Development Trend Chart */}
                 <Card className="mb-8">
