@@ -7,8 +7,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    Province::unguard();
+    City::unguard();
+});
+
+afterEach(function () {
+    Province::reguard();
+    City::reguard();
+});
+
 test('guest or non-admin-kampus cannot access location endpoints', function () {
-    $province = Province::create(['name' => 'Jawa Barat']);
+    $province = Province::create(['id' => 1, 'name' => 'Jawa Barat']);
 
     // Guest returns unauthorized
     $this->getJson('/admin-kampus/locations/provinces')->assertStatus(401);
@@ -28,9 +38,9 @@ test('admin-kampus can list provinces ordered by name', function () {
     $admin = User::factory()->adminKampus()->create();
     $this->actingAs($admin);
 
-    Province::create(['name' => 'Jawa Timur']);
-    Province::create(['name' => 'DKI Jakarta']);
-    Province::create(['name' => 'Jawa Barat']);
+    Province::create(['id' => 1, 'name' => 'Jawa Timur']);
+    Province::create(['id' => 2, 'name' => 'DKI Jakarta']);
+    Province::create(['id' => 3, 'name' => 'Jawa Barat']);
 
     $response = $this->getJson('/admin-kampus/locations/provinces');
 
@@ -48,12 +58,12 @@ test('admin-kampus can list cities of a province ordered by name', function () {
     $admin = User::factory()->adminKampus()->create();
     $this->actingAs($admin);
 
-    $province1 = Province::create(['name' => 'Jawa Barat']);
-    $province2 = Province::create(['name' => 'Jawa Tengah']);
+    $province1 = Province::create(['id' => 1, 'name' => 'Jawa Barat']);
+    $province2 = Province::create(['id' => 2, 'name' => 'Jawa Tengah']);
 
-    City::create(['province_id' => $province1->id, 'name' => 'Bogor']);
-    City::create(['province_id' => $province1->id, 'name' => 'Bandung']);
-    City::create(['province_id' => $province2->id, 'name' => 'Semarang']);
+    City::create(['id' => 1, 'province_id' => $province1->id, 'name' => 'Bogor']);
+    City::create(['id' => 2, 'province_id' => $province1->id, 'name' => 'Bandung']);
+    City::create(['id' => 3, 'province_id' => $province2->id, 'name' => 'Semarang']);
 
     $response = $this->getJson("/admin-kampus/locations/provinces/{$province1->id}/cities");
 
