@@ -470,6 +470,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\AdminKampus\TicketController::class, 'reply'])->name('tickets.reply');
         Route::patch('tickets/{ticket}/status', [App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
 
+        // API Location lookup
+        Route::get('locations/provinces', [App\Http\Controllers\LocationController::class, 'provinces'])
+            ->name('locations.provinces');
+        Route::get('locations/provinces/{province}/cities', [App\Http\Controllers\LocationController::class, 'cities'])
+            ->name('locations.cities');
     });
 
     /*

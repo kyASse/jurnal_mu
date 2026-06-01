@@ -9,7 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PageProps, type University } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Building2, Clock, Image as ImageIcon, Save, UploadCloud, X } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -40,6 +40,65 @@ export default function Edit({ university }: PageProps<{ university: University 
         accreditation_status: university.accreditation_status || '',
         cluster: university.cluster || '',
     });
+
+    const [provinces, setProvinces] = useState<{ id: number; name: string }[]>([]);
+    const [cities, setCities] = useState<{ id: number; name: string }[]>([]);
+    const [isLoadingProvinces, setIsLoadingProvinces] = useState(false);
+    const [isLoadingCities, setIsLoadingCities] = useState(false);
+
+    useEffect(() => {
+        setIsLoadingProvinces(true);
+        fetch(route('admin-kampus.locations.provinces'))
+            .then((res) => res.json())
+            .then((data) => {
+                if (Array.isArray(data)) {
+                    setProvinces(data);
+                } else {
+                    toast.error('Gagal memuat data provinsi');
+                }
+            })
+            .catch((err) => {
+                console.error('Failed to fetch provinces', err);
+                toast.error('Gagal memuat data provinsi');
+            })
+            .finally(() => {
+                setIsLoadingProvinces(false);
+            });
+    }, []);
+
+    useEffect(() => {
+        if (!data.province || provinces.length === 0) {
+            setCities([]);
+            return;
+        }
+
+        const matchedProvince = provinces.find(
+            (p) => p.name.toLowerCase() === data.province.toLowerCase()
+        );
+
+        if (matchedProvince) {
+            setIsLoadingCities(true);
+            fetch(route('admin-kampus.locations.cities', matchedProvince.id))
+                .then((res) => res.json())
+                .then((data) => {
+                    if (Array.isArray(data)) {
+                        setCities(data);
+                    } else {
+                        toast.error('Gagal memuat data kota');
+                    }
+                })
+                .catch((err) => {
+                    console.error('Failed to fetch cities', err);
+                    setCities([]);
+                    toast.error('Gagal memuat data kota');
+                })
+                .finally(() => {
+                    setIsLoadingCities(false);
+                });
+        } else {
+            setCities([]);
+        }
+    }, [provinces, data.province]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -258,17 +317,46 @@ export default function Edit({ university }: PageProps<{ university: University 
                                     <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-3">
                                         <div>
                                             <Label htmlFor="city">Kota/Kabupaten</Label>
-                                            <Input id="city" value={data.city} onChange={(e) => setData('city', e.target.value)} className="mt-1" />
+                                            <select
+                                                id="city"
+                                                value={data.city}
+                                                onChange={(e) => setData('city', e.target.value)}
+                                                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                                disabled={isLoadingCities || !data.province}
+                                            >
+                                                <option value="">{isLoadingCities ? 'Memuat...' : 'Pilih Kota/Kabupaten'}</option>
+                                                {cities.map((city) => (
+                                                    <option key={city.id} value={city.name}>
+                                                        {city.name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                             <InputError message={errors.city} className="mt-2" />
                                         </div>
                                         <div>
                                             <Label htmlFor="province">Provinsi</Label>
-                                            <Input
+                                            <select
                                                 id="province"
                                                 value={data.province}
-                                                onChange={(e) => setData('province', e.target.value)}
-                                                className="mt-1"
-                                            />
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        province: val,
+                                                        city: '',
+                                                    }));
+                                                    setCities([]);
+                                                }}
+                                                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                                disabled={isLoadingProvinces}
+                                            >
+                                                <option value="">{isLoadingProvinces ? 'Memuat...' : 'Pilih Provinsi'}</option>
+                                                {provinces.map((prov) => (
+                                                    <option key={prov.id} value={prov.name}>
+                                                        {prov.name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                             <InputError message={errors.province} className="mt-2" />
                                         </div>
                                         <div>
