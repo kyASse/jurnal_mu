@@ -46,6 +46,28 @@ export default function Edit({ university }: PageProps<{ university: University 
     const [isLoadingProvinces, setIsLoadingProvinces] = useState(false);
     const [isLoadingCities, setIsLoadingCities] = useState(false);
 
+    const [phoneNumbers, setPhoneNumbers] = useState<string[]>(() => {
+        const val = university.phone || '';
+        return val ? val.split(', ') : [''];
+    });
+
+    const handlePhoneChange = (index: number, value: string) => {
+        const newPhones = [...phoneNumbers];
+        newPhones[index] = value;
+        setPhoneNumbers(newPhones);
+        setData('phone', newPhones.filter(Boolean).join(', '));
+    };
+
+    const addPhoneField = () => {
+        setPhoneNumbers([...phoneNumbers, '']);
+    };
+
+    const removePhoneField = (index: number) => {
+        const newPhones = phoneNumbers.filter((_, i) => i !== index);
+        setPhoneNumbers(newPhones.length > 0 ? newPhones : ['']);
+        setData('phone', newPhones.filter(Boolean).join(', '));
+    };
+
     useEffect(() => {
         setIsLoadingProvinces(true);
         fetch(route('admin-kampus.locations.provinces'))
@@ -275,15 +297,40 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         <InputError message={errors.email} className="mt-2" />
                                     </div>
 
-                                    <div>
-                                        <Label htmlFor="phone">Nomor Telepon</Label>
-                                        <Input
-                                            id="phone"
-                                            type="text"
-                                            className="mt-1"
-                                            value={data.phone}
-                                            onChange={(e) => setData('phone', e.target.value)}
-                                        />
+                                    <div className="space-y-2">
+                                        <Label>Nomor Telepon</Label>
+                                        <div className="space-y-2">
+                                            {phoneNumbers.map((phone, index) => (
+                                                <div key={index} className="flex items-center gap-2">
+                                                    <Input
+                                                        type="text"
+                                                        value={phone}
+                                                        onChange={(e) => handlePhoneChange(index, e.target.value)}
+                                                        placeholder="Nomor Telepon"
+                                                    />
+                                                    {phoneNumbers.length > 1 && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-10 w-10 shrink-0 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                                                            onClick={() => removePhoneField(index)}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            className="text-xs"
+                                            onClick={addPhoneField}
+                                        >
+                                            + Tambah Nomor Telepon
+                                        </Button>
                                         <InputError message={errors.phone} className="mt-2" />
                                     </div>
 
