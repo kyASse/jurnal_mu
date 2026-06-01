@@ -44,7 +44,7 @@ class UniversityController extends Controller
                     if ($wordCount > 250) {
                         $fail('Deskripsi tidak boleh lebih dari 250 kata.');
                     }
-                }
+                },
             ],
             'website' => 'nullable|string|max:255',
             'email' => 'nullable|string|max:255',

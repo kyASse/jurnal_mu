@@ -120,9 +120,7 @@ export default function Edit({ university }: PageProps<{ university: University 
         }
     }, [provinces, data.province]);
 
-    const wordCount = data.profile_description
-        ? data.profile_description.trim().split(/\s+/).filter(Boolean).length
-        : 0;
+    const wordCount = data.profile_description ? data.profile_description.trim().split(/\s+/).filter(Boolean).length : 0;
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -290,12 +288,10 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         onChange={(e) => setData('profile_description', e.target.value)}
                                     />
                                     <div className="mt-1 flex items-center justify-between text-xs">
-                                        <span className={wordCount > 250 ? 'text-red-500 font-medium' : 'text-muted-foreground'}>
+                                        <span className={wordCount > 250 ? 'font-medium text-red-500' : 'text-muted-foreground'}>
                                             {wordCount} / 250 kata
                                         </span>
-                                        {wordCount > 250 && (
-                                            <span className="text-red-500 font-medium">Melebihi batas maksimal 250 kata!</span>
-                                        )}
+                                        {wordCount > 250 && <span className="font-medium text-red-500">Melebihi batas maksimal 250 kata!</span>}
                                     </div>
                                     <InputError message={errors.profile_description} className="mt-2" />
                                 </div>
@@ -338,13 +334,7 @@ export default function Edit({ university }: PageProps<{ university: University 
                                                 </div>
                                             ))}
                                         </div>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            className="text-xs"
-                                            onClick={addPhoneField}
-                                        >
+                                        <Button type="button" variant="outline" size="sm" className="text-xs" onClick={addPhoneField}>
                                             + Tambah Nomor Telepon
                                         </Button>
                                         <InputError message={errors.phone} className="mt-2" />

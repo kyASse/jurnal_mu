@@ -160,7 +160,7 @@ class UniversityController extends Controller
                     if ($wordCount > 250) {
                         $fail('Deskripsi tidak boleh lebih dari 250 kata.');
                     }
-                }
+                },
             ],
             'is_active' => 'boolean',
         ]);
@@ -291,7 +291,7 @@ class UniversityController extends Controller
                     if ($wordCount > 250) {
                         $fail('Deskripsi tidak boleh lebih dari 250 kata.');
                     }
-                }
+                },
             ],
             'is_active' => 'boolean',
         ]);

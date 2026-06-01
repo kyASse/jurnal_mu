@@ -271,7 +271,7 @@ export default function UniversityProfile({ university, stats, journals, article
                             <CardTitle className="text-lg">Profil Universitas</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+                            <div className="text-sm leading-relaxed whitespace-pre-line text-muted-foreground">
                                 {(() => {
                                     const text = university.profile_description;
                                     const limit = 300;
