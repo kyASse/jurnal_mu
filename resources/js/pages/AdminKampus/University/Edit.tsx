@@ -120,8 +120,16 @@ export default function Edit({ university }: PageProps<{ university: University 
         }
     }, [provinces, data.province]);
 
+    const wordCount = data.profile_description
+        ? data.profile_description.trim().split(/\s+/).filter(Boolean).length
+        : 0;
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        if (wordCount > 250) {
+            toast.error('Gagal memperbarui profil: Deskripsi melebihi batas 250 kata!');
+            return;
+        }
         post(route('admin-kampus.university.update'));
     };
 
@@ -281,6 +289,14 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         value={data.profile_description}
                                         onChange={(e) => setData('profile_description', e.target.value)}
                                     />
+                                    <div className="mt-1 flex items-center justify-between text-xs">
+                                        <span className={wordCount > 250 ? 'text-red-500 font-medium' : 'text-muted-foreground'}>
+                                            {wordCount} / 250 kata
+                                        </span>
+                                        {wordCount > 250 && (
+                                            <span className="text-red-500 font-medium">Melebihi batas maksimal 250 kata!</span>
+                                        )}
+                                    </div>
                                     <InputError message={errors.profile_description} className="mt-2" />
                                 </div>
 
