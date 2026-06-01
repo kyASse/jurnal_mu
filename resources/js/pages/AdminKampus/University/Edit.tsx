@@ -314,24 +314,6 @@ export default function Edit({ university }: PageProps<{ university: University 
 
                                     <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-3">
                                         <div>
-                                            <Label htmlFor="city">Kota/Kabupaten</Label>
-                                            <select
-                                                id="city"
-                                                value={data.city}
-                                                onChange={(e) => setData('city', e.target.value)}
-                                                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                                disabled={isLoadingCities || !data.province}
-                                            >
-                                                <option value="">{isLoadingCities ? 'Memuat...' : 'Pilih Kota/Kabupaten'}</option>
-                                                {cities.map((city) => (
-                                                    <option key={city.id} value={city.name}>
-                                                        {city.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <InputError message={errors.city} className="mt-2" />
-                                        </div>
-                                        <div>
                                             <Label htmlFor="province">Provinsi</Label>
                                             <select
                                                 id="province"
@@ -356,6 +338,24 @@ export default function Edit({ university }: PageProps<{ university: University 
                                                 ))}
                                             </select>
                                             <InputError message={errors.province} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="city">Kota/Kabupaten</Label>
+                                            <select
+                                                id="city"
+                                                value={data.city}
+                                                onChange={(e) => setData('city', e.target.value)}
+                                                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                                disabled={isLoadingCities || !data.province}
+                                            >
+                                                <option value="">{isLoadingCities ? 'Memuat...' : 'Pilih Kota/Kabupaten'}</option>
+                                                {cities.map((city) => (
+                                                    <option key={city.id} value={city.name}>
+                                                        {city.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <InputError message={errors.city} className="mt-2" />
                                         </div>
                                         <div>
                                             <Label htmlFor="postal_code">Kode Pos</Label>
