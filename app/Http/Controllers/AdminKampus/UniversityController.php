@@ -36,10 +36,19 @@ class UniversityController extends Controller
             'code' => 'nullable|string|max:20',
             'ptm_code' => 'nullable|string|max:10',
             'short_name' => 'nullable|string|max:20',
-            'profile_description' => 'nullable|string|max:250',
+            'profile_description' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $wordCount = count(preg_split('/\s+/', trim($value ?? ''), -1, PREG_SPLIT_NO_EMPTY));
+                    if ($wordCount > 250) {
+                        $fail('Deskripsi tidak boleh lebih dari 250 kata.');
+                    }
+                }
+            ],
             'website' => 'nullable|string|max:255',
             'email' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:100',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
