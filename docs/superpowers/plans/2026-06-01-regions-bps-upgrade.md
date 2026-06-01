@@ -584,13 +584,13 @@ git commit -m "test: update LocationControllerTest to use BPS string IDs"
 
 ### Task 6: Final Verification
 
-- [ ] **Step 1: Run all tests**
+- [x] **Step 1: Run all tests**
 
 Run: `docker exec jurnal-mu-app php artisan test`
 
 Expected: All feature and unit tests pass (pre-existing failures in AccreditationTemplateTest etc. are unrelated to this feature — ignore them, only check new/modified tests).
 
-- [ ] **Step 2: Verify data integrity in DB**
+- [x] **Step 2: Verify data integrity in DB**
 
 Run: `docker exec jurnal-mu-app php artisan tinker --execute="echo 'Provinces: ' . Province::count() . PHP_EOL . 'Cities: ' . City::count();"`
 
@@ -600,7 +600,7 @@ Provinces: 38
 Cities: 514
 ```
 
-- [ ] **Step 3: Commit (if any remaining uncommitted changes)**
+- [x] **Step 3: Commit (if any remaining uncommitted changes)**
 
 ```bash
 git status
