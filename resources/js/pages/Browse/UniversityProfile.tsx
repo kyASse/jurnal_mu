@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import PublicLayout from '@/layouts/public-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Search, ShieldCheck } from 'lucide-react';
+import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Phone, Search, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
@@ -28,6 +28,8 @@ interface Props {
         website: string | null;
         email: string | null;
         phone: string | null;
+        ptm_code: string | null;
+        postal_code: string | null;
         logo_url: string | null;
         accreditation_status: string | null;
         cluster: string | null;
@@ -188,14 +190,27 @@ export default function UniversityProfile({ university, stats, journals, article
                             )}
                         </div>
                         <p className="mt-2 text-white/90">
-                            Kode PT: {university.code} {university.short_name && `• ${university.short_name}`}
+                            {university.code.replace(/_/g, ' ')} {university.ptm_code && `• Kode PT: ${university.ptm_code}`}{' '}
+                            {university.short_name && `• ${university.short_name}`}
                         </p>
                         <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm text-white/80 md:justify-start">
-                            {(university.address || university.city) && (
-                                <span className="flex items-center gap-1">
-                                    <MapPin className="h-4 w-4 text-[#FCEE1F]" /> {university.address || university.city}
-                                </span>
-                            )}
+                            {(() => {
+                                const addressParts = [];
+                                if (university.address) addressParts.push(university.address);
+                                if (university.city) addressParts.push(university.city);
+
+                                let provZip = '';
+                                if (university.province) provZip += university.province;
+                                if (university.postal_code) provZip += (provZip ? ' ' : '') + university.postal_code;
+                                if (provZip) addressParts.push(provZip);
+
+                                if (addressParts.length === 0) return null;
+                                return (
+                                    <span className="flex items-center gap-1">
+                                        <MapPin className="h-4 w-4 text-[#FCEE1F]" /> {addressParts.join(', ')}
+                                    </span>
+                                );
+                            })()}
                             {university.website && (
                                 <a
                                     href={university.website.startsWith('http') ? university.website : `https://${university.website}`}
@@ -209,6 +224,11 @@ export default function UniversityProfile({ university, stats, journals, article
                             {university.email && (
                                 <span className="flex items-center gap-1">
                                     <Mail className="h-4 w-4 text-[#FCEE1F]" /> {university.email}
+                                </span>
+                            )}
+                            {university.phone && (
+                                <span className="flex items-center gap-1">
+                                    <Phone className="h-4 w-4 text-[#FCEE1F]" /> {university.phone}
                                 </span>
                             )}
                         </div>
