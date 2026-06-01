@@ -146,13 +146,22 @@ class UniversityController extends Controller
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:10',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:100',
             'email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'logo_url' => 'nullable|url|max:500',
             'accreditation_status' => 'nullable|string|max:50',
             'cluster' => 'nullable|string|max:50',
-            'profile_description' => 'nullable|string|max:250',
+            'profile_description' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $wordCount = count(preg_split('/\s+/', trim($value ?? ''), -1, PREG_SPLIT_NO_EMPTY));
+                    if ($wordCount > 250) {
+                        $fail('Deskripsi tidak boleh lebih dari 250 kata.');
+                    }
+                },
+            ],
             'is_active' => 'boolean',
         ]);
 
@@ -267,14 +276,23 @@ class UniversityController extends Controller
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:10',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:100',
             'email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'logo_url' => 'nullable|url|max:500',
             'logo_file' => 'nullable|image|max:2048',
             'accreditation_status' => 'nullable|string|max:50',
             'cluster' => 'nullable|string|max:50',
-            'profile_description' => 'nullable|string|max:250',
+            'profile_description' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $wordCount = count(preg_split('/\s+/', trim($value ?? ''), -1, PREG_SPLIT_NO_EMPTY));
+                    if ($wordCount > 250) {
+                        $fail('Deskripsi tidak boleh lebih dari 250 kata.');
+                    }
+                },
+            ],
             'is_active' => 'boolean',
         ]);
 
