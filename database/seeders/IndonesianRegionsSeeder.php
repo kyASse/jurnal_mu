@@ -29,16 +29,16 @@ class IndonesianRegionsSeeder extends Seeder
             DB::transaction(function () use ($regions) {
                 foreach ($regions as $provinceData) {
                     $province = Province::updateOrCreate(
-                        ['id' => $provinceData['id']],
+                        ['id' => (int) $provinceData['id']],
                         ['name' => $provinceData['name']]
                     );
 
                     foreach ($provinceData['cities'] as $cityData) {
                         City::updateOrCreate(
-                            ['id' => $cityData['id']],
+                            ['id' => (int) $cityData['id']],
                             [
                                 'province_id' => $province->id,
-                                'name' => $cityData['name'],
+                                'name'        => $cityData['name'],
                             ]
                         );
                     }
@@ -50,4 +50,3 @@ class IndonesianRegionsSeeder extends Seeder
         }
     }
 }
-
