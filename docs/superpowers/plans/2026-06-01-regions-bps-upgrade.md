@@ -1,10 +1,10 @@
-# BPS Regions Data Upgrade Implementation Plan
+# Regions Data Upgrade Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the hand-crafted 97-city JSON dataset with the full official BPS dataset (38 provinces, 514 kab/kota) sourced from `https://api-regional-indonesia.vercel.app`, stored locally via an artisan fetch command.
+**Goal:** Replace the hand-crafted 97-city JSON dataset with complete region data (38 provinces, 514 kab/kota) sourced from `https://api-regional-indonesia.vercel.app`, stored locally via an artisan fetch command.
 
-**Architecture:** Add `artisan regions:fetch` command that downloads data from the external API, strips Kabupaten/Kota prefixes from city names, and saves to `database/data/indonesian_regions.json`. A new migration drops and recreates `provinces`/`cities` tables using BPS string IDs. Models get `$incrementing = false` + `$keyType = 'string'`. Seeder is unchanged structurally. Tests updated for string IDs.
+**Architecture:** Add `artisan regions:fetch` command that downloads data from the external API (IDs are sequential integers 1–38 for provinces), strips Kabupaten/Kota prefixes from city names, and saves to `database/data/indonesian_regions.json`. A new migration drops and recreates `provinces`/`cities` tables using `unsignedBigInteger` primary keys. Models get `$incrementing = false`. Seeder casts IDs to int. Tests updated for integer IDs.
 
 **Tech Stack:** Laravel, PHP, Pest (Testing), Docker (`jurnal-mu-app`)
 
@@ -15,7 +15,7 @@
 **Files:**
 - Create: `app/Console/Commands/FetchIndonesianRegionsCommand.php`
 
-- [ ] **Step 1: Write the command class**
+- [x] **Step 1: Write the command class**
 
 ```php
 <?php
@@ -113,7 +113,7 @@ class FetchIndonesianRegionsCommand extends Command
 }
 ```
 
-- [ ] **Step 2: Run the command to verify it works and generates valid JSON**
+- [x] **Step 2: Run the command to verify it works and generates valid JSON**
 
 Run: `docker exec jurnal-mu-app php artisan regions:fetch`
 
@@ -133,7 +133,7 @@ Run: `docker exec jurnal-mu-app php -r "echo count(json_decode(file_get_contents
 
 Expected: `38`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/Console/Commands/FetchIndonesianRegionsCommand.php database/data/indonesian_regions.json
@@ -142,12 +142,14 @@ git commit -m "feat: add regions:fetch artisan command and update JSON with full
 
 ---
 
-### Task 2: Create Migration to Drop & Recreate Tables with String BPS IDs
+### Task 2: Create Migration to Drop & Recreate Tables with Integer IDs
 
 **Files:**
-- Create: `database/migrations/2026_06_01_000000_recreate_provinces_and_cities_with_bps_codes.php`
+- Create: `database/migrations/2026_06_01_000000_recreate_provinces_and_cities_with_integer_ids.php`
 
-- [ ] **Step 1: Create the migration file**
+**Note:** The API returns sequential integer IDs (1–38 for provinces, sequential for cities), not BPS string codes. We use `unsignedBigInteger` primary keys with `$incrementing = false` on models.
+
+- [x] **Step 1: Create the migration file**
 
 ```php
 <?php
@@ -165,14 +167,14 @@ return new class extends Migration
         Schema::dropIfExists('provinces');
 
         Schema::create('provinces', function (Blueprint $table) {
-            $table->string('id', 10)->primary();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('name', 100);
             $table->timestamps();
         });
 
         Schema::create('cities', function (Blueprint $table) {
-            $table->string('id', 10)->primary();
-            $table->string('province_id', 10);
+            $table->unsignedBigInteger('id')->primary();
+            $table->unsignedBigInteger('province_id');
             $table->foreign('province_id')->references('id')->on('provinces')->cascadeOnDelete();
             $table->string('name', 100);
             $table->timestamps();
@@ -184,7 +186,7 @@ return new class extends Migration
         Schema::dropIfExists('cities');
         Schema::dropIfExists('provinces');
 
-        // Restore integer ID schema (matching original migration)
+        // Restore original auto-increment schema
         Schema::create('provinces', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
@@ -201,28 +203,29 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 2: Run migration**
+- [x] **Step 2: Run migration**
 
 Run: `docker exec jurnal-mu-app php artisan migrate`
 
-Expected: `Running migrations... 2026_06_01_000000_recreate_provinces_and_cities_with_bps_codes ........ 4ms DONE`
+Expected: `Running migrations... 2026_06_01_000000_recreate_provinces_and_cities_with_integer_ids ........ 4ms DONE`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
-git add database/migrations/2026_06_01_000000_recreate_provinces_and_cities_with_bps_codes.php
-git commit -m "migration: drop and recreate provinces and cities tables with BPS string IDs"
+git add database/migrations/2026_06_01_000000_recreate_provinces_and_cities_with_integer_ids.php
+git commit -m "migration: drop and recreate provinces and cities tables with integer IDs"
 ```
 
 ---
 
-### Task 3: Update Eloquent Models for String IDs
+### Task 3: Update Eloquent Models and Seeder for Integer IDs
 
 **Files:**
 - Modify: `app/Models/Province.php`
 - Modify: `app/Models/City.php`
+- Modify: `database/seeders/IndonesianRegionsSeeder.php`
 
-- [ ] **Step 1: Update `Province` model**
+- [x] **Step 1: Update `Province` model**
 
 Replace the full file content with:
 ```php
@@ -239,7 +242,6 @@ class Province extends Model
     use HasFactory;
 
     public $incrementing = false;
-    protected $keyType = 'string';
     protected $fillable = ['name'];
 
     public function cities(): HasMany
@@ -249,7 +251,7 @@ class Province extends Model
 }
 ```
 
-- [ ] **Step 2: Update `City` model**
+- [x] **Step 2: Update `City` model**
 
 Replace the full file content with:
 ```php
@@ -266,7 +268,6 @@ class City extends Model
     use HasFactory;
 
     public $incrementing = false;
-    protected $keyType = 'string';
     protected $fillable = ['province_id', 'name'];
 
     public function province(): BelongsTo
@@ -276,7 +277,67 @@ class City extends Model
 }
 ```
 
-- [ ] **Step 3: Run seeder to verify models work with new schema**
+- [x] **Step 3: Update seeder to cast IDs to integer**
+
+The JSON from the API has string IDs (`"1"`, `"2"`). Cast to `int` before passing to `updateOrCreate` so they match the `unsignedBigInteger` column.
+
+Replace the full file content of `database/seeders/IndonesianRegionsSeeder.php` with:
+```php
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\City;
+use App\Models\Province;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class IndonesianRegionsSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $jsonPath = database_path('data/indonesian_regions.json');
+
+        if (! file_exists($jsonPath)) {
+            if ($this->command) {
+                $this->command->error("JSON file not found at: {$jsonPath}");
+            }
+            return;
+        }
+
+        $regions = json_decode(file_get_contents($jsonPath), true);
+
+        Province::unguard();
+        City::unguard();
+
+        try {
+            DB::transaction(function () use ($regions) {
+                foreach ($regions as $provinceData) {
+                    $province = Province::updateOrCreate(
+                        ['id' => (int) $provinceData['id']],
+                        ['name' => $provinceData['name']]
+                    );
+
+                    foreach ($provinceData['cities'] as $cityData) {
+                        City::updateOrCreate(
+                            ['id' => (int) $cityData['id']],
+                            [
+                                'province_id' => $province->id,
+                                'name'        => $cityData['name'],
+                            ]
+                        );
+                    }
+                }
+            });
+        } finally {
+            Province::reguard();
+            City::reguard();
+        }
+    }
+}
+```
+
+- [x] **Step 3: Run seeder to verify models work with new schema**
 
 Run: `docker exec jurnal-mu-app php artisan db:seed --class=IndonesianRegionsSeeder`
 
@@ -285,7 +346,7 @@ Run: `docker exec jurnal-mu-app php artisan tinker --execute="echo Province::cou
 
 Expected: `38 provinces, 514 cities`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/Models/Province.php app/Models/City.php
@@ -301,7 +362,7 @@ git commit -m "model: add incrementing=false and keyType=string for BPS string I
 
 The current tests use `Province::create(['name' => ...])` without explicit IDs (relying on auto-increment). With `$incrementing = false`, creating a Province without an `id` will fail. Tests must provide explicit BPS-style string IDs via `unguard()`.
 
-- [ ] **Step 1: Rewrite the test file**
+- [x] **Step 1: Rewrite the test file**
 
 ```php
 <?php
@@ -324,47 +385,47 @@ afterEach(function () {
 
 test('province can be created and has correct fillable attributes', function () {
     $province = Province::create([
-        'id'          => '13',
+        'id'          => 1,
         'name'        => 'Jawa Barat',
         'extra_field' => 'should be ignored',
     ]);
 
     expect($province)->toBeInstanceOf(Province::class)
-        ->and($province->id)->toBe('13')
+        ->and($province->id)->toBe(1)
         ->and($province->name)->toBe('Jawa Barat')
         ->and($province->extra_field)->toBeNull();
 });
 
 test('city can be created and has correct fillable attributes', function () {
-    $province = Province::create(['id' => '13', 'name' => 'Jawa Barat']);
+    $province = Province::create(['id' => 1, 'name' => 'Jawa Barat']);
 
     $city = City::create([
-        'id'          => '1301',
-        'province_id' => '13',
+        'id'          => 101,
+        'province_id' => 1,
         'name'        => 'Bandung',
         'extra_field' => 'should be ignored',
     ]);
 
     expect($city)->toBeInstanceOf(City::class)
-        ->and($city->province_id)->toBe('13')
+        ->and($city->province_id)->toBe(1)
         ->and($city->name)->toBe('Bandung')
         ->and($city->extra_field)->toBeNull();
 });
 
 test('province has many cities relationship', function () {
-    $province = Province::create(['id' => '13', 'name' => 'Jawa Barat']);
-    $province->cities()->create(['id' => '1371', 'name' => 'Bandung']);
-    $province->cities()->create(['id' => '1375', 'name' => 'Bekasi']);
+    $province = Province::create(['id' => 1, 'name' => 'Jawa Barat']);
+    $province->cities()->create(['id' => 101, 'name' => 'Bandung']);
+    $province->cities()->create(['id' => 102, 'name' => 'Bekasi']);
 
     expect($province->cities)->toHaveCount(2)
         ->and($province->cities->pluck('name')->toArray())->toEqualCanonicalizing(['Bandung', 'Bekasi']);
 });
 
 test('city belongs to province relationship', function () {
-    $province = Province::create(['id' => '13', 'name' => 'Jawa Barat']);
+    $province = Province::create(['id' => 1, 'name' => 'Jawa Barat']);
     $city = City::create([
-        'id'          => '1371',
-        'province_id' => '13',
+        'id'          => 101,
+        'province_id' => 1,
         'name'        => 'Bandung',
     ]);
 
@@ -373,7 +434,7 @@ test('city belongs to province relationship', function () {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they pass**
+- [x] **Step 2: Run tests to verify they pass**
 
 Run: `docker exec jurnal-mu-app php artisan test tests/Unit/Models/ProvinceCityTest.php`
 
@@ -386,7 +447,7 @@ PASS  Tests\Unit\Models\ProvinceCityTest
 ✓ city belongs to province relationship
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add tests/Unit/Models/ProvinceCityTest.php
@@ -402,7 +463,7 @@ git commit -m "test: update ProvinceCityTest to use BPS string IDs"
 
 The feature tests create `Province` records without explicit IDs. With `$incrementing = false`, all creates need explicit `id`. Also update `unguard`/`reguard` wrapping.
 
-- [ ] **Step 1: Rewrite the test file**
+- [x] **Step 1: Rewrite the test file**
 
 ```php
 <?php
@@ -425,7 +486,7 @@ afterEach(function () {
 });
 
 test('guest or non-admin-kampus cannot access location endpoints', function () {
-    $province = Province::create(['id' => '13', 'name' => 'Jawa Barat']);
+    $province = Province::create(['id' => 1, 'name' => 'Jawa Barat']);
 
     // Guest returns unauthorized
     $this->getJson('/admin-kampus/locations/provinces')->assertStatus(401);
@@ -445,9 +506,9 @@ test('admin-kampus can list provinces ordered by name', function () {
     $admin = User::factory()->adminKampus()->create();
     $this->actingAs($admin);
 
-    Province::create(['id' => '16', 'name' => 'Jawa Timur']);
-    Province::create(['id' => '11', 'name' => 'DKI Jakarta']);
-    Province::create(['id' => '13', 'name' => 'Jawa Barat']);
+    Province::create(['id' => 6, 'name' => 'Jawa Timur']);
+    Province::create(['id' => 15, 'name' => 'DKI Jakarta']);
+    Province::create(['id' => 1, 'name' => 'Jawa Barat']);
 
     $response = $this->getJson('/admin-kampus/locations/provinces');
 
@@ -465,12 +526,12 @@ test('admin-kampus can list cities of a province ordered by name', function () {
     $admin = User::factory()->adminKampus()->create();
     $this->actingAs($admin);
 
-    $province1 = Province::create(['id' => '13', 'name' => 'Jawa Barat']);
-    $province2 = Province::create(['id' => '33', 'name' => 'Jawa Tengah']);
+    $province1 = Province::create(['id' => 1, 'name' => 'Jawa Barat']);
+    $province2 = Province::create(['id' => 4, 'name' => 'Jawa Tengah']);
 
-    City::create(['id' => '1375', 'province_id' => '13', 'name' => 'Bekasi']);
-    City::create(['id' => '1371', 'province_id' => '13', 'name' => 'Bandung']);
-    City::create(['id' => '3374', 'province_id' => '33', 'name' => 'Semarang']);
+    City::create(['id' => 10, 'province_id' => 1, 'name' => 'Bekasi']);
+    City::create(['id' => 11, 'province_id' => 1, 'name' => 'Bandung']);
+    City::create(['id' => 20, 'province_id' => 4, 'name' => 'Semarang']);
 
     $response = $this->getJson("/admin-kampus/locations/provinces/{$province1->id}/cities");
 
@@ -487,17 +548,13 @@ test('returns 404 when province does not exist', function () {
     $admin = User::factory()->adminKampus()->create();
     $this->actingAs($admin);
 
-    // BPS-style ID that doesn't exist
+    // Integer ID that doesn't exist
     $this->getJson('/admin-kampus/locations/provinces/99999/cities')
-        ->assertStatus(404);
-
-    // Non-existent string ID
-    $this->getJson('/admin-kampus/locations/provinces/invalid-string/cities')
         ->assertStatus(404);
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they pass**
+- [x] **Step 2: Run tests to verify they pass**
 
 Run: `docker exec jurnal-mu-app php artisan test tests/Feature/LocationControllerTest.php`
 
@@ -510,13 +567,13 @@ PASS  Tests\Feature\LocationControllerTest
 ✓ returns 404 when province does not exist
 ```
 
-- [ ] **Step 3: Run full AdminKampus test suite to verify no regressions**
+- [x] **Step 3: Run full AdminKampus test suite to verify no regressions**
 
 Run: `docker exec jurnal-mu-app php artisan test tests/Feature/AdminKampus`
 
 Expected: All tests pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add tests/Feature/LocationControllerTest.php
