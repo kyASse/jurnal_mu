@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Journal;
+use App\Models\JournalAssessment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -28,23 +30,25 @@ class DashboardController extends Controller
         // Get stats based on user role
         if ($user->role->name === 'Super Admin') {
             // Super Admin sees all data
-            $stats['total_journals'] = DB::table('journals')->count();
-            $stats['total_assessments'] = DB::table('journal_assessments')->count();
+            $stats['total_journals'] = Journal::count();
+            $stats['total_assessments'] = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+                ->whereNull('journals.deleted_at')
+                ->count();
 
-            $avgScore = DB::table('journal_assessments')
-                ->whereNotNull('total_score')
-                ->avg('total_score');
+            $avgScore = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+                ->whereNotNull('journal_assessments.total_score')
+                ->whereNull('journals.deleted_at')
+                ->avg('journal_assessments.total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
 
             // Add pending LPPM Admin registrations count
-            $stats['pending_lppm_count'] = DB::table('users')
-                ->whereNull('role_id')
+            $stats['pending_lppm_count'] = User::whereNull('role_id')
                 ->where('approval_status', 'pending')
                 ->count();
 
             // Add university distribution (journal count by university)
-            $stats['universities_distribution'] = DB::table('journals')
-                ->join('universities', 'journals.university_id', '=', 'universities.id')
+            $stats['universities_distribution'] = Journal::join('universities', 'journals.university_id', '=', 'universities.id')
+                ->whereNull('universities.deleted_at')
                 ->select('universities.id', 'universities.name', DB::raw('COUNT(*) as count'))
                 ->groupBy('universities.id', 'universities.name')
                 ->orderByDesc('count')
@@ -53,62 +57,55 @@ class DashboardController extends Controller
 
         } elseif ($user->role->name === 'Admin Kampus') {
             // Admin Kampus sees only their university data
-            $stats['total_journals'] = DB::table('journals')
-                ->where('university_id', $user->university_id)
+            $stats['total_journals'] = Journal::where('university_id', $user->university_id)
                 ->count();
 
-            $stats['total_assessments'] = DB::table('journal_assessments')
-                ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+            $stats['total_assessments'] = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.university_id', $user->university_id)
+                ->whereNull('journals.deleted_at')
                 ->count();
 
-            $avgScore = DB::table('journal_assessments')
-                ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+            $avgScore = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.university_id', $user->university_id)
                 ->whereNotNull('journal_assessments.total_score')
+                ->whereNull('journals.deleted_at')
                 ->avg('journal_assessments.total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
 
-            $stats['pending_users_count'] = DB::table('users')
-                ->where('university_id', $user->university_id)
+            $stats['pending_users_count'] = User::where('university_id', $user->university_id)
                 ->where('approval_status', 'pending')
                 ->count();
 
-            $stats['pending_journals_count'] = DB::table('journals')
-                ->where('university_id', $user->university_id)
+            $stats['pending_journals_count'] = Journal::where('university_id', $user->university_id)
                 ->where('approval_status', 'pending')
                 ->count();
 
         } else {
             // Regular user (Pengelola Jurnal) sees only their own journals
-            $stats['total_journals'] = DB::table('journals')
-                ->where('user_id', $user->id)
+            $stats['total_journals'] = Journal::where('user_id', $user->id)
                 ->count();
 
-            $stats['total_assessments'] = DB::table('journal_assessments')
-                ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+            $stats['total_assessments'] = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.user_id', $user->id)
+                ->whereNull('journals.deleted_at')
                 ->count();
 
-            $avgScore = DB::table('journal_assessments')
-                ->join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+            $avgScore = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
                 ->where('journals.user_id', $user->id)
                 ->whereNotNull('journal_assessments.total_score')
+                ->whereNull('journals.deleted_at')
                 ->avg('journal_assessments.total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
 
             // Add journal breakdown by approval status for User
             $stats['journals_by_status'] = [
-                'pending' => DB::table('journals')
-                    ->where('user_id', $user->id)
+                'pending' => Journal::where('user_id', $user->id)
                     ->where('approval_status', 'pending')
                     ->count(),
-                'approved' => DB::table('journals')
-                    ->where('user_id', $user->id)
+                'approved' => Journal::where('user_id', $user->id)
                     ->where('approval_status', 'approved')
                     ->count(),
-                'rejected' => DB::table('journals')
-                    ->where('user_id', $user->id)
+                'rejected' => Journal::where('user_id', $user->id)
                     ->where('approval_status', 'rejected')
                     ->count(),
             ];
