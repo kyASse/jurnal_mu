@@ -19,11 +19,11 @@ class JournalAssessmentFactory extends Factory
      */
     public function definition(): array
     {
-        $journal = Journal::factory()->create();
-
         return [
-            'journal_id' => $journal->id,
-            'user_id' => $journal->user_id, // Same user who owns the journal
+            'journal_id' => Journal::factory(),
+            'user_id' => function (array $attributes) {
+                return Journal::find($attributes['journal_id'])?->user_id ?? User::factory();
+            },
             'assessment_date' => fake()->date(),
             'period' => fake()->year().'-Q'.fake()->numberBetween(1, 4),
             'status' => fake()->randomElement(['draft', 'submitted', 'reviewed']),

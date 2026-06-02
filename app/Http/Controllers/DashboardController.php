@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Journal;
-use App\Models\User;
 use App\Models\JournalAssessment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -31,10 +31,14 @@ class DashboardController extends Controller
         if ($user->role->name === 'Super Admin') {
             // Super Admin sees all data
             $stats['total_journals'] = Journal::count();
-            $stats['total_assessments'] = JournalAssessment::count();
+            $stats['total_assessments'] = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+                ->whereNull('journals.deleted_at')
+                ->count();
 
-            $avgScore = JournalAssessment::whereNotNull('total_score')
-                ->avg('total_score');
+            $avgScore = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
+                ->whereNotNull('journal_assessments.total_score')
+                ->whereNull('journals.deleted_at')
+                ->avg('journal_assessments.total_score');
             $stats['average_score'] = $avgScore ? round($avgScore, 2) : 0.0;
 
             // Add pending LPPM Admin registrations count
