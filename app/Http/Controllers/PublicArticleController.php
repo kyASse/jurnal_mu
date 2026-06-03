@@ -69,7 +69,11 @@ class PublicArticleController extends Controller
             $baseQuery->whereIn('journal_id', $selectedJournals);
         }
         if (! empty($selectedYears)) {
-            $baseQuery->whereIn(DB::raw('YEAR(publication_date)'), $selectedYears);
+            $baseQuery->where(function ($query) use ($selectedYears) {
+                foreach ($selectedYears as $year) {
+                    $query->orWhereBetween('publication_date', ["{$year}-01-01", "{$year}-12-31"]);
+                }
+            });
         }
 
         // Subquery of matching IDs for facets
