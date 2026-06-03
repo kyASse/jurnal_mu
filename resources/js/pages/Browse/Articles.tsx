@@ -101,7 +101,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                 journals,
                 years,
             },
-            { preserveState: true }
+            { preserveState: true, preserveScroll: true }
         );
     };
 
