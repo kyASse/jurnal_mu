@@ -18,9 +18,9 @@ class PublicArticleController extends Controller
         $field = $request->input('field', 'all');
 
         // Sidebar filters (arrays of selected values)
-        $selectedSubjects = $request->input('subjects', []);
-        $selectedJournals = $request->input('journals', []);
-        $selectedYears = $request->input('years', []);
+        $selectedSubjects = array_filter(array_map('intval', (array) $request->input('subjects', [])));
+        $selectedJournals = array_filter(array_map('intval', (array) $request->input('journals', [])));
+        $selectedYears = array_filter(array_map('intval', (array) $request->input('years', [])));
 
         // Base query matching text search
         if ($search) {
