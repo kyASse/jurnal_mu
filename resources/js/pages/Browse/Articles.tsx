@@ -272,8 +272,8 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                         {/* Content Grid */}
                         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
                             {/* Left Sidebar */}
-                            <div className="space-y-6 lg:col-span-1">
-                                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111111]">
+                            <div className="lg:col-span-1">
+                                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111111] lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto scrollbar-thin">
                                     <div className="mb-4 flex items-center justify-between border-b pb-3 dark:border-white/10">
                                         <h2 className="flex items-center text-lg font-bold">
                                             <Filter className="mr-2 h-4 w-4 text-[#079C4E]" />
