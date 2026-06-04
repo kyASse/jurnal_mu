@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -147,4 +148,39 @@ class Article extends Model
 
         return implode(', ', $parts);
     }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        $array = [
+            'id' => (int) $this->id,
+            'title' => $this->title,
+            'abstract' => $this->abstract,
+            'authors' => is_array($this->authors) ? implode(', ', $this->authors) : $this->authors,
+            'keywords' => is_array($this->keywords) ? implode(', ', $this->keywords) : $this->keywords,
+        ];
+
+        if (config('scout.driver') !== 'database') {
+            $array['journal_title'] = $this->journal?->title;
+            $array['scientific_field_name'] = $this->journal?->scientificField?->name;
+        }
+
+        return $array;
+    }
+
+    /**
+     * Modify the query used to retrieve models when making all of the models searchable.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function makeAllSearchableUsing($query)
+    {
+        return $query->with(['journal.scientificField']);
+    }
 }
+
