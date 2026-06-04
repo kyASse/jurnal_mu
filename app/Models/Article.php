@@ -98,6 +98,19 @@ class Article extends Model
     | Accessors & Helpers
     |--------------------------------------------------------------------------
     */
+    /**
+     * Get the article title.
+     *
+     * If the title is all uppercase, format it to Title Case.
+     */
+    public function getTitleAttribute($value): ?string
+    {
+        if ($value && $value === mb_strtoupper($value)) {
+            return \Illuminate\Support\Str::title(mb_strtolower($value));
+        }
+
+        return $value;
+    }
 
     /**
      * Get formatted authors list

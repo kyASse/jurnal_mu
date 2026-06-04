@@ -77,5 +77,19 @@ class ArticleSearchableTest extends TestCase
         $this->assertEquals($journal->title, $searchableArray['journal_title']);
         $this->assertEquals($field->name, $searchableArray['scientific_field_name']);
     }
+
+    public function test_title_accessor_formats_uppercase_title_to_title_case()
+    {
+        $article1 = Article::factory()->make([
+            'title' => 'DEEP LEARNING MODELS FOR TRAFFIC SIGN RECOGNITION',
+        ]);
+        
+        $article2 = Article::factory()->make([
+            'title' => 'Deep Learning Models for Traffic Sign Recognition',
+        ]);
+
+        $this->assertEquals('Deep Learning Models For Traffic Sign Recognition', $article1->title);
+        $this->assertEquals('Deep Learning Models for Traffic Sign Recognition', $article2->title);
+    }
 }
 
