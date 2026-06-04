@@ -194,8 +194,8 @@ it('fails validation when fields exceed database limits', function () {
         'name' => str_repeat('A', 151), // limit 150
         'short_name' => str_repeat('B', 21), // limit 20
         'ptm_code' => str_repeat('C', 11), // limit 10
-        'profile_description' => str_repeat('D', 251), // limit 250
-        'phone' => str_repeat('1', 21), // limit 20
+        'profile_description' => implode(' ', array_fill(0, 251, 'word')), // limit 250 words
+        'phone' => str_repeat('1', 101), // limit 100
     ];
 
     $response = $this->actingAs($this->adminKampus)

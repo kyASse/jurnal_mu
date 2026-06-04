@@ -53,8 +53,15 @@ it('loads public universities listing successfully with filters', function () {
 it('loads specific active university profile details successfully', function () {
     $university = University::factory()->create([
         'name' => 'Test University',
+        'code' => 'TEST_UNI',
+        'ptm_code' => '123456',
         'is_active' => true,
         'accreditation_status' => 'Unggul',
+        'address' => 'Jl. Ahmad Dahlan',
+        'city' => 'Yogyakarta',
+        'province' => 'DIY',
+        'postal_code' => '55281',
+        'phone' => '08123456789, 027412345',
     ]);
 
     $journal = Journal::factory()->create([
@@ -78,6 +85,10 @@ it('loads specific active university profile details successfully', function () 
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Browse/UniversityProfile')
         ->where('university.name', 'Test University')
+        ->where('university.ptm_code', '123456')
+        ->where('university.postal_code', '55281')
+        ->where('university.province', 'DIY')
+        ->where('university.phone', '08123456789, 027412345')
         ->where('stats.total_journals', 1)
         ->where('stats.total_articles', 1)
         ->has('articles.data', 1)

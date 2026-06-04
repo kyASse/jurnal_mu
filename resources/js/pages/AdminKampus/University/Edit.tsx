@@ -46,6 +46,28 @@ export default function Edit({ university }: PageProps<{ university: University 
     const [isLoadingProvinces, setIsLoadingProvinces] = useState(false);
     const [isLoadingCities, setIsLoadingCities] = useState(false);
 
+    const [phoneNumbers, setPhoneNumbers] = useState<string[]>(() => {
+        const val = university.phone || '';
+        return val ? val.split(', ') : [''];
+    });
+
+    const handlePhoneChange = (index: number, value: string) => {
+        const newPhones = [...phoneNumbers];
+        newPhones[index] = value;
+        setPhoneNumbers(newPhones);
+        setData('phone', newPhones.filter(Boolean).join(', '));
+    };
+
+    const addPhoneField = () => {
+        setPhoneNumbers([...phoneNumbers, '']);
+    };
+
+    const removePhoneField = (index: number) => {
+        const newPhones = phoneNumbers.filter((_, i) => i !== index);
+        setPhoneNumbers(newPhones.length > 0 ? newPhones : ['']);
+        setData('phone', newPhones.filter(Boolean).join(', '));
+    };
+
     useEffect(() => {
         setIsLoadingProvinces(true);
         fetch(route('admin-kampus.locations.provinces'))
@@ -98,8 +120,14 @@ export default function Edit({ university }: PageProps<{ university: University 
         }
     }, [provinces, data.province]);
 
+    const wordCount = data.profile_description ? data.profile_description.trim().split(/\s+/).filter(Boolean).length : 0;
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        if (wordCount > 250) {
+            toast.error('Gagal memperbarui profil: Deskripsi melebihi batas 250 kata!');
+            return;
+        }
         post(route('admin-kampus.university.update'));
     };
 
@@ -259,6 +287,12 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         value={data.profile_description}
                                         onChange={(e) => setData('profile_description', e.target.value)}
                                     />
+                                    <div className="mt-1 flex items-center justify-between text-xs">
+                                        <span className={wordCount > 250 ? 'font-medium text-red-500' : 'text-muted-foreground'}>
+                                            {wordCount} / 250 kata
+                                        </span>
+                                        {wordCount > 250 && <span className="font-medium text-red-500">Melebihi batas maksimal 250 kata!</span>}
+                                    </div>
                                     <InputError message={errors.profile_description} className="mt-2" />
                                 </div>
 
@@ -275,15 +309,34 @@ export default function Edit({ university }: PageProps<{ university: University 
                                         <InputError message={errors.email} className="mt-2" />
                                     </div>
 
-                                    <div>
-                                        <Label htmlFor="phone">Nomor Telepon</Label>
-                                        <Input
-                                            id="phone"
-                                            type="text"
-                                            className="mt-1"
-                                            value={data.phone}
-                                            onChange={(e) => setData('phone', e.target.value)}
-                                        />
+                                    <div className="space-y-2">
+                                        <Label>Nomor Telepon</Label>
+                                        <div className="space-y-2">
+                                            {phoneNumbers.map((phone, index) => (
+                                                <div key={index} className="flex items-center gap-2">
+                                                    <Input
+                                                        type="text"
+                                                        value={phone}
+                                                        onChange={(e) => handlePhoneChange(index, e.target.value)}
+                                                        placeholder="Nomor Telepon"
+                                                    />
+                                                    {phoneNumbers.length > 1 && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-10 w-10 shrink-0 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                                                            onClick={() => removePhoneField(index)}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <Button type="button" variant="outline" size="sm" className="text-xs" onClick={addPhoneField}>
+                                            + Tambah Nomor Telepon
+                                        </Button>
                                         <InputError message={errors.phone} className="mt-2" />
                                     </div>
 
@@ -314,24 +367,6 @@ export default function Edit({ university }: PageProps<{ university: University 
 
                                     <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-3">
                                         <div>
-                                            <Label htmlFor="city">Kota/Kabupaten</Label>
-                                            <select
-                                                id="city"
-                                                value={data.city}
-                                                onChange={(e) => setData('city', e.target.value)}
-                                                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                                disabled={isLoadingCities || !data.province}
-                                            >
-                                                <option value="">{isLoadingCities ? 'Memuat...' : 'Pilih Kota/Kabupaten'}</option>
-                                                {cities.map((city) => (
-                                                    <option key={city.id} value={city.name}>
-                                                        {city.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <InputError message={errors.city} className="mt-2" />
-                                        </div>
-                                        <div>
                                             <Label htmlFor="province">Provinsi</Label>
                                             <select
                                                 id="province"
@@ -356,6 +391,24 @@ export default function Edit({ university }: PageProps<{ university: University 
                                                 ))}
                                             </select>
                                             <InputError message={errors.province} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="city">Kota/Kabupaten</Label>
+                                            <select
+                                                id="city"
+                                                value={data.city}
+                                                onChange={(e) => setData('city', e.target.value)}
+                                                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                                disabled={isLoadingCities || !data.province}
+                                            >
+                                                <option value="">{isLoadingCities ? 'Memuat...' : 'Pilih Kota/Kabupaten'}</option>
+                                                {cities.map((city) => (
+                                                    <option key={city.id} value={city.name}>
+                                                        {city.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <InputError message={errors.city} className="mt-2" />
                                         </div>
                                         <div>
                                             <Label htmlFor="postal_code">Kode Pos</Label>
