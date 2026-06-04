@@ -24,30 +24,50 @@ class PublicArticleController extends Controller
 
         // Base query matching text search
         if ($search) {
+            $keywords = array_filter(explode(' ', $search));
             if ($field === 'all') {
-                // Eagerly fetch scout keys
-                $articleIds = Article::search($search)->keys();
-                $baseQuery = Article::where(function ($query) use ($search, $articleIds) {
-                    $query->whereIn('id', $articleIds)
-                        ->orWhereHas('journal', function ($q) use ($search) {
-                            $q->where('title', 'like', "%{$search}%")
-                                ->orWhere('publisher', 'like', "%{$search}%")
-                                ->orWhereHas('scientificField', function ($sf) use ($search) {
-                                    $sf->where('name', 'like', "%{$search}%");
+                $baseQuery = Article::where(function ($query) use ($keywords) {
+                    foreach ($keywords as $word) {
+                        $query->where(function ($q) use ($word) {
+                            $q->where('title', 'like', "%{$word}%")
+                                ->orWhere('abstract', 'like', "%{$word}%")
+                                ->orWhere('authors', 'like', "%{$word}%")
+                                ->orWhere('keywords', 'like', "%{$word}%")
+                                ->orWhereHas('journal', function ($j) use ($word) {
+                                    $j->where('title', 'like', "%{$word}%")
+                                        ->orWhere('publisher', 'like', "%{$word}%")
+                                        ->orWhereHas('scientificField', function ($sf) use ($word) {
+                                            $sf->where('name', 'like', "%{$word}%");
+                                        });
                                 });
                         });
+                    }
                 });
             } else {
                 $baseQuery = Article::query();
                 if ($field === 'title') {
-                    $baseQuery->where('title', 'like', "%{$search}%");
+                    $baseQuery->where(function ($query) use ($keywords) {
+                        foreach ($keywords as $word) {
+                            $query->where('title', 'like', "%{$word}%");
+                        }
+                    });
                 } elseif ($field === 'abstract') {
-                    $baseQuery->where('abstract', 'like', "%{$search}%");
+                    $baseQuery->where(function ($query) use ($keywords) {
+                        foreach ($keywords as $word) {
+                            $query->where('abstract', 'like', "%{$word}%");
+                        }
+                    });
                 } elseif ($field === 'author') {
-                    $baseQuery->where('authors', 'like', "%{$search}%");
+                    $baseQuery->where(function ($query) use ($keywords) {
+                        foreach ($keywords as $word) {
+                            $query->where('authors', 'like', "%{$word}%");
+                        }
+                    });
                 } elseif ($field === 'subject') {
-                    $baseQuery->whereHas('journal.scientificField', function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%");
+                    $baseQuery->whereHas('journal.scientificField', function ($query) use ($keywords) {
+                        foreach ($keywords as $word) {
+                            $query->where('name', 'like', "%{$word}%");
+                        }
                     });
                 }
             }
