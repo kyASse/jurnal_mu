@@ -197,3 +197,41 @@ it('filters articles by sidebar facets', function () {
         ->where('articles.data.0.title', 'Article in Journal A')
     );
 });
+
+it('searches articles using multiple keywords in query', function () {
+    config(['scout.driver' => 'database']);
+
+    $university = University::factory()->create(['is_active' => true]);
+    $field = ScientificField::factory()->create(['is_active' => true]);
+    $journal = Journal::factory()->create([
+        'university_id' => $university->id,
+        'scientific_field_id' => $field->id,
+        'is_active' => true,
+        'approval_status' => 'approved',
+    ]);
+    
+    Article::factory()->create([
+        'journal_id' => $journal->id,
+        'title' => 'Advanced Machine Learning and Deep Neural Networks',
+        'abstract' => 'This paper explores advanced algorithms in neural networks.',
+        'authors' => ['Jane Doe'],
+        'publication_date' => '2026-01-15',
+    ]);
+
+    Article::factory()->create([
+        'journal_id' => $journal->id,
+        'title' => 'Simple Regression Models',
+        'abstract' => 'An introductory text on linear modeling.',
+        'authors' => ['John Smith'],
+        'publication_date' => '2026-02-15',
+    ]);
+
+    // Test with multiple keywords in the search query
+    $response = $this->get('/browse/articles?q=Machine Learning&field=all');
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->has('articles.data', 1)
+        ->where('articles.data.0.title', 'Advanced Machine Learning and Deep Neural Networks')
+    );
+});
