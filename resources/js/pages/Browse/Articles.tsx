@@ -277,7 +277,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                     <div className="mb-4 flex items-center justify-between border-b pb-3 dark:border-white/10">
                                         <h2 className="flex items-center text-lg font-bold">
                                             <Filter className="mr-2 h-4 w-4 text-[#079C4E]" />
-                                            Refine Search
+                                            Refine Search Results
                                         </h2>
                                         {hasActiveFilters && (
                                             <Button
@@ -342,7 +342,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                             <div className="mt-3 space-y-3">
                                                 <Input
                                                     type="text"
-                                                    placeholder="Filter journals..."
+                                                    placeholder="search journals..."
                                                     value={journalSearchQuery}
                                                     onChange={(e) => setJournalSearchQuery(e.target.value)}
                                                     className="h-8 px-2 text-xs"
