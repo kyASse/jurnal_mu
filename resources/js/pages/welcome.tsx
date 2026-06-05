@@ -54,6 +54,18 @@ interface WelcomeProps extends SharedData {
     }>;
 }
 
+function getInitials(name: string, shortName?: string | null): string {
+    if (shortName) return shortName.substring(0, 3).toUpperCase();
+    const words = name.split(' ');
+    if (words.length >= 3) {
+        return (words[0][0] + words[1][0] + words[2][0]).toUpperCase();
+    } else if (words.length === 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
+    } else {
+        return name.substring(0, 3).toUpperCase();
+    }
+}
+
 export default function Welcome() {
     const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents, recentArticles, topUniversities } =
         usePage<WelcomeProps>().props;
@@ -368,6 +380,60 @@ export default function Welcome() {
                                         </Link>
                                     );
                                 })}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TOP UNIVERSITIES SECTION */}
+                    {topUniversities && topUniversities.length > 0 && (
+                        <div className="mt-24 mb-16">
+                            <div className="mb-12 flex items-end justify-between">
+                                <div>
+                                    <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                        Top Universities
+                                    </h2>
+                                    <p className="mt-2 text-gray-600 dark:text-gray-400">Leading Muhammadiyah institutions by active scientific journals.</p>
+                                </div>
+                                <Link href={route('browse.universities')} className="group flex items-center font-semibold text-[#1A2A75] hover:text-[#079C4E]">
+                                    Browse All Universities
+                                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                            </div>
+
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                {topUniversities.map((uni) => (
+                                    <Link
+                                        key={uni.id}
+                                        href={route('browse.universities.show', uni.id)}
+                                        className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
+                                    >
+                                        {/* Logo or Initials placeholder */}
+                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-50 p-2 border border-gray-100 group-hover:border-[#079C4E]/20 dark:bg-zinc-800 dark:border-zinc-800">
+                                            {uni.logo_url ? (
+                                                <img src={uni.logo_url} alt={uni.name} className="h-full w-full object-contain" />
+                                            ) : (
+                                                <span className="text-lg font-bold text-[#079C4E] dark:text-emerald-400">
+                                                    {getInitials(uni.name, uni.short_name)}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="flex-grow space-y-1 min-w-0">
+                                            <h3 className="truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
+                                                {uni.name}
+                                            </h3>
+                                            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                                                {uni.city ? `${uni.city}, ${uni.province || ''}` : 'Muhammadiyah Network'}
+                                            </p>
+                                            <div className="pt-1">
+                                                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#1A2A75] dark:bg-blue-950/30 dark:text-blue-300">
+                                                    {uni.journals_count} {uni.journals_count === 1 ? 'Journal' : 'Journals'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
                         </div>
                     )}
