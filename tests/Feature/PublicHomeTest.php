@@ -38,6 +38,8 @@ it('loads the welcome page with correct inertia components and props', function 
         ->has('totalJournals')
         ->has('totalArticles')
         ->has('scientificFields')
+        ->has('recentArticles')
+        ->has('topUniversities')
     );
 });
 
