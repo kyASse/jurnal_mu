@@ -158,4 +158,63 @@ class PublicHomeService
                 ]);
         });
     }
+
+    /**
+     * Get the 6 most recent articles.
+     */
+    public function getRecentArticles()
+    {
+        return Cache::remember('home_recent_articles', now()->addHours(2), function () {
+            return Article::with(['journal.university', 'journal.scientificField'])
+                ->orderBy('publication_date', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->limit(6)
+                ->get()
+                ->map(fn ($article) => [
+                    'id' => $article->id,
+                    'title' => $article->title,
+                    'authors_list' => $article->authors_list,
+                    'publication_date' => $article->publication_date?->format('Y-m-d'),
+                    'article_url' => $article->article_url,
+                    'pdf_url' => $article->pdf_url,
+                    'google_scholar_url' => $article->google_scholar_url,
+                    'journal' => [
+                        'id' => $article->journal->id,
+                        'title' => $article->journal->title,
+                    ],
+                ]);
+        });
+    }
+
+    /**
+     * Get top 6 universities by active journal count.
+     */
+    public function getTopUniversities()
+    {
+        return Cache::remember('home_top_universities', now()->addHours(6), function () {
+            return University::where('is_active', true)
+                ->whereHas('journals', function ($q) {
+                    $q->where('is_active', true)
+                        ->where('approval_status', 'approved');
+                })
+                ->withCount(['journals' => function ($q) {
+                    $q->where('is_active', true)
+                        ->where('approval_status', 'approved');
+                }])
+                ->orderByDesc('journals_count')
+                ->orderBy('name', 'asc')
+                ->limit(6)
+                ->get()
+                ->map(fn ($uni) => [
+                    'id' => $uni->id,
+                    'name' => $uni->name,
+                    'short_name' => $uni->short_name,
+                    'city' => $uni->city,
+                    'province' => $uni->province,
+                    'logo_url' => $uni->logo_url,
+                    'journals_count' => $uni->journals_count,
+                ]);
+        });
+    }
 }
+
