@@ -5,7 +5,7 @@ import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search, User, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
 interface WelcomeProps extends SharedData {
@@ -30,10 +30,32 @@ interface WelcomeProps extends SharedData {
         name: string;
     }>;
     upcomingEvents?: EventCardProps[];
+    recentArticles: Array<{
+        id: number;
+        title: string;
+        authors_list: string;
+        publication_date?: string;
+        article_url?: string;
+        pdf_url?: string;
+        google_scholar_url: string;
+        journal: {
+            id: number;
+            title: string;
+        };
+    }>;
+    topUniversities: Array<{
+        id: number;
+        name: string;
+        short_name: string | null;
+        city: string | null;
+        province: string | null;
+        logo_url: string | null;
+        journals_count: number;
+    }>;
 }
 
 export default function Welcome() {
-    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents } =
+    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents, recentArticles, topUniversities } =
         usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -195,6 +217,72 @@ export default function Welcome() {
                             />
                         ))}
                     </div>
+
+                    {/* RECENT ARTICLES SECTION */}
+                    {recentArticles && recentArticles.length > 0 && (
+                        <div className="mt-24 mb-16">
+                            <div className="mb-12 flex items-end justify-between">
+                                <div>
+                                    <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                        Recent Articles
+                                    </h2>
+                                    <p className="mt-2 text-gray-600 dark:text-gray-400">Read the latest publications from Muhammadiyah researchers.</p>
+                                </div>
+                                <Link href={route('browse.articles')} className="group flex items-center font-semibold text-[#1A2A75] hover:text-[#079C4E]">
+                                    Browse All Articles
+                                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                            </div>
+
+                            <div className="grid gap-6 md:grid-cols-2">
+                                {recentArticles.map((article) => (
+                                    <div key={article.id} className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900">
+                                        <div className="space-y-3">
+                                            <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#079C4E] dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                {article.journal.title}
+                                            </div>
+                                            
+                                            <h3 className="line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
+                                                {article.article_url ? (
+                                                    <a href={article.article_url} target="_blank" rel="noopener noreferrer">{article.title}</a>
+                                                ) : (
+                                                    article.title
+                                                )}
+                                            </h3>
+
+                                            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
+                                                <div className="flex items-center gap-1.5">
+                                                    <User className="h-4 w-4 text-gray-400" />
+                                                    <span className="line-clamp-1">{article.authors_list}</span>
+                                                </div>
+                                                {article.publication_date && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Calendar className="h-4 w-4 text-gray-400" />
+                                                        <span>{new Date(article.publication_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-6 flex items-center gap-3">
+                                            {article.pdf_url ? (
+                                                <Button asChild size="sm" className="bg-[#079C4E] text-white hover:bg-[#068a45]">
+                                                    <a href={article.pdf_url} target="_blank" rel="noopener noreferrer">Read Full PDF</a>
+                                                </Button>
+                                            ) : article.article_url ? (
+                                                <Button asChild size="sm" className="bg-[#079C4E] text-white hover:bg-[#068a45]">
+                                                    <a href={article.article_url} target="_blank" rel="noopener noreferrer">View Article</a>
+                                                </Button>
+                                            ) : null}
+                                            <Button asChild variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
+                                                <a href={article.google_scholar_url} target="_blank" rel="noopener noreferrer">Google Scholar</a>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* UPCOMING EVENTS SECTION: Split-Screen & Minimalist List */}
                     {upcomingEvents && upcomingEvents.length > 0 && (
