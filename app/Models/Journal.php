@@ -206,6 +206,11 @@ class Journal extends Model
         return $this->hasMany(Article::class);
     }
 
+    public function articleImportLogs()
+    {
+        return $this->hasMany(ArticleImportLog::class)->orderBy('created_at', 'desc');
+    }
+
     /**
      * Get recent articles for this journal
      */
