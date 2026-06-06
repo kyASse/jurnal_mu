@@ -107,4 +107,71 @@ class CrossrefXmlImporterTest extends TestCase
         $article->refresh();
         $this->assertEquals($originalTitle, $article->title);
     }
+
+    public function test_import_handles_author_with_missing_given_name_or_surname()
+    {
+        $journal = Journal::factory()->create();
+        $importer = new CrossrefXmlImporter();
+
+        $xmlContent = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch version="4.3.6" xmlns="http://www.crossref.org/schema/4.3.6">
+  <body>
+    <journal>
+      <journal_metadata>
+        <full_title>Journal Title</full_title>
+      </journal_metadata>
+      <journal_issue>
+        <publication_date media_type="online">
+          <year>2026</year>
+        </publication_date>
+        <journal_volume>
+          <volume>1</volume>
+        </journal_volume>
+        <issue>1</issue>
+      </journal_issue>
+      <journal_article publication_type="full_text">
+        <titles>
+          <title>Test Title</title>
+        </titles>
+        <contributors>
+          <person_name contributor_role="author" sequence="first">
+            <given_name>John</given_name>
+          </person_name>
+          <person_name contributor_role="author" sequence="additional">
+            <surname>Doe</surname>
+          </person_name>
+          <person_name contributor_role="author" sequence="additional">
+            <!-- No given name or surname -->
+          </person_name>
+        </contributors>
+        <publication_date media_type="online">
+          <year>2026</year>
+        </publication_date>
+        <doi_data>
+          <doi>10.12345/test.doi</doi>
+          <resource>http://example.com/test</resource>
+        </doi_data>
+      </journal_article>
+    </journal>
+  </body>
+</doi_batch>
+XML;
+
+        $tempFile = storage_path('app/public/temp_test_importer.xml');
+        file_put_contents($tempFile, $xmlContent);
+
+        try {
+            $result = $importer->import($journal, $tempFile, 'skip');
+            $this->assertEquals(1, $result['records_imported']);
+
+            $article = Article::where('doi', '10.12345/test.doi')->first();
+            $this->assertNotNull($article);
+            $this->assertEquals(['John', 'Doe'], $article->authors);
+        } finally {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+        }
+    }
 }

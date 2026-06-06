@@ -71,8 +71,10 @@ class CrossrefXmlImporter
                 if ($authorNodes) {
                     foreach ($authorNodes as $authorNode) {
                         $authorNode->registerXPathNamespace('cr', 'http://www.crossref.org/schema/4.3.6');
-                        $given = trim((string)($authorNode->xpath('.//cr:given_name') ?: $authorNode->xpath('.//given_name'))[0] ?? '');
-                        $surname = trim((string)($authorNode->xpath('.//cr:surname') ?: $authorNode->xpath('.//surname'))[0] ?? '');
+                        $givenNode = $authorNode->xpath('.//cr:given_name') ?: $authorNode->xpath('.//given_name');
+                        $surnameNode = $authorNode->xpath('.//cr:surname') ?: $authorNode->xpath('.//surname');
+                        $given = !empty($givenNode) ? trim((string)$givenNode[0]) : '';
+                        $surname = !empty($surnameNode) ? trim((string)$surnameNode[0]) : '';
                         $fullName = trim("{$given} {$surname}");
                         if ($fullName !== '') {
                             $authors[] = $fullName;
