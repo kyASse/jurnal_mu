@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Models\ArticleImportLog;
+use App\Jobs\ImportArticlesXmlJob;
 
 /**
  * JournalController - Super Admin
@@ -234,6 +236,11 @@ class JournalController extends Controller
                 'url' => $article->article_url,
             ]);
 
+        $importLogs = $journal->articleImportLogs()
+            ->latest()
+            ->take(10)
+            ->get();
+
         return Inertia::render('Admin/Journals/Show', [
             'journal' => [
                 'id' => $journal->id,
@@ -309,6 +316,7 @@ class JournalController extends Controller
                 ->where('journal_id', $journal->id)
                 ->orderByDesc('harvested_at')
                 ->get(),
+            'importLogs' => $importLogs,
             'isHarvestPending' => DB::table('jobs')
                 ->where('queue', 'harvesting')
                 ->where('payload', 'like', '%"journal_id":'.$journal->id.'%')
@@ -471,5 +479,37 @@ class JournalController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function importXml(Request $request, Journal $journal)
+    {
+        if (auth()->user()->cannot('update', $journal)) {
+            abort(403);
+        }
+
+        $request->validate([
+            'xml_file' => 'required|file|mimes:xml|max:10240',
+            'duplicate_strategy' => 'required|in:skip,update',
+        ], [
+            'xml_file.required' => 'Pilih file XML untuk diimport.',
+            'xml_file.mimes' => 'Format file harus berupa XML.',
+            'xml_file.max' => 'Ukuran file XML maksimal adalah 10MB.',
+            'duplicate_strategy.required' => 'Pilih strategi penanganan duplikat.',
+        ]);
+
+        $file = $request->file('xml_file');
+        $filename = $file->getClientOriginalName();
+        $storedPath = $file->store('xml_imports');
+
+        $log = ArticleImportLog::create([
+            'journal_id' => $journal->id,
+            'filename' => $filename,
+            'duplicate_strategy' => $request->input('duplicate_strategy'),
+            'status' => 'pending',
+        ]);
+
+        ImportArticlesXmlJob::dispatch($journal, $storedPath, $request->input('duplicate_strategy'), $log)->onQueue('harvesting');
+
+        return redirect()->back()->with('success', 'File XML berhasil diunggah dan sedang diproses di background.');
     }
 }

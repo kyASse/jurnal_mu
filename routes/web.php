@@ -273,6 +273,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.show');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])
             ->name('journals.harvest');
+        Route::post('journals/{journal}/import-xml', [JournalController::class, 'importXml'])
+            ->name('journals.import-xml');
         Route::patch('journals/{journal}/oai-urls', [JournalController::class, 'updateOaiUrls'])
             ->name('journals.update-oai-urls');
 
@@ -416,6 +418,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.upload-cover');
         Route::patch('journals/{journal}/oai-urls', [App\Http\Controllers\AdminKampus\JournalController::class, 'updateOaiUrls'])
             ->name('journals.update-oai-urls');
+        Route::post('journals/{journal}/import-xml', [App\Http\Controllers\AdminKampus\JournalController::class, 'importXml'])
+            ->name('journals.import-xml');
 
         // Import journals from CSV
         Route::get('journals/import/template', [App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
@@ -521,6 +525,8 @@ Route::middleware(['auth'])->group(function () {
         // OAI-PMH Article Harvest
         Route::post('journals/{journal}/harvest', [UserJournalController::class, 'harvest'])
             ->name('journals.harvest');
+        Route::post('journals/{journal}/import-xml', [UserJournalController::class, 'importXml'])
+            ->name('journals.import-xml');
 
         // Assessments Management
         Route::prefix('assessments')->name('assessments.')->group(function () {

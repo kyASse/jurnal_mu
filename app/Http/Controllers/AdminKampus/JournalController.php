@@ -25,6 +25,8 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Models\ArticleImportLog;
+use App\Jobs\ImportArticlesXmlJob;
 
 /**
  * JournalController - Admin Kampus
@@ -389,6 +391,11 @@ class JournalController extends Controller
             ->where('payload', 'like', '%i:'.$journal->id.';%')
             ->exists();
 
+        $importLogs = $journal->articleImportLogs()
+            ->latest()
+            ->take(10)
+            ->get();
+
         $articlesCount = $journal->articles()->count();
         $articles = $journal->articles()
             ->orderBy('publication_date', 'desc')
@@ -479,6 +486,7 @@ class JournalController extends Controller
             'articles' => $articles,
             'articlesCount' => $articlesCount,
             'harvestLogs' => $harvestLogs,
+            'importLogs' => $importLogs,
             'isHarvestPending' => $isHarvestPending,
         ]);
     }
@@ -955,5 +963,37 @@ class JournalController extends Controller
         $journal->update(['oai_urls' => $validated['oai_urls']]);
 
         return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
+    }
+
+    public function importXml(Request $request, Journal $journal)
+    {
+        if (auth()->user()->cannot('update', $journal)) {
+            abort(403);
+        }
+
+        $request->validate([
+            'xml_file' => 'required|file|mimes:xml|max:10240',
+            'duplicate_strategy' => 'required|in:skip,update',
+        ], [
+            'xml_file.required' => 'Pilih file XML untuk diimport.',
+            'xml_file.mimes' => 'Format file harus berupa XML.',
+            'xml_file.max' => 'Ukuran file XML maksimal adalah 10MB.',
+            'duplicate_strategy.required' => 'Pilih strategi penanganan duplikat.',
+        ]);
+
+        $file = $request->file('xml_file');
+        $filename = $file->getClientOriginalName();
+        $storedPath = $file->store('xml_imports');
+
+        $log = ArticleImportLog::create([
+            'journal_id' => $journal->id,
+            'filename' => $filename,
+            'duplicate_strategy' => $request->input('duplicate_strategy'),
+            'status' => 'pending',
+        ]);
+
+        ImportArticlesXmlJob::dispatch($journal, $storedPath, $request->input('duplicate_strategy'), $log)->onQueue('harvesting');
+
+        return redirect()->back()->with('success', 'File XML berhasil diunggah dan sedang diproses di background.');
     }
 }
