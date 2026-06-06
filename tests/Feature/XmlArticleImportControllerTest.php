@@ -161,4 +161,100 @@ class XmlArticleImportControllerTest extends TestCase
         $response->assertSessionHasErrors(['xml_file', 'duplicate_strategy']);
         Queue::assertNotPushed(\App\Jobs\ImportArticlesXmlJob::class);
     }
+
+    public function test_user_show_page_includes_import_logs()
+    {
+        $university = University::factory()->create();
+        $user = User::factory()->user($university->id)->create();
+        $journal = Journal::factory()->create([
+            'user_id' => $user->id,
+            'university_id' => $university->id,
+        ]);
+
+        // Create an import log
+        $log = \App\Models\ArticleImportLog::create([
+            'journal_id' => $journal->id,
+            'filename' => 'test_import.xml',
+            'duplicate_strategy' => 'skip',
+            'status' => 'success',
+            'records_found' => 5,
+            'records_imported' => 5,
+            'records_updated' => 0,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('user.journals.show', $journal->id));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('User/Journals/Show')
+            ->has('importLogs', 1)
+            ->where('importLogs.0.filename', 'test_import.xml')
+        );
+    }
+
+    public function test_admin_kampus_show_page_includes_import_logs()
+    {
+        $university = University::factory()->create();
+        $adminKampus = User::factory()->adminKampus($university->id)->create();
+        $user = User::factory()->user($university->id)->create();
+        $journal = Journal::factory()->create([
+            'user_id' => $user->id,
+            'university_id' => $university->id,
+        ]);
+
+        // Create an import log
+        $log = \App\Models\ArticleImportLog::create([
+            'journal_id' => $journal->id,
+            'filename' => 'test_import.xml',
+            'duplicate_strategy' => 'update',
+            'status' => 'processing',
+            'records_found' => 10,
+            'records_imported' => 0,
+            'records_updated' => 0,
+        ]);
+
+        $response = $this->actingAs($adminKampus)
+            ->get(route('admin-kampus.journals.show', $journal->id));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('AdminKampus/Journals/Show')
+            ->has('importLogs', 1)
+            ->where('importLogs.0.filename', 'test_import.xml')
+        );
+    }
+
+    public function test_admin_show_page_includes_import_logs()
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+        $university = University::factory()->create();
+        $user = User::factory()->user($university->id)->create();
+        $journal = Journal::factory()->create([
+            'user_id' => $user->id,
+            'university_id' => $university->id,
+        ]);
+
+        // Create an import log
+        $log = \App\Models\ArticleImportLog::create([
+            'journal_id' => $journal->id,
+            'filename' => 'test_import.xml',
+            'duplicate_strategy' => 'skip',
+            'status' => 'failed',
+            'records_found' => 0,
+            'records_imported' => 0,
+            'records_updated' => 0,
+            'error_message' => 'Malformed XML',
+        ]);
+
+        $response = $this->actingAs($superAdmin)
+            ->get(route('admin.journals.show', $journal->id));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Journals/Show')
+            ->has('importLogs', 1)
+            ->where('importLogs.0.filename', 'test_import.xml')
+        );
+    }
 }
