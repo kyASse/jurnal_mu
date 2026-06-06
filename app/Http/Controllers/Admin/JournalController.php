@@ -501,6 +501,10 @@ class JournalController extends Controller
         $filename = $file->getClientOriginalName();
         $storedPath = $file->store('xml_imports');
 
+        if ($storedPath === false) {
+            return redirect()->back()->with('error', 'Gagal menyimpan file XML yang diunggah. Pastikan folder storage memiliki izin menulis.');
+        }
+
         $log = ArticleImportLog::create([
             'journal_id' => $journal->id,
             'filename' => $filename,
