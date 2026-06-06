@@ -174,4 +174,29 @@ XML;
             }
         }
     }
+
+    public function test_import_job_execution()
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $journal = Journal::factory()->create();
+
+        $tempPath = 'xml_imports/test.xml';
+        \Illuminate\Support\Facades\Storage::put($tempPath, file_get_contents(storage_path('app/public/OJS_2.xml')));
+
+        $log = \App\Models\ArticleImportLog::create([
+            'journal_id' => $journal->id,
+            'filename' => 'OJS_2.xml',
+            'duplicate_strategy' => 'skip',
+            'status' => 'pending',
+        ]);
+
+        $job = new \App\Jobs\ImportArticlesXmlJob($journal, $tempPath, 'skip', $log);
+        $job->handle(new CrossrefXmlImporter());
+
+        $log->refresh();
+        $this->assertEquals('success', $log->status);
+        $this->assertEquals(2, $log->records_imported);
+        $this->assertFalse(\Illuminate\Support\Facades\Storage::exists($tempPath));
+    }
 }
+
