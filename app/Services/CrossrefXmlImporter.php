@@ -99,7 +99,14 @@ class CrossrefXmlImporter
                 if ($firstPageNode) {
                     $first = trim((string)$firstPageNode[0]);
                     $last = $lastPageNode ? trim((string)$lastPageNode[0]) : '';
-                    $pages = $last !== '' ? "{$first}-{$last}" : $first;
+                    $other = $otherPagesNode ? trim((string)$otherPagesNode[0]) : '';
+                    if ($last !== '') {
+                        $pages = "{$first}-{$last}";
+                    } elseif ($other !== '') {
+                        $pages = "{$first}-{$other}";
+                    } else {
+                        $pages = $first;
+                    }
                 } elseif ($otherPagesNode) {
                     $pages = trim((string)$otherPagesNode[0]);
                 }
