@@ -1,4 +1,5 @@
 import logoUrl from '@/assets/logo_dark.png';
+import muhammadiyahLogoUrl from '@/assets/Logo-Muhammadiyah-warna-hijau.png';
 import { Link } from '@inertiajs/react';
 import { Facebook, Mail, MapPin, MessageSquare, Phone, Printer, Twitter, Youtube } from 'lucide-react';
 
@@ -215,16 +216,13 @@ export default function PublicFooter() {
                         <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#FCEE1F] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
                             Muhammadiyah
                         </h4>
-                        <a
-                            href="#"
-                            className="mt-4 flex min-h-[120px] items-center justify-center rounded-2xl border border-white/10 bg-white p-6 transition-all duration-300 hover:border-[#FCEE1F] hover:bg-white/95"
-                        >
+                        <div className="mt-4 flex min-h-[120px] items-center justify-center rounded-2xl border border-white/10 bg-white p-6">
                             <img
-                                src="https://risetmu.or.id/assets/frontend/img/logo/Logo-Muhammadiyah-warna-hijau.png"
+                                src={muhammadiyahLogoUrl}
                                 alt="Muhammadiyah"
                                 className="max-w-[120px] object-contain"
                             />
-                        </a>
+                        </div>
                     </div>
                 </div>
             </div>
