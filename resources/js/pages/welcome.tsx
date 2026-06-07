@@ -88,14 +88,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="JurnalMu - Muhammadiyah Journal Portal">
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-                    rel="stylesheet"
-                />
-            </Head>
+            <Head title="JurnalMu - Muhammadiyah Journal Portal" />
 
             <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-[#079C4E] selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
                 <PublicNavbar />
