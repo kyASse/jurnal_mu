@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreJournalRequest;
 use App\Http\Requests\UpdateJournalRequest;
 use App\Jobs\HarvestJournalArticlesJob;
+use App\Jobs\ImportArticlesXmlJob;
+use App\Models\ArticleImportLog;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Services\JournalService;
@@ -161,6 +163,11 @@ class JournalController extends Controller
                 'url' => $article->article_url,
             ]);
 
+        $importLogs = $journal->articleImportLogs()
+            ->latest()
+            ->take(10)
+            ->get();
+
         return Inertia::render('User/Journals/Show', [
             'journal' => [
                 'id' => $journal->id,
@@ -237,6 +244,7 @@ class JournalController extends Controller
                 'total_articles' => $articlesCount,
             ],
             'harvestLogs' => $harvestLogs,
+            'importLogs' => $importLogs,
             'isHarvestPending' => $isHarvestPending,
         ]);
     }
@@ -375,5 +383,41 @@ class JournalController extends Controller
         $journal->update(['oai_urls' => $validated['oai_urls']]);
 
         return redirect()->back()->with('success', 'OAI-PMH URLs berhasil diperbarui.');
+    }
+
+    public function importXml(Request $request, Journal $journal)
+    {
+        if (auth()->user()->cannot('update', $journal)) {
+            abort(403);
+        }
+
+        $request->validate([
+            'xml_file' => 'required|file|mimes:xml|max:10240',
+            'duplicate_strategy' => 'required|in:skip,update',
+        ], [
+            'xml_file.required' => 'Pilih file XML untuk diimport.',
+            'xml_file.mimes' => 'Format file harus berupa XML.',
+            'xml_file.max' => 'Ukuran file XML maksimal adalah 10MB.',
+            'duplicate_strategy.required' => 'Pilih strategi penanganan duplikat.',
+        ]);
+
+        $file = $request->file('xml_file');
+        $filename = $file->getClientOriginalName();
+        $storedPath = $file->store('xml_imports');
+
+        if ($storedPath === false) {
+            return redirect()->back()->with('error', 'Gagal menyimpan file XML yang diunggah. Pastikan folder storage memiliki izin menulis.');
+        }
+
+        $log = ArticleImportLog::create([
+            'journal_id' => $journal->id,
+            'filename' => $filename,
+            'duplicate_strategy' => $request->input('duplicate_strategy'),
+            'status' => 'pending',
+        ]);
+
+        ImportArticlesXmlJob::dispatch($journal, $storedPath, $request->input('duplicate_strategy'), $log)->onQueue('harvesting');
+
+        return redirect()->back()->with('success', 'File XML berhasil diunggah dan sedang diproses di background.');
     }
 }

@@ -3,10 +3,11 @@ import JournalCard from '@/components/journal-card';
 import PublicFooter from '@/components/public-footer';
 import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, BookOpen, Calendar, ChevronDown, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface WelcomeProps extends SharedData {
     laravelVersion: string;
@@ -30,29 +31,84 @@ interface WelcomeProps extends SharedData {
         name: string;
     }>;
     upcomingEvents?: EventCardProps[];
+    featuredArticles: Array<{
+        id: number;
+        title: string;
+        authors_list: string;
+        publication_date?: string;
+        article_url?: string;
+        pdf_url?: string;
+        google_scholar_url: string;
+        journal: {
+            id: number;
+            title: string;
+        };
+    }>;
+    topUniversities: Array<{
+        id: number;
+        name: string;
+        short_name: string | null;
+        city: string | null;
+        province: string | null;
+        logo_url: string | null;
+        journals_count: number;
+    }>;
+}
+
+function getInitials(name: string, shortName?: string | null): string {
+    if (shortName) return shortName.substring(0, 3).toUpperCase();
+    const words = name.split(' ');
+    if (words.length >= 3) {
+        return (words[0][0] + words[1][0] + words[2][0]).toUpperCase();
+    } else if (words.length === 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
+    } else {
+        return name.substring(0, 3).toUpperCase();
+    }
 }
 
 export default function Welcome() {
-    const { auth, featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents } =
+    const { featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents, featuredArticles, topUniversities } =
         usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchType, setSearchType] = useState<'journals' | 'articles' | 'universities'>('journals');
 
     const handleSearch = () => {
-        if (searchQuery.trim()) {
+        if (!searchQuery.trim()) return;
+
+        if (searchType === 'journals') {
             window.location.href = route('journals.index', { search: searchQuery });
+        } else if (searchType === 'articles') {
+            window.location.href = route('browse.articles', { q: searchQuery });
+        } else if (searchType === 'universities') {
+            window.location.href = route('browse.universities', { search: searchQuery });
         }
     };
 
+    const links = [
+        { label: 'Browse Journals', href: route('journals.index') },
+        { label: 'Browse Articles', href: route('browse.articles') },
+        { label: 'Browse Universities', href: route('browse.universities') },
+    ];
+
+    const [currentLinkIndex, setCurrentLinkIndex] = useState(0);
+    const [isFading, setIsFading] = useState(false);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setIsFading(true);
+            setTimeout(() => {
+                setCurrentLinkIndex((prev) => (prev + 1) % links.length);
+                setIsFading(false);
+            }, 300);
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, [links.length]);
+
     return (
         <>
-            <Head title="JurnalMu - Muhammadiyah Journal Portal">
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-                    rel="stylesheet"
-                />
-            </Head>
+            <Head title="JurnalMu - Muhammadiyah Journal Portal" />
 
             <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-[#079C4E] selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
                 <PublicNavbar />
@@ -84,28 +140,84 @@ export default function Welcome() {
 
                         {/* Search Bar */}
                         <div className="mx-auto max-w-2xl">
-                            <div className="relative flex items-center rounded-full shadow-2xl">
-                                <Search className="absolute left-4 h-6 w-6 text-gray-400" />
+                            <div className="relative flex items-center rounded-full bg-white p-1.5 pl-4 shadow-2xl focus-within:ring-4 focus-within:ring-[#FCEE1F]/50">
+                                <Search className="h-5 w-5 flex-shrink-0 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="Search for journals, titles, or ISSN..."
-                                    className="h-14 w-full rounded-full border-0 bg-white pr-4 pl-12 text-gray-900 placeholder:text-gray-500 focus:ring-4 focus:ring-[#FCEE1F]/50 sm:text-lg"
+                                    placeholder={
+                                        searchType === 'journals'
+                                            ? 'Search for journals, publisher, or ISSN...'
+                                            : searchType === 'articles'
+                                              ? 'Search for article title, author, or abstract...'
+                                              : 'Search for university name or code...'
+                                    }
+                                    className="h-11 w-full border-0 bg-transparent px-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:ring-offset-0 focus:outline-none sm:text-base"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
+
+                                {/* Divider */}
+                                <div className="mx-2 h-6 w-[1px] flex-shrink-0 bg-gray-200" />
+
+                                {/* Dropdown Selector */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            type="button"
+                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none"
+                                        >
+                                            {searchType === 'journals' && <Library className="h-4 w-4 text-gray-500" />}
+                                            {searchType === 'articles' && <BookOpen className="h-4 w-4 text-gray-500" />}
+                                            {searchType === 'universities' && <GraduationCap className="h-4 w-4 text-gray-500" />}
+                                            <span className="capitalize">{searchType}</span>
+                                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-40">
+                                        <DropdownMenuItem
+                                            onClick={() => setSearchType('journals')}
+                                            className="flex cursor-pointer items-center gap-2"
+                                        >
+                                            <Library className="h-4 w-4 text-gray-400" />
+                                            <span>Journals</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => setSearchType('articles')}
+                                            className="flex cursor-pointer items-center gap-2"
+                                        >
+                                            <BookOpen className="h-4 w-4 text-gray-400" />
+                                            <span>Articles</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => setSearchType('universities')}
+                                            className="flex cursor-pointer items-center gap-2"
+                                        >
+                                            <GraduationCap className="h-4 w-4 text-gray-400" />
+                                            <span>Universities</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
                                 <Button
-                                    className="absolute top-2 right-2 h-10 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57]"
+                                    className="h-11 flex-shrink-0 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57]"
                                     onClick={handleSearch}
                                 >
                                     Search
                                 </Button>
                             </div>
-                            <div className="mt-4 flex justify-center gap-4 text-sm text-emerald-100">
+                            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-emerald-100">
                                 <span>Can't find what you're looking for?</span>
-                                <Link href={route('browse.universities')} className="font-semibold text-[#FCEE1F] hover:underline">
-                                    Browse by University
-                                </Link>
+                                <div className="inline-flex h-5 items-center overflow-hidden">
+                                    <Link
+                                        href={links[currentLinkIndex].href}
+                                        className={`inline-flex items-center font-semibold text-[#FCEE1F] transition-all duration-300 ease-out hover:underline ${
+                                            isFading ? 'translate-y-3 scale-95 opacity-0' : 'translate-y-0 scale-100 opacity-100'
+                                        }`}
+                                    >
+                                        {links[currentLinkIndex].label}
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -196,6 +308,92 @@ export default function Welcome() {
                         ))}
                     </div>
 
+                    {/* FEATURED ARTICLES SECTION */}
+                    {featuredArticles && featuredArticles.length > 0 && (
+                        <div className="mt-24 mb-16">
+                            <div className="mb-12 flex items-end justify-between">
+                                <div>
+                                    <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                        Featured Articles
+                                    </h2>
+                                    <p className="mt-2 text-gray-600 dark:text-gray-400">Explore research publications from Muhammadiyah scholars.</p>
+                                </div>
+                                <Link
+                                    href={route('browse.articles')}
+                                    className="group flex items-center font-semibold text-[#1A2A75] hover:text-[#079C4E]"
+                                >
+                                    Browse All Articles
+                                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                            </div>
+
+                            <div className="grid gap-6 md:grid-cols-2">
+                                {featuredArticles.map((article) => (
+                                    <div
+                                        key={article.id}
+                                        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
+                                    >
+                                        <div className="space-y-3">
+                                            <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#079C4E] dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                {article.journal.title}
+                                            </div>
+
+                                            <h3 className="line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
+                                                {article.article_url ? (
+                                                    <a href={article.article_url} target="_blank" rel="noopener noreferrer">
+                                                        {article.title}
+                                                    </a>
+                                                ) : (
+                                                    article.title
+                                                )}
+                                            </h3>
+
+                                            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
+                                                <div className="flex items-center gap-1.5">
+                                                    <User className="h-4 w-4 text-gray-400" />
+                                                    <span className="line-clamp-1">{article.authors_list}</span>
+                                                </div>
+                                                {article.publication_date && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Calendar className="h-4 w-4 text-gray-400" />
+                                                        <span>
+                                                            {new Date(article.publication_date).toLocaleDateString('id-ID', {
+                                                                year: 'numeric',
+                                                                month: 'long',
+                                                                day: 'numeric',
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-6 flex items-center gap-3">
+                                            {article.pdf_url ? (
+                                                <Button asChild size="sm" className="bg-[#079C4E] text-white hover:bg-[#068a45]">
+                                                    <a href={article.pdf_url} target="_blank" rel="noopener noreferrer">
+                                                        Read Full PDF
+                                                    </a>
+                                                </Button>
+                                            ) : article.article_url ? (
+                                                <Button asChild size="sm" className="bg-[#079C4E] text-white hover:bg-[#068a45]">
+                                                    <a href={article.article_url} target="_blank" rel="noopener noreferrer">
+                                                        View Article
+                                                    </a>
+                                                </Button>
+                                            ) : null}
+                                            <Button asChild variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
+                                                <a href={article.google_scholar_url} target="_blank" rel="noopener noreferrer">
+                                                    Google Scholar
+                                                </a>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* UPCOMING EVENTS SECTION: Split-Screen & Minimalist List */}
                     {upcomingEvents && upcomingEvents.length > 0 && (
                         <div className="mt-32 mb-24 grid items-start gap-12 lg:grid-cols-12 lg:gap-16">
@@ -284,6 +482,65 @@ export default function Welcome() {
                         </div>
                     )}
 
+                    {/* TOP UNIVERSITIES SECTION */}
+                    {topUniversities && topUniversities.length > 0 && (
+                        <div className="mt-24 mb-16">
+                            <div className="mb-12 flex items-end justify-between">
+                                <div>
+                                    <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                        Top Universities
+                                    </h2>
+                                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                                        Leading Muhammadiyah institutions by active scientific journals.
+                                    </p>
+                                </div>
+                                <Link
+                                    href={route('browse.universities')}
+                                    className="group flex items-center font-semibold text-[#1A2A75] hover:text-[#079C4E]"
+                                >
+                                    Browse All Universities
+                                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                            </div>
+
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                {topUniversities.map((uni) => (
+                                    <Link
+                                        key={uni.id}
+                                        href={route('browse.universities.show', uni.id)}
+                                        className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
+                                    >
+                                        {/* Logo or Initials placeholder */}
+                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2 group-hover:border-[#079C4E]/20 dark:border-zinc-800 dark:bg-zinc-800">
+                                            {uni.logo_url ? (
+                                                <img src={uni.logo_url} alt={uni.name} className="h-full w-full object-contain" />
+                                            ) : (
+                                                <span className="text-lg font-bold text-[#079C4E] dark:text-emerald-400">
+                                                    {getInitials(uni.name, uni.short_name)}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="min-w-0 flex-grow space-y-1">
+                                            <h3 className="truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
+                                                {uni.name}
+                                            </h3>
+                                            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                                                {uni.city ? `${uni.city}, ${uni.province || ''}` : 'Muhammadiyah Network'}
+                                            </p>
+                                            <div className="pt-1">
+                                                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#1A2A75] dark:bg-blue-950/30 dark:text-blue-300">
+                                                    {uni.journals_count} {uni.journals_count === 1 ? 'Journal' : 'Journals'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* JOURNALS BY SUBJECT SECTION */}
                     {scientificFields && scientificFields.length > 0 && (
                         <div className="relative left-1/2 mt-24 w-screen -translate-x-1/2 bg-[#1D5F82] px-4 py-20 text-white sm:px-6 lg:px-8 dark:bg-[#021A3B]">
@@ -347,19 +604,21 @@ export default function Welcome() {
                                     of accredited journals.
                                 </p>
                                 <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-                                    <Button
-                                        size="lg"
-                                        className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
-                                    >
-                                        Submit Manuscript
-                                    </Button>
-                                    <Button
+                                    <Link href={route('login')}>
+                                        <Button
+                                            size="lg"
+                                            className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
+                                        >
+                                            Submit Manuscript
+                                        </Button>
+                                    </Link>
+                                    {/* <Button
                                         size="lg"
                                         variant="outline"
                                         className="w-full border-white px-8 text-white hover:bg-white hover:text-[#1A2A75] sm:w-auto"
                                     >
                                         Author Guidelines
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </div>
                         </div>

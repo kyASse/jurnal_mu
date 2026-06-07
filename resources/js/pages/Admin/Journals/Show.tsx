@@ -7,6 +7,7 @@
  */
 import { AccreditationBadge, IndexationBadge, SintaBadge } from '@/components/badges';
 import { EditOaiUrlDialog } from '@/components/EditOaiUrlDialog';
+import { ImportXmlDialog } from '@/components/ImportXmlDialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -37,6 +38,7 @@ import {
     Database,
     ExternalLink,
     FileText,
+    FileUp,
     Globe,
     Mail,
     RefreshCw,
@@ -144,18 +146,32 @@ interface Journal {
     assessments: Assessment[];
 }
 
+interface ArticleImportLog {
+    id: number;
+    filename: string;
+    duplicate_strategy: 'skip' | 'update';
+    records_found: number;
+    records_imported: number;
+    records_updated: number;
+    status: 'pending' | 'processing' | 'success' | 'failed';
+    error_message: string | null;
+    created_at: string;
+}
+
 interface Props {
     journal: Journal;
     articles: PaginatedData<Article>;
     harvestLogs?: OaiHarvestingLog[];
     isHarvestPending: boolean;
+    importLogs?: ArticleImportLog[];
 }
 
-export default function JournalShow({ journal, articles, harvestLogs = [], isHarvestPending }: Props) {
+export default function JournalShow({ journal, articles, harvestLogs = [], isHarvestPending, importLogs = [] }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [harvesting, setHarvesting] = useState(false);
     const [forceSyncing, setForceSyncing] = useState(false);
     const [showEditOaiModal, setShowEditOaiModal] = useState(false);
+    const [showImportXmlModal, setShowImportXmlModal] = useState(false);
 
     const latestLog = harvestLogs && harvestLogs.length > 0 ? harvestLogs[0] : null;
     const isFailedOrPartial = latestLog && (latestLog.status === 'failed' || latestLog.status === 'partial');
@@ -507,6 +523,10 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
+                                        <Button onClick={() => setShowImportXmlModal(true)} size="sm" variant="outline" className="gap-2">
+                                            <FileUp className="h-4 w-4" />
+                                            Import XML
+                                        </Button>
                                     </div>
                                 </div>
 
@@ -517,6 +537,12 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                         journalId={journal.id}
                                         initialUrls={journal.oai_urls ?? null}
                                         updateRoute="admin.journals.update-oai-urls"
+                                    />
+                                    <ImportXmlDialog
+                                        open={showImportXmlModal}
+                                        onOpenChange={setShowImportXmlModal}
+                                        journalId={journal.id}
+                                        uploadRoute="admin.journals.import-xml"
                                     />
 
                                     {/* OAI-PMH URLs */}
@@ -640,6 +666,76 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                         <p className="text-sm text-muted-foreground">
                                             Belum pernah di-harvest. Klik <strong>Sync Artikel</strong> untuk memulai sinkronisasi OAI.
                                         </p>
+                                    )}
+
+                                    {importLogs && importLogs.length > 0 && (
+                                        <div className="mt-6 space-y-3">
+                                            <p className="text-sm font-medium text-foreground">Riwayat Import XML</p>
+                                            <div className="rounded-md border">
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow>
+                                                            <TableHead>Tanggal</TableHead>
+                                                            <TableHead>File</TableHead>
+                                                            <TableHead>Strategi</TableHead>
+                                                            <TableHead>Status</TableHead>
+                                                            <TableHead>Hasil (Ditemukan/Diimpor/Diupdate)</TableHead>
+                                                            <TableHead>Keterangan</TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {importLogs.map((log) => (
+                                                            <TableRow key={log.id}>
+                                                                <TableCell className="whitespace-nowrap">
+                                                                    {new Date(log.created_at).toLocaleString('id-ID', {
+                                                                        dateStyle: 'medium',
+                                                                        timeStyle: 'short',
+                                                                    })}
+                                                                </TableCell>
+                                                                <TableCell className="max-w-[150px] truncate" title={log.filename}>
+                                                                    {log.filename}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {log.duplicate_strategy === 'skip' ? 'Lewati Duplikat' : 'Perbarui'}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Badge
+                                                                        variant={
+                                                                            log.status === 'success'
+                                                                                ? 'outline'
+                                                                                : log.status === 'processing' || log.status === 'pending'
+                                                                                  ? 'default'
+                                                                                  : 'destructive'
+                                                                        }
+                                                                        className={
+                                                                            log.status === 'success'
+                                                                                ? 'border-green-300 text-green-700 dark:text-green-400'
+                                                                                : ''
+                                                                        }
+                                                                    >
+                                                                        {log.status === 'success'
+                                                                            ? 'Berhasil'
+                                                                            : log.status === 'failed'
+                                                                              ? 'Gagal'
+                                                                              : 'Proses'}
+                                                                    </Badge>
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {log.records_found} / {log.records_imported} / {log.records_updated}
+                                                                </TableCell>
+                                                                <TableCell className="max-w-xs truncate" title={log.error_message || '-'}>
+                                                                    {log.error_message ? (
+                                                                        <span className="text-red-600 dark:text-red-400">{log.error_message}</span>
+                                                                    ) : (
+                                                                        <span className="text-muted-foreground">-</span>
+                                                                    )}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </div>
+                                        </div>
                                     )}
                                 </CardContent>
                             </Card>
