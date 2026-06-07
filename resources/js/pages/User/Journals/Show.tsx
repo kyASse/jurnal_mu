@@ -711,12 +711,7 @@ export default function JournalShow({ journal, articles, statistics, harvestLogs
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
-                            <Button
-                                onClick={() => setShowImportXmlModal(true)}
-                                size="sm"
-                                variant="outline"
-                                className="gap-2"
-                            >
+                            <Button onClick={() => setShowImportXmlModal(true)} size="sm" variant="outline" className="gap-2">
                                 <FileUp className="h-4 w-4" />
                                 Import XML
                             </Button>
@@ -882,9 +877,7 @@ export default function JournalShow({ journal, articles, statistics, harvestLogs
                                                     <TableCell className="max-w-[150px] truncate" title={log.filename}>
                                                         {log.filename}
                                                     </TableCell>
-                                                    <TableCell>
-                                                        {log.duplicate_strategy === 'skip' ? 'Lewati Duplikat' : 'Perbarui'}
-                                                    </TableCell>
+                                                    <TableCell>{log.duplicate_strategy === 'skip' ? 'Lewati Duplikat' : 'Perbarui'}</TableCell>
                                                     <TableCell>
                                                         <Badge
                                                             variant={

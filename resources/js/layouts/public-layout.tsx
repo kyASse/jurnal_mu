@@ -1,10 +1,10 @@
 import logoUrl from '@/assets/logo_dark.png';
+import PublicFooter from '@/components/public-footer';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutDashboard } from 'lucide-react';
 import { PropsWithChildren } from 'react';
-import PublicFooter from '@/components/public-footer';
 
 export default function PublicLayout({ children }: PropsWithChildren) {
     const { auth } = usePage<SharedData>().props;

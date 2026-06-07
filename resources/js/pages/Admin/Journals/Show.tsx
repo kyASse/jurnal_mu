@@ -523,12 +523,7 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
-                                        <Button
-                                            onClick={() => setShowImportXmlModal(true)}
-                                            size="sm"
-                                            variant="outline"
-                                            className="gap-2"
-                                        >
+                                        <Button onClick={() => setShowImportXmlModal(true)} size="sm" variant="outline" className="gap-2">
                                             <FileUp className="h-4 w-4" />
                                             Import XML
                                         </Button>
@@ -713,10 +708,16 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                                                                   : 'destructive'
                                                                         }
                                                                         className={
-                                                                            log.status === 'success' ? 'border-green-300 text-green-700 dark:text-green-400' : ''
+                                                                            log.status === 'success'
+                                                                                ? 'border-green-300 text-green-700 dark:text-green-400'
+                                                                                : ''
                                                                         }
                                                                     >
-                                                                        {log.status === 'success' ? 'Berhasil' : log.status === 'failed' ? 'Gagal' : 'Proses'}
+                                                                        {log.status === 'success'
+                                                                            ? 'Berhasil'
+                                                                            : log.status === 'failed'
+                                                                              ? 'Gagal'
+                                                                              : 'Proses'}
                                                                     </Badge>
                                                                 </TableCell>
                                                                 <TableCell>

@@ -569,12 +569,7 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>
-                                <Button
-                                    onClick={() => setShowImportXmlModal(true)}
-                                    size="sm"
-                                    variant="outline"
-                                    className="gap-2"
-                                >
+                                <Button onClick={() => setShowImportXmlModal(true)} size="sm" variant="outline" className="gap-2">
                                     <FileUp className="h-4 w-4" />
                                     Import XML
                                 </Button>
@@ -746,9 +741,7 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
                                                         <TableCell className="max-w-[150px] truncate" title={log.filename}>
                                                             {log.filename}
                                                         </TableCell>
-                                                        <TableCell>
-                                                            {log.duplicate_strategy === 'skip' ? 'Lewati Duplikat' : 'Perbarui'}
-                                                        </TableCell>
+                                                        <TableCell>{log.duplicate_strategy === 'skip' ? 'Lewati Duplikat' : 'Perbarui'}</TableCell>
                                                         <TableCell>
                                                             <Badge
                                                                 variant={
@@ -759,7 +752,9 @@ export default function JournalShow({ journal, articles, articlesCount, harvestL
                                                                           : 'destructive'
                                                                 }
                                                                 className={
-                                                                    log.status === 'success' ? 'border-green-300 text-green-700 dark:text-green-400' : ''
+                                                                    log.status === 'success'
+                                                                        ? 'border-green-300 text-green-700 dark:text-green-400'
+                                                                        : ''
                                                                 }
                                                             >
                                                                 {log.status === 'success' ? 'Berhasil' : log.status === 'failed' ? 'Gagal' : 'Proses'}
