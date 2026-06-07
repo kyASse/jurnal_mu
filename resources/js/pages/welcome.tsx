@@ -5,8 +5,9 @@ import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, Calendar, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search, User } from 'lucide-react';
-import { useState } from 'react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ArrowRight, BookOpen, Calendar, ChevronDown, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface WelcomeProps extends SharedData {
     laravelVersion: string;
@@ -70,12 +71,40 @@ export default function Welcome() {
     const { featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents, featuredArticles, topUniversities } =
         usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchType, setSearchType] = useState<'journals' | 'articles' | 'universities'>('journals');
 
     const handleSearch = () => {
-        if (searchQuery.trim()) {
+        if (!searchQuery.trim()) return;
+
+        if (searchType === 'journals') {
             window.location.href = route('journals.index', { search: searchQuery });
+        } else if (searchType === 'articles') {
+            window.location.href = route('browse.articles', { q: searchQuery });
+        } else if (searchType === 'universities') {
+            window.location.href = route('browse.universities', { search: searchQuery });
         }
     };
+
+    const links = [
+        { label: 'Browse Journals', href: route('journals.index') },
+        { label: 'Browse Articles', href: route('browse.articles') },
+        { label: 'Browse Universities', href: route('browse.universities') },
+    ];
+
+    const [currentLinkIndex, setCurrentLinkIndex] = useState(0);
+    const [isFading, setIsFading] = useState(false);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setIsFading(true);
+            setTimeout(() => {
+                setCurrentLinkIndex((prev) => (prev + 1) % links.length);
+                setIsFading(false);
+            }, 300);
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <>
@@ -111,28 +140,75 @@ export default function Welcome() {
 
                         {/* Search Bar */}
                         <div className="mx-auto max-w-2xl">
-                            <div className="relative flex items-center rounded-full shadow-2xl">
-                                <Search className="absolute left-4 h-6 w-6 text-gray-400" />
+                            <div className="relative flex items-center rounded-full bg-white shadow-2xl p-1.5 pl-4 focus-within:ring-4 focus-within:ring-[#FCEE1F]/50">
+                                <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
                                 <input
                                     type="text"
-                                    placeholder="Search for journals, titles, or ISSN..."
-                                    className="h-14 w-full rounded-full border-0 bg-white pr-4 pl-12 text-gray-900 placeholder:text-gray-500 focus:ring-4 focus:ring-[#FCEE1F]/50 sm:text-lg"
+                                    placeholder={
+                                        searchType === 'journals'
+                                            ? "Search for journals, publisher, or ISSN..."
+                                            : searchType === 'articles'
+                                            ? "Search for article title, author, or abstract..."
+                                            : "Search for university name or code..."
+                                    }
+                                    className="h-11 w-full border-0 bg-transparent px-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:ring-offset-0 sm:text-base"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
+                                
+                                {/* Divider */}
+                                <div className="h-6 w-[1px] bg-gray-200 mx-2 flex-shrink-0" />
+
+                                {/* Dropdown Selector */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            type="button"
+                                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:text-gray-900 rounded-md hover:bg-gray-50 focus:outline-none transition-colors mr-2 flex-shrink-0"
+                                        >
+                                            {searchType === 'journals' && <Library className="h-4 w-4 text-gray-500" />}
+                                            {searchType === 'articles' && <BookOpen className="h-4 w-4 text-gray-500" />}
+                                            {searchType === 'universities' && <GraduationCap className="h-4 w-4 text-gray-500" />}
+                                            <span className="capitalize">{searchType}</span>
+                                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-40">
+                                        <DropdownMenuItem onClick={() => setSearchType('journals')} className="cursor-pointer flex items-center gap-2">
+                                            <Library className="h-4 w-4 text-gray-400" />
+                                            <span>Journals</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSearchType('articles')} className="cursor-pointer flex items-center gap-2">
+                                            <BookOpen className="h-4 w-4 text-gray-400" />
+                                            <span>Articles</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSearchType('universities')} className="cursor-pointer flex items-center gap-2">
+                                            <GraduationCap className="h-4 w-4 text-gray-400" />
+                                            <span>Universities</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
                                 <Button
-                                    className="absolute top-2 right-2 h-10 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57]"
+                                    className="h-11 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57] flex-shrink-0"
                                     onClick={handleSearch}
                                 >
                                     Search
                                 </Button>
                             </div>
-                            <div className="mt-4 flex justify-center gap-4 text-sm text-emerald-100">
+                            <div className="mt-4 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-sm text-emerald-100">
                                 <span>Can't find what you're looking for?</span>
-                                <Link href={route('browse.universities')} className="font-semibold text-[#FCEE1F] hover:underline">
-                                    Browse by University
-                                </Link>
+                                <div className="h-5 overflow-hidden inline-flex items-center">
+                                    <Link
+                                        href={links[currentLinkIndex].href}
+                                        className={`font-semibold text-[#FCEE1F] hover:underline transition-all duration-300 ease-out inline-flex items-center ${
+                                            isFading ? 'opacity-0 translate-y-3 scale-95' : 'opacity-100 translate-y-0 scale-100'
+                                        }`}
+                                      >
+                                        {links[currentLinkIndex].label}
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
