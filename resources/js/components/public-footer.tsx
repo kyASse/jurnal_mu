@@ -8,7 +8,7 @@ export default function PublicFooter() {
     return (
         <footer className="relative mt-auto overflow-hidden bg-gradient-to-br from-[#0d1433] via-[#162050] to-[#1a2a6c] text-white">
             {/* Top Border Accent */}
-            <div className="absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#232f72] via-[#f7b324] to-[#232f72]" />
+            <div className="absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#232f72] via-[#FCEE1F] to-[#232f72]" />
 
             {/* Radial Glow Overlay */}
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_8%_85%,rgba(35,47,114,0.45)_0%,transparent_52%),radial-gradient(ellipse_at_92%_15%,rgba(247,179,36,0.06)_0%,transparent_48%)]" />
@@ -25,29 +25,29 @@ export default function PublicFooter() {
                                 Journal MU
                             </span>
                         </div>
-                        <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#f7b324] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
+                        <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#FCEE1F] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
                             Sekretariat
                         </h4>
                         <ul className="mt-4 space-y-2.5 text-sm text-white/65">
                             <li className="flex items-start gap-2.5">
-                                <MapPin className="mt-1 h-4 w-4 shrink-0 text-[#f7b324]" />
+                                <MapPin className="mt-1 h-4 w-4 shrink-0 text-[#FCEE1F]" />
                                 <span>Jln. Brawijaya No.89, Menayu Kidul, Tirtonirmolo, Kasihan, Bantul, D.I. Yogyakarta 55181</span>
                             </li>
                             <li className="flex items-start gap-2.5">
-                                <Phone className="mt-1 h-4 w-4 shrink-0 text-[#f7b324]" />
+                                <Phone className="mt-1 h-4 w-4 shrink-0 text-[#FCEE1F]" />
                                 <span>+62 274 376336, 4221040</span>
                             </li>
                             <li className="flex items-start gap-2.5">
-                                <Printer className="mt-1 h-4 w-4 shrink-0 text-[#f7b324]" />
+                                <Printer className="mt-1 h-4 w-4 shrink-0 text-[#FCEE1F]" />
                                 <span>Fax: +62 274 389485</span>
                             </li>
                             <li className="flex items-start gap-2.5">
-                                <MessageSquare className="mt-1 h-4 w-4 shrink-0 text-[#f7b324]" />
+                                <MessageSquare className="mt-1 h-4 w-4 shrink-0 text-[#FCEE1F]" />
                                 <span>+62 895-4232-00040</span>
                             </li>
                             <li className="flex items-start gap-2.5">
-                                <Mail className="mt-1 h-4 w-4 shrink-0 text-[#f7b324]" />
-                                <a href={`mailto:${emailAddress}`} className="transition-colors hover:text-[#f7b324]">
+                                <Mail className="mt-1 h-4 w-4 shrink-0 text-[#FCEE1F]" />
+                                <a href={`mailto:${emailAddress}`} className="transition-colors hover:text-[#FCEE1F]">
                                     {emailAddress}
                                 </a>
                             </li>
@@ -58,27 +58,27 @@ export default function PublicFooter() {
                             <a
                                 href="https://web.facebook.com/"
                                 target="_blank"
-                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#f7b324] hover:bg-[#f7b324] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
+                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#FCEE1F] hover:bg-[#FCEE1F] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
                             >
                                 <Facebook className="h-4 w-4" />
                             </a>
                             <a
                                 href="https://twitter.com/"
                                 target="_blank"
-                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#f7b324] hover:bg-[#f7b324] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
+                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#FCEE1F] hover:bg-[#FCEE1F] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
                             >
                                 <Twitter className="h-4 w-4" />
                             </a>
                             <a
                                 href="https://youtube.com/"
                                 target="_blank"
-                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#f7b324] hover:bg-[#f7b324] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
+                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#FCEE1F] hover:bg-[#FCEE1F] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
                             >
                                 <Youtube className="h-4 w-4" />
                             </a>
                             <a
                                 href={`mailto:${emailAddress}`}
-                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#f7b324] hover:bg-[#f7b324] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
+                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/14 bg-white/5 text-sm text-white/70 transition-all hover:-translate-y-0.5 hover:border-[#FCEE1F] hover:bg-[#FCEE1F] hover:text-[#0d1433] hover:shadow-[0_6px_18px_rgba(247,179,36,0.3)]"
                             >
                                 <Mail className="h-4 w-4" />
                             </a>
@@ -89,59 +89,59 @@ export default function PublicFooter() {
                     <div className="col-span-12 md:col-span-5">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#f7b324] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
+                                <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#FCEE1F] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
                                     Menu
                                 </h4>
                                 <ul className="mt-4 space-y-2.5">
                                     <li>
                                         <Link
                                             href={route('home')}
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             Beranda
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             href={route('journals.index')}
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             Jurnal
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             href={route('browse.articles')}
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             Artikel
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             href={route('browse.universities')}
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             Universitas
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             href={route('events.index')}
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             Kegiatan
                                         </Link>
                                     </li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#f7b324] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
+                                <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#FCEE1F] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
                                     Tautan
                                 </h4>
                                 <ul className="mt-4 space-y-2.5">
@@ -149,9 +149,9 @@ export default function PublicFooter() {
                                         <a
                                             href="https://diktilitbangmuhammadiyah.org"
                                             target="_blank"
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             Diktilitbang
                                         </a>
                                     </li>
@@ -159,9 +159,9 @@ export default function PublicFooter() {
                                         <a
                                             href="https://sinta.kemdiktisaintek.go.id"
                                             target="_blank"
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             SINTA
                                         </a>
                                     </li>
@@ -169,9 +169,9 @@ export default function PublicFooter() {
                                         <a
                                             href="https://garuda.kemdiktisaintek.go.id"
                                             target="_blank"
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             Garuda
                                         </a>
                                     </li>
@@ -179,9 +179,9 @@ export default function PublicFooter() {
                                         <a
                                             href="https://pddikti.kemdiktisaintek.go.id"
                                             target="_blank"
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             PDDIKTI
                                         </a>
                                     </li>
@@ -189,9 +189,9 @@ export default function PublicFooter() {
                                         <a
                                             href="https://bima.kemdiktisaintek.go.id"
                                             target="_blank"
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             BIMA
                                         </a>
                                     </li>
@@ -199,9 +199,9 @@ export default function PublicFooter() {
                                         <a
                                             href="https://arjuna.kemdiktisaintek.go.id"
                                             target="_blank"
-                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#f7b324]"
+                                            className="group flex items-center gap-2 text-sm text-white/60 transition-all hover:translate-x-1 hover:text-[#FCEE1F]"
                                         >
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#f7b324]/30 group-hover:bg-[#f7b324]" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#FCEE1F]/30 group-hover:bg-[#FCEE1F]" />
                                             ARJUNA
                                         </a>
                                     </li>
@@ -212,7 +212,7 @@ export default function PublicFooter() {
 
                     {/* Right Column: Muhammadiyah Logo */}
                     <div className="col-span-12 md:col-span-3">
-                        <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#f7b324] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
+                        <h4 className="flex items-center gap-2 text-xs font-bold tracking-wider text-[#FCEE1F] uppercase after:h-[1px] after:flex-1 after:bg-gradient-to-r after:from-[#f7b324]/45 after:to-transparent">
                             Muhammadiyah
                         </h4>
                         <a
@@ -236,7 +236,7 @@ export default function PublicFooter() {
             <div className="relative z-10 bg-black/30 py-4 text-center">
                 <div className="container mx-auto px-4">
                     <p className="text-xs text-white/40">
-                        &copy; {new Date().getFullYear()} <span className="font-semibold text-[#f7b324]">JournalMU</span> &mdash; Majelis Diktilitbang
+                        &copy; {new Date().getFullYear()} <span className="font-semibold text-[#FCEE1F]">JournalMU</span> &mdash; Majelis Diktilitbang
                         Muhammadiyah. All rights reserved.
                     </p>
                 </div>
