@@ -217,7 +217,7 @@ export default function PublicFooter() {
                         </h4>
                         <a
                             href="#"
-                            className="mt-4 flex min-h-[120px] items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:border-[#f7b324]/38 hover:bg-[#f7b324]/4"
+                            className="mt-4 flex min-h-[120px] items-center justify-center rounded-2xl border border-white/10 bg-white p-6 transition-all duration-300 hover:border-[#FCEE1F] hover:bg-white/95"
                         >
                             <img
                                 src="https://risetmu.or.id/assets/frontend/img/logo/Logo-Muhammadiyah-warna-hijau.png"
