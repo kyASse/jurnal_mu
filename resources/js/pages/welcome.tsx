@@ -68,7 +68,6 @@ function getInitials(name: string, shortName?: string | null): string {
 
 export default function Welcome() {
     const {
-        auth,
         featuredJournals,
         totalUniversities,
         totalJournals,
