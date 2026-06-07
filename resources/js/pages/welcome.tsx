@@ -30,7 +30,7 @@ interface WelcomeProps extends SharedData {
         name: string;
     }>;
     upcomingEvents?: EventCardProps[];
-    recentArticles: Array<{
+    featuredArticles: Array<{
         id: number;
         title: string;
         authors_list: string;
@@ -67,17 +67,8 @@ function getInitials(name: string, shortName?: string | null): string {
 }
 
 export default function Welcome() {
-    const {
-        auth,
-        featuredJournals,
-        totalUniversities,
-        totalJournals,
-        totalArticles,
-        scientificFields,
-        upcomingEvents,
-        recentArticles,
-        topUniversities,
-    } = usePage<WelcomeProps>().props;
+    const { featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents, featuredArticles, topUniversities } =
+        usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = () => {
@@ -88,14 +79,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="JurnalMu - Muhammadiyah Journal Portal">
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-                    rel="stylesheet"
-                />
-            </Head>
+            <Head title="JurnalMu - Muhammadiyah Journal Portal" />
 
             <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-[#079C4E] selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
                 <PublicNavbar />
@@ -239,17 +223,15 @@ export default function Welcome() {
                         ))}
                     </div>
 
-                    {/* RECENT ARTICLES SECTION */}
-                    {recentArticles && recentArticles.length > 0 && (
+                    {/* FEATURED ARTICLES SECTION */}
+                    {featuredArticles && featuredArticles.length > 0 && (
                         <div className="mt-24 mb-16">
                             <div className="mb-12 flex items-end justify-between">
                                 <div>
                                     <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
-                                        Recent Articles
+                                        Featured Articles
                                     </h2>
-                                    <p className="mt-2 text-gray-600 dark:text-gray-400">
-                                        Read the latest publications from Muhammadiyah researchers.
-                                    </p>
+                                    <p className="mt-2 text-gray-600 dark:text-gray-400">Explore research publications from Muhammadiyah scholars.</p>
                                 </div>
                                 <Link
                                     href={route('browse.articles')}
@@ -261,7 +243,7 @@ export default function Welcome() {
                             </div>
 
                             <div className="grid gap-6 md:grid-cols-2">
-                                {recentArticles.map((article) => (
+                                {featuredArticles.map((article) => (
                                     <div
                                         key={article.id}
                                         className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
@@ -397,8 +379,8 @@ export default function Welcome() {
                                                             {event.location_type.toLowerCase() === 'online'
                                                                 ? 'Online'
                                                                 : event.location_type.toLowerCase() === 'hybrid'
-                                                                  ? `Hybrid - ${event.university?.name || 'TBA'}`
-                                                                  : event.university?.name || 'Venue TBA'}
+                                                                    ? `Hybrid - ${event.university?.name || 'TBA'}`
+                                                                    : event.university?.name || 'Venue TBA'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -537,19 +519,21 @@ export default function Welcome() {
                                     of accredited journals.
                                 </p>
                                 <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-                                    <Button
-                                        size="lg"
-                                        className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
-                                    >
-                                        Submit Manuscript
-                                    </Button>
-                                    <Button
+                                    <Link href={route('login')}>
+                                        <Button
+                                            size="lg"
+                                            className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
+                                        >
+                                            Submit Manuscript
+                                        </Button>
+                                    </Link>
+                                    {/* <Button
                                         size="lg"
                                         variant="outline"
                                         className="w-full border-white px-8 text-white hover:bg-white hover:text-[#1A2A75] sm:w-auto"
                                     >
                                         Author Guidelines
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </div>
                         </div>

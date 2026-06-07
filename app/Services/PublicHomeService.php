@@ -160,14 +160,13 @@ class PublicHomeService
     }
 
     /**
-     * Get the 6 most recent articles.
+     * Get 6 featured articles in random order.
      */
-    public function getRecentArticles()
+    public function getFeaturedArticles()
     {
-        return Cache::remember('home_recent_articles', now()->addHours(2), function () {
+        return Cache::remember('home_featured_articles', now()->addHours(2), function () {
             return Article::with(['journal.university', 'journal.scientificField'])
-                ->orderBy('publication_date', 'desc')
-                ->orderBy('created_at', 'desc')
+                ->inRandomOrder()
                 ->limit(6)
                 ->get()
                 ->map(fn ($article) => [

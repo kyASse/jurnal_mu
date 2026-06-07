@@ -22,7 +22,7 @@ class HomeController extends Controller
         $overallStats = $this->homeService->getOverallStats();
         $scientificFields = $this->homeService->getTopScientificFields();
         $upcomingEvents = $this->homeService->getUpcomingEvents();
-        $recentArticles = $this->homeService->getRecentArticles();
+        $featuredArticles = $this->homeService->getFeaturedArticles();
         $topUniversities = $this->homeService->getTopUniversities();
 
         return Inertia::render('welcome', [
@@ -32,7 +32,7 @@ class HomeController extends Controller
             'totalArticles' => $overallStats['totalArticles'],
             'scientificFields' => $scientificFields,
             'upcomingEvents' => $upcomingEvents,
-            'recentArticles' => $recentArticles,
+            'featuredArticles' => $featuredArticles,
             'topUniversities' => $topUniversities,
         ]);
     }
