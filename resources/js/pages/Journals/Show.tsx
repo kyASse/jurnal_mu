@@ -4,7 +4,8 @@
  * @features Display comprehensive journal information, article filtering, stats, and 3-column layout
  */
 
-import logoUrl from '@/assets/logo_dark.png';
+import PublicNavbar from '@/components/public-navbar';
+import PublicFooter from '@/components/public-footer';
 import { SintaBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -134,56 +135,11 @@ export default function JournalsShow() {
                 <meta property="og:title" content={journal.title} />
                 <meta property="og:description" content={journal.about || `Academic journal from ${journal.university.name}`} />
                 {journal.cover_image_url && <meta property="og:image" content={journal.cover_image_url} />}
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-                    rel="stylesheet"
-                />
             </Head>
 
             <div className="min-h-screen bg-slate-50 font-sans text-foreground dark:bg-background">
                 {/* NAVBAR */}
-                <nav className="fixed top-0 z-50 w-full border-b border-primary/20 bg-primary text-white shadow-sm backdrop-blur-md transition-all dark:border-primary/30 dark:bg-primary">
-                    <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                        <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
-                                <img src={logoUrl} alt="Majelis Diktilitbang" className="h-8 w-8 object-contain" />
-                            </div>
-                            <span className="font-heading text-2xl font-bold" style={{ fontFamily: '"El Messiri", sans-serif' }}>
-                                Journal MU
-                            </span>
-                        </Link>
-                        <div className="flex items-center gap-2 sm:gap-4">
-                            <Link href={route('journals.index')}>
-                                <Button variant="ghost" className="px-2 text-white hover:bg-white/20 hover:text-white sm:px-4">
-                                    <span className="hidden sm:inline">All Journals</span>
-                                    <span className="sm:hidden">Journals</span>
-                                </Button>
-                            </Link>
-                            {auth?.user ? (
-                                <Link href={route('dashboard')}>
-                                    <Button variant="secondary" className="border-0 bg-white px-3 font-bold text-[#079C4E] hover:bg-gray-100 sm:px-4">
-                                        Dashboard
-                                    </Button>
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link href={route('login')}>
-                                        <Button variant="ghost" className="px-2 text-white hover:bg-white/20 hover:text-white sm:px-4">
-                                            Log in
-                                        </Button>
-                                    </Link>
-                                    <Link href={route('register')}>
-                                        <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">
-                                            Register
-                                        </Button>
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </nav>
+                <PublicNavbar />
 
                 {/* BREADCRUMBS */}
                 <div className="mx-auto max-w-7xl px-4 pt-24 pb-4 sm:px-6 lg:px-8">
@@ -814,25 +770,7 @@ export default function JournalsShow() {
                 </main>
 
                 {/* FOOTER */}
-                <footer className="bg-[#0f172a] py-12 text-center text-sm text-gray-500">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="mb-8 flex justify-center gap-6">
-                            <Link href={route('home')} className="hover:text-white">
-                                Home
-                            </Link>
-                            <a href="#" className="hover:text-white">
-                                About Us
-                            </a>
-                            <a href="#" className="hover:text-white">
-                                Privacy Policy
-                            </a>
-                            <a href="#" className="hover:text-white">
-                                Contact Support
-                            </a>
-                        </div>
-                        <p>&copy; {new Date().getFullYear()} JurnalMu - Muhammadiyah Higher Education Research Network.</p>
-                    </div>
-                </footer>
+                <PublicFooter />
             </div>
         </>
     );
