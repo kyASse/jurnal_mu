@@ -30,7 +30,7 @@ interface WelcomeProps extends SharedData {
         name: string;
     }>;
     upcomingEvents?: EventCardProps[];
-    recentArticles: Array<{
+    featuredArticles: Array<{
         id: number;
         title: string;
         authors_list: string;
@@ -67,16 +67,8 @@ function getInitials(name: string, shortName?: string | null): string {
 }
 
 export default function Welcome() {
-    const {
-        featuredJournals,
-        totalUniversities,
-        totalJournals,
-        totalArticles,
-        scientificFields,
-        upcomingEvents,
-        recentArticles,
-        topUniversities,
-    } = usePage<WelcomeProps>().props;
+    const { featuredJournals, totalUniversities, totalJournals, totalArticles, scientificFields, upcomingEvents, featuredArticles, topUniversities } =
+        usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = () => {
@@ -231,17 +223,15 @@ export default function Welcome() {
                         ))}
                     </div>
 
-                    {/* RECENT ARTICLES SECTION */}
-                    {recentArticles && recentArticles.length > 0 && (
+                    {/* FEATURED ARTICLES SECTION */}
+                    {featuredArticles && featuredArticles.length > 0 && (
                         <div className="mt-24 mb-16">
                             <div className="mb-12 flex items-end justify-between">
                                 <div>
                                     <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
-                                        Recent Articles
+                                        Featured Articles
                                     </h2>
-                                    <p className="mt-2 text-gray-600 dark:text-gray-400">
-                                        Read the latest publications from Muhammadiyah researchers.
-                                    </p>
+                                    <p className="mt-2 text-gray-600 dark:text-gray-400">Explore research publications from Muhammadiyah scholars.</p>
                                 </div>
                                 <Link
                                     href={route('browse.articles')}
@@ -253,7 +243,7 @@ export default function Welcome() {
                             </div>
 
                             <div className="grid gap-6 md:grid-cols-2">
-                                {recentArticles.map((article) => (
+                                {featuredArticles.map((article) => (
                                     <div
                                         key={article.id}
                                         className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
