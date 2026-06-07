@@ -379,8 +379,8 @@ export default function Welcome() {
                                                             {event.location_type.toLowerCase() === 'online'
                                                                 ? 'Online'
                                                                 : event.location_type.toLowerCase() === 'hybrid'
-                                                                  ? `Hybrid - ${event.university?.name || 'TBA'}`
-                                                                  : event.university?.name || 'Venue TBA'}
+                                                                    ? `Hybrid - ${event.university?.name || 'TBA'}`
+                                                                    : event.university?.name || 'Venue TBA'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -519,19 +519,21 @@ export default function Welcome() {
                                     of accredited journals.
                                 </p>
                                 <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-                                    <Button
-                                        size="lg"
-                                        className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
-                                    >
-                                        Submit Manuscript
-                                    </Button>
-                                    <Button
+                                    <Link href={route('login')}>
+                                        <Button
+                                            size="lg"
+                                            className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
+                                        >
+                                            Submit Manuscript
+                                        </Button>
+                                    </Link>
+                                    {/* <Button
                                         size="lg"
                                         variant="outline"
                                         className="w-full border-white px-8 text-white hover:bg-white hover:text-[#1A2A75] sm:w-auto"
                                     >
                                         Author Guidelines
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </div>
                         </div>
