@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\ImportArticlesXmlJob;
+use App\Models\ArticleImportLog;
 use App\Models\Journal;
-use App\Models\User;
 use App\Models\University;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Queue;
@@ -45,7 +47,7 @@ class XmlArticleImportControllerTest extends TestCase
             'filename' => 'import.xml',
             'status' => 'pending',
         ]);
-        Queue::assertPushed(\App\Jobs\ImportArticlesXmlJob::class);
+        Queue::assertPushed(ImportArticlesXmlJob::class);
     }
 
     public function test_admin_kampus_can_upload_xml()
@@ -75,7 +77,7 @@ class XmlArticleImportControllerTest extends TestCase
             'status' => 'pending',
             'duplicate_strategy' => 'update',
         ]);
-        Queue::assertPushed(\App\Jobs\ImportArticlesXmlJob::class);
+        Queue::assertPushed(ImportArticlesXmlJob::class);
     }
 
     public function test_super_admin_can_upload_xml()
@@ -104,7 +106,7 @@ class XmlArticleImportControllerTest extends TestCase
             'filename' => 'import.xml',
             'status' => 'pending',
         ]);
-        Queue::assertPushed(\App\Jobs\ImportArticlesXmlJob::class);
+        Queue::assertPushed(ImportArticlesXmlJob::class);
     }
 
     public function test_user_cannot_upload_xml_to_other_journal()
@@ -130,7 +132,7 @@ class XmlArticleImportControllerTest extends TestCase
             ]);
 
         $response->assertStatus(403);
-        Queue::assertNotPushed(\App\Jobs\ImportArticlesXmlJob::class);
+        Queue::assertNotPushed(ImportArticlesXmlJob::class);
     }
 
     public function test_validation_errors()
@@ -159,7 +161,7 @@ class XmlArticleImportControllerTest extends TestCase
             ]);
 
         $response->assertSessionHasErrors(['xml_file', 'duplicate_strategy']);
-        Queue::assertNotPushed(\App\Jobs\ImportArticlesXmlJob::class);
+        Queue::assertNotPushed(ImportArticlesXmlJob::class);
     }
 
     public function test_user_show_page_includes_import_logs()
@@ -172,7 +174,7 @@ class XmlArticleImportControllerTest extends TestCase
         ]);
 
         // Create an import log
-        $log = \App\Models\ArticleImportLog::create([
+        $log = ArticleImportLog::create([
             'journal_id' => $journal->id,
             'filename' => 'test_import.xml',
             'duplicate_strategy' => 'skip',
@@ -204,7 +206,7 @@ class XmlArticleImportControllerTest extends TestCase
         ]);
 
         // Create an import log
-        $log = \App\Models\ArticleImportLog::create([
+        $log = ArticleImportLog::create([
             'journal_id' => $journal->id,
             'filename' => 'test_import.xml',
             'duplicate_strategy' => 'update',
@@ -236,7 +238,7 @@ class XmlArticleImportControllerTest extends TestCase
         ]);
 
         // Create an import log
-        $log = \App\Models\ArticleImportLog::create([
+        $log = ArticleImportLog::create([
             'journal_id' => $journal->id,
             'filename' => 'test_import.xml',
             'duplicate_strategy' => 'skip',

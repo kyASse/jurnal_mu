@@ -3,9 +3,9 @@ import JournalCard from '@/components/journal-card';
 import PublicFooter from '@/components/public-footer';
 import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ArrowRight, BookOpen, Calendar, ChevronDown, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -104,7 +104,7 @@ export default function Welcome() {
         }, 4000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [links.length]);
 
     return (
         <>
@@ -140,32 +140,32 @@ export default function Welcome() {
 
                         {/* Search Bar */}
                         <div className="mx-auto max-w-2xl">
-                            <div className="relative flex items-center rounded-full bg-white shadow-2xl p-1.5 pl-4 focus-within:ring-4 focus-within:ring-[#FCEE1F]/50">
-                                <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                            <div className="relative flex items-center rounded-full bg-white p-1.5 pl-4 shadow-2xl focus-within:ring-4 focus-within:ring-[#FCEE1F]/50">
+                                <Search className="h-5 w-5 flex-shrink-0 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder={
                                         searchType === 'journals'
-                                            ? "Search for journals, publisher, or ISSN..."
+                                            ? 'Search for journals, publisher, or ISSN...'
                                             : searchType === 'articles'
-                                            ? "Search for article title, author, or abstract..."
-                                            : "Search for university name or code..."
+                                              ? 'Search for article title, author, or abstract...'
+                                              : 'Search for university name or code...'
                                     }
-                                    className="h-11 w-full border-0 bg-transparent px-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:ring-offset-0 sm:text-base"
+                                    className="h-11 w-full border-0 bg-transparent px-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:ring-offset-0 focus:outline-none sm:text-base"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
-                                
+
                                 {/* Divider */}
-                                <div className="h-6 w-[1px] bg-gray-200 mx-2 flex-shrink-0" />
+                                <div className="mx-2 h-6 w-[1px] flex-shrink-0 bg-gray-200" />
 
                                 {/* Dropdown Selector */}
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <button
                                             type="button"
-                                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:text-gray-900 rounded-md hover:bg-gray-50 focus:outline-none transition-colors mr-2 flex-shrink-0"
+                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none"
                                         >
                                             {searchType === 'journals' && <Library className="h-4 w-4 text-gray-500" />}
                                             {searchType === 'articles' && <BookOpen className="h-4 w-4 text-gray-500" />}
@@ -175,15 +175,24 @@ export default function Welcome() {
                                         </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-40">
-                                        <DropdownMenuItem onClick={() => setSearchType('journals')} className="cursor-pointer flex items-center gap-2">
+                                        <DropdownMenuItem
+                                            onClick={() => setSearchType('journals')}
+                                            className="flex cursor-pointer items-center gap-2"
+                                        >
                                             <Library className="h-4 w-4 text-gray-400" />
                                             <span>Journals</span>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setSearchType('articles')} className="cursor-pointer flex items-center gap-2">
+                                        <DropdownMenuItem
+                                            onClick={() => setSearchType('articles')}
+                                            className="flex cursor-pointer items-center gap-2"
+                                        >
                                             <BookOpen className="h-4 w-4 text-gray-400" />
                                             <span>Articles</span>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setSearchType('universities')} className="cursor-pointer flex items-center gap-2">
+                                        <DropdownMenuItem
+                                            onClick={() => setSearchType('universities')}
+                                            className="flex cursor-pointer items-center gap-2"
+                                        >
                                             <GraduationCap className="h-4 w-4 text-gray-400" />
                                             <span>Universities</span>
                                         </DropdownMenuItem>
@@ -191,21 +200,21 @@ export default function Welcome() {
                                 </DropdownMenu>
 
                                 <Button
-                                    className="h-11 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57] flex-shrink-0"
+                                    className="h-11 flex-shrink-0 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57]"
                                     onClick={handleSearch}
                                 >
                                     Search
                                 </Button>
                             </div>
-                            <div className="mt-4 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-sm text-emerald-100">
+                            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-emerald-100">
                                 <span>Can't find what you're looking for?</span>
-                                <div className="h-5 overflow-hidden inline-flex items-center">
+                                <div className="inline-flex h-5 items-center overflow-hidden">
                                     <Link
                                         href={links[currentLinkIndex].href}
-                                        className={`font-semibold text-[#FCEE1F] hover:underline transition-all duration-300 ease-out inline-flex items-center ${
-                                            isFading ? 'opacity-0 translate-y-3 scale-95' : 'opacity-100 translate-y-0 scale-100'
+                                        className={`inline-flex items-center font-semibold text-[#FCEE1F] transition-all duration-300 ease-out hover:underline ${
+                                            isFading ? 'translate-y-3 scale-95 opacity-0' : 'translate-y-0 scale-100 opacity-100'
                                         }`}
-                                      >
+                                    >
                                         {links[currentLinkIndex].label}
                                     </Link>
                                 </div>
@@ -455,8 +464,8 @@ export default function Welcome() {
                                                             {event.location_type.toLowerCase() === 'online'
                                                                 ? 'Online'
                                                                 : event.location_type.toLowerCase() === 'hybrid'
-                                                                    ? `Hybrid - ${event.university?.name || 'TBA'}`
-                                                                    : event.university?.name || 'Venue TBA'}
+                                                                  ? `Hybrid - ${event.university?.name || 'TBA'}`
+                                                                  : event.university?.name || 'Venue TBA'}
                                                         </span>
                                                     </div>
                                                 </div>

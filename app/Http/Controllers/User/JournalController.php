@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreJournalRequest;
 use App\Http\Requests\UpdateJournalRequest;
 use App\Jobs\HarvestJournalArticlesJob;
+use App\Jobs\ImportArticlesXmlJob;
+use App\Models\ArticleImportLog;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Services\JournalService;
@@ -14,8 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use App\Models\ArticleImportLog;
-use App\Jobs\ImportArticlesXmlJob;
 
 class JournalController extends Controller
 {

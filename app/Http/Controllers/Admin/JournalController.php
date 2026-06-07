@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\HarvestJournalArticlesJob;
+use App\Jobs\ImportArticlesXmlJob;
 use App\Jobs\ProcessCsvImportJob;
+use App\Models\ArticleImportLog;
 use App\Models\CsvImport;
 use App\Models\Journal;
 use App\Models\ScientificField;
@@ -17,8 +19,6 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use App\Models\ArticleImportLog;
-use App\Jobs\ImportArticlesXmlJob;
 
 /**
  * JournalController - Super Admin

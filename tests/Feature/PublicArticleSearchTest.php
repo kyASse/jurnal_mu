@@ -4,8 +4,8 @@ use App\Models\Article;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
-use Inertia\Testing\AssertableInertia;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
 
@@ -18,7 +18,7 @@ it('loads the public articles browse page with required properties', function ()
         'is_active' => true,
         'approval_status' => 'approved',
     ]);
-    
+
     Article::factory()->create([
         'journal_id' => $journal->id,
         'title' => 'Advanced Machine Learning Search',
@@ -58,7 +58,7 @@ it('searches articles across all fields using scout', function () {
         'is_active' => true,
         'approval_status' => 'approved',
     ]);
-    
+
     Article::factory()->create([
         'journal_id' => $journal->id,
         'title' => 'Scout Deep Learning Target',
@@ -93,7 +93,7 @@ it('filters articles by specific fields', function () {
         'is_active' => true,
         'approval_status' => 'approved',
     ]);
-    
+
     Article::factory()->create([
         'journal_id' => $journal->id,
         'title' => 'Specific Target Title',
@@ -144,10 +144,10 @@ it('filters articles by specific fields', function () {
 
 it('filters articles by sidebar facets', function () {
     $university = University::factory()->create(['is_active' => true]);
-    
+
     $fieldA = ScientificField::factory()->create(['is_active' => true, 'name' => 'Field A']);
     $fieldB = ScientificField::factory()->create(['is_active' => true, 'name' => 'Field B']);
-    
+
     $journalA = Journal::factory()->create([
         'university_id' => $university->id,
         'scientific_field_id' => $fieldA->id,
@@ -160,7 +160,7 @@ it('filters articles by sidebar facets', function () {
         'is_active' => true,
         'approval_status' => 'approved',
     ]);
-    
+
     Article::factory()->create([
         'journal_id' => $journalA->id,
         'title' => 'Article in Journal A',
@@ -174,7 +174,7 @@ it('filters articles by sidebar facets', function () {
     ]);
 
     // Filter by subject
-    $response = $this->get('/browse/articles?subjects[]=' . $fieldA->id);
+    $response = $this->get('/browse/articles?subjects[]='.$fieldA->id);
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->has('articles.data', 1)
@@ -182,7 +182,7 @@ it('filters articles by sidebar facets', function () {
     );
 
     // Filter by journal
-    $response = $this->get('/browse/articles?journals[]=' . $journalB->id);
+    $response = $this->get('/browse/articles?journals[]='.$journalB->id);
     $response->assertStatus(200);
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->has('articles.data', 1)
@@ -209,7 +209,7 @@ it('searches articles using multiple keywords in query', function () {
         'is_active' => true,
         'approval_status' => 'approved',
     ]);
-    
+
     Article::factory()->create([
         'journal_id' => $journal->id,
         'title' => 'Advanced Machine Learning and Deep Neural Networks',
@@ -247,7 +247,7 @@ it('searches articles using non-contiguous multiple words in query', function ()
         'is_active' => true,
         'approval_status' => 'approved',
     ]);
-    
+
     Article::factory()->create([
         'journal_id' => $journal->id,
         'title' => 'Advanced Machine Learning and Deep Neural Networks',

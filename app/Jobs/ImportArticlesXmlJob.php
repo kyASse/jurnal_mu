@@ -17,8 +17,11 @@ class ImportArticlesXmlJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $journal;
+
     protected $filePath;
+
     protected $strategy;
+
     protected $log;
 
     public function __construct(Journal $journal, string $filePath, string $strategy, ArticleImportLog $log)

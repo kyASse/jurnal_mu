@@ -27,7 +27,7 @@ beforeEach(function () {
 test('article import log can be created and has correct fillable attributes', function () {
     ArticleImportLog::reguard();
 
-    $log = new ArticleImportLog();
+    $log = new ArticleImportLog;
     $log->fill([
         'journal_id' => $this->journal->id,
         'filename' => 'articles.xml',

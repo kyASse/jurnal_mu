@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\Journal;
+use App\Jobs\ImportArticlesXmlJob;
 use App\Models\Article;
+use App\Models\ArticleImportLog;
+use App\Models\Journal;
 use App\Services\CrossrefXmlImporter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class CrossrefXmlImporterTest extends TestCase
@@ -15,7 +18,7 @@ class CrossrefXmlImporterTest extends TestCase
     public function test_can_parse_ojs2_and_ojs3_xml()
     {
         $journal = Journal::factory()->create();
-        $importer = new CrossrefXmlImporter();
+        $importer = new CrossrefXmlImporter;
 
         // OJS 2 import
         $result2 = $importer->import($journal, storage_path('app/public/OJS_2.xml'), 'skip');
@@ -55,7 +58,7 @@ class CrossrefXmlImporterTest extends TestCase
     public function test_duplicate_strategy_skip()
     {
         $journal = Journal::factory()->create();
-        $importer = new CrossrefXmlImporter();
+        $importer = new CrossrefXmlImporter;
 
         // Initial import
         $importer->import($journal, storage_path('app/public/OJS_2.xml'), 'skip');
@@ -70,7 +73,7 @@ class CrossrefXmlImporterTest extends TestCase
 
         // Re-import with 'skip' strategy
         $result = $importer->import($journal, storage_path('app/public/OJS_2.xml'), 'skip');
-        
+
         $this->assertEquals(2, $result['records_found']);
         $this->assertEquals(0, $result['records_imported']);
         $this->assertEquals(0, $result['records_updated']);
@@ -83,7 +86,7 @@ class CrossrefXmlImporterTest extends TestCase
     public function test_duplicate_strategy_update()
     {
         $journal = Journal::factory()->create();
-        $importer = new CrossrefXmlImporter();
+        $importer = new CrossrefXmlImporter;
 
         // Initial import
         $importer->import($journal, storage_path('app/public/OJS_2.xml'), 'skip');
@@ -98,7 +101,7 @@ class CrossrefXmlImporterTest extends TestCase
 
         // Re-import with 'update' strategy
         $result = $importer->import($journal, storage_path('app/public/OJS_2.xml'), 'update');
-        
+
         $this->assertEquals(2, $result['records_found']);
         $this->assertEquals(0, $result['records_imported']);
         $this->assertEquals(2, $result['records_updated']);
@@ -111,9 +114,9 @@ class CrossrefXmlImporterTest extends TestCase
     public function test_import_handles_author_with_missing_given_name_or_surname()
     {
         $journal = Journal::factory()->create();
-        $importer = new CrossrefXmlImporter();
+        $importer = new CrossrefXmlImporter;
 
-        $xmlContent = <<<XML
+        $xmlContent = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <doi_batch version="4.3.6" xmlns="http://www.crossref.org/schema/4.3.6">
   <body>
@@ -177,26 +180,25 @@ XML;
 
     public function test_import_job_execution()
     {
-        \Illuminate\Support\Facades\Storage::fake('local');
+        Storage::fake('local');
         $journal = Journal::factory()->create();
 
         $tempPath = 'xml_imports/test.xml';
-        \Illuminate\Support\Facades\Storage::put($tempPath, file_get_contents(storage_path('app/public/OJS_2.xml')));
+        Storage::put($tempPath, file_get_contents(storage_path('app/public/OJS_2.xml')));
 
-        $log = \App\Models\ArticleImportLog::create([
+        $log = ArticleImportLog::create([
             'journal_id' => $journal->id,
             'filename' => 'OJS_2.xml',
             'duplicate_strategy' => 'skip',
             'status' => 'pending',
         ]);
 
-        $job = new \App\Jobs\ImportArticlesXmlJob($journal, $tempPath, 'skip', $log);
-        $job->handle(new CrossrefXmlImporter());
+        $job = new ImportArticlesXmlJob($journal, $tempPath, 'skip', $log);
+        $job->handle(new CrossrefXmlImporter);
 
         $log->refresh();
         $this->assertEquals('success', $log->status);
         $this->assertEquals(2, $log->records_imported);
-        $this->assertFalse(\Illuminate\Support\Facades\Storage::exists($tempPath));
+        $this->assertFalse(Storage::exists($tempPath));
     }
 }
-

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Article;
 use App\Models\Journal;
 use App\Models\University;
 use Illuminate\Support\Facades\Cache;
@@ -78,7 +79,7 @@ it('caches the featured articles output', function () {
         'university_id' => $university->id,
         'is_active' => true,
     ]);
-    \App\Models\Article::factory()->create([
+    Article::factory()->create([
         'journal_id' => $journal->id,
         'title' => 'Test Article',
         'publication_date' => now(),
@@ -103,4 +104,3 @@ it('caches the top universities output', function () {
     expect(Cache::has('home_top_universities'))->toBeTrue();
     expect(Cache::get('home_top_universities')->first()['name'])->toBe($university->name);
 });
-
