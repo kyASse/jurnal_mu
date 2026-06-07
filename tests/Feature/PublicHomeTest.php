@@ -38,7 +38,7 @@ it('loads the welcome page with correct inertia components and props', function 
         ->has('totalJournals')
         ->has('totalArticles')
         ->has('scientificFields')
-        ->has('recentArticles')
+        ->has('featuredArticles')
         ->has('topUniversities')
     );
 });
@@ -72,7 +72,7 @@ it('can refresh the featured journals cache via artisan command', function () {
     expect(Cache::get('featured_journals_welcome')->first())->not->toBe('dummy data');
 });
 
-it('caches the recent articles output', function () {
+it('caches the featured articles output', function () {
     $university = University::factory()->create(['is_active' => true]);
     $journal = Journal::factory()->create([
         'university_id' => $university->id,
@@ -84,10 +84,10 @@ it('caches the recent articles output', function () {
         'publication_date' => now(),
     ]);
 
-    expect(Cache::has('home_recent_articles'))->toBeFalse();
+    expect(Cache::has('home_featured_articles'))->toBeFalse();
     $this->get('/');
-    expect(Cache::has('home_recent_articles'))->toBeTrue();
-    expect(Cache::get('home_recent_articles')->first()['title'])->toBe('Test Article');
+    expect(Cache::has('home_featured_articles'))->toBeTrue();
+    expect(Cache::get('home_featured_articles')->first()['title'])->toBe('Test Article');
 });
 
 it('caches the top universities output', function () {
