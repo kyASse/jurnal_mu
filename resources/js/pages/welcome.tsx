@@ -85,6 +85,27 @@ export default function Welcome() {
         }
     };
 
+    const links = [
+        { label: 'Browse Journals', href: route('journals.index') },
+        { label: 'Browse Articles', href: route('browse.articles') },
+        { label: 'Browse Universities', href: route('browse.universities') },
+    ];
+
+    const [currentLinkIndex, setCurrentLinkIndex] = useState(0);
+    const [isFading, setIsFading] = useState(false);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setIsFading(true);
+            setTimeout(() => {
+                setCurrentLinkIndex((prev) => (prev + 1) % links.length);
+                setIsFading(false);
+            }, 300);
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <>
             <Head title="JurnalMu - Muhammadiyah Journal Portal" />
@@ -176,11 +197,18 @@ export default function Welcome() {
                                     Search
                                 </Button>
                             </div>
-                            <div className="mt-4 flex justify-center gap-4 text-sm text-emerald-100">
+                            <div className="mt-4 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-sm text-emerald-100">
                                 <span>Can't find what you're looking for?</span>
-                                <Link href={route('browse.universities')} className="font-semibold text-[#FCEE1F] hover:underline">
-                                    Browse by University
-                                </Link>
+                                <div className="h-5 overflow-hidden inline-flex items-center">
+                                    <Link
+                                        href={links[currentLinkIndex].href}
+                                        className={`font-semibold text-[#FCEE1F] hover:underline transition-all duration-300 ease-out inline-flex items-center ${
+                                            isFading ? 'opacity-0 translate-y-3 scale-95' : 'opacity-100 translate-y-0 scale-100'
+                                        }`}
+                                      >
+                                        {links[currentLinkIndex].label}
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
