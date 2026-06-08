@@ -14,6 +14,7 @@ export type JournalFormData = {
     issn: string;
     e_issn: string;
     url: string;
+    editorial_team_url: string;
     scientific_field_id: string;
     sinta_rank: string;
     frequency: string;
@@ -69,6 +70,7 @@ export default function JournalForm({
         issn: initialData?.issn || '',
         e_issn: initialData?.e_issn || '',
         url: initialData?.url || '',
+        editorial_team_url: initialData?.editorial_team_url || '',
         scientific_field_id: initialData?.scientific_field_id || '',
         sinta_rank: initialData?.sinta_rank || 'non_sinta',
         frequency: initialData?.frequency || '',
@@ -218,6 +220,19 @@ export default function JournalForm({
                         required
                     />
                     {errors.url && <p className="mt-1 text-sm text-red-600">{errors.url}</p>}
+                </div>
+
+                <div>
+                    <Label htmlFor="editorial_team_url">Editorial Team URL</Label>
+                    <Input
+                        id="editorial_team_url"
+                        type="url"
+                        value={data.editorial_team_url}
+                        onChange={(e) => setData('editorial_team_url', e.target.value)}
+                        placeholder="https://journal.example.ac.id/index.php/jite/about/editorialTeam"
+                        className="mt-1"
+                    />
+                    {errors.editorial_team_url && <p className="mt-1 text-sm text-red-600">{errors.editorial_team_url}</p>}
                 </div>
             </div>
 

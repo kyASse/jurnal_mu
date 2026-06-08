@@ -24,6 +24,7 @@ class Journal extends Model
         'issn',
         'e_issn',
         'url',
+        'editorial_team_url',
         'oai_urls',
         'publisher',
         'frequency',
