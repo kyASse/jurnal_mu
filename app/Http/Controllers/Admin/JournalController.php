@@ -181,6 +181,7 @@ class JournalController extends Controller
             'scientific_field_id' => 'required|exists:scientific_fields,id',
             'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i|unique:journals,e_issn',
             'url' => 'required|url|max:255',
+            'editorial_team_url' => 'nullable|url|max:255',
             'sinta_rank' => 'required|string|max:255',
             'frequency' => 'required|string|max:255',
             'oai_urls' => 'required|array|min:1',

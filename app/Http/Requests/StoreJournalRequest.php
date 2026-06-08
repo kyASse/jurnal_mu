@@ -29,6 +29,7 @@ class StoreJournalRequest extends FormRequest
             'issn' => 'nullable|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i|unique:journals,issn',
             'e_issn' => 'required|string|max:20|regex:/^\d{4}-\d{3}[\dX]$/i|unique:journals,e_issn',
             'url' => 'required|url|max:500',
+            'editorial_team_url' => 'nullable|url|max:500',
 
             // Publication Details
             'publisher' => 'nullable|string|max:255',
