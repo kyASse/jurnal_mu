@@ -552,8 +552,37 @@ export default function JournalsShow() {
                         </div>
 
                         {/* Article List Header */}
-                        <div className="mb-4 flex items-center justify-between rounded-t-xl bg-muted p-4 dark:bg-muted">
-                            <span className="text-sm font-semibold text-foreground">Articles</span>
+                        <div className="mb-4 flex flex-col gap-2 rounded-t-xl bg-muted p-4 sm:flex-row sm:items-center sm:justify-between dark:bg-muted">
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-3">
+                                <span className="text-sm font-semibold text-foreground">Articles</span>
+                                {(queries.search || queries.year_start || queries.year_end || queries.volume || queries.issue) && (
+                                    <span className="text-xs text-muted-foreground">
+                                        (Filtered by:{' '}
+                                        {[
+                                            queries.search && `Search: "${queries.search}"`,
+                                            (queries.year_start || queries.year_end) &&
+                                                `Year: ${
+                                                    queries.year_start && queries.year_end
+                                                        ? `${queries.year_start}-${queries.year_end}`
+                                                        : queries.year_start
+                                                          ? `>= ${queries.year_start}`
+                                                          : `<= ${queries.year_end}`
+                                                }`,
+                                            (queries.volume || queries.issue) &&
+                                                `Issue: ${
+                                                    queries.volume && queries.issue
+                                                        ? `Vol. ${queries.volume}, No. ${queries.issue}`
+                                                        : queries.volume
+                                                          ? `Vol. ${queries.volume}`
+                                                          : `No. ${queries.issue}`
+                                                }`,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(', ')}
+                                        )
+                                    </span>
+                                )}
+                            </div>
                             <span className="text-xs text-muted-foreground">{articles.total ?? 0} Documents</span>
                         </div>
 
