@@ -33,6 +33,7 @@ export default function Create({ universities, users, scientificFields, sintaRan
         scientific_field_id: '',
         e_issn: '',
         url: '',
+        editorial_team_url: '',
         sinta_rank: '',
         frequency: '',
         oai_urls: [''],
@@ -189,6 +190,18 @@ export default function Create({ universities, users, scientificFields, sintaRan
                                                 placeholder="https://journal.ac.id/..."
                                             />
                                             <InputError message={errors.url} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="editorial_team_url">Editorial Team URL</Label>
+                                            <Input
+                                                id="editorial_team_url"
+                                                type="url"
+                                                className="mt-1"
+                                                value={data.editorial_team_url}
+                                                onChange={(e) => setData('editorial_team_url', e.target.value)}
+                                                placeholder="https://journal.ac.id/..."
+                                            />
+                                            <InputError message={errors.editorial_team_url} className="mt-2" />
                                         </div>
                                         <div>
                                             <Label htmlFor="sinta_rank">
