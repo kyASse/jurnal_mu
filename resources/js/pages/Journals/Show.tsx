@@ -4,9 +4,9 @@
  * @features Display comprehensive journal information, article filtering, stats, and 3-column layout
  */
 
-import PublicNavbar from '@/components/public-navbar';
-import PublicFooter from '@/components/public-footer';
 import { SintaBadge } from '@/components/badges';
+import PublicFooter from '@/components/public-footer';
+import PublicNavbar from '@/components/public-navbar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -190,7 +190,21 @@ export default function JournalsShow() {
                             )}
 
                             <div className="flex flex-wrap items-center gap-2">
-                                <SintaBadge rank={journal.sinta_rank ?? null} />
+                                {journal.sinta_rank && journal.sinta_rank !== 'non_sinta' ? (
+                                    <a
+                                        href={
+                                            journal.indexations?.SINTA?.url ||
+                                            `https://sinta.kemdikbud.go.id/journals?q=${encodeURIComponent(journal.title)}`
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-block transition-opacity hover:opacity-85"
+                                    >
+                                        <SintaBadge rank={journal.sinta_rank} />
+                                    </a>
+                                ) : (
+                                    <SintaBadge rank={journal.sinta_rank ?? null} />
+                                )}
                                 {journal.accreditation_label && (
                                     <Badge
                                         variant="outline"
@@ -201,15 +215,41 @@ export default function JournalsShow() {
                                 )}
                                 {journal.indexation_labels && journal.indexation_labels.length > 0 && (
                                     <>
-                                        {journal.indexation_labels.map((indexation, idx) => (
-                                            <Badge
-                                                key={idx}
-                                                variant="outline"
-                                                className="border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-700 dark:bg-purple-950 dark:text-purple-300"
-                                            >
-                                                {indexation}
-                                            </Badge>
-                                        ))}
+                                        {journal.indexation_labels
+                                            .filter((label) => label !== 'SINTA')
+                                            .map((indexation, idx) => {
+                                                const indexationData = journal.indexations?.[indexation];
+                                                const url = indexationData?.url;
+
+                                                if (url) {
+                                                    return (
+                                                        <a
+                                                            key={idx}
+                                                            href={url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-block transition-opacity hover:opacity-85"
+                                                        >
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="cursor-pointer border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-700 dark:bg-purple-950 dark:text-purple-300 dark:hover:bg-purple-900"
+                                                            >
+                                                                {indexation}
+                                                            </Badge>
+                                                        </a>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <Badge
+                                                        key={idx}
+                                                        variant="outline"
+                                                        className="border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-700 dark:bg-purple-950 dark:text-purple-300"
+                                                    >
+                                                        {indexation}
+                                                    </Badge>
+                                                );
+                                            })}
                                     </>
                                 )}
                                 <a href={journal.url} target="_blank" rel="noopener noreferrer">
