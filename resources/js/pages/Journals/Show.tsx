@@ -50,7 +50,7 @@ interface JournalsShowProps extends SharedData {
 }
 
 export default function JournalsShow() {
-    const { journal, articles, articlesByYear, issuesList, auth, queries } = usePage<JournalsShowProps>().props;
+    const { journal, articles, articlesByYear, issuesList, queries } = usePage<JournalsShowProps>().props;
     const [searchQuery, setSearchQuery] = useState(queries.search || '');
     const [yearFrom, setYearFrom] = useState<string>(queries.year_start || '');
     const [yearTo, setYearTo] = useState<string>(queries.year_end || '');
@@ -419,14 +419,16 @@ export default function JournalsShow() {
                                 >
                                     <ChevronRight className="h-4 w-4" /> Journal URL
                                 </a>
-                                <a
-                                    href={journal.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
-                                >
-                                    <ChevronRight className="h-4 w-4" /> Editorial Team
-                                </a>
+                                {journal.editorial_team_url && (
+                                    <a
+                                        href={journal.editorial_team_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
+                                    >
+                                        <ChevronRight className="h-4 w-4" /> Editorial Team
+                                    </a>
+                                )}
                                 <a
                                     href={`mailto:${journal.email}`}
                                     className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary dark:border-border dark:hover:bg-muted"
