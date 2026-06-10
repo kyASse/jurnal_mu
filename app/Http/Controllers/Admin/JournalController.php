@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Spatie\SimpleExcel\SimpleExcelWriter;
 
 /**
  * JournalController - Super Admin
@@ -516,5 +517,46 @@ class JournalController extends Controller
         ImportArticlesXmlJob::dispatch($journal, $storedPath, $request->input('duplicate_strategy'), $log)->onQueue('harvesting');
 
         return redirect()->back()->with('success', 'File XML berhasil diunggah dan sedang diproses di background.');
+    }
+
+    public function export(Request $request, string $format)
+    {
+        abort_unless($request->user()->isSuperAdmin(), 403);
+
+        return response()->streamDownload(function () use ($format) {
+            $writer = SimpleExcelWriter::create('php://output', $format);
+
+            $journals = Journal::with(['university', 'user', 'scientificField'])
+                ->orderBy('title')
+                ->cursor();
+
+            foreach ($journals as $journal) {
+                $writer->addRow([
+                    'ID' => $journal->id,
+                    'Judul Jurnal' => $journal->title,
+                    'ISSN' => $journal->issn,
+                    'E-ISSN' => $journal->e_issn,
+                    'URL Jurnal' => $journal->url,
+                    'Editorial Team URL' => $journal->editorial_team_url,
+                    'Publisher' => $journal->publisher,
+                    'Frekuensi' => $journal->frequency,
+                    'Tahun Terbit Pertama' => $journal->first_published_year,
+                    'Universitas' => $journal->university?->name,
+                    'Pengelola Jurnal' => $journal->user ? $journal->user->name . ' (' . $journal->user->email . ')' : '',
+                    'Bidang Ilmu' => $journal->scientificField?->name,
+                    'SINTA Rank' => $journal->sinta_rank,
+                    'Mulai Akreditasi' => $journal->accreditation_start_year,
+                    'Selesai Akreditasi' => $journal->accreditation_end_year,
+                    'Nomor SK Akreditasi' => $journal->accreditation_sk_number,
+                    'Tanggal SK Akreditasi' => $journal->accreditation_sk_date?->format('Y-m-d'),
+                    'Indeksasi' => is_array($journal->indexations) ? implode(', ', $journal->indexations) : '',
+                    'Status Aktif' => $journal->is_active ? 'Aktif' : 'Tidak Aktif',
+                    'Status Persetujuan' => $journal->approval_status,
+                    'Tanggal Dibuat' => $journal->created_at?->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            $writer->close();
+        }, "journals_all.{$format}");
     }
 }
