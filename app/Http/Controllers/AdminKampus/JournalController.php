@@ -27,6 +27,8 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Spatie\SimpleExcel\SimpleExcelWriter;
+use Illuminate\Support\Str;
 
 /**
  * JournalController - Admin Kampus
@@ -742,6 +744,61 @@ class JournalController extends Controller
 
         return redirect()->route('admin-kampus.journals.index')
             ->with('success', 'Jurnal berhasil dihapus.');
+    }
+
+    /**
+     * Export journals for the Admin Kampus's university.
+     *
+     * @route GET /admin-kampus/journals/export/{format}
+     */
+    public function export(Request $request, string $format)
+    {
+        abort_unless($request->user()->isAdminKampus(), 403);
+
+        abort_if(
+            is_null($request->user()->university_id),
+            403,
+            'Akun Admin Kampus Anda belum terhubung ke universitas. Hubungi Super Admin.'
+        );
+
+        $uniSlug = Str::slug($request->user()->university->name ?? 'kampus');
+
+        return response()->streamDownload(function () use ($request, $format) {
+            $writer = SimpleExcelWriter::create('php://output', $format);
+
+            $journals = Journal::with(['university', 'user', 'scientificField'])
+                ->forUniversity($request->user()->university_id)
+                ->orderBy('title')
+                ->cursor();
+
+            foreach ($journals as $journal) {
+                $writer->addRow([
+                    'ID' => $journal->id,
+                    'Judul Jurnal' => $journal->title,
+                    'ISSN' => $journal->issn,
+                    'E-ISSN' => $journal->e_issn,
+                    'URL Jurnal' => $journal->url,
+                    'Editorial Team URL' => $journal->editorial_team_url,
+                    'Publisher' => $journal->publisher,
+                    'Frekuensi' => $journal->frequency,
+                    'Tahun Terbit Pertama' => $journal->first_published_year,
+                    'Universitas' => $journal->university?->name,
+                    'Pengelola Jurnal (PIC)' => $journal->user ? $journal->user->name . ' (' . $journal->user->email . ')' : '',
+                    'Bidang Ilmu' => $journal->scientificField?->name,
+                    'SINTA Rank' => $journal->sinta_rank,
+                    'Mulai Akreditasi' => $journal->accreditation_start_year,
+                    'Selesai Akreditasi' => $journal->accreditation_end_year,
+                    'Nomor SK Akreditasi' => $journal->accreditation_sk_number,
+                    'Tanggal SK Akreditasi' => $journal->accreditation_sk_date?->format('Y-m-d'),
+                    'Indeksasi' => is_array($journal->indexations) ? implode(', ', array_keys(array_filter($journal->indexations))) : '',
+                    'Status Aktif' => $journal->is_active ? 'Aktif' : 'Tidak Aktif',
+                    'Status Persetujuan' => $journal->approval_status,
+                    'Tanggal Dibuat' => $journal->created_at?->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            $writer->close();
+        }, "journals_{$uniSlug}.{$format}");
     }
 
     /**
