@@ -398,38 +398,31 @@ class UniversityController extends Controller
     {
         abort_unless($request->user()->isSuperAdmin(), 403);
 
-        $universities = University::orderBy('name')->get();
+        return response()->streamDownload(function () use ($format) {
+            $writer = SimpleExcelWriter::create('php://output', $format);
 
-        $writer = SimpleExcelWriter::streamDownload("universities.{$format}");
+            foreach (University::orderBy('name')->cursor() as $university) {
+                $writer->addRow([
+                    'ID' => $university->id,
+                    'Kode PTM' => $university->code,
+                    'Kode NIDN' => $university->ptm_code,
+                    'Nama Universitas' => $university->name,
+                    'Nama Singkat' => $university->short_name,
+                    'Alamat' => $university->address,
+                    'Kota' => $university->city,
+                    'Provinsi' => $university->province,
+                    'Kode Pos' => $university->postal_code,
+                    'Telepon' => $university->phone,
+                    'Email' => $university->email,
+                    'Website' => $university->website,
+                    'Status Akreditasi' => $university->accreditation_status,
+                    'Klaster' => $university->cluster,
+                    'Status Aktif' => $university->is_active ? 'Aktif' : 'Tidak Aktif',
+                    'Tanggal Terdaftar' => $university->created_at?->format('Y-m-d H:i:s'),
+                ]);
+            }
 
-        foreach ($universities as $university) {
-            $writer->addRow([
-                'ID' => $university->id,
-                'Kode PTM' => $university->code,
-                'Kode NIDN' => $university->ptm_code,
-                'Nama Universitas' => $university->name,
-                'Nama Singkat' => $university->short_name,
-                'Alamat' => $university->address,
-                'Kota' => $university->city,
-                'Provinsi' => $university->province,
-                'Kode Pos' => $university->postal_code,
-                'Telepon' => $university->phone,
-                'Email' => $university->email,
-                'Website' => $university->website,
-                'Status Akreditasi' => $university->accreditation_status,
-                'Klaster' => $university->cluster,
-                'Status Aktif' => $university->is_active ? 'Aktif' : 'Tidak Aktif',
-                'Tanggal Terdaftar' => $university->created_at?->format('Y-m-d H:i:s'),
-            ]);
-        }
-
-        if (app()->environment('testing')) {
             $writer->close();
-            return response('', 200, [
-                'Content-Disposition' => 'attachment; filename="universities.' . $format . '"'
-            ]);
-        }
-
-        return $writer->toBrowser();
+        }, "universities.{$format}");
     }
 }
