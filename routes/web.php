@@ -226,6 +226,8 @@ Route::middleware(['auth'])->group(function () {
         */
 
         // Universities Management
+        Route::get('universities/export/{format}', [UniversityController::class, 'export'])
+            ->name('universities.export');
         Route::resource('universities', UniversityController::class);
         Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
             ->name('universities.toggle-active');
@@ -269,6 +271,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('journals/import/process', [JournalController::class, 'processImport'])
             ->name('journals.import.process');
 
+        Route::get('journals/export/{format}', [JournalController::class, 'export'])
+            ->name('journals.export');
         Route::get('journals/{journal}', [JournalController::class, 'show'])
             ->name('journals.show');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])
@@ -398,6 +402,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('journals.create');
         Route::post('journals', [App\Http\Controllers\AdminKampus\JournalController::class, 'store'])
             ->name('journals.store');
+        Route::get('journals/export/{format}', [App\Http\Controllers\AdminKampus\JournalController::class, 'export'])
+            ->name('journals.export');
         Route::get('journals/{journal}', [App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
             ->name('journals.show');
         Route::get('journals/{journal}/edit', [App\Http\Controllers\AdminKampus\JournalController::class, 'edit'])
