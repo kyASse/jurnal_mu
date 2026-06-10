@@ -549,7 +549,7 @@ class JournalController extends Controller
                     'Selesai Akreditasi' => $journal->accreditation_end_year,
                     'Nomor SK Akreditasi' => $journal->accreditation_sk_number,
                     'Tanggal SK Akreditasi' => $journal->accreditation_sk_date?->format('Y-m-d'),
-                    'Indeksasi' => is_array($journal->indexations) ? implode(', ', $journal->indexations) : '',
+                    'Indeksasi' => implode(', ', $journal->indexation_labels),
                     'Status Aktif' => $journal->is_active ? 'Aktif' : 'Tidak Aktif',
                     'Status Persetujuan' => $journal->approval_status,
                     'Tanggal Dibuat' => $journal->created_at?->format('Y-m-d H:i:s'),
