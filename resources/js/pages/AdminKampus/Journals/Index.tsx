@@ -35,8 +35,11 @@ import {
     Check,
     ChevronLeft,
     ChevronRight,
+    Download,
     ExternalLink,
     Eye,
+    FileSpreadsheet,
+    FileText,
     MoreHorizontal,
     Pencil,
     Plus,
@@ -380,6 +383,24 @@ export default function JournalsIndex({
                                     Import CSV
                                 </Button>
                             </Link>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="flex items-center gap-2">
+                                        <Download className="h-4 w-4" />
+                                        Export
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => window.open(route('admin-kampus.journals.export', 'xlsx'), '_blank')}>
+                                        <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
+                                        Export as XLSX
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => window.open(route('admin-kampus.journals.export', 'csv'), '_blank')}>
+                                        <FileText className="mr-2 h-4 w-4 text-blue-600" />
+                                        Export as CSV
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                             <Link href={route('admin-kampus.journals.create')}>
                                 <Button>
                                     <Plus className="mr-2 h-4 w-4" />

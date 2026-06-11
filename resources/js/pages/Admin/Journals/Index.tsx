@@ -25,10 +25,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { UniversityFilterCombobox } from '@/components/ui/university-filter-combobox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Eye, Search, Upload } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Download, ExternalLink, Eye, FileSpreadsheet, FileText, Search, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -197,6 +198,24 @@ export default function JournalsIndex({ journals, filters, universities, scienti
                                         Import Jurnal
                                     </Button>
                                 </Link>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="flex items-center gap-2">
+                                            <Download className="h-4 w-4" />
+                                            Export
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => window.open(route('admin.journals.export', 'xlsx'), '_blank')}>
+                                            <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
+                                            Export as XLSX
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => window.open(route('admin.journals.export', 'csv'), '_blank')}>
+                                            <FileText className="mr-2 h-4 w-4 text-blue-600" />
+                                            Export as CSV
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                                 <Link href={route('admin.journals.create')}>
                                     <Button className="gap-2">Tambah Jurnal</Button>
                                 </Link>
