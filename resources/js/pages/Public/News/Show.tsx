@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import { Head } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Eye, Link2, Share2, Facebook, Twitter } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Eye, Link2, Share2, Facebook, Twitter, Newspaper } from 'lucide-react';
 import { useState } from 'react';
 
 interface NewsItem {
