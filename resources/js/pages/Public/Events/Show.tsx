@@ -112,7 +112,7 @@ export default function Show({ agenda }: Props) {
         const params = new URLSearchParams({
             action: 'TEMPLATE',
             text: agenda.title,
-            details: `${agenda.description}\n\nLink: ${window.location.href}`,
+            details: `${agenda.description}\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`,
             location: agenda.location_venue || agenda.location_type,
             dates: `${start}/${end}`,
         });
@@ -121,9 +121,26 @@ export default function Show({ agenda }: Props) {
     };
 
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(window.location.href);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(currentUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } else {
+            // Fallback
+            const textArea = document.createElement("textarea");
+            textArea.value = currentUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
     };
 
     const shareUrl = encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '');
