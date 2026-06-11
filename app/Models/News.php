@@ -10,6 +10,8 @@ class News extends Model
 {
     use HasFactory;
 
+    public const PAGINATION_LIMIT = 6;
+
     protected $table = 'news';
 
     protected $fillable = [
@@ -30,6 +32,12 @@ class News extends Model
         'is_active' => 'boolean',
         'published_at' => 'datetime',
     ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_active', true)
+            ->where('published_at', '<=', now());
+    }
 
     public function author(): BelongsTo
     {

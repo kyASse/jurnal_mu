@@ -12,10 +12,9 @@ class PublicNewsController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->input('search');
-        $sort = $request->input('sort', 'new');
+        $sort = in_array($request->input('sort'), ['new', 'old', 'A to Z']) ? $request->input('sort') : 'new';
 
-        $query = News::where('is_active', true)
-            ->where('published_at', '<=', now());
+        $query = News::published();
 
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -34,7 +33,7 @@ class PublicNewsController extends Controller
         }
 
         $news = $query->with('author:id,name')
-            ->paginate(6)
+            ->paginate(News::PAGINATION_LIMIT)
             ->withQueryString();
 
         return Inertia::render('Public/News/Index', [
@@ -48,9 +47,8 @@ class PublicNewsController extends Controller
 
     public function show(string $slug): Response
     {
-        $news = News::where('slug', $slug)
-            ->where('is_active', true)
-            ->where('published_at', '<=', now())
+        $news = News::published()
+            ->where('slug', $slug)
             ->with('author:id,name')
             ->firstOrFail();
 
