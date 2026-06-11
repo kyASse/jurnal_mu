@@ -32,6 +32,9 @@ export default function PublicNavbar() {
                         <Link href={route('browse.universities')} className="font-semibold text-white/90 transition-colors hover:text-white">
                             Universities
                         </Link>
+                        <Link href={route('news.index')} className="font-semibold text-white/90 transition-colors hover:text-white">
+                            News
+                        </Link>
                         <Link href={route('events.index')} className="font-semibold text-white/90 transition-colors hover:text-white">
                             Events
                         </Link>
