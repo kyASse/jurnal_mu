@@ -36,11 +36,13 @@ export default function Index({ news, filters }: Props) {
     const [sort, setSort] = useState(filters?.sort || 'new');
     const [newsList, setNewsList] = useState<NewsItem[]>(news.data);
     const [currentPage, setCurrentPage] = useState(news.current_page);
+    const [nextPageUrl, setNextPageUrl] = useState<string | null>(news.next_page_url);
     const [loadingMore, setLoadingMore] = useState(false);
 
     useEffect(() => {
         setNewsList(news.data);
         setCurrentPage(news.current_page);
+        setNextPageUrl(news.next_page_url);
     }, [news.data]);
 
     const handleSearch = (e: FormEvent) => {
@@ -62,11 +64,11 @@ export default function Index({ news, filters }: Props) {
     };
 
     const loadMore = async () => {
-        if (!news.next_page_url || loadingMore) return;
+        if (!nextPageUrl || loadingMore) return;
         setLoadingMore(true);
 
         try {
-            const url = new URL(news.next_page_url, window.location.origin);
+            const url = new URL(nextPageUrl, window.location.origin);
             url.searchParams.set('search', search);
             url.searchParams.set('sort', sort);
 
@@ -79,10 +81,10 @@ export default function Index({ news, filters }: Props) {
 
             if (res.ok) {
                 const responseData = await res.json();
-                const fetchedNews: PaginatedData = responseData.news;
+                const fetchedNews: PaginatedData = responseData.props.news;
                 setNewsList(prev => [...prev, ...fetchedNews.data]);
                 setCurrentPage(fetchedNews.current_page);
-                news.next_page_url = fetchedNews.next_page_url;
+                setNextPageUrl(fetchedNews.next_page_url);
             }
         } catch (err) {
             console.error('Error loading more news:', err);
@@ -236,7 +238,7 @@ export default function Index({ news, filters }: Props) {
                             ))}
                         </div>
 
-                        {news.next_page_url && (
+                        {nextPageUrl && (
                             <div className="mt-12 flex justify-center">
                                 <Button
                                     onClick={loadMore}
