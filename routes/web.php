@@ -328,6 +328,10 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('{event}', [AgendaController::class, 'destroy'])->name('destroy');
         });
 
+        // News Management
+        Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
+        Route::post('news/{id}/toggle-active', [App\Http\Controllers\Admin\NewsController::class, 'toggleActive'])->name('news.toggle-active');
+
     });
 
     /*
