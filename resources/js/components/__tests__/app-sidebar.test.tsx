@@ -1,10 +1,8 @@
+import { render, screen } from '@testing-library/react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 // Mock route function globally before module evaluation
 (globalThis as any).route = (name: string, params?: any) => `/route/${name}/${params || ''}`;
-
-import { AppSidebar } from '../app-sidebar';
-import { ROLE_NAMES } from '@/constants/roles';
 
 // Mock dependencies
 vi.mock('@inertiajs/react', () => {
@@ -45,9 +43,12 @@ vi.mock('./app-logo', () => ({
 }));
 
 import { usePage } from '@inertiajs/react';
+import { ROLE_NAMES } from '@/constants/roles';
 
 describe('AppSidebar', () => {
-    it('renders News Management for Super Admin', () => {
+    it('renders News Management for Super Admin', async () => {
+        const { AppSidebar } = await import('../app-sidebar');
+
         vi.mocked(usePage).mockReturnValue({
             props: {
                 auth: {
