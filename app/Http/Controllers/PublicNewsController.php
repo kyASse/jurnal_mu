@@ -15,10 +15,7 @@ class PublicNewsController extends Controller
         $sort = $request->input('sort', 'new');
 
         $query = News::where('is_active', true)
-            ->where(function($q) {
-                $q->whereNull('published_at')
-                  ->orWhere('published_at', '<=', now());
-            });
+            ->where('published_at', '<=', now());
 
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -53,10 +50,7 @@ class PublicNewsController extends Controller
     {
         $news = News::where('slug', $slug)
             ->where('is_active', true)
-            ->where(function($q) {
-                $q->whereNull('published_at')
-                  ->orWhere('published_at', '<=', now());
-            })
+            ->where('published_at', '<=', now())
             ->with('author:id,name')
             ->firstOrFail();
 

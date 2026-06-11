@@ -56,3 +56,29 @@ it('displays active published news and increments views on detail page', functio
     // Verify views incremented
     expect($news->fresh()->views)->toBe(1);
 });
+
+it('excludes news with null published_at', function () {
+    $author = User::factory()->create();
+
+    $news = News::create([
+        'title' => 'Draft News Without Date',
+        'slug' => 'draft-news-without-date',
+        'body' => 'Should not be visible to public.',
+        'author_id' => $author->id,
+        'is_active' => true,
+        'published_at' => null,
+    ]);
+
+    // Index page check - should not display the news
+    $response = $this->get(route('news.index'));
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Public/News/Index')
+        ->has('news.data', 0)
+    );
+
+    // Detail page check - should fail with 404
+    $detailResponse = $this->get(route('news.show', $news->slug));
+    $detailResponse->assertNotFound();
+});
+
