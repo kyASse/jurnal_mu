@@ -28,7 +28,7 @@ export default function Show({ news }: Props) {
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
     const copyToClipboard = () => {
-        if (navigator.clipboard) {
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
             navigator.clipboard.writeText(shareUrl);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);

@@ -3,8 +3,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PublicLayout from '@/layouts/public-layout';
 import { Head, router } from '@inertiajs/react';
-import { CalendarDays, Search, Newspaper } from 'lucide-react';
-import { FormEvent, useState, useEffect } from 'react';
+import { CalendarDays, Newspaper, Search } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
 
 interface NewsItem {
     id: number;
@@ -47,20 +47,12 @@ export default function Index({ news, filters }: Props) {
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
-        router.get(
-            route('news.index'),
-            { search, sort },
-            { preserveState: true }
-        );
+        router.get(route('news.index'), { search, sort }, { preserveState: true });
     };
 
     const handleSortChange = (value: string) => {
         setSort(value);
-        router.get(
-            route('news.index'),
-            { search, sort: value },
-            { preserveState: true }
-        );
+        router.get(route('news.index'), { search, sort: value }, { preserveState: true });
     };
 
     const loadMore = async () => {
@@ -75,14 +67,14 @@ export default function Index({ news, filters }: Props) {
             const res = await fetch(url.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                }
+                    Accept: 'application/json',
+                },
             });
 
             if (res.ok) {
                 const responseData = await res.json();
                 const fetchedNews: PaginatedData = responseData.props.news;
-                setNewsList(prev => [...prev, ...fetchedNews.data]);
+                setNewsList((prev) => [...prev, ...fetchedNews.data]);
                 setCurrentPage(fetchedNews.current_page);
                 setNextPageUrl(fetchedNews.next_page_url);
             }
@@ -94,8 +86,15 @@ export default function Index({ news, filters }: Props) {
     };
 
     const stripHtml = (html: string) => {
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        return doc.body.textContent || "";
+        if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+            return html.replace(/<[^>]*>/g, '');
+        }
+        try {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            return doc.body.textContent || "";
+        } catch {
+            return html.replace(/<[^>]*>/g, '');
+        }
     };
 
     return (
@@ -184,8 +183,11 @@ export default function Index({ news, filters }: Props) {
                     <>
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-8">
                             {newsList.map((item) => (
-                                <article key={item.id} className="flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-                                    <div className="aspect-video w-full overflow-hidden bg-muted relative">
+                                <article
+                                    key={item.id}
+                                    className="flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+                                >
+                                    <div className="relative aspect-video w-full overflow-hidden bg-muted">
                                         {item.thumbnail ? (
                                             <img
                                                 src={`/storage/${item.thumbnail}`}
@@ -204,9 +206,17 @@ export default function Index({ news, filters }: Props) {
                                         )}
                                     </div>
                                     <div className="flex flex-1 flex-col p-6">
-                                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+                                        <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
                                             <CalendarDays className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                                            <span>{item.published_at ? new Date(item.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Draft'}</span>
+                                            <span>
+                                                {item.published_at
+                                                    ? new Date(item.published_at).toLocaleDateString('id-ID', {
+                                                          day: 'numeric',
+                                                          month: 'short',
+                                                          year: 'numeric',
+                                                      })
+                                                    : 'Draft'}
+                                            </span>
                                             {item.views > 0 && (
                                                 <>
                                                     <span>&bull;</span>
@@ -214,21 +224,17 @@ export default function Index({ news, filters }: Props) {
                                                 </>
                                             )}
                                         </div>
-                                        <h3 className="font-heading text-xl font-bold leading-snug text-foreground hover:text-[#079C4E] dark:hover:text-[#079C4E] transition-colors mb-2 line-clamp-2">
+                                        <h3 className="font-heading mb-2 line-clamp-2 text-xl leading-snug font-bold text-foreground transition-colors hover:text-[#079C4E] dark:hover:text-[#079C4E]">
                                             <a href={route('news.show', item.slug)}>{item.title}</a>
                                         </h3>
                                         {item.subtitle && (
-                                            <p className="text-sm font-semibold text-muted-foreground line-clamp-1 mb-2">
-                                                {item.subtitle}
-                                            </p>
+                                            <p className="mb-2 line-clamp-1 text-sm font-semibold text-muted-foreground">{item.subtitle}</p>
                                         )}
-                                        <p className="text-muted-foreground text-sm line-clamp-3 mb-6 flex-1">
-                                            {stripHtml(item.body)}
-                                        </p>
-                                        <div className="pt-4 border-t dark:border-zinc-800">
+                                        <p className="mb-6 line-clamp-3 flex-1 text-sm text-muted-foreground">{stripHtml(item.body)}</p>
+                                        <div className="border-t pt-4 dark:border-zinc-800">
                                             <a
                                                 href={route('news.show', item.slug)}
-                                                className="text-[#079C4E] text-sm font-bold hover:underline inline-flex items-center gap-1"
+                                                className="inline-flex items-center gap-1 text-sm font-bold text-[#079C4E] hover:underline"
                                             >
                                                 Read Full Article &rarr;
                                             </a>
@@ -244,7 +250,7 @@ export default function Index({ news, filters }: Props) {
                                     onClick={loadMore}
                                     disabled={loadingMore}
                                     size="lg"
-                                    className="rounded-full bg-[#079C4E] hover:bg-[#068A44] px-8 font-semibold"
+                                    className="rounded-full bg-[#079C4E] px-8 font-semibold hover:bg-[#068A44]"
                                 >
                                     {loadingMore ? 'Loading...' : 'Load More News'}
                                 </Button>

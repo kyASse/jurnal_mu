@@ -8,7 +8,11 @@ beforeAll(() => {
 
 vi.mock('@inertiajs/react', () => {
     return {
-        Link: ({ href, children, ...props }: any) => <a href={href} {...props}>{children}</a>,
+        Link: ({ href, children, ...props }: any) => (
+            <a href={href} {...props}>
+                {children}
+            </a>
+        ),
         usePage: () => ({
             props: {
                 auth: { user: null },

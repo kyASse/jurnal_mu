@@ -122,7 +122,7 @@ export default function Show({ agenda }: Props) {
 
     const copyToClipboard = () => {
         const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-        if (navigator.clipboard) {
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
             navigator.clipboard.writeText(currentUrl);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);

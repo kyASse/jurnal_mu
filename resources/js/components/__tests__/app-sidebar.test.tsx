@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 // Mock route function globally before module evaluation
 (globalThis as any).route = (name: string, params?: any) => `/route/${name}/${params || ''}`;
@@ -7,7 +7,11 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 // Mock dependencies
 vi.mock('@inertiajs/react', () => {
     return {
-        Link: ({ href, children, ...props }: any) => <a href={href} {...props}>{children}</a>,
+        Link: ({ href, children, ...props }: any) => (
+            <a href={href} {...props}>
+                {children}
+            </a>
+        ),
         usePage: vi.fn(),
     };
 });
@@ -42,8 +46,8 @@ vi.mock('./app-logo', () => ({
     default: () => <div data-testid="app-logo" />,
 }));
 
-import { usePage } from '@inertiajs/react';
 import { ROLE_NAMES } from '@/constants/roles';
+import { usePage } from '@inertiajs/react';
 
 describe('AppSidebar', () => {
     it('renders News Management for Super Admin', async () => {
