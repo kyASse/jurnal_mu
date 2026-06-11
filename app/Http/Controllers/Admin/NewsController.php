@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Http\Requests\Admin\StoreNewsRequest;
+use App\Http\Requests\Admin\UpdateNewsRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -19,13 +21,15 @@ class NewsController extends Controller
         $query = News::query();
 
         if ($search) {
-            $query->where('title', 'like', "%{$search}%")
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
                   ->orWhere('body', 'like', "%{$search}%");
+            });
         }
 
         $news = $query->with('author:id,name')
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            ->paginate(News::PAGINATION_LIMIT_ADMIN)
             ->withQueryString();
 
         return Inertia::render('Admin/News/Index', [
@@ -41,20 +45,9 @@ class NewsController extends Controller
         return Inertia::render('Admin/News/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreNewsRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:news,slug',
-            'subtitle' => 'nullable|string|max:255',
-            'body' => 'required|string',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string',
-            'is_active' => 'boolean',
-            'published_at' => 'nullable|date',
-            'thumbnail' => 'nullable|image|max:2048',
-            'image' => 'nullable|image|max:4096',
-        ]);
+        $validated = $request->validated();
 
         $validated['author_id'] = auth()->id();
 
@@ -78,20 +71,9 @@ class NewsController extends Controller
         ]);
     }
 
-    public function update(Request $request, News $news)
+    public function update(UpdateNewsRequest $request, News $news)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:news,slug,' . $news->id,
-            'subtitle' => 'nullable|string|max:255',
-            'body' => 'required|string',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string',
-            'is_active' => 'boolean',
-            'published_at' => 'nullable|date',
-            'thumbnail' => 'nullable|image|max:2048',
-            'image' => 'nullable|image|max:4096',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('thumbnail')) {
             if ($news->thumbnail) {
@@ -126,9 +108,8 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'News deleted successfully.');
     }
 
-    public function toggleActive(int $id)
+    public function toggleActive(News $news)
     {
-        $news = News::findOrFail($id);
         $news->update([
             'is_active' => !$news->is_active
         ]);

@@ -330,7 +330,7 @@ Route::middleware(['auth'])->group(function () {
 
         // News Management
         Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
-        Route::post('news/{id}/toggle-active', [App\Http\Controllers\Admin\NewsController::class, 'toggleActive'])->name('news.toggle-active');
+        Route::post('news/{news}/toggle-active', [App\Http\Controllers\Admin\NewsController::class, 'toggleActive'])->name('news.toggle-active');
 
     });
 

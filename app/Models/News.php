@@ -11,6 +11,7 @@ class News extends Model
     use HasFactory;
 
     public const PAGINATION_LIMIT = 6;
+    public const PAGINATION_LIMIT_ADMIN = 10;
 
     protected $table = 'news';
 
