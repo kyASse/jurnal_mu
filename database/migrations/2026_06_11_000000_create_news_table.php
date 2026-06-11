@@ -16,11 +16,13 @@ return new class extends Migration {
             $table->string('thumbnail')->nullable();
             $table->string('image')->nullable();
             $table->json('tags')->nullable();
-            $table->integer('views')->default(0);
+            $table->unsignedInteger('views')->default(0);
             $table->boolean('is_active')->default(true);
             $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
+
+            $table->index(['is_active', 'published_at']);
         });
     }
 

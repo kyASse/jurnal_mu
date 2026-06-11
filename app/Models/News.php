@@ -20,7 +20,6 @@ class News extends Model
         'thumbnail',
         'image',
         'tags',
-        'views',
         'is_active',
         'author_id',
         'published_at',
