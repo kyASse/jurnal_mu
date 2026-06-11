@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import { Head } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Eye, Link2, Share2, Facebook, Twitter, Newspaper } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Eye, Link2, Share2, Facebook, Twitter, Newspaper, Check } from 'lucide-react';
 import { useState } from 'react';
 
 interface NewsItem {
@@ -25,7 +25,7 @@ interface Props {
 export default function Show({ news }: Props) {
     const [copied, setCopied] = useState(false);
 
-    const shareUrl = window.location.href;
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
     const copyToClipboard = () => {
         if (navigator.clipboard) {
@@ -34,7 +34,7 @@ export default function Show({ news }: Props) {
             setTimeout(() => setCopied(false), 2000);
         } else {
             // Fallback
-            const textArea = document.createElement("textarea");
+            const textArea = document.createElement('textarea');
             textArea.value = shareUrl;
             document.body.appendChild(textArea);
             textArea.select();
@@ -70,43 +70,50 @@ export default function Show({ news }: Props) {
                 <nav className="mb-6 flex text-sm text-muted-foreground">
                     <ol className="inline-flex items-center space-x-1 md:space-x-3">
                         <li className="inline-flex items-center">
-                            <a href={route('home')} className="hover:text-foreground">Home</a>
+                            <a href={route('home')} className="hover:text-foreground">
+                                Home
+                            </a>
                         </li>
                         <li>
                             <div className="flex items-center">
                                 <span className="mx-2 text-zinc-400">/</span>
-                                <a href={route('news.index')} className="hover:text-foreground">News</a>
+                                <a href={route('news.index')} className="hover:text-foreground">
+                                    News
+                                </a>
                             </div>
                         </li>
                         <li className="hidden sm:block">
                             <div className="flex items-center">
                                 <span className="mx-2 text-zinc-400">/</span>
-                                <span className="text-foreground line-clamp-1">{news.title}</span>
+                                <span className="line-clamp-1 text-foreground">{news.title}</span>
                             </div>
                         </li>
                     </ol>
                 </nav>
 
-                <a href={route('news.index')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#079C4E] hover:underline mb-8">
+                <a href={route('news.index')} className="mb-8 inline-flex items-center gap-1.5 text-sm font-semibold text-[#079C4E] hover:underline">
                     <ArrowLeft className="h-4 w-4" /> Back to all news
                 </a>
 
                 <article className="mx-auto">
                     {/* Header: Title, Subtitle, and Metadata */}
-                    <div className="text-center mb-8">
-                        <h1 className="font-heading text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl mb-4 leading-tight max-w-4xl mx-auto" style={{ fontFamily: '"El Messiri", serif' }}>
+                    <div className="mb-8 text-center">
+                        <h1
+                            className="font-heading mx-auto mb-4 max-w-4xl text-3xl leading-tight font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl"
+                            style={{ fontFamily: '"El Messiri", serif' }}
+                        >
                             {news.title}
                         </h1>
-                        {news.subtitle && (
-                            <p className="text-xl text-muted-foreground font-medium max-w-3xl mx-auto mb-6">
-                                {news.subtitle}
-                            </p>
-                        )}
+                        {news.subtitle && <p className="mx-auto mb-6 max-w-3xl text-xl font-medium text-muted-foreground">{news.subtitle}</p>}
 
-                        <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground border-y py-4 dark:border-zinc-800">
+                        <div className="flex flex-wrap items-center justify-center gap-4 border-y py-4 text-sm text-muted-foreground dark:border-zinc-800">
                             <div className="flex items-center gap-1">
                                 <CalendarDays className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                                <span>{news.published_at ? new Date(news.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Draft'}</span>
+                                <span>
+                                    {news.published_at
+                                        ? new Date(news.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                                        : 'Draft'}
+                                </span>
                             </div>
                             <span>&bull;</span>
                             <div>
@@ -124,17 +131,35 @@ export default function Show({ news }: Props) {
                     {/* Share Buttons & Main Image */}
                     <div className="relative mb-10">
                         {/* Share Overlay floating bar */}
-                        <div className="flex justify-center gap-2 mb-6 sm:absolute sm:top-4 sm:right-4 sm:mb-0 sm:flex-col sm:bg-white/90 sm:p-2 sm:rounded-2xl sm:shadow-lg sm:backdrop-blur-sm dark:sm:bg-zinc-900/90">
-                            <Button onClick={copyToClipboard} size="icon" variant="outline" className="rounded-full" title="Copy Link">
-                                <Link2 className="h-4 w-4" />
+                        <div className="mb-6 flex justify-center gap-2 sm:absolute sm:top-4 sm:right-4 sm:mb-0 sm:flex-col sm:rounded-2xl sm:bg-white/90 sm:p-2 sm:shadow-lg sm:backdrop-blur-sm dark:sm:bg-zinc-900/90">
+                            <Button onClick={copyToClipboard} size="icon" variant="outline" className="rounded-full" title={copied ? "Copied!" : "Copy Link"}>
+                                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
                             </Button>
-                            <Button onClick={shareWhatsApp} size="icon" variant="outline" className="rounded-full hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/20" title="Share WhatsApp">
+                            <Button
+                                onClick={shareWhatsApp}
+                                size="icon"
+                                variant="outline"
+                                className="rounded-full hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/20"
+                                title="Share WhatsApp"
+                            >
                                 <Share2 className="h-4 w-4" />
                             </Button>
-                            <Button onClick={shareFacebook} size="icon" variant="outline" className="rounded-full hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/20" title="Share Facebook">
+                            <Button
+                                onClick={shareFacebook}
+                                size="icon"
+                                variant="outline"
+                                className="rounded-full hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/20"
+                                title="Share Facebook"
+                            >
                                 <Facebook className="h-4 w-4" />
                             </Button>
-                            <Button onClick={shareTwitter} size="icon" variant="outline" className="rounded-full hover:bg-sky-50 hover:text-sky-500 dark:hover:bg-sky-950/20" title="Share Twitter">
+                            <Button
+                                onClick={shareTwitter}
+                                size="icon"
+                                variant="outline"
+                                className="rounded-full hover:bg-sky-50 hover:text-sky-500 dark:hover:bg-sky-950/20"
+                                title="Share Twitter"
+                            >
                                 <Twitter className="h-4 w-4" />
                             </Button>
                         </div>
@@ -142,11 +167,7 @@ export default function Show({ news }: Props) {
                         {/* Main Media Image */}
                         <div className="aspect-video w-full overflow-hidden rounded-3xl bg-muted shadow-lg">
                             {news.image ? (
-                                <img
-                                    src={`/storage/${news.image}`}
-                                    alt={news.title}
-                                    className="h-full w-full object-cover"
-                                />
+                                <img src={`/storage/${news.image}`} alt={news.title} className="h-full w-full object-cover" />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center bg-emerald-50 dark:bg-emerald-950/20">
                                     <Newspaper className="h-24 w-24 text-emerald-600/20 dark:text-emerald-400/10" />
@@ -158,7 +179,7 @@ export default function Show({ news }: Props) {
                     {/* Body Text */}
                     <div className="mx-auto max-w-2xl px-2 sm:px-6">
                         <div
-                            className="prose prose-lg dark:prose-invert prose-emerald max-w-none text-[#242420] dark:text-[#E8E8E6] leading-relaxed font-sans"
+                            className="prose prose-lg dark:prose-invert prose-emerald max-w-none font-sans leading-relaxed text-[#242420] dark:text-[#E8E8E6]"
                             dangerouslySetInnerHTML={{ __html: news.body }}
                             style={{ fontSize: '1.125rem' }}
                         />
@@ -166,10 +187,14 @@ export default function Show({ news }: Props) {
                         {/* Tags Badges */}
                         {news.tags && news.tags.length > 0 && (
                             <div className="mt-12 border-t pt-6 dark:border-zinc-800">
-                                <span className="text-sm font-semibold text-muted-foreground mr-3 block sm:inline mb-2 sm:mb-0">Tags:</span>
+                                <span className="mr-3 mb-2 block text-sm font-semibold text-muted-foreground sm:mb-0 sm:inline">Tags:</span>
                                 <div className="inline-flex flex-wrap gap-2">
                                     {news.tags.map((tag) => (
-                                        <Badge key={tag} variant="secondary" className="px-3 py-1 text-xs hover:bg-[#079C4E] hover:text-white transition-colors cursor-pointer">
+                                        <Badge
+                                            key={tag}
+                                            variant="secondary"
+                                            className="cursor-pointer px-3 py-1 text-xs transition-colors hover:bg-[#079C4E] hover:text-white"
+                                        >
                                             {tag}
                                         </Badge>
                                     ))}

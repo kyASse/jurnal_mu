@@ -1,8 +1,7 @@
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import Index from '../Index';
 import Show from '../Show';
-import React from 'react';
 
 // Setup mock route
 beforeAll(() => {
@@ -13,7 +12,11 @@ beforeAll(() => {
 const mockGet = vi.fn();
 vi.mock('@inertiajs/react', () => {
     return {
-        Link: ({ href, children, ...props }: any) => <a href={href} {...props}>{children}</a>,
+        Link: ({ href, children, ...props }: any) => (
+            <a href={href} {...props}>
+                {children}
+            </a>
+        ),
         Head: ({ title }: any) => <title>{title}</title>,
         router: {
             get: (url: string, data?: any, options?: any) => mockGet(url, data, options),
@@ -60,7 +63,7 @@ const mockNewsData = {
             views: 10,
             published_at: '2026-06-11T12:00:00Z',
             author: { id: 1, name: 'Author 1' },
-        }
+        },
     ],
     current_page: 1,
     last_page: 2,
@@ -100,13 +103,13 @@ describe('News Index Page', () => {
                                 views: 5,
                                 published_at: '2026-06-11T13:00:00Z',
                                 author: { id: 1, name: 'Author 1' },
-                            }
+                            },
                         ],
                         current_page: 2,
                         last_page: 2,
                         next_page_url: null,
-                    }
-                }
+                    },
+                },
             }),
         });
         globalThis.fetch = mockFetch;
@@ -146,7 +149,7 @@ describe('News Show Page', () => {
 
         render(<Show news={mockNewsItem} />);
         const copyBtn = screen.getByTitle('Copy Link');
-        
+
         await act(async () => {
             fireEvent.click(copyBtn);
         });
@@ -183,6 +186,41 @@ describe('News Show Page', () => {
         expect(mockExecCommand).toHaveBeenCalledWith('copy');
 
         // Restore
+        Object.defineProperty(navigator, 'clipboard', {
+            value: originalClipboard,
+            writable: true,
+            configurable: true,
+        });
+    });
+
+    it('updates button state to copied when clicked', async () => {
+        const mockWriteText = vi.fn().mockResolvedValue(undefined);
+        const originalClipboard = navigator.clipboard;
+        Object.defineProperty(navigator, 'clipboard', {
+            value: {
+                writeText: mockWriteText,
+            },
+            writable: true,
+            configurable: true,
+        });
+
+        render(<Show news={mockNewsItem} />);
+        
+        // Before click: title is "Copy Link", Link2 icon is visible, Check is not.
+        const copyBtn = screen.getByTitle('Copy Link');
+        expect(screen.queryByText('Check')).not.toBeInTheDocument();
+        expect(screen.getByText('Link2')).toBeInTheDocument();
+
+        await act(async () => {
+            fireEvent.click(copyBtn);
+        });
+
+        // After click: title is "Copied!", Check icon is visible, Link2 is not.
+        expect(screen.getByTitle('Copied!')).toBeInTheDocument();
+        expect(screen.getByText('Check')).toBeInTheDocument();
+        expect(screen.queryByText('Link2')).not.toBeInTheDocument();
+
+        // Restore clipboard
         Object.defineProperty(navigator, 'clipboard', {
             value: originalClipboard,
             writable: true,
