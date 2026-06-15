@@ -179,7 +179,7 @@ export default function Show({ news }: Props) {
                     {/* Body Text */}
                     <div className="mx-auto max-w-2xl px-2 sm:px-6">
                         <div
-                            className="prose prose-lg dark:prose-invert prose-emerald max-w-none font-sans leading-relaxed text-[#242420] dark:text-[#E8E8E6]"
+                            className="prose prose-lg dark:prose-invert prose-emerald max-w-none font-sans leading-relaxed text-[#242420] dark:text-[#E8E8E6] text-justify [&_p]:indent-8"
                             dangerouslySetInnerHTML={{ __html: news.body }}
                             style={{ fontSize: '1.125rem' }}
                         />
