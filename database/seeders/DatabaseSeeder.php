@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             AssessmentSeeder::class,        // 10. Assessments with Journal Metadata (depends on: journals, users, indicators)
             PembinaanSeeder::class,         // 11. Pembinaan System (depends on: journals, users, templates)
             UadSeeder::class,               // 12. UAD specific test data
+            NewsSeeder::class,              // 13. News Articles (depends on: users)
         ]);
 
         $this->command->info('');
