@@ -1,6 +1,3 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { CalendarDays, Search, Trash2, Edit2, Newspaper, Plus } from 'lucide-react';
-import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { Edit2, Newspaper, Plus, Search, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface NewsItem {
     id: number;
@@ -129,9 +129,7 @@ export default function Index({ news, filters }: Props) {
                                 ) : (
                                     news.data.map((item) => (
                                         <TableRow key={item.id}>
-                                            <TableCell className="font-medium max-w-sm truncate">
-                                                {item.title}
-                                            </TableCell>
+                                            <TableCell className="max-w-sm truncate font-medium">{item.title}</TableCell>
                                             <TableCell>{item.views} views</TableCell>
                                             <TableCell>{item.published_at ? new Date(item.published_at).toLocaleDateString() : 'N/A'}</TableCell>
                                             <TableCell className="text-center">
@@ -175,9 +173,10 @@ export default function Index({ news, filters }: Props) {
                                 <Card key={item.id}>
                                     <div className="space-y-4 p-4">
                                         <div>
-                                            <h3 className="text-lg font-semibold truncate">{item.title}</h3>
+                                            <h3 className="truncate text-lg font-semibold">{item.title}</h3>
                                             <p className="mt-1 text-sm text-muted-foreground">
-                                                {item.views} views &bull; {item.published_at ? new Date(item.published_at).toLocaleDateString() : 'Draft'}
+                                                {item.views} views &bull;{' '}
+                                                {item.published_at ? new Date(item.published_at).toLocaleDateString() : 'Draft'}
                                             </p>
                                         </div>
                                         <div className="flex items-center justify-between">
@@ -190,7 +189,9 @@ export default function Index({ news, filters }: Props) {
                                             </Button>
                                             <div className="flex gap-2">
                                                 <Link href={route('admin.news.edit', item.id)}>
-                                                    <Button size="sm" variant="outline">Edit</Button>
+                                                    <Button size="sm" variant="outline">
+                                                        Edit
+                                                    </Button>
                                                 </Link>
                                                 <Button size="sm" variant="destructive" onClick={() => handleDelete(item)}>
                                                     Delete

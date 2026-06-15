@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\EvaluationIndicatorController;
 use App\Http\Controllers\Admin\EvaluationSubCategoryController;
 use App\Http\Controllers\Admin\JournalController;
 use App\Http\Controllers\Admin\LppmApprovalController;
+use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PembinaanController as AdminPembinaanController;
 use App\Http\Controllers\Admin\ScientificFieldController;
 use App\Http\Controllers\Admin\TicketController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PublicArticleController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\PublicJournalController;
+use App\Http\Controllers\PublicNewsController;
 use App\Http\Controllers\PublicUniversityController;
 use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\ReviewerController as MainReviewerController;
@@ -109,8 +111,8 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])
     ->name('events.show');
 
 // Public access to view news
-Route::get('/news', [App\Http\Controllers\PublicNewsController::class, 'index'])->name('news.index');
-Route::get('/news/{slug}', [App\Http\Controllers\PublicNewsController::class, 'show'])->name('news.show');
+Route::get('/news', [PublicNewsController::class, 'index'])->name('news.index');
+Route::get('/news/{slug}', [PublicNewsController::class, 'show'])->name('news.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -336,8 +338,8 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // News Management
-        Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
-        Route::post('news/{news}/toggle-active', [App\Http\Controllers\Admin\NewsController::class, 'toggleActive'])->name('news.toggle-active');
+        Route::resource('news', NewsController::class);
+        Route::post('news/{news}/toggle-active', [NewsController::class, 'toggleActive'])->name('news.toggle-active');
 
     });
 

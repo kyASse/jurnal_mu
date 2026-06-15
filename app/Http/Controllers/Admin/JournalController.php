@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Spatie\SimpleExcel\SimpleExcelWriter;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * JournalController - Super Admin
@@ -542,7 +542,7 @@ class JournalController extends Controller
                     'Frekuensi' => $journal->frequency,
                     'Tahun Terbit Pertama' => $journal->first_published_year,
                     'Universitas' => $journal->university?->name,
-                    'Pengelola Jurnal' => $journal->user ? $journal->user->name . ' (' . $journal->user->email . ')' : '',
+                    'Pengelola Jurnal' => $journal->user ? $journal->user->name.' ('.$journal->user->email.')' : '',
                     'Bidang Ilmu' => $journal->scientificField?->name,
                     'SINTA Rank' => $journal->sinta_rank,
                     'Mulai Akreditasi' => $journal->accreditation_start_year,

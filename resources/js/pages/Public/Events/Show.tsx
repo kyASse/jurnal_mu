@@ -128,7 +128,7 @@ export default function Show({ agenda }: Props) {
             setTimeout(() => setCopied(false), 2000);
         } else {
             // Fallback
-            const textArea = document.createElement("textarea");
+            const textArea = document.createElement('textarea');
             textArea.value = currentUrl;
             document.body.appendChild(textArea);
             textArea.select();

@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import { Head } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Eye, Link2, Share2, Facebook, Twitter, Newspaper, Check } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Check, Eye, Facebook, Link2, Newspaper, Share2, Twitter } from 'lucide-react';
 import { useState } from 'react';
 
 interface NewsItem {
@@ -132,7 +132,13 @@ export default function Show({ news }: Props) {
                     <div className="relative mb-10">
                         {/* Share Overlay floating bar */}
                         <div className="mb-6 flex justify-center gap-2 sm:absolute sm:top-4 sm:right-4 sm:mb-0 sm:flex-col sm:rounded-2xl sm:bg-white/90 sm:p-2 sm:shadow-lg sm:backdrop-blur-sm dark:sm:bg-zinc-900/90">
-                            <Button onClick={copyToClipboard} size="icon" variant="outline" className="rounded-full" title={copied ? "Copied!" : "Copy Link"}>
+                            <Button
+                                onClick={copyToClipboard}
+                                size="icon"
+                                variant="outline"
+                                className="rounded-full"
+                                title={copied ? 'Copied!' : 'Copy Link'}
+                            >
                                 {copied ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
                             </Button>
                             <Button
@@ -179,7 +185,7 @@ export default function Show({ news }: Props) {
                     {/* Body Text */}
                     <div className="mx-auto max-w-2xl px-2 sm:px-6">
                         <div
-                            className="prose prose-lg dark:prose-invert prose-emerald max-w-none font-sans leading-relaxed text-[#242420] dark:text-[#E8E8E6] text-justify [&_p]:indent-8 [&_p]:mb-6 [&_p]:mt-0"
+                            className="prose prose-lg dark:prose-invert prose-emerald max-w-none text-justify font-sans leading-relaxed text-[#242420] dark:text-[#E8E8E6] [&_p]:mt-0 [&_p]:mb-6 [&_p]:indent-8"
                             dangerouslySetInnerHTML={{ __html: news.body }}
                             style={{ fontSize: '1.125rem' }}
                         />

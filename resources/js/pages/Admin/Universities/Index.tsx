@@ -50,13 +50,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -254,10 +249,10 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                 </h1>
                                 <p className="mt-1 text-muted-foreground">Manage Perguruan Tinggi Muhammadiyah (PTM) and their details</p>
                             </div>
-                            <div className="flex flex-col gap-2 sm:flex-row w-full md:w-auto">
+                            <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
+                                        <Button variant="outline" className="flex w-full items-center gap-2 sm:w-auto">
                                             <Download className="h-4 w-4" />
                                             Export
                                         </Button>

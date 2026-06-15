@@ -16,7 +16,7 @@ class UpdateNewsRequest extends FormRequest
         $newsId = $this->route('news')->id;
         $rules = [
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:news,slug,' . $newsId,
+            'slug' => 'required|string|max:255|unique:news,slug,'.$newsId,
             'subtitle' => 'nullable|string|max:255',
             'body' => 'required|string',
             'tags' => 'nullable|array',

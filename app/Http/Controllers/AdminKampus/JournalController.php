@@ -23,12 +23,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Spatie\SimpleExcel\SimpleExcelWriter;
-use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * JournalController - Admin Kampus
@@ -783,7 +783,7 @@ class JournalController extends Controller
                     'Frekuensi' => $journal->frequency,
                     'Tahun Terbit Pertama' => $journal->first_published_year,
                     'Universitas' => $journal->university?->name,
-                    'Pengelola Jurnal' => $journal->user ? $journal->user->name . ' (' . $journal->user->email . ')' : '',
+                    'Pengelola Jurnal' => $journal->user ? $journal->user->name.' ('.$journal->user->email.')' : '',
                     'Bidang Ilmu' => $journal->scientificField?->name,
                     'SINTA Rank' => $journal->sinta_rank,
                     'Mulai Akreditasi' => $journal->accreditation_start_year,

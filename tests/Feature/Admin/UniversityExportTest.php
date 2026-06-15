@@ -42,7 +42,7 @@ it('allows super admin to export universities to csv', function () {
     $contentDisposition = $response->headers->get('content-disposition');
     expect($contentDisposition)->not->toBeNull();
     expect($contentDisposition)->toContain('universities.csv');
-    
+
     expect($response->streamedContent())->toContain('Original University Name');
     expect($response->streamedContent())->toContain('ORIG');
 });

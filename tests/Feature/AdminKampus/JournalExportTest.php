@@ -27,7 +27,7 @@ it('allows admin kampus to export their own university journals to xlsx', functi
 
     $contentDisposition = $response->headers->get('content-disposition');
     expect($contentDisposition)->not->toBeNull();
-    
+
     $uniSlug = Str::slug($university->name);
     expect($contentDisposition)->toContain("journals_{$uniSlug}.xlsx");
 });
@@ -55,7 +55,7 @@ it('allows admin kampus to export their own university journals to csv and filte
 
     $contentDisposition = $response->headers->get('content-disposition');
     expect($contentDisposition)->not->toBeNull();
-    
+
     $uniSlug = Str::slug($univ1->name);
     expect($contentDisposition)->toContain("journals_{$uniSlug}.csv");
 

@@ -17,10 +17,10 @@ class PublicNewsController extends Controller
         $query = News::published();
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('subtitle', 'like', "%{$search}%")
-                  ->orWhere('body', 'like', "%{$search}%");
+                    ->orWhere('subtitle', 'like', "%{$search}%")
+                    ->orWhere('body', 'like', "%{$search}%");
             });
         }
 
@@ -41,7 +41,7 @@ class PublicNewsController extends Controller
             'filters' => [
                 'search' => $search,
                 'sort' => $sort,
-            ]
+            ],
         ]);
     }
 
@@ -55,7 +55,7 @@ class PublicNewsController extends Controller
         $news->increment('views');
 
         return Inertia::render('Public/News/Show', [
-            'news' => $news
+            'news' => $news,
         ]);
     }
 }

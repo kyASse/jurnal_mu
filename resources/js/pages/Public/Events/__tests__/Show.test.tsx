@@ -133,7 +133,7 @@ describe('Events Show Page', () => {
         });
 
         render(<Show agenda={mockAgenda} />);
-        
+
         // Before click
         expect(screen.queryByText(/Copied!/i)).not.toBeInTheDocument();
         const copyBtn = screen.getByRole('button', { name: /Copy Link/i });

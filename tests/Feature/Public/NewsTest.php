@@ -5,7 +5,7 @@ use App\Models\User;
 
 it('displays active published news and increments views on detail page', function () {
     $author = User::factory()->create();
-    
+
     // Active published news
     $news = News::create([
         'title' => 'React Setup Seminar',
@@ -81,4 +81,3 @@ it('excludes news with null published_at', function () {
     $detailResponse = $this->get(route('news.show', $news->slug));
     $detailResponse->assertNotFound();
 });
-

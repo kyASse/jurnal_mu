@@ -1,21 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
+    AlignCenter,
+    AlignJustify,
+    AlignLeft,
+    AlignRight,
     Bold,
+    Code,
+    Eraser,
+    FileText,
     Italic,
-    Underline,
-    Strikethrough,
+    Link2,
     List,
     ListOrdered,
-    AlignLeft,
-    AlignCenter,
-    AlignRight,
-    AlignJustify,
-    Link2,
-    Eraser,
-    Code,
-    FileText
+    Strikethrough,
+    Underline,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useRef, useState } from 'react';
 
 interface RichTextEditorProps {
     value: string;
@@ -24,12 +24,7 @@ interface RichTextEditorProps {
     className?: string;
 }
 
-export default function RichTextEditor({
-    value,
-    onChange,
-    placeholder = 'Start writing news body here...',
-    className = ''
-}: RichTextEditorProps) {
+export default function RichTextEditor({ value, onChange, placeholder = 'Start writing news body here...', className = '' }: RichTextEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [isRawMode, setIsRawMode] = useState(false);
@@ -73,7 +68,9 @@ export default function RichTextEditor({
     };
 
     return (
-        <div className={`flex flex-col rounded-md border border-input bg-transparent shadow-sm focus-within:ring-1 focus-within:ring-emerald-500 ${className}`}>
+        <div
+            className={`flex flex-col rounded-md border border-input bg-transparent shadow-sm focus-within:ring-1 focus-within:ring-emerald-500 ${className}`}
+        >
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-1 border-b bg-muted/30 p-2 dark:bg-muted/10">
                 <Button
@@ -117,7 +114,7 @@ export default function RichTextEditor({
                     <Strikethrough className="h-4 w-4" />
                 </Button>
 
-                <div className="h-6 w-[1px] bg-border mx-1" />
+                <div className="mx-1 h-6 w-[1px] bg-border" />
 
                 <Button
                     type="button"
@@ -127,7 +124,7 @@ export default function RichTextEditor({
                     onClick={() => execCommand('formatBlock', '<h2>')}
                     title="Heading 2"
                 >
-                    <span className="text-xs font-bold font-mono">H2</span>
+                    <span className="font-mono text-xs font-bold">H2</span>
                 </Button>
                 <Button
                     type="button"
@@ -137,7 +134,7 @@ export default function RichTextEditor({
                     onClick={() => execCommand('formatBlock', '<h3>')}
                     title="Heading 3"
                 >
-                    <span className="text-xs font-bold font-mono">H3</span>
+                    <span className="font-mono text-xs font-bold">H3</span>
                 </Button>
                 <Button
                     type="button"
@@ -147,10 +144,10 @@ export default function RichTextEditor({
                     onClick={() => execCommand('formatBlock', '<p>')}
                     title="Paragraph"
                 >
-                    <span className="text-xs font-mono">P</span>
+                    <span className="font-mono text-xs">P</span>
                 </Button>
 
-                <div className="h-6 w-[1px] bg-border mx-1" />
+                <div className="mx-1 h-6 w-[1px] bg-border" />
 
                 <Button
                     type="button"
@@ -173,7 +170,7 @@ export default function RichTextEditor({
                     <ListOrdered className="h-4 w-4" />
                 </Button>
 
-                <div className="h-6 w-[1px] bg-border mx-1" />
+                <div className="mx-1 h-6 w-[1px] bg-border" />
 
                 <Button
                     type="button"
@@ -216,7 +213,7 @@ export default function RichTextEditor({
                     <AlignJustify className="h-4 w-4" />
                 </Button>
 
-                <div className="h-6 w-[1px] bg-border mx-1" />
+                <div className="mx-1 h-6 w-[1px] bg-border" />
 
                 <Button
                     type="button"
@@ -244,7 +241,7 @@ export default function RichTextEditor({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className={`h-8 w-8 ${isRawMode ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20' : 'text-muted-foreground'}`}
+                        className={`h-8 w-8 ${isRawMode ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20' : 'text-muted-foreground'}`}
                         onClick={() => setIsRawMode(!isRawMode)}
                         title={isRawMode ? 'Switch to Rich Text' : 'Switch to Raw HTML'}
                     >
@@ -267,7 +264,7 @@ export default function RichTextEditor({
                     contentEditable
                     onInput={handleInput}
                     onBlur={handleInput}
-                    className="min-h-[250px] w-full resize-y overflow-y-auto p-4 text-sm focus:outline-none dark:text-neutral-100 prose prose-sm dark:prose-invert max-w-none"
+                    className="prose prose-sm dark:prose-invert min-h-[250px] w-full max-w-none resize-y overflow-y-auto p-4 text-sm focus:outline-none dark:text-neutral-100"
                     style={{ outline: 'none' }}
                 />
             )}

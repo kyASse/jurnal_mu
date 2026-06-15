@@ -1,9 +1,9 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import Index from '../Index';
 import Create from '../Create';
 import Edit from '../Edit';
+import Index from '../Index';
 
 // Setup mock route
 beforeAll(() => {
@@ -70,12 +70,7 @@ vi.mock('@inertiajs/react', () => {
 // Mock RichTextEditor for easy testing
 vi.mock('@/components/RichTextEditor', () => ({
     default: ({ value, onChange, placeholder }: any) => (
-        <textarea
-            id="body"
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            placeholder={placeholder}
-        />
+        <textarea id="body" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
 
@@ -204,15 +199,18 @@ describe('Admin News Create Page', () => {
         const form = titleInput.closest('form')!;
         fireEvent.submit(form);
 
-        expect(mockPost).toHaveBeenCalledWith('/route/admin.news.store', expect.objectContaining({
-            title: 'New Test Title!',
-            slug: 'new-test-title',
-            subtitle: 'Nice subtitle',
-            body: '<p>Content</p>',
-            tags: ['Announcement', 'Event'],
-            is_active: true,
-            published_at: '2026-06-11T12:00',
-        }));
+        expect(mockPost).toHaveBeenCalledWith(
+            '/route/admin.news.store',
+            expect.objectContaining({
+                title: 'New Test Title!',
+                slug: 'new-test-title',
+                subtitle: 'Nice subtitle',
+                body: '<p>Content</p>',
+                tags: ['Announcement', 'Event'],
+                is_active: true,
+                published_at: '2026-06-11T12:00',
+            }),
+        );
     });
 });
 
@@ -258,14 +256,17 @@ describe('Admin News Edit Page', () => {
         const form = titleInput.closest('form')!;
         fireEvent.submit(form);
 
-        expect(mockPost).toHaveBeenCalledWith('/route/admin.news.update/5', expect.objectContaining({
-            _method: 'PUT',
-            title: 'Editing Title',
-            slug: 'editing-title',
-            subtitle: 'Sub editing',
-            body: '<p>Body editing</p>',
-            tags: ['Seminar', 'Updates'],
-            is_active: false,
-        }));
+        expect(mockPost).toHaveBeenCalledWith(
+            '/route/admin.news.update/5',
+            expect.objectContaining({
+                _method: 'PUT',
+                title: 'Editing Title',
+                slug: 'editing-title',
+                subtitle: 'Sub editing',
+                body: '<p>Body editing</p>',
+                tags: ['Seminar', 'Updates'],
+                is_active: false,
+            }),
+        );
     });
 });

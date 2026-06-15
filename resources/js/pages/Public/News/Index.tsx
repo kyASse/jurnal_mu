@@ -91,7 +91,7 @@ export default function Index({ news, filters }: Props) {
         }
         try {
             const doc = new DOMParser().parseFromString(html, 'text/html');
-            return doc.body.textContent || "";
+            return doc.body.textContent || '';
         } catch {
             return html.replace(/<[^>]*>/g, '');
         }

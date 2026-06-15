@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Journal;
-use App\Models\Role;
 use App\Models\User;
 
 beforeEach(function () {
@@ -36,7 +35,7 @@ it('allows super admin to export journals to csv', function () {
     $contentDisposition = $response->headers->get('content-disposition');
     expect($contentDisposition)->not->toBeNull();
     expect($contentDisposition)->toContain('journals_all.csv');
-    
+
     expect($response->streamedContent())->toContain('Original Journal Title');
 });
 

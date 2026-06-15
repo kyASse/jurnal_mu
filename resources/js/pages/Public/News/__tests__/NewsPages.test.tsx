@@ -205,7 +205,7 @@ describe('News Show Page', () => {
         });
 
         render(<Show news={mockNewsItem} />);
-        
+
         // Before click: title is "Copy Link", Link2 icon is visible, Check is not.
         const copyBtn = screen.getByTitle('Copy Link');
         expect(screen.queryByText('Check')).not.toBeInTheDocument();

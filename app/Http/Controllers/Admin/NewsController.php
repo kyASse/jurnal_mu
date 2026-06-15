@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\News;
 use App\Http\Requests\Admin\StoreNewsRequest;
 use App\Http\Requests\Admin\UpdateNewsRequest;
+use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,7 +22,7 @@ class NewsController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('body', 'like', "%{$search}%");
+                    ->orWhere('body', 'like', "%{$search}%");
             });
         }
 
@@ -35,8 +34,8 @@ class NewsController extends Controller
         return Inertia::render('Admin/News/Index', [
             'news' => $news,
             'filters' => [
-                'search' => $search
-            ]
+                'search' => $search,
+            ],
         ]);
     }
 
@@ -67,7 +66,7 @@ class NewsController extends Controller
     public function edit(News $news): Response
     {
         return Inertia::render('Admin/News/Edit', [
-            'news' => $news
+            'news' => $news,
         ]);
     }
 
@@ -111,7 +110,7 @@ class NewsController extends Controller
     public function toggleActive(News $news)
     {
         $news->update([
-            'is_active' => !$news->is_active
+            'is_active' => ! $news->is_active,
         ]);
 
         return back()->with('success', 'News status updated.');
