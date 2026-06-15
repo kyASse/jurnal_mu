@@ -108,6 +108,10 @@ Route::get('/events', [PublicEventController::class, 'index'])
 Route::get('/events/{event}', [PublicEventController::class, 'show'])
     ->name('events.show');
 
+// Public access to view news
+Route::get('/news', [App\Http\Controllers\PublicNewsController::class, 'index'])->name('news.index');
+Route::get('/news/{slug}', [App\Http\Controllers\PublicNewsController::class, 'show'])->name('news.show');
+
 /*
 |--------------------------------------------------------------------------
 | Guest Routes (Redirect jika sudah login)
@@ -330,6 +334,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('{event}/toggle-featured', [AgendaController::class, 'toggleFeatured'])->name('toggle-featured');
             Route::delete('{event}', [AgendaController::class, 'destroy'])->name('destroy');
         });
+
+        // News Management
+        Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
+        Route::post('news/{news}/toggle-active', [App\Http\Controllers\Admin\NewsController::class, 'toggleActive'])->name('news.toggle-active');
 
     });
 
