@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
 use App\Http\Controllers\AdminKampus\JournalApprovalController;
+use App\Http\Controllers\AdminKampus\JournalController as AdminKampusJournalController;
 use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
 use App\Http\Controllers\AdminKampus\ReviewerController;
 use App\Http\Controllers\AdminKampus\UserApprovalController;
@@ -230,6 +231,9 @@ Route::middleware(['auth'])->group(function () {
         */
 
         // Universities Management
+        Route::get('universities/export/{format}', [UniversityController::class, 'export'])
+            ->name('universities.export')
+            ->whereIn('format', ['xlsx', 'csv']);
         Route::resource('universities', UniversityController::class);
         Route::post('universities/{university}/toggle-active', [UniversityController::class, 'toggleActive'])
             ->name('universities.toggle-active');
@@ -273,6 +277,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('journals/import/process', [JournalController::class, 'processImport'])
             ->name('journals.import.process');
 
+        Route::get('journals/export/{format}', [JournalController::class, 'export'])
+            ->name('journals.export')
+            ->whereIn('format', ['xlsx', 'csv']);
         Route::get('journals/{journal}', [JournalController::class, 'show'])
             ->name('journals.show');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])
@@ -389,30 +396,33 @@ Route::middleware(['auth'])->group(function () {
                 ->name('reject');
 
             // Journal reassignment
-            Route::post('{journal}/reassign', [App\Http\Controllers\AdminKampus\JournalController::class, 'reassign'])
+            Route::post('{journal}/reassign', [AdminKampusJournalController::class, 'reassign'])
                 ->name('reassign');
 
             // OAI-PMH Article Harvest (dispatches to queue)
-            Route::post('harvest/bulk', [App\Http\Controllers\AdminKampus\JournalController::class, 'bulkHarvest'])
+            Route::post('harvest/bulk', [AdminKampusJournalController::class, 'bulkHarvest'])
                 ->name('harvest.bulk');
-            Route::post('{journal}/harvest', [App\Http\Controllers\AdminKampus\JournalController::class, 'harvest'])
+            Route::post('{journal}/harvest', [AdminKampusJournalController::class, 'harvest'])
                 ->name('harvest');
         });
 
         // View journals from their university
-        Route::get('journals', [App\Http\Controllers\AdminKampus\JournalController::class, 'index'])
+        Route::get('journals', [AdminKampusJournalController::class, 'index'])
             ->name('journals.index');
-        Route::get('journals/create', [App\Http\Controllers\AdminKampus\JournalController::class, 'create'])
+        Route::get('journals/create', [AdminKampusJournalController::class, 'create'])
             ->name('journals.create');
-        Route::post('journals', [App\Http\Controllers\AdminKampus\JournalController::class, 'store'])
+        Route::post('journals', [AdminKampusJournalController::class, 'store'])
             ->name('journals.store');
-        Route::get('journals/{journal}', [App\Http\Controllers\AdminKampus\JournalController::class, 'show'])
+        Route::get('journals/export/{format}', [AdminKampusJournalController::class, 'export'])
+            ->name('journals.export')
+            ->whereIn('format', ['xlsx', 'csv']);
+        Route::get('journals/{journal}', [AdminKampusJournalController::class, 'show'])
             ->name('journals.show');
-        Route::get('journals/{journal}/edit', [App\Http\Controllers\AdminKampus\JournalController::class, 'edit'])
+        Route::get('journals/{journal}/edit', [AdminKampusJournalController::class, 'edit'])
             ->name('journals.edit');
-        Route::put('journals/{journal}', [App\Http\Controllers\AdminKampus\JournalController::class, 'update'])
+        Route::put('journals/{journal}', [AdminKampusJournalController::class, 'update'])
             ->name('journals.update');
-        Route::delete('journals/{journal}', [App\Http\Controllers\AdminKampus\JournalController::class, 'destroy'])
+        Route::delete('journals/{journal}', [AdminKampusJournalController::class, 'destroy'])
             ->name('journals.destroy');
 
         // University Profile Management
@@ -422,19 +432,19 @@ Route::middleware(['auth'])->group(function () {
             ->name('university.update');
 
         // Cover image upload (dedicated endpoint)
-        Route::patch('journals/{journal}/cover', [App\Http\Controllers\AdminKampus\JournalController::class, 'uploadCover'])
+        Route::patch('journals/{journal}/cover', [AdminKampusJournalController::class, 'uploadCover'])
             ->name('journals.upload-cover');
-        Route::patch('journals/{journal}/oai-urls', [App\Http\Controllers\AdminKampus\JournalController::class, 'updateOaiUrls'])
+        Route::patch('journals/{journal}/oai-urls', [AdminKampusJournalController::class, 'updateOaiUrls'])
             ->name('journals.update-oai-urls');
-        Route::post('journals/{journal}/import-xml', [App\Http\Controllers\AdminKampus\JournalController::class, 'importXml'])
+        Route::post('journals/{journal}/import-xml', [AdminKampusJournalController::class, 'importXml'])
             ->name('journals.import-xml');
 
         // Import journals from CSV
-        Route::get('journals/import/template', [App\Http\Controllers\AdminKampus\JournalController::class, 'downloadTemplate'])
+        Route::get('journals/import/template', [AdminKampusJournalController::class, 'downloadTemplate'])
             ->name('journals.import.template');
-        Route::get('journals/import/form', [App\Http\Controllers\AdminKampus\JournalController::class, 'import'])
+        Route::get('journals/import/form', [AdminKampusJournalController::class, 'import'])
             ->name('journals.import');
-        Route::post('journals/import/process', [App\Http\Controllers\AdminKampus\JournalController::class, 'processImport'])
+        Route::post('journals/import/process', [AdminKampusJournalController::class, 'processImport'])
             ->name('journals.import.process');
 
         // Reviewer Management (Placeholder)
