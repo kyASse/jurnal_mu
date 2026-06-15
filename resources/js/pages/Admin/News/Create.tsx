@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import RichTextEditor from '@/components/RichTextEditor';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
@@ -27,15 +27,21 @@ export default function Create() {
         image: null as File | null,
     });
 
-    const handleTitleBlur = () => {
-        if (!data.slug) {
-            const generatedSlug = data.title
-                .toLowerCase()
-                .replace(/[^a-z0-9 -]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-');
-            setData('slug', generatedSlug);
-        }
+    const generateSlug = (text: string) => {
+        return text
+            .toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    };
+
+    const handleTitleChange = (val: string) => {
+        setData(data => ({
+            ...data,
+            title: val,
+            slug: generateSlug(val),
+        }));
     };
 
     const submit = (e: React.FormEvent) => {
@@ -73,24 +79,11 @@ export default function Create() {
                             <Input
                                 id="title"
                                 value={data.title}
-                                onChange={e => setData('title', e.target.value)}
-                                onBlur={handleTitleBlur}
+                                onChange={e => handleTitleChange(e.target.value)}
                                 required
                                 className="mt-1"
                             />
                             {errors.title && <span className="text-sm text-red-500">{errors.title}</span>}
-                        </div>
-
-                        <div>
-                            <Label htmlFor="slug">Slug *</Label>
-                            <Input
-                                id="slug"
-                                value={data.slug}
-                                onChange={e => setData('slug', e.target.value)}
-                                required
-                                className="mt-1"
-                            />
-                            {errors.slug && <span className="text-sm text-red-500">{errors.slug}</span>}
                         </div>
 
                         <div>
@@ -105,15 +98,11 @@ export default function Create() {
                         </div>
 
                         <div>
-                            <Label htmlFor="body">Body (HTML allowed) *</Label>
-                            <Textarea
-                                id="body"
-                                rows={10}
+                            <Label htmlFor="body">Body *</Label>
+                            <RichTextEditor
                                 value={data.body}
-                                onChange={e => setData('body', e.target.value)}
-                                required
-                                className="mt-1 font-mono"
-                                placeholder="Enter article body HTML here..."
+                                onChange={val => setData('body', val)}
+                                className="mt-1 bg-white dark:bg-neutral-950"
                             />
                             {errors.body && <span className="text-sm text-red-500">{errors.body}</span>}
                         </div>

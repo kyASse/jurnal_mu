@@ -67,6 +67,18 @@ vi.mock('@inertiajs/react', () => {
     };
 });
 
+// Mock RichTextEditor for easy testing
+vi.mock('@/components/RichTextEditor', () => ({
+    default: ({ value, onChange, placeholder }: any) => (
+        <textarea
+            id="body"
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            placeholder={placeholder}
+        />
+    ),
+}));
+
 // Mock layouts
 vi.mock('@/layouts/app-layout', () => ({
     default: ({ children }: any) => <div data-testid="app-layout">{children}</div>,
@@ -83,6 +95,20 @@ vi.mock('lucide-react', () => ({
     Edit2: () => <span>Edit2</span>,
     Save: () => <span>Save</span>,
     X: () => <span>X</span>,
+    Bold: () => <span>Bold</span>,
+    Italic: () => <span>Italic</span>,
+    Underline: () => <span>Underline</span>,
+    Strikethrough: () => <span>Strikethrough</span>,
+    List: () => <span>List</span>,
+    ListOrdered: () => <span>ListOrdered</span>,
+    AlignLeft: () => <span>AlignLeft</span>,
+    AlignCenter: () => <span>AlignCenter</span>,
+    AlignRight: () => <span>AlignRight</span>,
+    AlignJustify: () => <span>AlignJustify</span>,
+    Link2: () => <span>Link2</span>,
+    Eraser: () => <span>Eraser</span>,
+    Code: () => <span>Code</span>,
+    FileText: () => <span>FileText</span>,
 }));
 
 const mockNewsList = {
@@ -159,17 +185,14 @@ describe('Admin News Create Page', () => {
         expect(screen.getByText('Create News Article')).toBeInTheDocument();
 
         const titleInput = screen.getByLabelText(/Title \*/i);
-        const slugInput = screen.getByLabelText(/Slug \*/i);
         const subtitleInput = screen.getByLabelText(/Subtitle/i);
-        const bodyInput = screen.getByLabelText(/Body \(HTML allowed\) \*/i);
+        const bodyInput = screen.getByLabelText(/Body \*/i);
         const tagsInput = screen.getByLabelText(/Tags \(comma separated\)/i);
         const publishInput = screen.getByLabelText(/Publish Date\/Time/i);
         const activeCheckbox = screen.getByLabelText(/Publish Status \(Active\)/i);
 
-        // Fill Title and blur to auto-generate slug
+        // Fill Title and trigger change which auto-generates slug internally
         fireEvent.change(titleInput, { target: { value: 'New Test Title!' } });
-        fireEvent.blur(titleInput);
-        expect(slugInput).toHaveValue('new-test-title');
 
         // Fill other fields
         fireEvent.change(subtitleInput, { target: { value: 'Nice subtitle' } });
@@ -217,14 +240,12 @@ describe('Admin News Edit Page', () => {
         expect(screen.getByText('Edit News Article')).toBeInTheDocument();
 
         const titleInput = screen.getByLabelText(/Title \*/i);
-        const slugInput = screen.getByLabelText(/Slug \*/i);
         const subtitleInput = screen.getByLabelText(/Subtitle/i);
-        const bodyInput = screen.getByLabelText(/Body \(HTML allowed\) \*/i);
+        const bodyInput = screen.getByLabelText(/Body \*/i);
         const tagsInput = screen.getByLabelText(/Tags \(comma separated\)/i);
         const activeCheckbox = screen.getByLabelText(/Publish Status \(Active\)/i) as HTMLInputElement;
 
         expect(titleInput).toHaveValue('Editing Title');
-        expect(slugInput).toHaveValue('editing-title');
         expect(subtitleInput).toHaveValue('Sub editing');
         expect(bodyInput).toHaveValue('<p>Body editing</p>');
         expect(tagsInput).toHaveValue('Seminar, Updates');
