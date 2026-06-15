@@ -51,6 +51,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -65,8 +66,11 @@ import {
     ChevronLeft,
     ChevronRight,
     Clock,
+    Download,
     Edit,
     Eye,
+    FileSpreadsheet,
+    FileText,
     Plus,
     Search,
     Trash2,
@@ -245,14 +249,35 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                 </h1>
                                 <p className="mt-1 text-muted-foreground">Manage Perguruan Tinggi Muhammadiyah (PTM) and their details</p>
                             </div>
-                            {can.create && (
-                                <Link href={route('admin.universities.create')}>
-                                    <Button className="flex w-full items-center gap-2 md:w-auto">
-                                        <Plus className="h-4 w-4" />
-                                        Add University
-                                    </Button>
-                                </Link>
-                            )}
+                            <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="flex w-full items-center gap-2 sm:w-auto">
+                                            <Download className="h-4 w-4" />
+                                            Export
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => window.open(route('admin.universities.export', 'xlsx'), '_blank')}>
+                                            <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
+                                            Export as XLSX
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => window.open(route('admin.universities.export', 'csv'), '_blank')}>
+                                            <FileText className="mr-2 h-4 w-4 text-blue-600" />
+                                            Export as CSV
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
+                                {can.create && (
+                                    <Link href={route('admin.universities.create')}>
+                                        <Button className="flex w-full items-center gap-2 md:w-auto">
+                                            <Plus className="h-4 w-4" />
+                                            Add University
+                                        </Button>
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     </div>
 

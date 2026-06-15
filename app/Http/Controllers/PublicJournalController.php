@@ -252,6 +252,7 @@ class PublicJournalController extends Controller
                 // Indexation
                 'indexed_in' => $journal->indexed_in,
                 'indexation_labels' => $journal->indexation_labels,
+                'indexations' => $journal->indexations,
                 // Relationships
                 'university' => [
                     'id' => $journal->university->id,

@@ -174,6 +174,7 @@ export interface Journal {
     // Indexation
     indexed_in?: string[];
     indexation_labels?: string[];
+    indexations?: Record<string, { url?: string; indexed_at?: string }> | null;
     // Relations
     university_id: number;
     user_id: number;

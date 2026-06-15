@@ -15,6 +15,7 @@ import {
     LayoutGrid,
     Library,
     LifeBuoy,
+    Newspaper,
     UserCheck,
     Users,
 } from 'lucide-react';
@@ -103,6 +104,11 @@ export function AppSidebar() {
                 title: 'Support Tickets',
                 href: route('admin.tickets.index'),
                 icon: LifeBuoy,
+            },
+            {
+                title: 'News Management',
+                href: route('admin.news.index'),
+                icon: Newspaper,
             },
             ...commonNavItems,
         ];
