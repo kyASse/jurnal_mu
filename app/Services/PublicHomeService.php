@@ -241,10 +241,10 @@ class PublicHomeService
                     'doi' => $article->doi,
                     'doi_url' => $article->doi_url,
                     'abstract' => $article->abstract,
-                    'journal' => [
-                        'id' => $article->journal?->id,
-                        'title' => $article->journal?->title,
-                    ],
+                    'journal' => $article->journal ? [
+                        'id' => $article->journal->id,
+                        'title' => $article->journal->title,
+                    ] : null,
                 ]);
         });
     }
