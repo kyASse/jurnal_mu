@@ -190,11 +190,13 @@ class UserController extends Controller
             'is_reviewer' => false, // Will be set by role assignment
         ]);
 
-        // Attach all selected roles to the user
-        $user->roles()->attach($validated['role_ids'], [
-            'assigned_at' => now(),
-            'assigned_by' => auth()->id(),
-        ]);
+        // Sync all selected roles to the user
+        $user->roles()->sync(collect($validated['role_ids'])->mapWithKeys(function ($roleId) {
+            return [$roleId => [
+                'assigned_at' => now(),
+                'assigned_by' => auth()->id(),
+            ]];
+        }));
 
         // Update is_reviewer flag if Reviewer role is selected
         $reviewerRole = Role::where('name', Role::REVIEWER)->first();
