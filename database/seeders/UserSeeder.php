@@ -275,6 +275,24 @@ class UserSeeder extends Seeder
         $this->command->info('Super Admin: superadmin@ajm.ac.id / password123');
         $this->command->info('Admin UAD: admin.uad@ajm.ac.id / password123');
         $this->command->info('User UAD: andi.prasetyo@uad.ac.id / password123');
+
+        // Populate user_roles pivot table for seeded users
+        $seededUsers = \App\Models\User::all();
+        $reviewerRole = Role::where('name', Role::REVIEWER)->first();
+        foreach ($seededUsers as $u) {
+            if ($u->role_id) {
+                $u->roles()->syncWithoutDetaching([$u->role_id => [
+                    'assigned_at' => now(),
+                    'assigned_by' => null,
+                ]]);
+            }
+            if ($u->is_reviewer && $reviewerRole) {
+                $u->roles()->syncWithoutDetaching([$reviewerRole->id => [
+                    'assigned_at' => now(),
+                    'assigned_by' => null,
+                ]]);
+            }
+        }
     }
 
     /**
