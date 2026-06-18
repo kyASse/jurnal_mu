@@ -6,7 +6,21 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, Calendar, ChevronDown, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search, User, Download, FileText } from 'lucide-react';
+import {
+    ArrowRight,
+    BookOpen,
+    Calendar,
+    ChevronDown,
+    Clock,
+    Download,
+    FileText,
+    GraduationCap,
+    LayoutDashboard,
+    Library,
+    MapPin,
+    Search,
+    User,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface WelcomeProps extends SharedData {
@@ -115,9 +129,8 @@ export default function Welcome() {
 
     const downloadRis = (article: WelcomeProps['featuredArticles'][number]) => {
         const year = article.publication_date ? new Date(article.publication_date).getFullYear() : new Date().getFullYear();
-        const authorsFormatted = article.authors && Array.isArray(article.authors)
-            ? article.authors.map((a: string) => `AU  - ${a}`).join('\n')
-            : 'AU  - Unknown';
+        const authorsFormatted =
+            article.authors && Array.isArray(article.authors) ? article.authors.map((a: string) => `AU  - ${a}`).join('\n') : 'AU  - Unknown';
 
         const risLines = ['TY  - JOUR', `TI  - ${article.title}`, authorsFormatted, `PY  - ${year}`];
 

@@ -3,8 +3,8 @@
 namespace Tests\Feature\User;
 
 use App\Models\Role;
-use App\Models\User;
 use App\Models\University;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +15,7 @@ class UserRoleSyncTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Ensure roles exist
         Role::updateOrCreate(['name' => Role::USER], ['display_name' => 'User']);
         Role::updateOrCreate(['name' => Role::ADMIN_KAMPUS], ['display_name' => 'Admin Kampus']);

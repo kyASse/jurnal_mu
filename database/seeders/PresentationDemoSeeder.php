@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -128,7 +129,7 @@ class PresentationDemoSeeder extends Seeder
         DB::table('users')->insert($users);
 
         // Populate user_roles pivot table for seeded users
-        $seededUsers = \App\Models\User::all();
+        $seededUsers = User::all();
         foreach ($seededUsers as $u) {
             if ($u->role_id) {
                 $u->roles()->syncWithoutDetaching([$u->role_id => [

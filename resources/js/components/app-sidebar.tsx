@@ -216,15 +216,15 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={baseNavItems} label="Platform" />
-                
+
                 {isSuperAdmin && <NavMain items={superAdminNavItems} label="Super Admin" />}
-                
+
                 {isAdminKampus && <NavMain items={adminKampusNavItems} label="LPPM Admin" />}
-                
+
                 {isUser && <NavMain items={userNavItems} label="Pengelola Jurnal" />}
-                
+
                 {isReviewer && <NavMain items={reviewerNavItems} label="Reviewer" />}
-                
+
                 <NavMain items={commonNavItems} label="Resources" />
             </SidebarContent>
 

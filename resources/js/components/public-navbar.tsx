@@ -1,9 +1,9 @@
 import logoUrl from '@/assets/logo_dark.png';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutDashboard } from 'lucide-react';
-import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 export default function PublicNavbar() {
     const { auth } = usePage<SharedData>().props;

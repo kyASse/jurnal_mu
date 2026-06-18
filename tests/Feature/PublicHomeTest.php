@@ -140,7 +140,7 @@ it('formats all-caps titles and returns citation fields', function () {
     $this->get('/');
 
     $cachedArticles = Cache::get('home_featured_articles');
-    
+
     $cachedCaps = $cachedArticles->firstWhere('id', $articleCaps->id);
     $cachedMixed = $cachedArticles->firstWhere('id', $articleMixed->id);
 
@@ -158,4 +158,3 @@ it('formats all-caps titles and returns citation fields', function () {
     expect($cachedCaps['authors'])->toBe(['John Doe', 'Jane Doe']);
     expect($cachedCaps['abstract'])->toBe('This is a test abstract.');
 });
-

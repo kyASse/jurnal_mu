@@ -173,39 +173,40 @@ class PublicHomeService
         // If the letters are all uppercase and the script supports casing
         if (mb_strtoupper($lettersOnly, 'UTF-8') === $lettersOnly && mb_strtoupper($lettersOnly, 'UTF-8') !== mb_strtolower($lettersOnly, 'UTF-8')) {
             $minorWords = ['and', 'or', 'in', 'of', 'to', 'the', 'a', 'an', 'dan', 'di', 'ke', 'dari', 'pada', 'untuk', 'dengan', 'yang', 'atau', 'serta', 'terhadap', 'dalam', 'oleh', 'bagi', 'by', 'with', 'from', 'at', 'but', 'for'];
-            
+
             $words = preg_split('/\s+/', mb_strtolower($title, 'UTF-8'));
             $formattedWords = [];
             $wordCount = count($words);
             foreach ($words as $index => $word) {
                 $cleanedWord = trim($word, '.,:;()[]{}""\'\'');
                 $isLastWord = ($index === $wordCount - 1);
-                
-                if ($index > 0 && !$isLastWord && in_array($cleanedWord, $minorWords)) {
+
+                if ($index > 0 && ! $isLastWord && in_array($cleanedWord, $minorWords)) {
                     $formattedWords[] = $word;
                 } else {
                     $formattedWords[] = preg_replace_callback(
                         '/^([^\p{L}]*)(\p{L})/u',
-                        fn($m) => $m[1] . mb_strtoupper($m[2], 'UTF-8'),
+                        fn ($m) => $m[1].mb_strtoupper($m[2], 'UTF-8'),
                         $word
                     );
                 }
             }
-            
+
             // Post-process common acronyms
             $acronyms = ['Doi', 'Pdf', 'Url', 'Sinta', 'Oai-pmh', 'Oai', 'Pmh', 'Ris', 'Issn', 'E-issn'];
             $acronymReplacements = ['DOI', 'PDF', 'URL', 'SINTA', 'OAI-PMH', 'OAI', 'PMH', 'RIS', 'ISSN', 'E-ISSN'];
-            
+
             $formattedTitle = implode(' ', $formattedWords);
             $formattedTitle = preg_replace_callback(
                 '/:\s*([^\p{L}]*)(\p{L})/u',
-                fn($m) => ': ' . $m[1] . mb_strtoupper($m[2], 'UTF-8'),
+                fn ($m) => ': '.$m[1].mb_strtoupper($m[2], 'UTF-8'),
                 $formattedTitle
             );
-            
+
             foreach ($acronyms as $idx => $acronym) {
-                $formattedTitle = preg_replace('/\b' . preg_quote($acronym, '/') . '\b/u', $acronymReplacements[$idx], $formattedTitle);
+                $formattedTitle = preg_replace('/\b'.preg_quote($acronym, '/').'\b/u', $acronymReplacements[$idx], $formattedTitle);
             }
+
             return $formattedTitle;
         }
 
@@ -219,33 +220,33 @@ class PublicHomeService
     {
         return Cache::remember('home_featured_articles', now()->addHours(2), function () {
             return Article::whereHas('journal', function ($query) {
-                    $query->where('is_active', true)
-                          ->where('approval_status', 'approved');
-                })
+                $query->where('is_active', true)
+                    ->where('approval_status', 'approved');
+            })
                 ->with(['journal:id,title'])
                 ->inRandomOrder()
                 ->limit(6)
                 ->get()
                 ->map(fn ($article) => [
-                    'id' => $article->id,
-                    'title' => $this->toTitleCaseIfAllUpper($article->title),
-                    'authors_list' => $article->authors_list,
-                    'publication_date' => $article->publication_date?->format('Y-m-d'),
-                    'article_url' => $article->article_url,
-                    'pdf_url' => $article->pdf_url,
-                    'google_scholar_url' => $article->google_scholar_url,
-                    'authors' => $article->authors,
-                    'volume' => $article->volume,
-                    'issue' => $article->issue,
-                    'pages' => $article->pages,
-                    'doi' => $article->doi,
-                    'doi_url' => $article->doi_url,
-                    'abstract' => $article->abstract,
-                    'journal' => $article->journal ? [
-                        'id' => $article->journal->id,
-                        'title' => $article->journal->title,
-                    ] : null,
-                ]);
+                'id' => $article->id,
+                'title' => $this->toTitleCaseIfAllUpper($article->title),
+                'authors_list' => $article->authors_list,
+                'publication_date' => $article->publication_date?->format('Y-m-d'),
+                'article_url' => $article->article_url,
+                'pdf_url' => $article->pdf_url,
+                'google_scholar_url' => $article->google_scholar_url,
+                'authors' => $article->authors,
+                'volume' => $article->volume,
+                'issue' => $article->issue,
+                'pages' => $article->pages,
+                'doi' => $article->doi,
+                'doi_url' => $article->doi_url,
+                'abstract' => $article->abstract,
+                'journal' => $article->journal ? [
+                    'id' => $article->journal->id,
+                    'title' => $article->journal->title,
+                ] : null,
+            ]);
         });
     }
 

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -277,7 +278,7 @@ class UserSeeder extends Seeder
         $this->command->info('User UAD: andi.prasetyo@uad.ac.id / password123');
 
         // Populate user_roles pivot table for seeded users
-        $seededUsers = \App\Models\User::all();
+        $seededUsers = User::all();
         $reviewerRole = Role::where('name', Role::REVIEWER)->first();
         foreach ($seededUsers as $u) {
             if ($u->role_id) {
