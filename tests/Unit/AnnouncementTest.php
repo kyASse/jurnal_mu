@@ -67,3 +67,40 @@ it('applies published and audience scopes correctly', function () {
     expect($published->count())->toBe(1)
         ->and($published->first()->id)->toBe($active->id);
 });
+
+it('applies audience scope correctly', function () {
+    $author = User::factory()->create();
+
+    // Public announcement
+    $public = Announcement::create([
+        'title' => 'Public Post',
+        'slug' => 'public-post',
+        'body' => 'Content',
+        'target_audience' => 'public',
+        'author_id' => $author->id,
+    ]);
+
+    // Reviewer announcement
+    $reviewer = Announcement::create([
+        'title' => 'Reviewer Post',
+        'slug' => 'reviewer-post',
+        'body' => 'Content',
+        'target_audience' => 'reviewer',
+        'author_id' => $author->id,
+    ]);
+
+    // Other/admin announcement
+    $admin = Announcement::create([
+        'title' => 'Admin Post',
+        'slug' => 'admin-post',
+        'body' => 'Content',
+        'target_audience' => 'admin',
+        'author_id' => $author->id,
+    ]);
+
+    $reviewerAudience = Announcement::forAudience('reviewer')->get();
+    expect($reviewerAudience->count())->toBe(2)
+        ->and($reviewerAudience->pluck('id'))->toContain($public->id, $reviewer->id)
+        ->and($reviewerAudience->pluck('id'))->not->toContain($admin->id);
+});
+
