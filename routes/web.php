@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AccreditationTemplateController;
 use App\Http\Controllers\Admin\AdminKampusController;
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
 use App\Http\Controllers\Admin\DataMasterController;
@@ -346,6 +347,12 @@ Route::middleware(['auth'])->group(function () {
         // News Management
         Route::resource('news', NewsController::class);
         Route::post('news/{news}/toggle-active', [NewsController::class, 'toggleActive'])->name('news.toggle-active');
+
+        // Announcement Management
+        Route::resource('announcements', AnnouncementController::class);
+        Route::post('announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
+        Route::post('announcements/{announcement}/toggle-pinned', [AnnouncementController::class, 'togglePinned'])->name('announcements.toggle-pinned');
+
 
     });
 
