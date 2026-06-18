@@ -34,6 +34,17 @@ export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
     const { user } = auth;
 
+    // Helper to check if user has a role (by name)
+    const hasRole = (roleName: string) => {
+        if (user.role && user.role.name === roleName) return true;
+        return user.roles && user.roles.some((r: { name: string }) => r.name === roleName);
+    };
+
+    const isSuperAdmin = hasRole(ROLE_NAMES.SUPER_ADMIN);
+    const isAdminKampus = hasRole(ROLE_NAMES.ADMIN_KAMPUS);
+    const isUser = hasRole(ROLE_NAMES.USER);
+    const isReviewer = hasRole('Reviewer') || user.is_reviewer;
+
     // Base items available to everyone
     const baseNavItems: NavItem[] = [
         {
@@ -43,158 +54,151 @@ export function AppSidebar() {
         },
     ];
 
-    // Role-specific items
-    let roleNavItems: NavItem[] = [];
+    // Super Admin items
+    const superAdminNavItems: NavItem[] = [
+        {
+            title: 'Data Master',
+            href: route('admin.data-master.index'),
+            icon: BookType,
+        },
+        {
+            title: 'Borang Indikator',
+            href: route('admin.borang-indikator.index'),
+            icon: ClipboardList,
+            items: [
+                { title: 'Templates', href: route('admin.templates.index') },
+                { title: 'List View', href: route('admin.borang-indikator.list') },
+            ],
+        },
+        {
+            title: 'Universities',
+            href: route('admin.universities.index'),
+            icon: Building2,
+        },
+        {
+            title: 'User Management',
+            href: '#',
+            icon: Users,
+            items: [
+                { title: 'Admin Kampus', href: route('admin.admin-kampus.index') },
+                { title: 'Pengelola Jurnal', href: route('admin.users.index') },
+                { title: 'Reviewer', href: route('admin.reviewers.index') },
+            ],
+        },
+        {
+            title: 'Journals',
+            href: route('admin.journals.index'),
+            icon: Library,
+        },
+        {
+            title: 'Pembinaan',
+            href: route('admin.pembinaan.index'),
+            icon: Award,
+        },
+        {
+            title: 'Agendas & Events',
+            href: route('admin.events.index'),
+            icon: CalendarDays,
+        },
+        {
+            title: 'Reviewer Assignment',
+            href: route('dikti.assessments.index'),
+            icon: UserCheck,
+        },
+        {
+            title: 'Support Tickets',
+            href: route('admin.tickets.index'),
+            icon: LifeBuoy,
+        },
+        {
+            title: 'News Management',
+            href: route('admin.news.index'),
+            icon: Newspaper,
+        },
+    ];
 
-    if (!user.role) {
-        // Fallback for users without assigned roles - show only common items
-        roleNavItems = [...commonNavItems];
-    } else if (user.role.name === ROLE_NAMES.SUPER_ADMIN) {
-        roleNavItems = [
-            {
-                title: 'Data Master',
-                href: route('admin.data-master.index'),
-                icon: BookType,
-            },
-            {
-                title: 'Borang Indikator',
-                href: route('admin.borang-indikator.index'),
-                icon: ClipboardList,
-                items: [
-                    { title: 'Templates', href: route('admin.templates.index') },
-                    { title: 'List View', href: route('admin.borang-indikator.list') },
-                ],
-            },
-            {
-                title: 'Universities',
-                href: route('admin.universities.index'),
-                icon: Building2,
-            },
-            {
-                title: 'User Management',
-                href: '#',
-                icon: Users,
-                items: [
-                    { title: 'Admin Kampus', href: route('admin.admin-kampus.index') },
-                    { title: 'Pengelola Jurnal', href: route('admin.users.index') },
-                    { title: 'Reviewer', href: route('admin.reviewers.index') },
-                ],
-            },
-            {
-                title: 'Journals',
-                href: route('admin.journals.index'),
-                icon: Library,
-            },
-            {
-                title: 'Pembinaan',
-                href: route('admin.pembinaan.index'),
-                icon: Award,
-            },
-            {
-                title: 'Agendas & Events',
-                href: route('admin.events.index'),
-                icon: CalendarDays,
-            },
-            {
-                title: 'Reviewer Assignment',
-                href: route('dikti.assessments.index'),
-                icon: UserCheck,
-            },
-            {
-                title: 'Support Tickets',
-                href: route('admin.tickets.index'),
-                icon: LifeBuoy,
-            },
-            {
-                title: 'News Management',
-                href: route('admin.news.index'),
-                icon: Newspaper,
-            },
-            ...commonNavItems,
-        ];
-    } else if (user.role.name === ROLE_NAMES.ADMIN_KAMPUS) {
-        // Build Admin Kampus menu items
-        const adminKampusItems: NavItem[] = [
-            {
-                title: 'Profil Universitas',
-                href: route('admin-kampus.university.edit'),
-                icon: Building2,
-            },
-            {
-                title: 'Pengelola Jurnal',
-                href: route('admin-kampus.users.index'),
-                icon: Users,
-            },
-            {
-                title: 'Journals',
-                href: route('admin-kampus.journals.index'),
-                icon: Library,
-            },
-            {
-                title: 'Agendas & Events',
-                href: route('admin-kampus.events.index'),
-                icon: CalendarDays,
-            },
-            {
-                title: 'Pembinaan',
-                href: '#',
-                icon: Award,
-                items: [
-                    { title: 'Akreditasi', href: route('admin-kampus.pembinaan.akreditasi') },
-                    { title: 'Indeksasi', href: route('admin-kampus.pembinaan.indeksasi') },
-                ],
-            },
-            {
-                title: 'Support Tickets',
-                href: route('admin-kampus.tickets.index'),
-                icon: LifeBuoy,
-            },
-        ];
+    // Admin Kampus items
+    const adminKampusNavItems: NavItem[] = [
+        {
+            title: 'Profil Universitas',
+            href: route('admin-kampus.university.edit'),
+            icon: Building2,
+        },
+        {
+            title: 'Pengelola Jurnal',
+            href: route('admin-kampus.users.index'),
+            icon: Users,
+        },
+        {
+            title: 'Journals',
+            href: route('admin-kampus.journals.index'),
+            icon: Library,
+        },
+        {
+            title: 'Agendas & Events',
+            href: route('admin-kampus.events.index'),
+            icon: CalendarDays,
+        },
+        {
+            title: 'Pembinaan',
+            href: '#',
+            icon: Award,
+            items: [
+                { title: 'Akreditasi', href: route('admin-kampus.pembinaan.akreditasi') },
+                { title: 'Indeksasi', href: route('admin-kampus.pembinaan.indeksasi') },
+            ],
+        },
+        {
+            title: 'Support Tickets',
+            href: route('admin-kampus.tickets.index'),
+            icon: LifeBuoy,
+        },
+    ];
 
-        // Add Reviewer menu only if user has reviewer role
-        if (user.roles && user.roles.some((role: { name: string }) => role.name === 'Reviewer')) {
-            adminKampusItems.push({
-                title: 'Reviewer',
-                href: route('admin-kampus.reviewer.index'),
-                icon: UserCheck,
-            });
-        }
-
-        roleNavItems = [...adminKampusItems, ...commonNavItems];
-    } else if (user.role.name === ROLE_NAMES.USER) {
-        roleNavItems = [
-            {
-                title: 'Profil',
-                href: route('user.profil.index'),
-                icon: UserCheck,
-            },
-            {
-                title: 'Jurnal',
-                href: route('user.journals.index'),
-                icon: BookOpen,
-            },
-            {
-                title: 'Pembinaan',
-                href: '#',
-                icon: Award,
-                items: [
-                    { title: 'Akreditasi', href: route('user.pembinaan.akreditasi') },
-                    { title: 'Indeksasi', href: route('user.pembinaan.indeksasi') },
-                ],
-            },
-            {
-                title: 'Support Tickets',
-                href: route('user.tickets.index'),
-                icon: LifeBuoy,
-            },
-            ...commonNavItems,
-        ];
-    } else {
-        // Fallback for unrecognized roles - show only common items
-        roleNavItems = [...commonNavItems];
+    if (isReviewer) {
+        adminKampusNavItems.push({
+            title: 'Reviewer',
+            href: route('admin-kampus.reviewer.index'),
+            icon: UserCheck,
+        });
     }
 
-    const mainNavItems = [...baseNavItems, ...roleNavItems];
+    // User items
+    const userNavItems: NavItem[] = [
+        {
+            title: 'Profil',
+            href: route('user.profil.index'),
+            icon: UserCheck,
+        },
+        {
+            title: 'Jurnal',
+            href: route('user.journals.index'),
+            icon: BookOpen,
+        },
+        {
+            title: 'Pembinaan',
+            href: '#',
+            icon: Award,
+            items: [
+                { title: 'Akreditasi', href: route('user.pembinaan.akreditasi') },
+                { title: 'Indeksasi', href: route('user.pembinaan.indeksasi') },
+            ],
+        },
+        {
+            title: 'Support Tickets',
+            href: route('user.tickets.index'),
+            icon: LifeBuoy,
+        },
+    ];
+
+    // Reviewer items
+    const reviewerNavItems: NavItem[] = [
+        {
+            title: 'Penugasan Reviewer',
+            href: route('reviewer.assignments.index'),
+            icon: UserCheck,
+        },
+    ];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -211,7 +215,17 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={baseNavItems} label="Platform" />
+                
+                {isSuperAdmin && <NavMain items={superAdminNavItems} label="Super Admin" />}
+                
+                {isAdminKampus && <NavMain items={adminKampusNavItems} label="LPPM Admin" />}
+                
+                {isUser && <NavMain items={userNavItems} label="Pengelola Jurnal" />}
+                
+                {isReviewer && <NavMain items={reviewerNavItems} label="Reviewer" />}
+                
+                <NavMain items={commonNavItems} label="Resources" />
             </SidebarContent>
 
             <SidebarFooter>

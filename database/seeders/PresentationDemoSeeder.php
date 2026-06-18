@@ -127,6 +127,17 @@ class PresentationDemoSeeder extends Seeder
 
         DB::table('users')->insert($users);
 
+        // Populate user_roles pivot table for seeded users
+        $seededUsers = \App\Models\User::all();
+        foreach ($seededUsers as $u) {
+            if ($u->role_id) {
+                $u->roles()->syncWithoutDetaching([$u->role_id => [
+                    'assigned_at' => now(),
+                    'assigned_by' => null,
+                ]]);
+            }
+        }
+
         $this->command->info('✓ Created 3 demo users: DIKTI (Super Admin), LPPM (Admin Kampus - UAD), Editor (User - UAD)');
     }
 
