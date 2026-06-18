@@ -17,7 +17,23 @@ class PublicAnnouncementController extends Controller
         $sort = $request->input('sort', 'new');
         $tag = $request->input('tag');
 
-        $query = Announcement::query()->published()->where('target_audience', 'public');
+        $user = auth()->user();
+        $query = Announcement::query()->published();
+
+        if ($user) {
+            if ($user->isSuperAdmin()) {
+                $audiences = ['public', 'super_admin', 'admin_kampus', 'pengelola_jurnal', 'reviewer', 'user'];
+            } else {
+                $audiences = ['public'];
+                foreach ($user->getRoleNames() as $roleName) {
+                    $audiences[] = $this->mapRoleToAudience($roleName);
+                }
+                $audiences = array_unique($audiences);
+            }
+            $query->whereIn('target_audience', $audiences);
+        } else {
+            $query->where('target_audience', 'public');
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -64,11 +80,11 @@ class PublicAnnouncementController extends Controller
     {
         $this->authorizeAccess($announcement);
 
-        if (!$announcement->attachment_path || !Storage::exists($announcement->attachment_path)) {
+        if (!$announcement->attachment_path || !Storage::disk('local')->exists($announcement->attachment_path)) {
             abort(404, 'File not found');
         }
 
-        return Storage::download($announcement->attachment_path, $announcement->attachment_name);
+        return Storage::disk('local')->download($announcement->attachment_path, $announcement->attachment_name);
     }
 
     private function authorizeAccess(Announcement $announcement): void
@@ -83,14 +99,18 @@ class PublicAnnouncementController extends Controller
         }
 
         // Super Admin has bypass access
-        if ($user->role?->name === Role::SUPER_ADMIN) {
+        if ($user->isSuperAdmin()) {
             return;
         }
 
-        $mappedAudience = $this->mapRoleToAudience($user->role?->name);
-        if ($announcement->target_audience !== $mappedAudience) {
-            abort(403, 'Unauthorized access to this announcement.');
+        $userRoles = $user->getRoleNames();
+        $allowedAudiences = array_map([$this, 'mapRoleToAudience'], $userRoles);
+
+        if (in_array($announcement->target_audience, $allowedAudiences, true)) {
+            return;
         }
+
+        abort(403, 'Unauthorized access to this announcement.');
     }
 
     private function mapRoleToAudience(?string $roleName): string
