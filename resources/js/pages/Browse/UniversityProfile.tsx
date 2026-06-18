@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import PublicLayout from '@/layouts/public-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Award, BookOpen, Building2, FileText, Globe, Mail, MapPin, Phone, Search, ShieldCheck } from 'lucide-react';
+import { Award, BookOpen, Building2, Download, FileText, Globe, Mail, MapPin, Phone, Search, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
@@ -154,6 +154,43 @@ export default function UniversityProfile({ university, stats, journals, article
             preserveScroll: true,
         });
     }, [debouncedSearch, journalId, year]);
+
+    const downloadRis = (article: any) => {
+        const year = article.publication_date ? new Date(article.publication_date).getFullYear() : 'Unknown';
+        let authorsFormatted = 'AU  - Unknown';
+        if (article.authors) {
+            if (Array.isArray(article.authors)) {
+                authorsFormatted = article.authors.map((a: string) => `AU  - ${a}`).join('\n');
+            } else {
+                authorsFormatted = `AU  - ${article.authors}`;
+            }
+        }
+
+        const risLines = ['TY  - JOUR', `TI  - ${article.title}`, authorsFormatted, `JO  - ${article.journal?.title || 'Unknown'}`, `PY  - ${year}`];
+
+        if (article.volume) risLines.push(`VL  - ${article.volume}`);
+        if (article.issue) risLines.push(`IS  - ${article.issue}`);
+        if (article.pages) risLines.push(`SP  - ${article.pages}`);
+        if (article.doi) risLines.push(`DO  - ${article.doi}`);
+        if (article.article_url) risLines.push(`UR  - ${article.article_url}`);
+        if (article.abstract) risLines.push(`AB  - ${article.abstract}`);
+        risLines.push('ER  -');
+
+        const risContent = risLines.filter(Boolean).join('\n');
+        const blob = new Blob([risContent], { type: 'application/x-research-info-systems;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute(
+            'download',
+            `${article.title
+                .substring(0, 30)
+                .replace(/[^a-z0-9]/gi, '_')
+                .toLowerCase()}.ris`,
+        );
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     const handlePageChange = (url: string | null) => {
         if (!url) return;
@@ -467,44 +504,75 @@ export default function UniversityProfile({ university, stats, journals, article
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Artikel & Penulis</TableHead>
-                                            <TableHead>Jurnal</TableHead>
-                                            <TableHead>Tahun Terbit</TableHead>
-                                            <TableHead className="text-right">Aksi</TableHead>
+                                            <TableHead>Articles & Author(s)</TableHead>
+                                            <TableHead>Journal</TableHead>
+                                            <TableHead>Volume</TableHead>
+                                            <TableHead>Issue</TableHead>
+                                            <TableHead>Year</TableHead>
+                                            <TableHead className="text-right">Action</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {(articles?.data || []).map((article: any) => (
                                             <TableRow key={article.id}>
-                                                <TableCell className="max-w-[450px]">
-                                                    <div className="line-clamp-2 font-bold text-gray-900">{article.title}</div>
+                                                <TableCell className="max-w-[320px]">
+                                                    {article.article_url ? (
+                                                        <a
+                                                            href={article.article_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="line-clamp-2 font-bold text-gray-900 dark:text-white hover:text-[#079C4E] dark:hover:text-[#079C4E] hover:underline transition-colors"
+                                                        >
+                                                            {article.title}
+                                                        </a>
+                                                    ) : (
+                                                        <div className="line-clamp-2 font-bold text-gray-900 dark:text-white">{article.title}</div>
+                                                    )}
                                                     <div className="mt-1 truncate text-xs text-muted-foreground">
                                                         {Array.isArray(article.authors)
                                                             ? article.authors.join(', ')
                                                             : article.authors || 'Penulis Tidak Diketahui'}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell className="max-w-[200px]">
                                                     {article.journal && (
                                                         <Link
                                                             href={route('journals.show', article.journal.id)}
-                                                            className="text-xs font-semibold text-[#079C4E] hover:underline"
+                                                            className="text-xs font-semibold text-[#079C4E] hover:underline block truncate"
+                                                            title={article.journal.title}
                                                         >
                                                             {article.journal.title}
                                                         </Link>
                                                     )}
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {article.volume || '-'}
+                                                </TableCell>
+                                                <TableCell className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {article.issue || '-'}
+                                                </TableCell>
+                                                <TableCell className="text-sm text-gray-600 dark:text-gray-400">
                                                     {article.publication_date ? new Date(article.publication_date).getFullYear() : '-'}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    {article.article_url && (
-                                                        <a href={article.article_url} target="_blank" rel="noopener noreferrer">
-                                                            <Button size="sm" className="bg-[#079C4E] text-white hover:bg-[#068442]">
-                                                                Buka Artikel
-                                                            </Button>
-                                                        </a>
-                                                    )}
+                                                    <div className="flex flex-col items-end gap-1.5">
+                                                        {article.article_url && (
+                                                            <a href={article.article_url} target="_blank" rel="noopener noreferrer">
+                                                                <Button size="sm" className="bg-[#079C4E] text-white hover:bg-[#068442] h-8 px-3 text-xs">
+                                                                    Buka Artikel
+                                                                </Button>
+                                                            </a>
+                                                        )}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => downloadRis(article)}
+                                                            className="h-7 px-2 text-xs font-medium text-gray-500 hover:text-[#079C4E] hover:bg-emerald-50/50 dark:text-gray-400 dark:hover:text-[#079C4E] dark:hover:bg-[#079C4E]/10"
+                                                        >
+                                                            <Download className="mr-1 h-3.5 w-3.5" />
+                                                            Cite
+                                                        </Button>
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

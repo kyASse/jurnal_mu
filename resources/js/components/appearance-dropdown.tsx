@@ -4,7 +4,11 @@ import { useAppearance } from '@/hooks/use-appearance';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { HTMLAttributes } from 'react';
 
-export default function AppearanceToggleDropdown({ className = '', ...props }: HTMLAttributes<HTMLDivElement>) {
+interface AppearanceToggleDropdownProps extends HTMLAttributes<HTMLDivElement> {
+    buttonClassName?: string;
+}
+
+export default function AppearanceToggleDropdown({ className = '', buttonClassName = '', ...props }: AppearanceToggleDropdownProps) {
     const { appearance, updateAppearance } = useAppearance();
 
     const getCurrentIcon = () => {
@@ -22,7 +26,7 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
         <div className={className} {...props}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md">
+                    <Button variant="ghost" size="icon" className={`h-9 w-9 rounded-md ${buttonClassName}`}>
                         {getCurrentIcon()}
                         <span className="sr-only">Toggle theme</span>
                     </Button>
