@@ -17,8 +17,10 @@ class AnnouncementController extends Controller
         $query = Announcement::query()->with('author:id,name');
 
         if ($search) {
-            $query->where('title', 'like', "%{$search}%")
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
                   ->orWhere('target_audience', 'like', "%{$search}%");
+            });
         }
 
         $announcements = $query->orderBy('is_pinned', 'desc')
@@ -112,7 +114,7 @@ class AnnouncementController extends Controller
         $announcement->tags = $tagsArray;
         $announcement->is_pinned = $request->boolean('is_pinned');
         $announcement->is_active = $request->boolean('is_active');
-        $announcement->published_at = ($validated['published_at'] ?? null) ?: $announcement->published_at;
+        $announcement->published_at = $validated['published_at'] ?? null;
 
         if ($request->hasFile('attachment')) {
             // Delete old file
@@ -145,7 +147,7 @@ class AnnouncementController extends Controller
         $announcement->is_active = !$announcement->is_active;
         $announcement->save();
 
-        return response()->json(['success' => true, 'is_active' => $announcement->is_active]);
+        return redirect()->back();
     }
 
     public function togglePinned(Announcement $announcement)
@@ -153,7 +155,7 @@ class AnnouncementController extends Controller
         $announcement->is_pinned = !$announcement->is_pinned;
         $announcement->save();
 
-        return response()->json(['success' => true, 'is_pinned' => $announcement->is_pinned]);
+        return redirect()->back();
     }
 
     private function makeExcerpt(string $body): string

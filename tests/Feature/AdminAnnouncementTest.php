@@ -46,7 +46,7 @@ it('allows super admin to toggle active status', function () {
     ]);
 
     $response = $this->actingAs($this->admin)->post(route('admin.announcements.toggle-active', $announcement->id));
-    $response->assertStatus(200);
+    $response->assertRedirect();
 
     expect($announcement->refresh()->is_active)->toBeFalse();
 });
@@ -128,7 +128,7 @@ it('allows super admin to toggle pinned status', function () {
     ]);
 
     $response = $this->actingAs($this->admin)->post(route('admin.announcements.toggle-pinned', $announcement->id));
-    $response->assertStatus(200);
+    $response->assertRedirect();
 
     expect($announcement->refresh()->is_pinned)->toBeTrue();
 });
@@ -163,4 +163,31 @@ it('blocks non-admin users from announcement admin operations', function () {
     // 4. Try to destroy
     $response = $this->actingAs($user)->delete(route('admin.announcements.destroy', $announcement->id));
     $response->assertStatus(403);
+});
+
+it('allows super admin to update announcement and unset published_at', function () {
+    $announcement = Announcement::create([
+        'title' => 'Title',
+        'slug' => 'title',
+        'body' => 'Body',
+        'target_audience' => 'public',
+        'is_active' => true,
+        'is_pinned' => false,
+        'author_id' => $this->admin->id,
+        'published_at' => now(),
+    ]);
+
+    $response = $this->actingAs($this->admin)->put(route('admin.announcements.update', $announcement->id), [
+        'title' => 'Updated Title',
+        'body' => '<p>Updated Body</p>',
+        'target_audience' => 'public',
+        'is_active' => true,
+        'is_pinned' => false,
+        'published_at' => null,
+    ]);
+
+    $response->assertRedirect(route('admin.announcements.index'));
+
+    $announcement->refresh();
+    expect($announcement->published_at)->toBeNull();
 });
