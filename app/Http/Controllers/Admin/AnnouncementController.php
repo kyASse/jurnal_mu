@@ -117,7 +117,7 @@ class AnnouncementController extends Controller
         if ($request->hasFile('attachment')) {
             // Delete old file
             if ($announcement->attachment_path) {
-                Storage::delete($announcement->attachment_path);
+                Storage::disk('local')->delete($announcement->attachment_path);
             }
             $file = $request->file('attachment');
             $path = $file->store('announcements', 'local');
@@ -133,7 +133,7 @@ class AnnouncementController extends Controller
     public function destroy(Announcement $announcement)
     {
         if ($announcement->attachment_path) {
-            Storage::delete($announcement->attachment_path);
+            Storage::disk('local')->delete($announcement->attachment_path);
         }
         $announcement->delete();
 
