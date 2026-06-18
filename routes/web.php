@@ -114,6 +114,12 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])
 Route::get('/news', [PublicNewsController::class, 'index'])->name('news.index');
 Route::get('/news/{slug}', [PublicNewsController::class, 'show'])->name('news.show');
 
+// Public access to view announcements
+Route::get('/announcements', [App\Http\Controllers\PublicAnnouncementController::class, 'index'])->name('announcements.index');
+Route::get('/announcements/{slug}', [App\Http\Controllers\PublicAnnouncementController::class, 'show'])->name('announcements.show');
+Route::get('/announcements/{announcement}/download', [App\Http\Controllers\PublicAnnouncementController::class, 'downloadAttachment'])->name('announcements.download');
+
+
 /*
 |--------------------------------------------------------------------------
 | Guest Routes (Redirect jika sudah login)
