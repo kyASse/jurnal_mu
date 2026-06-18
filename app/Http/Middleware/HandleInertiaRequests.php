@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user() ?
-                    $request->user()->load(['role', 'university']) :
+                    $request->user()->load(['role', 'roles', 'university']) :
                     null,
             ],
             'flash' => [

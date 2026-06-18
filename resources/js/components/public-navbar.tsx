@@ -1,4 +1,5 @@
 import logoUrl from '@/assets/logo_dark.png';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -39,6 +40,9 @@ export default function PublicNavbar() {
                             Events
                         </Link>
                     </div>
+
+                    <AppearanceToggleDropdown buttonClassName="text-white hover:bg-white/20 hover:text-white" />
+
                     {auth?.user ? (
                         <Link href={route('dashboard')}>
                             <Button variant="secondary" className="border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100">

@@ -6,7 +6,21 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, Calendar, ChevronDown, Clock, GraduationCap, LayoutDashboard, Library, MapPin, Search, User } from 'lucide-react';
+import {
+    ArrowRight,
+    BookOpen,
+    Calendar,
+    ChevronDown,
+    Clock,
+    Download,
+    FileText,
+    GraduationCap,
+    LayoutDashboard,
+    Library,
+    MapPin,
+    Search,
+    User,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface WelcomeProps extends SharedData {
@@ -42,7 +56,14 @@ interface WelcomeProps extends SharedData {
         journal: {
             id: number;
             title: string;
-        };
+        } | null;
+        authors?: string[];
+        volume?: string;
+        issue?: string;
+        pages?: string;
+        doi?: string;
+        doi_url?: string;
+        abstract?: string;
     }>;
     topUniversities: Array<{
         id: number;
@@ -105,6 +126,38 @@ export default function Welcome() {
 
         return () => clearInterval(interval);
     }, [links.length]);
+
+    const downloadRis = (article: WelcomeProps['featuredArticles'][number]) => {
+        const year = article.publication_date ? new Date(article.publication_date).getFullYear() : new Date().getFullYear();
+        const authorsFormatted =
+            article.authors && Array.isArray(article.authors) ? article.authors.map((a: string) => `AU  - ${a}`).join('\n') : 'AU  - Unknown';
+
+        const risLines = ['TY  - JOUR', `TI  - ${article.title}`, authorsFormatted, `PY  - ${year}`];
+
+        if (article.journal?.title) risLines.push(`JO  - ${article.journal.title}`);
+        if (article.volume) risLines.push(`VL  - ${article.volume}`);
+        if (article.issue) risLines.push(`IS  - ${article.issue}`);
+        if (article.pages) risLines.push(`SP  - ${article.pages}`);
+        if (article.doi) risLines.push(`DO  - ${article.doi}`);
+        if (article.article_url) risLines.push(`UR  - ${article.article_url}`);
+        if (article.abstract) risLines.push(`AB  - ${article.abstract}`);
+        risLines.push('ER  -');
+
+        const risContent = risLines.filter(Boolean).join('\n');
+        const blob = new Blob([risContent], { type: 'application/x-research-info-systems;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute(
+            'download',
+            `${article.title
+                .substring(0, 30)
+                .replace(/[^a-z0-9]/gi, '_')
+                .toLowerCase()}.ris`,
+        );
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <>
@@ -334,9 +387,11 @@ export default function Welcome() {
                                         className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
                                     >
                                         <div className="space-y-3">
-                                            <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#079C4E] dark:bg-emerald-950/30 dark:text-emerald-400">
-                                                {article.journal.title}
-                                            </div>
+                                            {article.journal?.title && (
+                                                <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#079C4E] dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                    {article.journal.title}
+                                                </div>
+                                            )}
 
                                             <h3 className="line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
                                                 {article.article_url ? (
@@ -368,7 +423,7 @@ export default function Welcome() {
                                             </div>
                                         </div>
 
-                                        <div className="mt-6 flex items-center gap-3">
+                                        <div className="mt-6 flex flex-wrap items-center gap-3">
                                             {article.pdf_url ? (
                                                 <Button asChild size="sm" className="bg-[#079C4E] text-white hover:bg-[#068a45]">
                                                     <a href={article.pdf_url} target="_blank" rel="noopener noreferrer">
@@ -386,6 +441,25 @@ export default function Welcome() {
                                                 <a href={article.google_scholar_url} target="_blank" rel="noopener noreferrer">
                                                     Google Scholar
                                                 </a>
+                                            </Button>
+
+                                            {article.doi && (
+                                                <Button asChild size="sm" variant="outline" className="text-gray-700 dark:text-gray-300">
+                                                    <a href={article.doi_url} target="_blank" rel="noopener noreferrer">
+                                                        <FileText className="mr-1 h-4 w-4" />
+                                                        DOI
+                                                    </a>
+                                                </Button>
+                                            )}
+
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => downloadRis(article)}
+                                                className="border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10"
+                                            >
+                                                <Download className="mr-1 h-4 w-4" />
+                                                Export RIS
                                             </Button>
                                         </div>
                                     </div>
