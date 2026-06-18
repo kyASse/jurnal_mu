@@ -181,7 +181,7 @@ class PublicHomeService
                 $cleanedWord = trim($word, '.,:;()[]{}""\'\'');
                 $isLastWord = ($index === $wordCount - 1);
 
-                if ($index > 0 && ! $isLastWord && in_array($cleanedWord, $minorWords)) {
+                if ($index > 0 && $isLastWord === false && in_array($cleanedWord, $minorWords)) {
                     $formattedWords[] = $word;
                 } else {
                     $formattedWords[] = preg_replace_callback(
@@ -228,25 +228,25 @@ class PublicHomeService
                 ->limit(6)
                 ->get()
                 ->map(fn ($article) => [
-                'id' => $article->id,
-                'title' => $this->toTitleCaseIfAllUpper($article->title),
-                'authors_list' => $article->authors_list,
-                'publication_date' => $article->publication_date?->format('Y-m-d'),
-                'article_url' => $article->article_url,
-                'pdf_url' => $article->pdf_url,
-                'google_scholar_url' => $article->google_scholar_url,
-                'authors' => $article->authors,
-                'volume' => $article->volume,
-                'issue' => $article->issue,
-                'pages' => $article->pages,
-                'doi' => $article->doi,
-                'doi_url' => $article->doi_url,
-                'abstract' => $article->abstract,
-                'journal' => $article->journal ? [
-                    'id' => $article->journal->id,
-                    'title' => $article->journal->title,
-                ] : null,
-            ]);
+                    'id' => $article->id,
+                    'title' => $this->toTitleCaseIfAllUpper($article->title),
+                    'authors_list' => $article->authors_list,
+                    'publication_date' => $article->publication_date?->format('Y-m-d'),
+                    'article_url' => $article->article_url,
+                    'pdf_url' => $article->pdf_url,
+                    'google_scholar_url' => $article->google_scholar_url,
+                    'authors' => $article->authors,
+                    'volume' => $article->volume,
+                    'issue' => $article->issue,
+                    'pages' => $article->pages,
+                    'doi' => $article->doi,
+                    'doi_url' => $article->doi_url,
+                    'abstract' => $article->abstract,
+                    'journal' => $article->journal ? [
+                        'id' => $article->journal->id,
+                        'title' => $article->journal->title,
+                    ] : null,
+                ]);
         });
     }
 
