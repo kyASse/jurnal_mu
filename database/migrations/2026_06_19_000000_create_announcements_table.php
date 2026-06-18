@@ -24,7 +24,7 @@ return new class extends Migration {
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
 
-            $table->index(['is_active', 'published_at', 'is_pinned']);
+            $table->index(['is_active', 'target_audience', 'is_pinned', 'published_at'], 'announcements_active_audience_pinned_pub_idx');
         });
     }
 

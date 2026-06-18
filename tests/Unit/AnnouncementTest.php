@@ -104,3 +104,26 @@ it('applies audience scope correctly', function () {
         ->and($reviewerAudience->pluck('id'))->not->toContain($admin->id);
 });
 
+it('excludes announcements with null published_at from published scope', function () {
+    $author = User::factory()->create();
+
+    Announcement::create([
+        'title' => 'Draft Announcement',
+        'slug' => 'draft-announcement',
+        'body' => 'Draft body',
+        'is_active' => true,
+        'author_id' => $author->id,
+        'published_at' => null,
+    ]);
+
+    $published = Announcement::published()->get();
+    expect($published->count())->toBe(0);
+});
+
+it('can be created using factory', function () {
+    $announcement = Announcement::factory()->create();
+    expect($announcement)->toBeInstanceOf(Announcement::class)
+        ->and($announcement->author)->toBeInstanceOf(User::class);
+});
+
+
