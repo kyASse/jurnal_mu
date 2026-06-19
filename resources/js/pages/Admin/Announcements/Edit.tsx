@@ -33,7 +33,13 @@ export default function Edit({ announcement }: Props) {
     const formatDateTime = (dtStr: string | null) => {
         if (!dtStr) return '';
         const d = new Date(dtStr);
-        return d.toISOString().slice(0, 16);
+        const pad = (num: number) => String(num).padStart(2, '0');
+        const year = d.getFullYear();
+        const month = pad(d.getMonth() + 1);
+        const day = pad(d.getDate());
+        const hours = pad(d.getHours());
+        const minutes = pad(d.getMinutes());
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
 
     const { data, setData, post, processing, errors } = useForm({
