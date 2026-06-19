@@ -111,12 +111,41 @@ class DashboardController extends Controller
             ];
         }
 
+        // Fetch relevant announcements
+        $roleNames = $user->roles()->pluck('name')->toArray();
+        if ($user->role) {
+            $roleNames[] = $user->role->name;
+        }
+
+        $roleMapping = [
+            'Super Admin' => 'super_admin',
+            'Admin Kampus' => 'admin_kampus',
+            'Pengelola Jurnal' => 'pengelola_jurnal',
+            'Reviewer' => 'reviewer',
+            'User' => 'user',
+        ];
+
+        $targetAudiences = collect($roleNames)
+            ->map(fn ($roleName) => $roleMapping[$roleName] ?? null)
+            ->filter()
+            ->push('public')
+            ->unique()
+            ->toArray();
+
+        $announcements = \App\Models\Announcement::published()
+            ->whereIn('target_audience', $targetAudiences)
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('published_at')
+            ->limit(5)
+            ->get();
+
         // Calculate journal statistics for visualization
         $statistics = $this->calculateJournalStatisticsForRole($user);
 
         return Inertia::render('dashboard', [
             'stats' => $stats,
             'statistics' => $statistics,
+            'announcements' => $announcements,
         ]);
     }
 
