@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, CalendarDays, Eye, FileDown, Paperclip } from 'lucide-react';
 
 interface AnnouncementItem {
@@ -26,12 +26,12 @@ export default function Show({ announcement }: Props) {
             <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
                 {/* Back Link */}
                 <div className="mb-6">
-                    <a
+                    <Link
                         href={route('announcements.index')}
                         className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#079C4E] hover:underline"
                     >
                         <ArrowLeft className="h-4 w-4" /> Back to Announcements
-                    </a>
+                    </Link>
                 </div>
 
                 <article className="rounded-2xl border bg-card p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">

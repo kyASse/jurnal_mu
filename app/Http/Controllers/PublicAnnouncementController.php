@@ -35,6 +35,13 @@ class PublicAnnouncementController extends Controller
             $query->where('target_audience', 'public');
         }
 
+        $allTags = (clone $query)->whereNotNull('tags')
+            ->pluck('tags')
+            ->flatten()
+            ->unique()
+            ->values()
+            ->toArray();
+
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -60,6 +67,7 @@ class PublicAnnouncementController extends Controller
         return Inertia::render('Public/Announcements/Index', [
             'announcements' => $announcements,
             'filters' => $request->only(['search', 'sort', 'tag']),
+            'allTags' => $allTags,
         ]);
     }
 

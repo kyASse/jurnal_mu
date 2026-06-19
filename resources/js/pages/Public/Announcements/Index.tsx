@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PublicLayout from '@/layouts/public-layout';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { CalendarDays, Megaphone, Search, Pin, FileDown } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 
@@ -31,9 +31,10 @@ interface PaginatedData {
 interface Props {
     announcements: PaginatedData;
     filters?: { search?: string; sort?: string; tag?: string };
+    allTags: string[];
 }
 
-export default function Index({ announcements, filters }: Props) {
+export default function Index({ announcements, filters, allTags }: Props) {
     const [search, setSearch] = useState(filters?.search || '');
     const [sort, setSort] = useState(filters?.sort || 'new');
     const [activeTag, setActiveTag] = useState(filters?.tag || '');
@@ -54,10 +55,7 @@ export default function Index({ announcements, filters }: Props) {
         router.get(route('announcements.index'), { search, sort, tag: nextTag }, { preserveState: true });
     };
 
-    // Extract all unique tags from current data
-    const allTags = Array.from(
-        new Set(announcements.data.flatMap((item) => item.tags || []))
-    );
+
 
     return (
         <PublicLayout>
@@ -151,7 +149,7 @@ export default function Index({ announcements, filters }: Props) {
                             <article
                                 key={item.id}
                                 className={`group relative flex flex-col p-6 rounded-2xl border bg-card transition-all duration-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 ${
-                                    item.is_pinned ? 'border-l-4 border-l-[#079C4E] bg-emerald-50/20' : ''
+                                    item.is_pinned ? 'border-l-4 border-l-[#079C4E] bg-emerald-50/20 dark:bg-emerald-950/20' : ''
                                 }`}
                             >
                                 <div className="flex items-center justify-between mb-3">
@@ -182,18 +180,18 @@ export default function Index({ announcements, filters }: Props) {
                                 </div>
 
                                 <h2 className="mb-2 text-2xl font-bold tracking-tight text-foreground transition-colors group-hover:text-[#079C4E]">
-                                    <a href={route('announcements.show', item.slug)}>{item.title}</a>
+                                    <Link href={route('announcements.show', item.slug)}>{item.title}</Link>
                                 </h2>
 
                                 <p className="mb-4 text-muted-foreground text-sm leading-relaxed">{item.summary}</p>
 
                                 <div className="flex items-center justify-between border-t pt-4 dark:border-zinc-800">
-                                    <a
+                                    <Link
                                         href={route('announcements.show', item.slug)}
                                         className="inline-flex items-center text-sm font-bold text-[#079C4E] hover:underline"
                                     >
                                         Read Announcement &rarr;
-                                    </a>
+                                    </Link>
                                     {item.attachment_name && (
                                         <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                                             <FileDown className="h-4 w-4 text-emerald-600" /> {item.attachment_name}
