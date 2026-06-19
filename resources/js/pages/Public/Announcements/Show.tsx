@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import { Head } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Eye, FileDown, Megaphone } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Eye, FileDown, Paperclip } from 'lucide-react';
 
 interface AnnouncementItem {
     id: number;
@@ -77,7 +77,7 @@ export default function Show({ announcement }: Props) {
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-start gap-3">
                                     <div className="rounded-lg bg-emerald-100 p-2.5 dark:bg-emerald-950/40">
-                                        <Megaphone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                        <Paperclip className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-foreground">Attached Document</h4>
