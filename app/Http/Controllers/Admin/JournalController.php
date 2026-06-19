@@ -12,6 +12,8 @@ use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
+use App\Http\Requests\UpdateJournalRequest;
+use App\Services\JournalService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -324,6 +326,63 @@ class JournalController extends Controller
                 ->where('payload', 'like', '%"journal_id":'.$journal->id.'%')
                 ->exists(),
         ]);
+    }
+
+    /**
+     * Show form to edit the specified journal.
+     */
+    public function edit(Journal $journal): Response
+    {
+        $this->authorize('update', $journal);
+
+        $scientificFields = ScientificField::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+        
+        $universityUsers = User::where('university_id', $journal->university_id)
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+
+        $sintaRanks = collect(Journal::getSintaRankOptions())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
+        $indexationOptions = collect(Journal::getIndexationPlatforms())
+            ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+            ->values();
+
+        return Inertia::render('Admin/Journals/Edit', [
+             'journal' => $journal,
+             'scientificFields' => $scientificFields,
+             'sintaRankOptions' => Journal::getSintaRankOptions(),
+             'indexationOptions' => $indexationOptions,
+             'universityUsers' => $universityUsers,
+        ]);
+    }
+
+    /**
+     * Update the specified journal in storage.
+     */
+    public function update(UpdateJournalRequest $request, Journal $journal, JournalService $journalService): RedirectResponse
+    {
+        $this->authorize('update', $journal);
+
+        $validated = $request->validated();
+
+        try {
+            $journalService->updateJournal(
+                $validated,
+                $request->file('cover_image'),
+                $journal,
+                auth()->user()
+            );
+
+            return redirect()->route('admin.journals.show', $journal)
+                ->with('success', 'Data jurnal berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui jurnal. Silakan coba lagi.');
+        }
     }
 
     /**
