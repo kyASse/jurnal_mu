@@ -28,7 +28,7 @@ class DashboardController extends Controller
         ];
 
         // Get stats based on user role
-        if ($user->role->name === 'Super Admin') {
+        if ($user->role && $user->role->name === 'Super Admin') {
             // Super Admin sees all data
             $stats['total_journals'] = Journal::count();
             $stats['total_assessments'] = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
@@ -55,7 +55,7 @@ class DashboardController extends Controller
                 ->get()
                 ->toArray();
 
-        } elseif ($user->role->name === 'Admin Kampus') {
+        } elseif ($user->role && $user->role->name === 'Admin Kampus') {
             // Admin Kampus sees only their university data
             $stats['total_journals'] = Journal::where('university_id', $user->university_id)
                 ->count();
@@ -156,13 +156,13 @@ class DashboardController extends Controller
     private function calculateJournalStatisticsForRole($user): array
     {
         // Generate cache key based on role and scope
-        if ($user->role->name === 'Super Admin') {
+        if ($user->role && $user->role->name === 'Super Admin') {
             $cacheKey = 'dashboard_statistics_super_admin';
 
             return Cache::remember($cacheKey, 3600, function () {
                 return $this->calculateJournalStatistics(null, null);
             });
-        } elseif ($user->role->name === 'Admin Kampus') {
+        } elseif ($user->role && $user->role->name === 'Admin Kampus') {
             $cacheKey = "dashboard_statistics_university_{$user->university_id}";
 
             return Cache::remember($cacheKey, 3600, function () use ($user) {

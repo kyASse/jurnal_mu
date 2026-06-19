@@ -3,7 +3,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type JournalStatistics, type PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BookOpen, CheckCircle, ClipboardCheck, Clock, TrendingUp, UserPlus, XCircle } from 'lucide-react';
+import { BookOpen, CheckCircle, ClipboardCheck, Clock, Megaphone, Pin, TrendingUp, UserPlus, XCircle } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,6 +24,16 @@ interface JournalsByStatus {
     rejected: number;
 }
 
+interface AnnouncementItem {
+    id: number;
+    title: string;
+    slug: string;
+    summary: string;
+    target_audience: string;
+    published_at: string;
+    is_pinned: boolean;
+}
+
 interface DashboardProps extends PageProps {
     stats: {
         total_journals: number;
@@ -36,9 +46,10 @@ interface DashboardProps extends PageProps {
         journals_by_status?: JournalsByStatus;
     };
     statistics: JournalStatistics;
+    announcements?: AnnouncementItem[];
 }
 
-export default function Dashboard({ stats, statistics }: DashboardProps) {
+export default function Dashboard({ stats, statistics, announcements = [] }: DashboardProps) {
     const { auth } = usePage<PageProps>().props;
     const isSuperAdmin = auth.user?.role?.name === 'Super Admin';
     const isUser = auth.user?.role?.name === 'User';
@@ -189,6 +200,75 @@ export default function Dashboard({ stats, statistics }: DashboardProps) {
                 {stats.total_journals > 0 && statistics && (
                     <div className="mt-2">
                         <StatisticsDashboard statistics={statistics} />
+                    </div>
+                )}
+
+                {/* Announcements Widget */}
+                {announcements && announcements.length > 0 && (
+                    <div className="mt-2 rounded-xl border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-neutral-950">
+                        <div className="flex items-center justify-between border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
+                            <div className="flex items-center gap-2">
+                                <Megaphone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                <div>
+                                    <h3 className="text-lg font-semibold">Pengumuman Terbaru</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Informasi dan pengumuman terbaru untuk Anda
+                                    </p>
+                                </div>
+                            </div>
+                            <Link href="/announcements" className="text-sm font-medium text-primary hover:underline">
+                                Lihat Semua
+                            </Link>
+                        </div>
+                        <div className="p-6">
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {announcements.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className={`relative flex flex-col justify-between overflow-hidden rounded-lg border p-5 transition-all hover:shadow-md dark:bg-neutral-900/30 ${
+                                            item.is_pinned
+                                                ? 'border-amber-200 bg-amber-50/20 dark:border-amber-900/30'
+                                                : 'border-sidebar-border/70 dark:border-sidebar-border'
+                                        }`}
+                                    >
+                                        {item.is_pinned && (
+                                            <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                                                <Pin className="h-3 w-3 fill-current" />
+                                                PINNED
+                                            </div>
+                                        )}
+                                        <div>
+                                            <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                                                {item.target_audience.replace('_', ' ')}
+                                            </span>
+                                            <h4 className="mt-1 font-bold leading-snug line-clamp-2 hover:text-[#079C4E]">
+                                                <Link href={`/announcements/${item.slug}`}>
+                                                    {item.title}
+                                                </Link>
+                                            </h4>
+                                            <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
+                                                {item.summary}
+                                            </p>
+                                        </div>
+                                        <div className="mt-4 pt-4 border-t border-dashed border-sidebar-border/70 dark:border-sidebar-border text-xs text-muted-foreground flex items-center justify-between">
+                                            <span>
+                                                {new Date(item.published_at).toLocaleDateString('id-ID', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric',
+                                                })}
+                                            </span>
+                                            <Link
+                                                href={`/announcements/${item.slug}`}
+                                                className="text-xs font-semibold text-[#079C4E] hover:underline"
+                                            >
+                                                Selengkapnya &rarr;
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 )}
 
