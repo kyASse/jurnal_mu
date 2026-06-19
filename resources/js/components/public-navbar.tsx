@@ -2,7 +2,7 @@ import logoUrl from '@/assets/logo_dark.png';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import AppearanceToggleTab from '@/components/appearance-tabs';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutDashboard, Menu } from 'lucide-react';
@@ -67,9 +67,7 @@ export default function PublicNavbar() {
                                     </Button>
                                 </Link>
                                 <Link href={route('register')}>
-                                    <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">
-                                        Register
-                                    </Button>
+                                    <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">Register</Button>
                                 </Link>
                             </>
                         )}
@@ -83,9 +81,12 @@ export default function PublicNavbar() {
                                 <span className="sr-only">Toggle Menu</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[300px] border-white/10 bg-[#079C4E] text-white p-6 sm:max-w-sm flex flex-col justify-between">
+                        <SheetContent
+                            side="right"
+                            className="flex w-[300px] flex-col justify-between border-white/10 bg-[#079C4E] p-6 text-white sm:max-w-sm"
+                        >
                             <div className="flex flex-col gap-6">
-                                <SheetHeader className="p-0 border-b border-white/10 pb-4">
+                                <SheetHeader className="border-b border-white/10 p-0 pb-4">
                                     <SheetTitle className="text-left">
                                         <div className="flex items-center gap-3 text-white">
                                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
@@ -96,6 +97,7 @@ export default function PublicNavbar() {
                                             </span>
                                         </div>
                                     </SheetTitle>
+                                    <SheetDescription className="sr-only">Mobile navigation menu</SheetDescription>
                                 </SheetHeader>
 
                                 {/* Body: Stack the nav links vertically */}
@@ -119,7 +121,10 @@ export default function PublicNavbar() {
                                 <div className="flex flex-col gap-3">
                                     {auth?.user ? (
                                         <Link href={route('dashboard')} onClick={() => setOpen(false)}>
-                                            <Button variant="secondary" className="w-full border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100">
+                                            <Button
+                                                variant="secondary"
+                                                className="w-full border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100"
+                                            >
                                                 <LayoutDashboard className="mr-2 h-4 w-4" />
                                                 Dashboard
                                             </Button>
@@ -142,9 +147,9 @@ export default function PublicNavbar() {
                             </div>
 
                             {/* Footer: Appearance Toggle */}
-                            <div className="mt-auto space-y-3 pt-6 border-t border-white/10">
+                            <div className="mt-auto space-y-3 border-t border-white/10 pt-6">
                                 <h4 className="text-sm font-semibold text-white/70">Appearance</h4>
-                                <AppearanceToggleTab className="w-full bg-white/10 dark:bg-black/20 text-white" />
+                                <AppearanceToggleTab className="w-full bg-white/10 text-white dark:bg-black/20" />
                             </div>
                         </SheetContent>
                     </Sheet>
