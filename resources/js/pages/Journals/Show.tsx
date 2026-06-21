@@ -4,6 +4,7 @@
  * @features Display comprehensive journal information, article filtering, stats, and 3-column layout
  */
 
+import { CitationModal } from '@/components/CitationModal';
 import { SintaBadge } from '@/components/badges';
 import PublicFooter from '@/components/public-footer';
 import PublicNavbar from '@/components/public-navbar';
@@ -24,6 +25,7 @@ import {
     Info,
     Mail,
     MapPin,
+    Quote,
     Search,
     Target,
     User,
@@ -58,6 +60,8 @@ export default function JournalsShow() {
     const [showScope, setShowScope] = useState(false);
     const [isOaiExpanded, setIsOaiExpanded] = useState(false);
     const [ReactApexChart, setReactApexChart] = useState<any>(null);
+    const [activeCitationArticle, setActiveCitationArticle] = useState<Article | null>(null);
+    const [isCitationOpen, setIsCitationOpen] = useState(false);
 
     React.useEffect(() => {
         import('react-apexcharts').then((mod) => {
@@ -686,6 +690,18 @@ export default function JournalsShow() {
                                             >
                                                 Check in Google Scholar
                                             </a>
+                                            <span className="text-border">|</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="flex h-6 items-center gap-1 px-0 font-medium text-primary transition-colors hover:text-primary/80"
+                                                onClick={() => {
+                                                    setActiveCitationArticle(article);
+                                                    setIsCitationOpen(true);
+                                                }}
+                                            >
+                                                <Quote className="h-3 w-3" /> Cite
+                                            </Button>
                                         </div>
 
                                         <div
@@ -851,6 +867,17 @@ export default function JournalsShow() {
                 {/* FOOTER */}
                 <PublicFooter />
             </div>
+            {activeCitationArticle && (
+                <CitationModal
+                    isOpen={isCitationOpen}
+                    onClose={() => {
+                        setIsCitationOpen(false);
+                        setActiveCitationArticle(null);
+                    }}
+                    article={activeCitationArticle}
+                    journalTitle={journal.title}
+                />
+            )}
         </>
     );
 }

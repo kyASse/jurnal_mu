@@ -36,6 +36,7 @@ import {
     Calendar,
     Clock,
     Database,
+    Edit,
     ExternalLink,
     FileText,
     FileUp,
@@ -283,6 +284,15 @@ export default function JournalShow({ journal, articles, harvestLogs = [], isHar
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                            {/* Actions */}
+                            <div className="flex items-center gap-2">
+                                <Link href={route('admin.journals.edit', journal.id)}>
+                                    <Button size="sm" className="gap-2">
+                                        <Edit className="h-4 w-4" />
+                                        Edit Jurnal
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
