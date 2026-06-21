@@ -694,7 +694,7 @@ export default function JournalsShow() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-6 px-0 text-primary transition-colors hover:text-primary/80 flex items-center gap-1 font-medium"
+                                                className="flex h-6 items-center gap-1 px-0 font-medium text-primary transition-colors hover:text-primary/80"
                                                 onClick={() => {
                                                     setActiveCitationArticle(article);
                                                     setIsCitationOpen(true);

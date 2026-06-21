@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateJournalRequest;
 use App\Jobs\HarvestJournalArticlesJob;
 use App\Jobs\ImportArticlesXmlJob;
 use App\Jobs\ProcessCsvImportJob;
@@ -12,7 +13,6 @@ use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
-use App\Http\Requests\UpdateJournalRequest;
 use App\Services\JournalService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -336,7 +336,7 @@ class JournalController extends Controller
         $this->authorize('update', $journal);
 
         $scientificFields = ScientificField::where('is_active', true)->orderBy('name')->get(['id', 'name']);
-        
+
         $universityUsers = User::where('university_id', $journal->university_id)
             ->select('id', 'name', 'email')
             ->orderBy('name')
@@ -351,11 +351,11 @@ class JournalController extends Controller
             ->values();
 
         return Inertia::render('Admin/Journals/Edit', [
-             'journal' => $journal,
-             'scientificFields' => $scientificFields,
-             'sintaRankOptions' => Journal::getSintaRankOptions(),
-             'indexationOptions' => $indexationOptions,
-             'universityUsers' => $universityUsers,
+            'journal' => $journal,
+            'scientificFields' => $scientificFields,
+            'sintaRankOptions' => Journal::getSintaRankOptions(),
+            'indexationOptions' => $indexationOptions,
+            'universityUsers' => $universityUsers,
         ]);
     }
 

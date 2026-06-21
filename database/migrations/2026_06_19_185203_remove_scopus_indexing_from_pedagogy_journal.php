@@ -1,8 +1,7 @@
 <?php
 
+use App\Models\Journal;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -11,9 +10,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $journals = \App\Models\Journal::where(function ($query) {
+        $journals = Journal::where(function ($query) {
             $query->where('issn', '1979-5351')
-                  ->orWhere('e_issn', '2723-1879');
+                ->orWhere('e_issn', '2723-1879');
         })->get();
 
         foreach ($journals as $journal) {
@@ -29,7 +28,5 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-    }
+    public function down(): void {}
 };
