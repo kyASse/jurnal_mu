@@ -34,6 +34,25 @@ it('allows super admin to export universities to xlsx', function () {
 });
 
 it('allows super admin to export universities to csv', function () {
+    $roleId = Role::where('name', Role::USER)->value('id');
+    $user = User::factory()->create([
+        'university_id' => $this->university->id,
+        'role_id' => $roleId,
+    ]);
+
+    \App\Models\Journal::factory()->create([
+        'university_id' => $this->university->id,
+        'user_id' => $user->id,
+    ]);
+
+    // Force delete any side-effect universities created by the journal factory
+    University::whereNotIn('id', [$this->university->id])->forceDelete();
+
+    $this->university->update([
+        'address' => 'Test Address 123',
+        'profile_description' => 'Test Profile Description',
+    ]);
+
     $response = $this->actingAs($this->superAdmin)
         ->get(route('admin.universities.export', 'csv'));
 
@@ -43,8 +62,27 @@ it('allows super admin to export universities to csv', function () {
     expect($contentDisposition)->not->toBeNull();
     expect($contentDisposition)->toContain('universities.csv');
 
-    expect($response->streamedContent())->toContain('Original University Name');
-    expect($response->streamedContent())->toContain('ORIG');
+    $csvContent = $response->streamedContent();
+
+    expect($csvContent)->toContain('Jumlah Jurnal');
+    expect($csvContent)->toContain('Jumlah User');
+    expect($csvContent)->toContain('Original University Name');
+    expect($csvContent)->toContain('ORIG');
+
+    $lines = explode("\n", str_replace("\r", "", $csvContent));
+    $univRow = collect($lines)->first(fn ($line) => str_contains($line, 'Original University Name'));
+    expect($univRow)->not->toBeNull();
+
+    $data = str_getcsv($univRow);
+    $headerRow = str_getcsv($lines[0]);
+    $jurnalIndex = array_search('Jumlah Jurnal', $headerRow);
+    $userIndex = array_search('Jumlah User', $headerRow);
+
+    expect($jurnalIndex)->not->toBeFalse();
+    expect($userIndex)->not->toBeFalse();
+
+    expect($data[$jurnalIndex])->toBe('1');
+    expect($data[$userIndex])->toBe('1');
 });
 
 it('denies access to export universities for admin kampus', function () {
