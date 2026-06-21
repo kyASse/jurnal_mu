@@ -47,9 +47,24 @@ class UniversityController extends Controller
             }
 
             // Get universities with counts
+            $query->withCount(['users', 'journals']);
+
+            // Apply sorting filter
+            $sortBy = $request->input('sort', 'name_asc');
+            match ($sortBy) {
+                'name_desc' => $query->orderByDesc('name'),
+                'code_asc', 'code' => $query->orderBy('code')->orderBy('name'),
+                'code_desc' => $query->orderByDesc('code')->orderBy('name'),
+                'ptm_code_asc', 'ptm_code' => $query->orderBy('ptm_code')->orderBy('name'),
+                'ptm_code_desc' => $query->orderByDesc('ptm_code')->orderBy('name'),
+                'journals_desc', 'journals_count_desc', 'journals_count' => $query->orderByDesc('journals_count')->orderBy('name'),
+                'journals_asc', 'journals_count_asc' => $query->orderBy('journals_count')->orderBy('name'),
+                'users_desc', 'users_count_desc', 'users_count' => $query->orderByDesc('users_count')->orderBy('name'),
+                'users_asc', 'users_count_asc' => $query->orderBy('users_count')->orderBy('name'),
+                default => $query->orderBy('name'), // name_asc is default
+            };
+
             $universities = $query
-                ->withCount(['users', 'journals'])
-                ->orderBy('name')
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn ($university) => [
@@ -111,7 +126,7 @@ class UniversityController extends Controller
         return Inertia::render('Admin/Universities/Index', [
             'universities' => $universities,
             'pendingUniversities' => $pendingUniversities,
-            'filters' => $request->only(['search', 'is_active', 'accreditation_status', 'cluster']),
+            'filters' => $request->only(['search', 'is_active', 'accreditation_status', 'cluster', 'sort']),
             'can' => [
                 'create' => $request->user()->can('create', University::class),
             ],
