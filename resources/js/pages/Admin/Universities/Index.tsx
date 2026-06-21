@@ -141,6 +141,7 @@ interface Props {
         is_active: string;
         accreditation_status: string;
         cluster: string;
+        sort?: string;
     };
     can: {
         create: boolean;
@@ -154,6 +155,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
     const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
     const [accreditationFilter, setAccreditationFilter] = useState(filters.accreditation_status || '');
     const [clusterFilter, setClusterFilter] = useState(filters.cluster || '');
+    const [sortFilter, setSortFilter] = useState(filters.sort || 'name_asc');
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; universityId?: number; universityName?: string }>({ open: false });
     const [pendingSearch, setPendingSearch] = useState('');
     const [pendingPage, setPendingPage] = useState(1);
@@ -194,6 +196,22 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                 is_active: isActiveFilter === 'all' ? '' : isActiveFilter,
                 accreditation_status: accreditationFilter === 'all' ? '' : accreditationFilter,
                 cluster: clusterFilter === 'all' ? '' : clusterFilter,
+                sort: sortFilter,
+            },
+            { preserveState: true },
+        );
+    };
+
+    const handleSortChange = (value: string) => {
+        setSortFilter(value);
+        router.get(
+            route('admin.universities.index'),
+            {
+                search,
+                is_active: isActiveFilter === 'all' ? '' : isActiveFilter,
+                accreditation_status: accreditationFilter === 'all' ? '' : accreditationFilter,
+                cluster: clusterFilter === 'all' ? '' : clusterFilter,
+                sort: value,
             },
             { preserveState: true },
         );
@@ -502,13 +520,30 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                     </SelectContent>
                                 </Select>
 
+                                <Select value={sortFilter} onValueChange={handleSortChange}>
+                                    <SelectTrigger className="w-full sm:w-48">
+                                        <SelectValue placeholder="Sort By" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="name_asc">Name (A-Z)</SelectItem>
+                                        <SelectItem value="name_desc">Name (Z-A)</SelectItem>
+                                        <SelectItem value="code_asc">Code (A-Z)</SelectItem>
+                                        <SelectItem value="code_desc">Code (Z-A)</SelectItem>
+                                        <SelectItem value="ptm_code_asc">PTM Code (A-Z)</SelectItem>
+                                        <SelectItem value="ptm_code_desc">PTM Code (Z-A)</SelectItem>
+                                        <SelectItem value="users_desc">Most Users</SelectItem>
+                                        <SelectItem value="journals_desc">Most Journals</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
                                 <Button type="submit" className="w-full sm:w-32">
                                     Search
                                 </Button>
                                 {(search ||
                                     (isActiveFilter && isActiveFilter !== 'all') ||
                                     (accreditationFilter && accreditationFilter !== 'all') ||
-                                    (clusterFilter && clusterFilter !== 'all')) && (
+                                    (clusterFilter && clusterFilter !== 'all') ||
+                                    (sortFilter && sortFilter !== 'name_asc')) && (
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -518,6 +553,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                             setIsActiveFilter('all');
                                             setAccreditationFilter('all');
                                             setClusterFilter('all');
+                                            setSortFilter('name_asc');
                                             router.get(route('admin.universities.index'));
                                         }}
                                     >
