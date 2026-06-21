@@ -187,6 +187,14 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
         }
     }, [flash]);
 
+    useEffect(() => {
+        setSearch(filters.search || '');
+        setIsActiveFilter(filters.is_active || '');
+        setAccreditationFilter(filters.accreditation_status || '');
+        setClusterFilter(filters.cluster || '');
+        setSortFilter(filters.sort || 'name_asc');
+    }, [filters]);
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(
@@ -494,7 +502,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                 </Select>
                             </div>
 
-                            <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
                                 <Select value={accreditationFilter} onValueChange={(value) => setAccreditationFilter(value)}>
                                     <SelectTrigger className="w-full sm:w-48">
                                         <SelectValue placeholder="All Accreditation" />
