@@ -416,7 +416,7 @@ class UniversityController extends Controller
         return response()->streamDownload(function () use ($format) {
             $writer = SimpleExcelWriter::create('php://output', $format);
 
-            foreach (University::orderBy('name')->cursor() as $university) {
+            foreach (University::withCount(['users', 'journals'])->orderBy('name')->cursor() as $university) {
                 $writer->addRow([
                     'ID' => $university->id,
                     'Kode PTM' => $university->code,
@@ -430,6 +430,8 @@ class UniversityController extends Controller
                     'Telepon' => $university->phone,
                     'Email' => $university->email,
                     'Website' => $university->website,
+                    'Jumlah Jurnal' => $university->journals_count,
+                    'Jumlah User' => $university->users_count,
                     'Status Akreditasi' => $university->accreditation_status,
                     'Klaster' => $university->cluster,
                     'Status Aktif' => $university->is_active ? 'Aktif' : 'Tidak Aktif',
