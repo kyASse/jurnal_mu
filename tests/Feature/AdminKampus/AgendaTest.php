@@ -22,7 +22,7 @@ beforeEach(function () {
         'university_id' => $this->university->id,
         'is_active' => true,
     ]);
-    $this->adminKampus->roles()->attach($adminRole->id);
+    $this->adminKampus->roles()->syncWithoutDetaching([$adminRole->id]);
 
     // Create Super Admin for cross-checks
     $superRole = Role::where('name', Role::SUPER_ADMIN)->first();
@@ -30,7 +30,7 @@ beforeEach(function () {
         'role_id' => $superRole->id,
         'is_active' => true,
     ]);
-    $this->superAdmin->roles()->attach($superRole->id);
+    $this->superAdmin->roles()->syncWithoutDetaching([$superRole->id]);
 });
 
 // Helper for valid payload
@@ -49,6 +49,7 @@ function validAgendaPayload(): array
         'location_link' => 'https://zoom.us',
         'registration_link' => 'https://example.com/register',
         'price' => 0,
+        'currency' => 'IDR',
         'contact_person_name' => 'Alice',
         'contact_person_phone' => '08123456789',
         'contact_person_email' => 'alice@test.com',
@@ -97,6 +98,22 @@ it('allows admin kampus to store a new agenda', function () {
         'title' => 'Test Agenda 1',
         'university_id' => $this->university->id,
         'user_id' => $this->adminKampus->id,
+    ]);
+});
+
+it('allows admin kampus to store agenda with USD currency', function () {
+    $payload = validAgendaPayload();
+    $payload['price'] = 15.50;
+    $payload['currency'] = 'USD';
+
+    actingAs($this->adminKampus)
+        ->post(route('admin-kampus.events.store'), $payload)
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('agendas', [
+        'title' => 'Test Agenda 1',
+        'price' => 15.50,
+        'currency' => 'USD',
     ]);
 });
 
