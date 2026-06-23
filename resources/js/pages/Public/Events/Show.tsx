@@ -20,6 +20,7 @@ import {
     User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { formatPrice } from '@/utils/price';
 
 interface AgendaDetails {
     id: number;
@@ -36,6 +37,7 @@ interface AgendaDetails {
     location_link: string | null;
     registration_link: string | null;
     price: string | null;
+    currency?: string | null;
     contact_person_name: string | null;
     contact_person_phone: string | null;
     contact_person_email: string | null;
@@ -71,7 +73,7 @@ export default function Show({ agenda }: Props) {
         if (!agenda.date_start) return;
 
         const updateCountdown = () => {
-            const startDateTime = new Date(`${agenda.date_start}T${agenda.time_start || '00:00'}`);
+            const startDateTime = new Date(`${agenda.date_start}T${agenda.time_start || '00:00'}:00+07:00`);
             const now = new Date();
             const diff = startDateTime.getTime() - now.getTime();
 
@@ -145,8 +147,6 @@ export default function Show({ agenda }: Props) {
 
     const shareUrl = encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '');
     const shareTitle = encodeURIComponent(agenda.title);
-
-    const isFree = !agenda.price || parseFloat(agenda.price) === 0;
 
     return (
         <PublicLayout>
@@ -251,10 +251,10 @@ export default function Show({ agenda }: Props) {
                                         <div>
                                             <p className="mb-1 text-sm font-medium tracking-wide text-muted-foreground uppercase">Registration</p>
                                             <span className="text-3xl font-bold tracking-tight">
-                                                {isFree ? (
+                                                {formatPrice(agenda.price, agenda.currency || 'IDR') === 'Free' ? (
                                                     <span className="text-emerald-600">Free</span>
                                                 ) : (
-                                                    `Rp ${parseFloat(agenda.price!).toLocaleString('id-ID')}`
+                                                    formatPrice(agenda.price, agenda.currency || 'IDR')
                                                 )}
                                             </span>
                                         </div>

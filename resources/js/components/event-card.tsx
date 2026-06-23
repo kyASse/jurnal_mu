@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Link } from '@inertiajs/react';
 import { CalendarDays, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { formatPrice } from '@/utils/price';
 
 export interface EventCardProps {
     id: number;
@@ -17,6 +18,7 @@ export interface EventCardProps {
     location_type: string;
     location_venue: string | null;
     price?: string | null;
+    currency?: string | null;
     quota?: number | null;
     is_featured: boolean;
     university: {
@@ -32,7 +34,7 @@ export default function EventCard({ agenda }: { agenda: EventCardProps }) {
         if (!agenda.date_start) return;
 
         const updateCountdown = () => {
-            const startDateTime = new Date(`${agenda.date_start}T${agenda.time_start || '00:00'}`);
+            const startDateTime = new Date(`${agenda.date_start}T${agenda.time_start || '00:00'}:00+07:00`);
             const now = new Date();
             const diff = startDateTime.getTime() - now.getTime();
 
@@ -150,10 +152,10 @@ export default function EventCard({ agenda }: { agenda: EventCardProps }) {
 
             <CardFooter className="mt-auto flex items-center justify-between border-t bg-muted/30 pt-4">
                 <div className="text-sm font-semibold">
-                    {agenda.price && parseFloat(agenda.price) > 0 ? (
-                        `Rp ${parseFloat(agenda.price).toLocaleString('id-ID')}`
-                    ) : (
+                    {formatPrice(agenda.price, agenda.currency || 'IDR') === 'Free' ? (
                         <span className="text-emerald-600 dark:text-emerald-400">Free Event</span>
+                    ) : (
+                        formatPrice(agenda.price, agenda.currency || 'IDR')
                     )}
                 </div>
                 <Button asChild size="sm" className="rounded-full shadow-sm hover:shadow">
