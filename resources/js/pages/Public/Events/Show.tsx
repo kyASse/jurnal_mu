@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PublicLayout from '@/layouts/public-layout';
+import { formatPrice } from '@/utils/price';
 import { Head, Link } from '@inertiajs/react';
 import {
     ArrowLeft,
@@ -20,7 +21,6 @@ import {
     User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { formatPrice } from '@/utils/price';
 
 interface AgendaDetails {
     id: number;

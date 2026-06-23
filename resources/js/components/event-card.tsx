@@ -1,10 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatPrice } from '@/utils/price';
 import { Link } from '@inertiajs/react';
 import { CalendarDays, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { formatPrice } from '@/utils/price';
 
 export interface EventCardProps {
     id: number;
