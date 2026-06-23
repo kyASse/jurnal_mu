@@ -17,8 +17,17 @@ class PublicEventController extends Controller
     {
         $query = Agenda::query()
             ->with('university:id,name,logo_url')
-            ->active() // Only active events
-            ->orderBy('date_start', 'desc');
+            ->active(); // Only active events
+
+        $timeFilter = $request->input('time_filter', 'upcoming');
+        if ($timeFilter === 'past') {
+            $query->where('date_start', '<', now()->toDateString())
+                ->orderBy('date_start', 'desc');
+        } else {
+            // Default is upcoming
+            $query->where('date_start', '>=', now()->toDateString())
+                ->orderBy('date_start', 'asc');
+        }
 
         if ($request->filled('search')) {
             $query->where('title', 'like', "%{$request->search}%");
@@ -65,7 +74,7 @@ class PublicEventController extends Controller
 
         return Inertia::render('Public/Events/Index', [
             'agendas' => $agendas,
-            'filters' => $request->only(['search', 'type', 'university_id', 'location_type']),
+            'filters' => $request->only(['search', 'type', 'university_id', 'location_type', 'time_filter']),
             'types' => $types,
             'universities' => $universities,
         ]);
