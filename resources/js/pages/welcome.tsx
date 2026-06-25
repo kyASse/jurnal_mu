@@ -163,15 +163,15 @@ export default function Welcome() {
         <>
             <Head title="JurnalMu - Muhammadiyah Journal Portal" />
 
-            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-[#079C4E] selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
+            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-primary selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
                 <PublicNavbar />
 
                 {/* HERO SECTION */}
                 <div className="relative pt-16">
                     {/* Background Pattern */}
-                    <div className="absolute inset-0 z-0 overflow-hidden bg-gradient-to-br from-[#079C4E] to-[#10816F] pb-32">
-                        <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-[#FCEE1F] opacity-10 mix-blend-overlay blur-3xl"></div>
-                        <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-[#1A2A75] opacity-20 mix-blend-multiply blur-3xl"></div>
+                    <div className="absolute inset-0 z-0 overflow-hidden bg-gradient-to-br from-primary to-secondary pb-32">
+                        <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-accent opacity-10 mix-blend-overlay blur-3xl"></div>
+                        <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-secondary opacity-20 mix-blend-multiply blur-3xl"></div>
 
                         <div
                             className="absolute inset-0 opacity-5"
@@ -184,7 +184,7 @@ export default function Welcome() {
                             className="font-heading mb-6 text-4xl font-bold tracking-tight text-white sm:text-6xl"
                             style={{ fontFamily: '"El Messiri", serif' }}
                         >
-                            Discover Muhammadiyah's <br /> <span className="text-[#FCEE1F]">Scientific Excellence</span>
+                            Discover Muhammadiyah's <br /> <span className="text-accent">Scientific Excellence</span>
                         </h1>
                         <p className="mx-auto mb-10 max-w-2xl text-lg text-emerald-50 sm:text-xl">
                             The central portal for academic journals, research papers, and scholarly works from Muhammadiyah Universities across
@@ -193,7 +193,7 @@ export default function Welcome() {
 
                         {/* Search Bar */}
                         <div className="mx-auto max-w-2xl">
-                            <div className="relative flex items-center rounded-full bg-white p-1.5 pl-4 shadow-2xl focus-within:ring-4 focus-within:ring-[#FCEE1F]/50">
+                            <div className="relative flex items-center rounded-full bg-white p-1.5 pl-4 shadow-2xl focus-within:ring-4 focus-within:ring-accent/50">
                                 <Search className="h-5 w-5 flex-shrink-0 text-gray-400" />
                                 <input
                                     type="text"
@@ -253,7 +253,7 @@ export default function Welcome() {
                                 </DropdownMenu>
 
                                 <Button
-                                    className="h-11 flex-shrink-0 rounded-full bg-[#1A2A75] px-6 text-white hover:bg-[#131f57]"
+                                    className="h-11 flex-shrink-0 rounded-full bg-secondary px-6 text-white hover:bg-secondary/90"
                                     onClick={handleSearch}
                                 >
                                     Search
@@ -264,7 +264,7 @@ export default function Welcome() {
                                 <div className="inline-flex h-5 items-center overflow-hidden">
                                     <Link
                                         href={links[currentLinkIndex].href}
-                                        className={`inline-flex items-center font-semibold text-[#FCEE1F] transition-all duration-300 ease-out hover:underline ${
+                                        className={`inline-flex items-center font-semibold text-accent transition-all duration-300 ease-out hover:underline ${
                                             isFading ? 'translate-y-3 scale-95 opacity-0' : 'translate-y-0 scale-100 opacity-100'
                                         }`}
                                     >
@@ -278,7 +278,7 @@ export default function Welcome() {
                     <div className="relative z-20 mx-auto -mt-16 max-w-5xl px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
                             {/* Total Journals Stat Card */}
-                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-[#079C4E] bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
+                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-primary bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
                                 <div className="absolute -top-4 -right-4 rounded-full bg-emerald-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-emerald-900/20"></div>
                                 <div className="relative flex items-center justify-between">
                                     <div>
@@ -287,14 +287,14 @@ export default function Welcome() {
                                             {new Intl.NumberFormat('id-ID').format(totalJournals || 0)}
                                         </p>
                                     </div>
-                                    <div className="rounded-xl bg-emerald-100 p-4 text-[#079C4E] dark:bg-[#079C4E]/20">
+                                    <div className="rounded-xl bg-primary/10 p-4 text-primary dark:bg-primary/20">
                                         <Library className="h-8 w-8" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Total Articles Stat Card */}
-                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-[#1A2A75] bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
+                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-secondary bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
                                 <div className="absolute -top-4 -right-4 rounded-full bg-blue-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-blue-900/20"></div>
                                 <div className="relative flex items-center justify-between">
                                     <div>
@@ -303,14 +303,14 @@ export default function Welcome() {
                                             {new Intl.NumberFormat('id-ID').format(totalArticles || 0)}
                                         </p>
                                     </div>
-                                    <div className="rounded-xl bg-[#1A2A75]/10 p-4 text-[#1A2A75] dark:bg-[#1A2A75]/20 dark:text-blue-400">
+                                    <div className="rounded-xl bg-secondary/10 p-4 text-secondary dark:bg-secondary/20 dark:text-blue-400">
                                         <BookOpen className="h-8 w-8" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Total Universities Stat Card */}
-                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-[#FCEE1F] bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
+                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-accent bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
                                 <div className="absolute -top-4 -right-4 rounded-full bg-yellow-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-yellow-900/20"></div>
                                 <div className="relative flex items-center justify-between">
                                     <div>
@@ -321,7 +321,7 @@ export default function Welcome() {
                                             {new Intl.NumberFormat('id-ID').format(totalUniversities || 0)}
                                         </p>
                                     </div>
-                                    <div className="rounded-xl bg-[#FCEE1F]/20 p-4 text-yellow-700 dark:bg-[#FCEE1F]/10 dark:text-yellow-400">
+                                    <div className="rounded-xl bg-accent/20 p-4 text-yellow-700 dark:bg-accent/10 dark:text-yellow-400">
                                         <GraduationCap className="h-8 w-8" />
                                     </div>
                                 </div>
@@ -335,12 +335,12 @@ export default function Welcome() {
                     {/* Featured Journals Section */}
                     <div className="mb-12 flex items-end justify-between">
                         <div>
-                            <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                            <h2 className="font-heading text-3xl font-bold text-primary" style={{ fontFamily: '"El Messiri", serif' }}>
                                 Featured Journals
                             </h2>
                             <p className="mt-2 text-gray-600 dark:text-gray-400">High-impact research from our network.</p>
                         </div>
-                        <Link href={route('journals.index')} className="group flex items-center font-semibold text-[#1A2A75] hover:text-[#079C4E]">
+                        <Link href={route('journals.index')} className="group flex items-center font-semibold text-secondary hover:text-primary">
                             View All Journals
                             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Link>
@@ -366,14 +366,14 @@ export default function Welcome() {
                         <div className="mt-24 mb-16">
                             <div className="mb-12 flex items-end justify-between">
                                 <div>
-                                    <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                    <h2 className="font-heading text-3xl font-bold text-primary" style={{ fontFamily: '"El Messiri", serif' }}>
                                         Featured Articles
                                     </h2>
                                     <p className="mt-2 text-gray-600 dark:text-gray-400">Explore research publications from Muhammadiyah scholars.</p>
                                 </div>
                                 <Link
                                     href={route('browse.articles')}
-                                    className="group flex items-center font-semibold text-[#1A2A75] hover:text-[#079C4E]"
+                                    className="group flex items-center font-semibold text-secondary hover:text-primary"
                                 >
                                     Browse All Articles
                                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -388,12 +388,12 @@ export default function Welcome() {
                                     >
                                         <div className="space-y-3">
                                             {article.journal?.title && (
-                                                <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#079C4E] dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary dark:bg-primary/30 dark:text-primary">
                                                     {article.journal.title}
                                                 </div>
                                             )}
 
-                                            <h3 className="line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
+                                            <h3 className="line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-primary dark:text-white">
                                                 {article.article_url ? (
                                                     <a href={article.article_url} target="_blank" rel="noopener noreferrer">
                                                         {article.title}
@@ -425,13 +425,13 @@ export default function Welcome() {
 
                                         <div className="mt-6 flex flex-wrap items-center gap-3">
                                             {article.pdf_url ? (
-                                                <Button asChild size="sm" className="bg-[#079C4E] text-white hover:bg-[#068a45]">
+                                                <Button asChild size="sm" className="bg-primary text-white hover:bg-primary/90">
                                                     <a href={article.pdf_url} target="_blank" rel="noopener noreferrer">
                                                         Read Full PDF
                                                     </a>
                                                 </Button>
                                             ) : article.article_url ? (
-                                                <Button asChild size="sm" className="bg-[#079C4E] text-white hover:bg-[#068a45]">
+                                                <Button asChild size="sm" className="bg-primary text-white hover:bg-primary/90">
                                                     <a href={article.article_url} target="_blank" rel="noopener noreferrer">
                                                         View Article
                                                     </a>
@@ -456,7 +456,7 @@ export default function Welcome() {
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={() => downloadRis(article)}
-                                                className="border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10"
+                                                className="border-primary/20 text-primary hover:bg-primary/10"
                                             >
                                                 <Download className="mr-1 h-4 w-4" />
                                                 Export RIS
@@ -473,7 +473,7 @@ export default function Welcome() {
                         <div className="mt-32 mb-24 grid items-start gap-12 lg:grid-cols-12 lg:gap-16">
                             {/* Sticky Left Column */}
                             <div className="lg:sticky lg:top-24 lg:col-span-4">
-                                <h2 className="font-heading mb-4 text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                <h2 className="font-heading mb-4 text-3xl font-bold text-primary" style={{ fontFamily: '"El Messiri", serif' }}>
                                     Upcoming Events
                                 </h2>
                                 <p className="mb-8 text-gray-600 dark:text-gray-400">
@@ -483,7 +483,7 @@ export default function Welcome() {
                                 <Link href={route('events.index')}>
                                     <Button
                                         size="sm"
-                                        className="group rounded-full bg-[#1A2A75] px-6 py-6 text-base font-semibold hover:bg-[#131f57]"
+                                        className="group rounded-full bg-secondary px-6 py-6 text-base font-semibold hover:bg-secondary/90"
                                     >
                                         Explore All Events
                                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -503,37 +503,37 @@ export default function Welcome() {
                                         <Link
                                             key={event.id}
                                             href={route('events.show', event.slug)}
-                                            className="group flex animate-fade-in-up flex-col items-start gap-6 border-b border-gray-200 py-8 transition-all hover:border-[#079C4E] sm:flex-row sm:items-center dark:border-gray-800"
+                                            className="group flex animate-fade-in-up flex-col items-start gap-6 border-b border-gray-200 py-8 transition-all hover:border-primary sm:flex-row sm:items-center dark:border-gray-800"
                                             style={{ animationDelay: `${index * 150}ms` }}
                                         >
                                             {/* Date Box */}
-                                            <div className="flex w-24 shrink-0 flex-col items-center justify-center rounded-2xl bg-gray-50 py-4 text-center transition-colors group-hover:bg-[#079C4E]/10 dark:bg-gray-900/50">
-                                                <span className="text-sm font-bold tracking-wider text-[#079C4E]">{month}</span>
+                                            <div className="flex w-24 shrink-0 flex-col items-center justify-center rounded-2xl bg-gray-50 py-4 text-center transition-colors group-hover:bg-primary/10 dark:bg-gray-900/50">
+                                                <span className="text-sm font-bold tracking-wider text-primary">{month}</span>
                                                 <span className="mt-1 text-3xl font-black text-gray-900 dark:text-white">{day}</span>
                                             </div>
 
                                             {/* Content */}
                                             <div className="flex-grow space-y-3 transition-transform duration-300 group-hover:translate-x-2">
                                                 <div className="flex flex-wrap items-center gap-3">
-                                                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold tracking-wide text-[#1A2A75] uppercase dark:bg-blue-900/30 dark:text-blue-300">
+                                                    <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold tracking-wide text-secondary uppercase dark:bg-secondary/30 dark:text-secondary">
                                                         {event.type}
                                                     </span>
                                                     {event.is_featured && (
-                                                        <span className="rounded-full bg-[#FCEE1F]/20 px-3 py-1 text-xs font-bold tracking-wide text-yellow-700 uppercase">
+                                                        <span className="rounded-full bg-accent/20 px-3 py-1 text-xs font-bold tracking-wide text-yellow-700 uppercase">
                                                             Featured
                                                         </span>
                                                     )}
                                                 </div>
-                                                <h3 className="line-clamp-2 text-2xl leading-tight font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-gray-100">
+                                                <h3 className="line-clamp-2 text-2xl leading-tight font-bold text-gray-900 transition-colors group-hover:text-primary dark:text-gray-100">
                                                     {event.title}
                                                 </h3>
                                                 <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400">
                                                     <div className="flex items-center gap-1.5">
-                                                        <Clock className="h-4 w-4 text-[#079C4E]" />
+                                                        <Clock className="h-4 w-4 text-primary" />
                                                         <span>{event.time_start || 'TBA'} WIB</span>
                                                     </div>
                                                     <div className="flex items-center gap-1.5">
-                                                        <MapPin className="h-4 w-4 text-[#079C4E]" />
+                                                        <MapPin className="h-4 w-4 text-primary" />
                                                         <span className="capitalize">
                                                             {event.location_type.toLowerCase() === 'online'
                                                                 ? 'Online'
@@ -546,7 +546,7 @@ export default function Welcome() {
                                             </div>
 
                                             {/* Hover Arrow */}
-                                            <div className="hidden shrink-0 items-center justify-center rounded-full bg-gray-100 p-4 text-gray-400 transition-all duration-300 group-hover:bg-[#079C4E] group-hover:text-white sm:flex dark:bg-gray-800">
+                                            <div className="hidden shrink-0 items-center justify-center rounded-full bg-gray-100 p-4 text-gray-400 transition-all duration-300 group-hover:bg-primary group-hover:text-white sm:flex dark:bg-gray-800">
                                                 <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
                                             </div>
                                         </Link>
@@ -561,7 +561,7 @@ export default function Welcome() {
                         <div className="mt-24 mb-16">
                             <div className="mb-12 flex items-end justify-between">
                                 <div>
-                                    <h2 className="font-heading text-3xl font-bold text-[#079C4E]" style={{ fontFamily: '"El Messiri", serif' }}>
+                                    <h2 className="font-heading text-3xl font-bold text-primary" style={{ fontFamily: '"El Messiri", serif' }}>
                                         Top Universities
                                     </h2>
                                     <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -570,7 +570,7 @@ export default function Welcome() {
                                 </div>
                                 <Link
                                     href={route('browse.universities')}
-                                    className="group flex items-center font-semibold text-[#1A2A75] hover:text-[#079C4E]"
+                                    className="group flex items-center font-semibold text-secondary hover:text-primary"
                                 >
                                     Browse All Universities
                                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -585,11 +585,11 @@ export default function Welcome() {
                                         className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
                                     >
                                         {/* Logo or Initials placeholder */}
-                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2 group-hover:border-[#079C4E]/20 dark:border-zinc-800 dark:bg-zinc-800">
+                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2 group-hover:border-primary/20 dark:border-zinc-800 dark:bg-zinc-800">
                                             {uni.logo_url ? (
                                                 <img src={uni.logo_url} alt={uni.name} className="h-full w-full object-contain" />
                                             ) : (
-                                                <span className="text-lg font-bold text-[#079C4E] dark:text-emerald-400">
+                                                <span className="text-lg font-bold text-primary dark:text-primary">
                                                     {getInitials(uni.name, uni.short_name)}
                                                 </span>
                                             )}
@@ -597,14 +597,14 @@ export default function Welcome() {
 
                                         {/* Details */}
                                         <div className="min-w-0 flex-grow space-y-1">
-                                            <h3 className="truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
+                                            <h3 className="truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-primary dark:text-white">
                                                 {uni.name}
                                             </h3>
                                             <p className="truncate text-sm text-gray-500 dark:text-gray-400">
                                                 {uni.city ? `${uni.city}, ${uni.province || ''}` : 'Muhammadiyah Network'}
                                             </p>
                                             <div className="pt-1">
-                                                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#1A2A75] dark:bg-blue-950/30 dark:text-blue-300">
+                                                <span className="inline-flex items-center rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary dark:bg-secondary/30 dark:text-blue-300">
                                                     {uni.journals_count} {uni.journals_count === 1 ? 'Journal' : 'Journals'}
                                                 </span>
                                             </div>
@@ -623,7 +623,7 @@ export default function Welcome() {
                                     {/* Header / Title area */}
                                     <div className="space-y-6">
                                         <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                                            <LayoutDashboard className="h-8 w-8 text-[#FCEE1F]" />
+                                            <LayoutDashboard className="h-8 w-8 text-accent" />
                                         </div>
                                         <h2 className="font-heading text-3xl font-bold" style={{ fontFamily: '"El Messiri", serif' }}>
                                             Journals by Subject
@@ -664,7 +664,7 @@ export default function Welcome() {
                     )}
 
                     {/* CTA Section */}
-                    <div className="mt-24 overflow-hidden rounded-3xl bg-[#1A2A75] text-white shadow-2xl">
+                    <div className="mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary text-white shadow-2xl">
                         <div className="relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] px-6 py-16 text-center sm:px-12 lg:py-20">
                             <div className="relative z-10 mx-auto max-w-3xl">
                                 <h2
@@ -681,7 +681,7 @@ export default function Welcome() {
                                     <Link href={route('login')}>
                                         <Button
                                             size="lg"
-                                            className="w-full bg-[#FCEE1F] px-8 text-lg font-bold text-[#1A2A75] hover:bg-[#e3d51b] sm:w-auto"
+                                            className="w-full bg-accent-gradient px-8 text-lg font-bold text-white hover:opacity-90 sm:w-auto"
                                         >
                                             Submit Manuscript
                                         </Button>
@@ -689,7 +689,7 @@ export default function Welcome() {
                                     {/* <Button
                                         size="lg"
                                         variant="outline"
-                                        className="w-full border-white px-8 text-white hover:bg-white hover:text-[#1A2A75] sm:w-auto"
+                                        className="w-full border-white px-8 text-white hover:bg-white hover:text-secondary sm:w-auto"
                                     >
                                         Author Guidelines
                                     </Button> */}

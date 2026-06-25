@@ -72,9 +72,9 @@ describe('Welcome Page Redesign', () => {
 
     it('should not contain hardcoded green or old navy hex colors in welcome.tsx', () => {
         const welcomePath = path.resolve(__dirname, '../welcome.tsx');
-        const content = fs.readFileSync(welcomePath, 'utf8');
+        const content = fs.readFileSync(welcomePath, 'utf8').toLowerCase();
 
-        expect(content).not.toContain('#079C4E');
-        expect(content).not.toContain('#1A2A75');
+        expect(content).not.toContain('#079c4e');
+        expect(content).not.toContain('#1a2a75');
     });
 });
