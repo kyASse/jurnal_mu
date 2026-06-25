@@ -303,7 +303,7 @@ export default function Welcome() {
                                             {new Intl.NumberFormat('id-ID').format(totalArticles || 0)}
                                         </p>
                                     </div>
-                                    <div className="rounded-xl bg-secondary/10 p-4 text-secondary dark:bg-secondary/20 dark:text-blue-400">
+                                    <div className="rounded-xl bg-secondary/10 p-4 text-secondary dark:bg-secondary/20 dark:text-white">
                                         <BookOpen className="h-8 w-8" />
                                     </div>
                                 </div>
@@ -604,7 +604,7 @@ export default function Welcome() {
                                                 {uni.city ? `${uni.city}, ${uni.province || ''}` : 'Muhammadiyah Network'}
                                             </p>
                                             <div className="pt-1">
-                                                <span className="inline-flex items-center rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary dark:bg-secondary/30 dark:text-blue-300">
+                                                <span className="inline-flex items-center rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary dark:bg-secondary/30 dark:text-white">
                                                     {uni.journals_count} {uni.journals_count === 1 ? 'Journal' : 'Journals'}
                                                 </span>
                                             </div>
@@ -681,7 +681,7 @@ export default function Welcome() {
                                     <Link href={route('login')}>
                                         <Button
                                             size="lg"
-                                            className="w-full bg-accent-gradient px-8 text-lg font-bold text-white hover:opacity-90 sm:w-auto"
+                                            className="w-full bg-accent px-8 text-lg font-bold text-primary hover:bg-accent/90 sm:w-auto"
                                         >
                                             Submit Manuscript
                                         </Button>
