@@ -186,7 +186,7 @@ export default function Welcome() {
                         >
                             Discover Muhammadiyah's <br /> <span className="text-accent">Scientific Excellence</span>
                         </h1>
-                        <p className="mx-auto mb-10 max-w-2xl text-lg text-emerald-50 sm:text-xl">
+                        <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 sm:text-xl">
                             The central portal for academic journals, research papers, and scholarly works from Muhammadiyah Universities across
                             Indonesia.
                         </p>
@@ -259,7 +259,7 @@ export default function Welcome() {
                                     Search
                                 </Button>
                             </div>
-                            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-emerald-100">
+                            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-white/80">
                                 <span>Can't find what you're looking for?</span>
                                 <div className="inline-flex h-5 items-center overflow-hidden">
                                     <Link
@@ -279,7 +279,7 @@ export default function Welcome() {
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
                             {/* Total Journals Stat Card */}
                             <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-primary bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
-                                <div className="absolute -top-4 -right-4 rounded-full bg-emerald-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-emerald-900/20"></div>
+                                <div className="absolute -top-4 -right-4 rounded-full bg-primary/10 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-primary/25"></div>
                                 <div className="relative flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">Total Journals</p>
@@ -295,7 +295,7 @@ export default function Welcome() {
 
                             {/* Total Articles Stat Card */}
                             <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-secondary bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
-                                <div className="absolute -top-4 -right-4 rounded-full bg-blue-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-blue-900/20"></div>
+                                <div className="absolute -top-4 -right-4 rounded-full bg-secondary/10 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-secondary/25"></div>
                                 <div className="relative flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">Total Articles</p>
@@ -311,7 +311,7 @@ export default function Welcome() {
 
                             {/* Total Universities Stat Card */}
                             <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-accent bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
-                                <div className="absolute -top-4 -right-4 rounded-full bg-yellow-50 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-yellow-900/20"></div>
+                                <div className="absolute -top-4 -right-4 rounded-full bg-accent/10 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-accent/20"></div>
                                 <div className="relative flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
@@ -617,7 +617,7 @@ export default function Welcome() {
 
                     {/* JOURNALS BY SUBJECT SECTION */}
                     {scientificFields && scientificFields.length > 0 && (
-                        <div className="relative left-1/2 mt-24 w-screen -translate-x-1/2 bg-[#1D5F82] px-4 py-20 text-white sm:px-6 lg:px-8 dark:bg-[#021A3B]">
+                        <div className="relative left-1/2 mt-24 w-screen -translate-x-1/2 bg-primary px-4 py-20 text-white sm:px-6 lg:px-8 dark:bg-zinc-950">
                             <div className="mx-auto max-w-7xl">
                                 <div className="grid gap-12 lg:grid-cols-[1fr_3fr]">
                                     {/* Header / Title area */}
@@ -635,7 +635,7 @@ export default function Welcome() {
                                         <Link href={route('journals.index')}>
                                             <Button
                                                 variant="outline"
-                                                className="mt-4 rounded-full border-white/30 bg-transparent text-white hover:bg-white hover:text-[#06326E]"
+                                                className="mt-4 rounded-full border-white/30 bg-transparent text-white hover:bg-white hover:text-primary"
                                             >
                                                 View all journals
                                                 <ArrowRight className="ml-2 h-4 w-4" />

@@ -6,7 +6,7 @@ import path from 'path';
 
 // Setup mock route
 beforeAll(() => {
-    (globalThis as any).route = (name: string, params?: any) => `/route/${name}`;
+    (globalThis as any).route = (name: string, _params?: any) => `/route/${name}`;
 });
 
 // Mock @inertiajs/react
