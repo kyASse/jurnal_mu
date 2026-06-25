@@ -70,11 +70,12 @@ describe('Welcome Page Redesign', () => {
         expect(screen.getByText(/Discover Muhammadiyah/i)).toBeInTheDocument();
     });
 
-    it('should not contain hardcoded green or old navy hex colors in welcome.tsx', () => {
+    it('should not contain hardcoded green, old navy, or yellow hex colors in welcome.tsx', () => {
         const welcomePath = path.resolve(__dirname, '../welcome.tsx');
         const content = fs.readFileSync(welcomePath, 'utf8').toLowerCase();
 
         expect(content).not.toContain('#079c4e');
         expect(content).not.toContain('#1a2a75');
+        expect(content).not.toContain('#fcee1f');
     });
 });
