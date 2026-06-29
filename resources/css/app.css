@@ -49,7 +49,7 @@
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
 
-    --background-image-accent-gradient: var(--accent-gradient);
+    --color-accent-gradient: var(--accent-gradient);
     --color-accent-red: var(--accent-red);
     --color-accent-red-foreground: var(--accent-red-foreground);
 
@@ -193,7 +193,7 @@
     --sidebar-primary: #5C6BC0;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: #1e293b;
-    --sidebar-accent-foreground: #ffffff;
+    --sidebar-accent-foreground: #5C6BC0;
     --sidebar-border: #1e293b;
     --sidebar-ring: #5C6BC0;
 }
