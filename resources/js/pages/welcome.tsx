@@ -232,7 +232,8 @@ export default function Welcome() {
                                     <DropdownMenuTrigger asChild>
                                         <button
                                             type="button"
-                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none"
+                                            disabled={isSearching}
+                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none disabled:opacity-50"
                                         >
                                             {searchType === 'journals' && <Library className="h-4 w-4 text-gray-500" />}
                                             {searchType === 'articles' && <BookOpen className="h-4 w-4 text-gray-500" />}
