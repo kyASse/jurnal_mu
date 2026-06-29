@@ -227,7 +227,7 @@ export default function Welcome() {
                                     <DropdownMenuTrigger asChild>
                                         <button
                                             type="button"
-                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none"
+                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none"
                                         >
                                             {searchType === 'journals' && <Library className="h-4 w-4 text-gray-500" />}
                                             {searchType === 'articles' && <BookOpen className="h-4 w-4 text-gray-500" />}
@@ -490,15 +490,16 @@ export default function Welcome() {
                                     Discover our curated selection of academic conferences, seminars, and workshops. Join the scholarly community to
                                     expand your knowledge.
                                 </p>
-                                <Link href={route('events.index')} aria-label="Explore all upcoming events">
-                                    <Button
-                                        size="sm"
-                                        className="group rounded-full bg-secondary px-6 py-6 text-base font-semibold hover:bg-secondary/90"
-                                    >
+                                <Button
+                                    asChild
+                                    size="sm"
+                                    className="group rounded-full bg-secondary px-6 py-6 text-base font-semibold hover:bg-secondary/90"
+                                >
+                                    <Link href={route('events.index')} aria-label="Explore all upcoming events">
                                         Explore All Events
                                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                                    </Button>
-                                </Link>
+                                    </Link>
+                                </Button>
                             </div>
 
                             {/* Scrolling Right Column (Minimalist List) */}
@@ -643,15 +644,16 @@ export default function Welcome() {
                                             Explore our extensive collection of journals categorized by scientific fields, showcasing the diverse
                                             research output from Muhammadiyah Universities across Indonesia.
                                         </p>
-                                        <Link href={route('journals.index')}>
-                                            <Button
-                                                variant="outline"
-                                                className="mt-4 rounded-full border-white/30 bg-transparent text-white hover:bg-white hover:text-primary"
-                                            >
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            className="mt-4 rounded-full border-white/30 bg-transparent text-white hover:bg-white hover:text-primary"
+                                        >
+                                            <Link href={route('journals.index')}>
                                                 View all journals
                                                 <ArrowRight className="ml-2 h-4 w-4" />
-                                            </Button>
-                                        </Link>
+                                            </Link>
+                                        </Button>
                                     </div>
 
                                     {/* Subjects Grid */}
@@ -689,14 +691,15 @@ export default function Welcome() {
                                     of accredited journals.
                                 </p>
                                 <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-                                    <Link href={route('login')}>
-                                        <Button
-                                            size="lg"
-                                            className="w-full bg-accent px-8 text-lg font-bold text-primary hover:bg-accent/90 sm:w-auto"
-                                        >
+                                    <Button
+                                        asChild
+                                        size="lg"
+                                        className="w-full bg-accent px-8 text-lg font-bold text-primary hover:bg-accent/90 sm:w-auto"
+                                    >
+                                        <Link href={route('login')}>
                                             Submit Manuscript
-                                        </Button>
-                                    </Link>
+                                        </Link>
+                                    </Button>
                                     {/* <Button
                                         size="lg"
                                         variant="outline"
