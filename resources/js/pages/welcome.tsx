@@ -200,7 +200,13 @@ export default function Welcome() {
 
                         {/* Search Bar */}
                         <div className="mx-auto max-w-2xl">
-                            <div className="relative flex items-center rounded-full bg-white p-1.5 pl-4 shadow-2xl focus-within:ring-4 focus-within:ring-accent/50">
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleSearch();
+                                }}
+                                className="relative flex items-center rounded-full bg-white p-1.5 pl-4 shadow-2xl focus-within:ring-4 focus-within:ring-accent/50"
+                            >
                                 <Search className="h-5 w-5 flex-shrink-0 text-gray-400" />
                                 <input
                                     type="text"
@@ -216,7 +222,6 @@ export default function Welcome() {
                                     className="h-11 w-full border-0 bg-transparent px-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:ring-offset-0 focus:outline-none sm:text-base"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
 
                                 {/* Divider */}
@@ -262,13 +267,14 @@ export default function Welcome() {
                                 </DropdownMenu>
 
                                 <Button
+                                    type="submit"
                                     className="h-11 flex-shrink-0 rounded-full bg-secondary px-6 text-white hover:bg-secondary/90 disabled:opacity-70"
                                     onClick={handleSearch}
                                     disabled={isSearching}
                                 >
                                     {isSearching ? 'Loading...' : 'Search'}
                                 </Button>
-                            </div>
+                            </form>
                             <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-white/80">
                                 <span>Can't find what you're looking for?</span>
                                 <div className="inline-flex h-5 items-center overflow-hidden">
@@ -492,10 +498,9 @@ export default function Welcome() {
                                 </p>
                                 <Button
                                     asChild
-                                    size="sm"
                                     className="group rounded-full bg-secondary px-6 py-6 text-base font-semibold hover:bg-secondary/90"
                                 >
-                                    <Link href={route('events.index')} aria-label="Explore all upcoming events">
+                                    <Link href={route('events.index')}>
                                         Explore All Events
                                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                                     </Link>
