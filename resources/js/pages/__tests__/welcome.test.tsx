@@ -1,8 +1,14 @@
-import { render, screen } from '@testing-library/react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import Welcome from '../welcome';
 import fs from 'fs';
 import path from 'path';
+
+const { mockGet } = vi.hoisted(() => {
+    return {
+        mockGet: vi.fn(),
+    };
+});
 
 // Setup mock route
 beforeAll(() => {
@@ -12,6 +18,9 @@ beforeAll(() => {
 // Mock @inertiajs/react
 vi.mock('@inertiajs/react', () => {
     return {
+        router: {
+            get: mockGet,
+        },
         Link: ({ href, children, ...props }: any) => (
             <a href={href} {...props}>
                 {children}
@@ -64,6 +73,10 @@ vi.mock('lucide-react', () => ({
     User: () => <span>User</span>,
 }));
 
+beforeEach(() => {
+    mockGet.mockClear();
+});
+
 describe('Welcome Page Redesign', () => {
     it('should render welcome page without crashing', () => {
         render(<Welcome />);
@@ -86,4 +99,22 @@ describe('Welcome Page Redesign', () => {
         const occurrences = (content.match(/bg-\[url\('https:\/\/www\.transparenttextures\.com\/patterns\/cubes\.png'\)\]/g) || []).length;
         expect(occurrences).toBeGreaterThanOrEqual(2);
     });
+
+    it('should have accessibility labels on search input', () => {
+        render(<Welcome />);
+        const searchInput = screen.getByPlaceholderText(/Search for journals/i);
+        expect(searchInput).toHaveAttribute('aria-label', 'Search academic content');
+    });
+
+    it('should perform client-side search using Inertia router', async () => {
+        render(<Welcome />);
+        const searchInput = screen.getByPlaceholderText(/Search for journals/i);
+        fireEvent.change(searchInput, { target: { value: 'physics' } });
+        
+        const searchButton = screen.getByRole('button', { name: /Search/i });
+        fireEvent.click(searchButton);
+
+        expect(mockGet).toHaveBeenCalled();
+    });
 });
+
