@@ -28,5 +28,6 @@ describe('PublicNavbar', () => {
         expect(screen.getByText('Articles')).toBeInTheDocument();
         expect(screen.getByText('Universities')).toBeInTheDocument();
         expect(screen.getByText('News')).toBeInTheDocument();
+        expect(screen.getByText('Announcements')).toBeInTheDocument();
     });
 });
