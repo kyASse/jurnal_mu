@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Journal;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
@@ -179,4 +180,64 @@ it('does not allow non-super admins to access universities index', function () {
         ->get(route('admin.universities.index'));
 
     $response->assertStatus(403);
+});
+
+it('allows sorting by name_desc, users_desc, and journals_desc', function () {
+    // Clean up
+    Journal::query()->delete();
+    User::where('id', '!=', $this->superAdmin->id)->delete();
+    University::query()->delete();
+
+    $roleId = Role::where('name', Role::USER)->value('id');
+
+    // Create 3 universities
+    $univA = University::factory()->create(['name' => 'A University']);
+    $univB = University::factory()->create(['name' => 'B University']);
+    $univC = University::factory()->create(['name' => 'C University']);
+
+    // Users: A=3, B=1, C=2
+    $usersA = User::factory()->count(3)->create(['university_id' => $univA->id, 'role_id' => $roleId]);
+    $usersB = User::factory()->count(1)->create(['university_id' => $univB->id, 'role_id' => $roleId]);
+    $usersC = User::factory()->count(2)->create(['university_id' => $univC->id, 'role_id' => $roleId]);
+
+    // Journals: A=1, B=3, C=2
+    Journal::factory()->count(1)->create(['university_id' => $univA->id, 'user_id' => $usersA->first()->id]);
+    Journal::factory()->count(3)->create(['university_id' => $univB->id, 'user_id' => $usersB->first()->id]);
+    Journal::factory()->count(2)->create(['university_id' => $univC->id, 'user_id' => $usersC->first()->id]);
+
+    // Force delete side-effect universities and users created by factories
+    University::whereNotIn('id', [$univA->id, $univB->id, $univC->id])->forceDelete();
+    User::whereNotIn('id', [$this->superAdmin->id])
+        ->whereNotIn('university_id', [$univA->id, $univB->id, $univC->id])
+        ->forceDelete();
+
+    // Test sort = name_desc (C, B, A)
+    $response = $this->actingAs($this->superAdmin)
+        ->get(route('admin.universities.index', ['sort' => 'name_desc']));
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->where('universities.data.0.id', $univC->id)
+        ->where('universities.data.1.id', $univB->id)
+        ->where('universities.data.2.id', $univA->id)
+    );
+
+    // Test sort = users_desc (A, C, B)
+    $response = $this->actingAs($this->superAdmin)
+        ->get(route('admin.universities.index', ['sort' => 'users_desc']));
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->where('universities.data.0.id', $univA->id)
+        ->where('universities.data.1.id', $univC->id)
+        ->where('universities.data.2.id', $univB->id)
+    );
+
+    // Test sort = journals_desc (B, C, A)
+    $response = $this->actingAs($this->superAdmin)
+        ->get(route('admin.universities.index', ['sort' => 'journals_desc']));
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->where('universities.data.0.id', $univB->id)
+        ->where('universities.data.1.id', $univC->id)
+        ->where('universities.data.2.id', $univA->id)
+    );
 });

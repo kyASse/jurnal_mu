@@ -12,13 +12,17 @@ import EventCard, { type EventCardProps as AgendaItem } from '@/components/event
 
 interface Props {
     agendas: PaginatedData<AgendaItem>;
-    filters?: { search?: string; type?: string };
+    filters?: { search?: string; type?: string; university_id?: string; location_type?: string; time_filter?: string };
     types?: string[];
+    universities?: { id: number; name: string }[];
 }
 
-export default function Index({ agendas, filters, types = [] }: Props) {
+export default function Index({ agendas, filters, types = [], universities = [] }: Props) {
     const [search, setSearch] = useState(filters?.search || '');
     const [type, setType] = useState(filters?.type || 'all');
+    const [universityId, setUniversityId] = useState(filters?.university_id || 'all');
+    const [locationType, setLocationType] = useState(filters?.location_type || 'all');
+    const timeFilter = filters?.time_filter || 'upcoming';
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
@@ -27,6 +31,9 @@ export default function Index({ agendas, filters, types = [] }: Props) {
             {
                 search,
                 type: type !== 'all' ? type : undefined,
+                university_id: universityId !== 'all' ? universityId : undefined,
+                location_type: locationType !== 'all' ? locationType : undefined,
+                time_filter: timeFilter,
             },
             { preserveState: true },
         );
@@ -49,7 +56,7 @@ export default function Index({ agendas, filters, types = [] }: Props) {
 
                 <div className="relative z-10 mx-auto max-w-7xl px-4 pt-8 pb-12 text-center sm:px-6 lg:px-8">
                     <h1 className="font-heading mb-4 text-4xl font-bold tracking-tight sm:text-5xl" style={{ fontFamily: '"El Messiri", serif' }}>
-                        Upcoming <span className="text-[#FCEE1F]">Events & Agendas</span>
+                        {timeFilter === 'past' ? 'Past' : 'Upcoming'} <span className="text-[#FCEE1F]">Events & Agendas</span>
                     </h1>
                     <p className="mx-auto max-w-2xl text-lg text-emerald-50">
                         Discover conferences, workshops, and calls for papers from universities across the network.
@@ -60,8 +67,8 @@ export default function Index({ agendas, filters, types = [] }: Props) {
             {/* Filters Section */}
             <div className="relative z-20 mx-auto -mt-8 mb-12 max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900">
-                    <form onSubmit={handleSearch} className="flex flex-col gap-4 sm:flex-row">
-                        <div className="relative flex-1">
+                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
+                        <div className="relative sm:col-span-2 lg:col-span-4">
                             <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                             <Input
                                 type="text"
@@ -71,7 +78,7 @@ export default function Index({ agendas, filters, types = [] }: Props) {
                                 className="h-12 rounded-full pl-12 text-base"
                             />
                         </div>
-                        <div className="w-full sm:w-[250px]">
+                        <div className="w-full lg:col-span-2">
                             <Select value={type} onValueChange={setType}>
                                 <SelectTrigger className="h-12 rounded-full">
                                     <SelectValue placeholder="Event Type" />
@@ -86,10 +93,38 @@ export default function Index({ agendas, filters, types = [] }: Props) {
                                 </SelectContent>
                             </Select>
                         </div>
+                        <div className="w-full lg:col-span-2">
+                            <Select value={universityId} onValueChange={setUniversityId}>
+                                <SelectTrigger className="h-12 rounded-full">
+                                    <SelectValue placeholder="University" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Universities</SelectItem>
+                                    {universities.map((u) => (
+                                        <SelectItem key={u.id} value={u.id.toString()}>
+                                            {u.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="w-full sm:col-span-2 lg:col-span-2">
+                            <Select value={locationType} onValueChange={setLocationType}>
+                                <SelectTrigger className="h-12 rounded-full">
+                                    <SelectValue placeholder="Location" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Locations</SelectItem>
+                                    <SelectItem value="Online">Online</SelectItem>
+                                    <SelectItem value="Offline">Offline</SelectItem>
+                                    <SelectItem value="Hybrid">Hybrid</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <Button
                             type="submit"
                             size="lg"
-                            className="h-12 w-full rounded-full bg-[#079C4E] px-8 font-semibold hover:bg-[#068A44] sm:w-auto"
+                            className="h-12 w-full rounded-full bg-[#079C4E] px-8 font-semibold hover:bg-[#068A44] sm:col-span-2 lg:col-span-2"
                         >
                             Search
                         </Button>
@@ -98,17 +133,34 @@ export default function Index({ agendas, filters, types = [] }: Props) {
             </div>
 
             <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+                <div className="mb-8 flex justify-center border-b">
+                    <button
+                        onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'upcoming' })}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'upcoming' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Upcoming Events
+                    </button>
+                    <button
+                        onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'past' })}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'past' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Past Events
+                    </button>
+                </div>
+
                 {agendas.data.length === 0 ? (
                     <div className="rounded-lg border border-dashed bg-muted/20 py-16 text-center">
                         <CalendarDays className="mx-auto mb-4 h-12 w-12 text-muted-foreground opacity-50" />
                         <h3 className="text-lg font-medium text-foreground">No events found</h3>
                         <p className="mt-2 text-muted-foreground">Try adjusting your search or filters to find what you're looking for.</p>
-                        {(search || type !== 'all') && (
+                        {(search || type !== 'all' || universityId !== 'all' || locationType !== 'all') && (
                             <Button
                                 variant="link"
                                 onClick={() => {
                                     setSearch('');
                                     setType('all');
+                                    setUniversityId('all');
+                                    setLocationType('all');
                                     router.get(route('events.index'));
                                 }}
                                 className="mt-4"

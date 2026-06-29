@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Announcement;
 use App\Models\Journal;
 use App\Models\JournalAssessment;
 use App\Models\User;
@@ -28,7 +29,7 @@ class DashboardController extends Controller
         ];
 
         // Get stats based on user role
-        if ($user->role->name === 'Super Admin') {
+        if ($user->role && $user->role->name === 'Super Admin') {
             // Super Admin sees all data
             $stats['total_journals'] = Journal::count();
             $stats['total_assessments'] = JournalAssessment::join('journals', 'journal_assessments.journal_id', '=', 'journals.id')
@@ -55,7 +56,7 @@ class DashboardController extends Controller
                 ->get()
                 ->toArray();
 
-        } elseif ($user->role->name === 'Admin Kampus') {
+        } elseif ($user->role && $user->role->name === 'Admin Kampus') {
             // Admin Kampus sees only their university data
             $stats['total_journals'] = Journal::where('university_id', $user->university_id)
                 ->count();
@@ -111,12 +112,41 @@ class DashboardController extends Controller
             ];
         }
 
+        // Fetch relevant announcements
+        $roleNames = $user->roles()->pluck('name')->toArray();
+        if ($user->role) {
+            $roleNames[] = $user->role->name;
+        }
+
+        $roleMapping = [
+            'Super Admin' => 'super_admin',
+            'Admin Kampus' => 'admin_kampus',
+            'Pengelola Jurnal' => 'pengelola_jurnal',
+            'Reviewer' => 'reviewer',
+            'User' => 'user',
+        ];
+
+        $targetAudiences = collect($roleNames)
+            ->map(fn ($roleName) => $roleMapping[$roleName] ?? null)
+            ->filter()
+            ->push('public')
+            ->unique()
+            ->toArray();
+
+        $announcements = Announcement::published()
+            ->whereIn('target_audience', $targetAudiences)
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('published_at')
+            ->limit(5)
+            ->get();
+
         // Calculate journal statistics for visualization
         $statistics = $this->calculateJournalStatisticsForRole($user);
 
         return Inertia::render('dashboard', [
             'stats' => $stats,
             'statistics' => $statistics,
+            'announcements' => $announcements,
         ]);
     }
 
@@ -127,13 +157,13 @@ class DashboardController extends Controller
     private function calculateJournalStatisticsForRole($user): array
     {
         // Generate cache key based on role and scope
-        if ($user->role->name === 'Super Admin') {
+        if ($user->role && $user->role->name === 'Super Admin') {
             $cacheKey = 'dashboard_statistics_super_admin';
 
             return Cache::remember($cacheKey, 3600, function () {
                 return $this->calculateJournalStatistics(null, null);
             });
-        } elseif ($user->role->name === 'Admin Kampus') {
+        } elseif ($user->role && $user->role->name === 'Admin Kampus') {
             $cacheKey = "dashboard_statistics_university_{$user->university_id}";
 
             return Cache::remember($cacheKey, 3600, function () use ($user) {
