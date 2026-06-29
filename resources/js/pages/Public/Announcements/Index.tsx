@@ -36,7 +36,7 @@ interface Props {
 
 export default function Index({ announcements, filters, allTags }: Props) {
     const [search, setSearch] = useState(filters?.search || '');
-    const [sort, setSort] = useState(filters?.sort || 'new');
+    const [sort, setSort] = useState(typeof filters?.sort === 'string' ? filters.sort : 'new');
     const [activeTag, setActiveTag] = useState(filters?.tag || '');
 
     const handleSearch = (e: FormEvent) => {

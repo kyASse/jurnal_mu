@@ -30,7 +30,9 @@ class AnnouncementController extends Controller
 
         return Inertia::render('Admin/Announcements/Index', [
             'announcements' => $announcements,
-            'filters' => $request->only(['search']),
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

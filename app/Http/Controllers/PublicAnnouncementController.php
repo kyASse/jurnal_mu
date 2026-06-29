@@ -66,7 +66,11 @@ class PublicAnnouncementController extends Controller
 
         return Inertia::render('Public/Announcements/Index', [
             'announcements' => $announcements,
-            'filters' => $request->only(['search', 'sort', 'tag']),
+            'filters' => [
+                'search' => $request->input('search'),
+                'sort' => $request->input('sort', 'new'),
+                'tag' => $request->input('tag'),
+            ],
             'allTags' => $allTags,
         ]);
     }
