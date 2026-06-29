@@ -15,6 +15,7 @@ import {
     LayoutGrid,
     Library,
     LifeBuoy,
+    Megaphone,
     Newspaper,
     UserCheck,
     Users,
@@ -114,6 +115,11 @@ export function AppSidebar() {
             title: 'News Management',
             href: route('admin.news.index'),
             icon: Newspaper,
+        },
+        {
+            title: 'Announcements',
+            href: route('admin.announcements.index'),
+            icon: Megaphone,
         },
     ];
 

@@ -69,5 +69,6 @@ describe('AppSidebar', () => {
 
         render(<AppSidebar />);
         expect(screen.getByText('News Management')).toBeInTheDocument();
+        expect(screen.getByText('Announcements')).toBeInTheDocument();
     });
 });
