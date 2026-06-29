@@ -291,6 +291,10 @@ Route::middleware(['auth'])->group(function () {
             ->whereIn('format', ['xlsx', 'csv']);
         Route::get('journals/{journal}', [JournalController::class, 'show'])
             ->name('journals.show');
+        Route::get('journals/{journal}/edit', [JournalController::class, 'edit'])
+            ->name('journals.edit');
+        Route::put('journals/{journal}', [JournalController::class, 'update'])
+            ->name('journals.update');
         Route::post('journals/{journal}/harvest', [JournalController::class, 'harvest'])
             ->name('journals.harvest');
         Route::post('journals/{journal}/import-xml', [JournalController::class, 'importXml'])

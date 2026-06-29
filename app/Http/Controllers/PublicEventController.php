@@ -17,8 +17,17 @@ class PublicEventController extends Controller
     {
         $query = Agenda::query()
             ->with('university:id,name,logo_url')
-            ->active() // Only active events
-            ->orderBy('date_start', 'desc');
+            ->active(); // Only active events
+
+        $timeFilter = $request->input('time_filter', 'upcoming');
+        if ($timeFilter === 'past') {
+            $query->where('date_start', '<', now()->toDateString())
+                ->orderBy('date_start', 'desc');
+        } else {
+            // Default is upcoming
+            $query->where('date_start', '>=', now()->toDateString())
+                ->orderBy('date_start', 'asc');
+        }
 
         if ($request->filled('search')) {
             $query->where('title', 'like', "%{$request->search}%");
@@ -26,6 +35,14 @@ class PublicEventController extends Controller
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
+        }
+
+        if ($request->filled('university_id')) {
+            $query->where('university_id', $request->university_id);
+        }
+
+        if ($request->filled('location_type')) {
+            $query->where('location_type', $request->location_type);
         }
 
         $agendas = $query->paginate(12)
@@ -42,6 +59,7 @@ class PublicEventController extends Controller
                 'location_type' => $agenda->location_type,
                 'location_venue' => $agenda->location_venue,
                 'price' => $agenda->price,
+                'currency' => $agenda->currency,
                 'quota' => $agenda->quota,
                 'is_featured' => $agenda->is_featured,
                 'university' => $agenda->university ? [
@@ -52,11 +70,13 @@ class PublicEventController extends Controller
 
         // Need the options to populate the filter dropdown
         $types = Agenda::active()->distinct()->pluck('type');
+        $universities = \App\Models\University::select('id', 'name')->orderBy('name')->get();
 
         return Inertia::render('Public/Events/Index', [
             'agendas' => $agendas,
-            'filters' => $request->only(['search', 'type']),
+            'filters' => $request->only(['search', 'type', 'university_id', 'location_type', 'time_filter']),
             'types' => $types,
+            'universities' => $universities,
         ]);
     }
 
@@ -96,6 +116,7 @@ class PublicEventController extends Controller
                 'location_link' => $agenda->location_link,
                 'registration_link' => $agenda->registration_link,
                 'price' => $agenda->price,
+                'currency' => $agenda->currency,
                 'contact_person_name' => $agenda->contact_person_name,
                 'contact_person_phone' => $agenda->contact_person_phone,
                 'contact_person_email' => $agenda->contact_person_email,
