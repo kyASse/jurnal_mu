@@ -5,7 +5,7 @@ import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     ArrowRight,
     BookOpen,
@@ -93,17 +93,27 @@ export default function Welcome() {
         usePage<WelcomeProps>().props;
     const [searchQuery, setSearchQuery] = useState('');
     const [searchType, setSearchType] = useState<'journals' | 'articles' | 'universities'>('journals');
+    const [isSearching, setIsSearching] = useState(false);
 
     const handleSearch = () => {
-        if (!searchQuery.trim()) return;
+        if (!searchQuery.trim() || isSearching) return;
 
-        if (searchType === 'journals') {
-            window.location.href = route('journals.index', { search: searchQuery });
-        } else if (searchType === 'articles') {
-            window.location.href = route('browse.articles', { q: searchQuery });
-        } else if (searchType === 'universities') {
-            window.location.href = route('browse.universities', { search: searchQuery });
-        }
+        setIsSearching(true);
+        const params = searchType === 'journals'
+            ? { search: searchQuery }
+            : searchType === 'articles'
+              ? { q: searchQuery }
+              : { search: searchQuery };
+
+        const routeName = searchType === 'journals'
+            ? 'journals.index'
+            : searchType === 'articles'
+              ? 'browse.articles'
+              : 'browse.universities';
+
+        router.get(route(routeName), params, {
+            onFinish: () => setIsSearching(false)
+        });
     };
 
     const links = [
@@ -169,7 +179,7 @@ export default function Welcome() {
                 {/* HERO SECTION */}
                 <div className="relative pt-16">
                     {/* Background Pattern */}
-                    <div className="absolute inset-0 z-0 overflow-hidden bg-gradient-to-br from-primary to-secondary pb-32">
+                    <div className="absolute inset-0 z-0 overflow-hidden bg-gradient-to-br from-primary to-secondary dark:from-[#151a43] dark:to-[#6b1013] pb-32">
                         <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-accent opacity-10 mix-blend-overlay blur-3xl"></div>
                         <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-secondary opacity-20 mix-blend-multiply blur-3xl"></div>
 
@@ -194,6 +204,8 @@ export default function Welcome() {
                                 <Search className="h-5 w-5 flex-shrink-0 text-gray-400" />
                                 <input
                                     type="text"
+                                    aria-label="Search academic content"
+                                    disabled={isSearching}
                                     placeholder={
                                         searchType === 'journals'
                                             ? 'Search for journals, publisher, or ISSN...'
@@ -215,7 +227,7 @@ export default function Welcome() {
                                     <DropdownMenuTrigger asChild>
                                         <button
                                             type="button"
-                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none"
+                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none"
                                         >
                                             {searchType === 'journals' && <Library className="h-4 w-4 text-gray-500" />}
                                             {searchType === 'articles' && <BookOpen className="h-4 w-4 text-gray-500" />}
@@ -250,10 +262,11 @@ export default function Welcome() {
                                 </DropdownMenu>
 
                                 <Button
-                                    className="h-11 flex-shrink-0 rounded-full bg-secondary px-6 text-white hover:bg-secondary/90"
+                                    className="h-11 flex-shrink-0 rounded-full bg-secondary px-6 text-white hover:bg-secondary/90 disabled:opacity-70"
                                     onClick={handleSearch}
+                                    disabled={isSearching}
                                 >
-                                    Search
+                                    {isSearching ? 'Loading...' : 'Search'}
                                 </Button>
                             </div>
                             <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-white/80">
@@ -477,7 +490,7 @@ export default function Welcome() {
                                     Discover our curated selection of academic conferences, seminars, and workshops. Join the scholarly community to
                                     expand your knowledge.
                                 </p>
-                                <Link href={route('events.index')}>
+                                <Link href={route('events.index')} aria-label="Explore all upcoming events">
                                     <Button
                                         size="sm"
                                         className="group rounded-full bg-secondary px-6 py-6 text-base font-semibold hover:bg-secondary/90"
@@ -500,6 +513,7 @@ export default function Welcome() {
                                         <Link
                                             key={event.id}
                                             href={route('events.show', event.slug)}
+                                            aria-label={`View details of event: ${event.title}`}
                                             className="group flex animate-fade-in-up flex-col items-start gap-6 border-b border-gray-200 py-8 transition-all hover:border-primary sm:flex-row sm:items-center dark:border-gray-800"
                                             style={{ animationDelay: `${index * 150}ms` }}
                                         >
@@ -661,7 +675,7 @@ export default function Welcome() {
                     )}
 
                     {/* CTA Section */}
-                    <div className="mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary text-white shadow-2xl">
+                    <div className="mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary dark:from-[#151a43] dark:to-[#6b1013] text-white shadow-2xl">
                         <div className="relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] px-6 py-16 text-center sm:px-12 lg:py-20">
                             <div className="relative z-10 mx-auto max-w-3xl">
                                 <h2
