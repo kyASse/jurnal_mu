@@ -380,7 +380,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                 </TableCell>
                                                 <TableCell>
                                                     <ul className="space-y-1 text-sm">
-                                                        {'name' in uni.pending_updates && (
+                                                        {uni.pending_updates && 'name' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs font-semibold text-muted-foreground">Name: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.name}</span>
@@ -389,7 +389,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                                 </span>
                                                             </li>
                                                         )}
-                                                        {'code' in uni.pending_updates && (
+                                                        {uni.pending_updates && 'code' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs font-semibold text-muted-foreground">Abbreviation: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.code}</span>
@@ -398,7 +398,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                                 </span>
                                                             </li>
                                                         )}
-                                                        {'ptm_code' in uni.pending_updates && (
+                                                        {uni.pending_updates && 'ptm_code' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs font-semibold text-muted-foreground">PTM Code: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.ptm_code || '-'}</span>
