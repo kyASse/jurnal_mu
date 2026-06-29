@@ -29,7 +29,7 @@ it('casts fields correctly and belongs to an author', function () {
 
 it('applies published and audience scopes correctly', function () {
     $author = User::factory()->create();
-    
+
     // Future announcement
     Announcement::create([
         'title' => 'Future Post',
@@ -125,5 +125,3 @@ it('can be created using factory', function () {
     expect($announcement)->toBeInstanceOf(Announcement::class)
         ->and($announcement->author)->toBeInstanceOf(User::class);
 });
-
-

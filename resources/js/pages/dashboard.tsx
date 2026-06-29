@@ -256,9 +256,7 @@ export default function Dashboard({ stats, statistics, announcements = [] }: Das
                                 <Megaphone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                 <div>
                                     <h3 className="text-lg font-semibold">Pengumuman Terbaru</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        Informasi dan pengumuman terbaru untuk Anda
-                                    </p>
+                                    <p className="text-sm text-muted-foreground">Informasi dan pengumuman terbaru untuk Anda</p>
                                 </div>
                             </div>
                             <Link href="/announcements" className="text-sm font-medium text-primary hover:underline">
@@ -283,19 +281,15 @@ export default function Dashboard({ stats, statistics, announcements = [] }: Das
                                             </div>
                                         )}
                                         <div>
-                                            <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                                            <span className="text-[11px] font-semibold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
                                                 {item.target_audience.replace('_', ' ')}
                                             </span>
-                                            <h4 className="mt-1 font-bold leading-snug line-clamp-2 hover:text-[#079C4E]">
-                                                <Link href={`/announcements/${item.slug}`}>
-                                                    {item.title}
-                                                </Link>
+                                            <h4 className="mt-1 line-clamp-2 leading-snug font-bold hover:text-[#079C4E]">
+                                                <Link href={`/announcements/${item.slug}`}>{item.title}</Link>
                                             </h4>
-                                            <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
-                                                {item.summary}
-                                            </p>
+                                            <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{item.summary}</p>
                                         </div>
-                                        <div className="mt-4 pt-4 border-t border-dashed border-sidebar-border/70 dark:border-sidebar-border text-xs text-muted-foreground flex items-center justify-between">
+                                        <div className="mt-4 flex items-center justify-between border-t border-dashed border-sidebar-border/70 pt-4 text-xs text-muted-foreground dark:border-sidebar-border">
                                             <span>
                                                 {new Date(item.published_at).toLocaleDateString('id-ID', {
                                                     day: 'numeric',

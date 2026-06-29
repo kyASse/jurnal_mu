@@ -1,13 +1,13 @@
 <?php
 
 use App\Models\Announcement;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 
 it('passes relevant announcements to user dashboard based on multi-role mapping', function () {
     $roleReviewer = Role::where('name', Role::REVIEWER)->first() ?? Role::create(['name' => Role::REVIEWER, 'display_name' => 'Reviewer']);
     $roleUser = Role::where('name', Role::USER)->first() ?? Role::create(['name' => Role::USER, 'display_name' => 'User']);
-    
+
     $user = User::factory()->create(['role_id' => $roleUser->id]);
     // Sync multiple roles
     $user->roles()->sync([$roleReviewer->id, $roleUser->id]);

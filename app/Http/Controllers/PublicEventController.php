@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agenda;
+use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -70,7 +71,7 @@ class PublicEventController extends Controller
 
         // Need the options to populate the filter dropdown
         $types = Agenda::active()->distinct()->pluck('type');
-        $universities = \App\Models\University::select('id', 'name')->orderBy('name')->get();
+        $universities = University::select('id', 'name')->orderBy('name')->get();
 
         return Inertia::render('Public/Events/Index', [
             'agendas' => $agendas,
@@ -92,11 +93,11 @@ class PublicEventController extends Controller
         $agenda = (clone $query)->where('slug', $slug)->first();
 
         // If not found by slug and $slug is numeric, try finding by ID as a fallback
-        if (! $agenda && is_numeric($slug)) {
+        if (!$agenda && is_numeric($slug)) {
             $agenda = $query->find($slug);
         }
 
-        if (! $agenda) {
+        if (!$agenda) {
             abort(404);
         }
 

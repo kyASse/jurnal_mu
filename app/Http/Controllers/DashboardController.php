@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Announcement;
 use App\Models\Journal;
 use App\Models\JournalAssessment;
 use App\Models\User;
@@ -132,7 +133,7 @@ class DashboardController extends Controller
             ->unique()
             ->toArray();
 
-        $announcements = \App\Models\Announcement::published()
+        $announcements = Announcement::published()
             ->whereIn('target_audience', $targetAudiences)
             ->orderByDesc('is_pinned')
             ->orderByDesc('published_at')

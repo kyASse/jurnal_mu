@@ -45,7 +45,7 @@ class Announcement extends Model
     {
         return $query->where(function ($q) use ($audience) {
             $q->where('target_audience', $audience)
-              ->orWhere('target_audience', 'public');
+                ->orWhere('target_audience', 'public');
         });
     }
 

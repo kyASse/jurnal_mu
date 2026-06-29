@@ -60,7 +60,7 @@ class Agenda extends Model
         parent::boot();
 
         static::saving(function ($agenda) {
-            if (! $agenda->slug) {
+            if (!$agenda->slug) {
                 $agenda->slug = static::generateUniqueSlug($agenda->title);
             }
         });

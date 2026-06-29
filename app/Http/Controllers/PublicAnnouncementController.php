@@ -7,7 +7,6 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Symfony\Component\HttpFoundation\Response;
 
 class PublicAnnouncementController extends Controller
 {
@@ -45,8 +44,8 @@ class PublicAnnouncementController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('summary', 'like', "%{$search}%")
-                  ->orWhere('body', 'like', "%{$search}%");
+                    ->orWhere('summary', 'like', "%{$search}%")
+                    ->orWhere('body', 'like', "%{$search}%");
             });
         }
 

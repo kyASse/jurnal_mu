@@ -34,20 +34,22 @@ export default function Show({ announcement }: Props) {
                     </Link>
                 </div>
 
-                <article className="rounded-2xl border bg-card p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
+                <article className="rounded-2xl border bg-card p-6 shadow-sm sm:p-8 dark:border-zinc-800 dark:bg-zinc-900">
                     {/* Header */}
                     <div className="border-b pb-6 dark:border-zinc-800">
-                        <div className="flex flex-wrap gap-2 mb-3">
-                            {announcement.tags && announcement.tags.map((tag) => (
-                                <span key={tag} className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                                    {tag}
-                                </span>
-                            ))}
+                        <div className="mb-3 flex flex-wrap gap-2">
+                            {announcement.tags &&
+                                announcement.tags.map((tag) => (
+                                    <span
+                                        key={tag}
+                                        className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
                         </div>
 
-                        <h1 className="font-heading mb-4 text-3xl font-extrabold text-foreground sm:text-4xl">
-                            {announcement.title}
-                        </h1>
+                        <h1 className="font-heading mb-4 text-3xl font-extrabold text-foreground sm:text-4xl">{announcement.title}</h1>
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1.5">
@@ -85,7 +87,7 @@ export default function Show({ announcement }: Props) {
                                     </div>
                                 </div>
                                 <a href={route('announcements.download', announcement.id)} className="block">
-                                    <Button className="w-full bg-[#079C4E] hover:bg-[#068A44] font-semibold flex items-center justify-center gap-2">
+                                    <Button className="flex w-full items-center justify-center gap-2 bg-[#079C4E] font-semibold hover:bg-[#068A44]">
                                         <FileDown className="h-4 w-4" /> Download Document
                                     </Button>
                                 </a>

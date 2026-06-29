@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PublicLayout from '@/layouts/public-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { CalendarDays, Megaphone, Search, Pin, FileDown } from 'lucide-react';
+import { CalendarDays, FileDown, Megaphone, Pin, Search } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 
 interface AnnouncementItem {
@@ -54,8 +54,6 @@ export default function Index({ announcements, filters, allTags }: Props) {
         setActiveTag(nextTag);
         router.get(route('announcements.index'), { search, sort, tag: nextTag }, { preserveState: true });
     };
-
-
 
     return (
         <PublicLayout>
@@ -114,17 +112,17 @@ export default function Index({ announcements, filters, allTags }: Props) {
                     </form>
 
                     {allTags.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2 items-center">
+                        <div className="mt-4 flex flex-wrap items-center gap-2">
                             <span className="text-xs font-semibold text-muted-foreground">Filter by tag:</span>
                             {allTags.map((tag) => (
                                 <button
                                     key={tag}
                                     type="button"
                                     onClick={() => handleTagClick(tag)}
-                                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                                         activeTag === tag
-                                            ? 'bg-[#079C4E] border-[#079C4E] text-white'
-                                            : 'bg-muted border-transparent text-muted-foreground hover:bg-muted/80'
+                                            ? 'border-[#079C4E] bg-[#079C4E] text-white'
+                                            : 'border-transparent bg-muted text-muted-foreground hover:bg-muted/80'
                                     }`}
                                 >
                                     {tag}
@@ -148,11 +146,11 @@ export default function Index({ announcements, filters, allTags }: Props) {
                         {announcements.data.map((item) => (
                             <article
                                 key={item.id}
-                                className={`group relative flex flex-col p-6 rounded-2xl border bg-card transition-all duration-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 ${
+                                className={`group relative flex flex-col rounded-2xl border bg-card p-6 transition-all duration-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 ${
                                     item.is_pinned ? 'border-l-4 border-l-[#079C4E] bg-emerald-50/20 dark:bg-emerald-950/20' : ''
                                 }`}
                             >
-                                <div className="flex items-center justify-between mb-3">
+                                <div className="mb-3 flex items-center justify-between">
                                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                         <CalendarDays className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                                         <span>
@@ -171,11 +169,15 @@ export default function Index({ announcements, filters, allTags }: Props) {
                                                 <Pin className="h-3 w-3 fill-current" /> Pinned
                                             </span>
                                         )}
-                                        {item.tags && item.tags.map(tag => (
-                                            <span key={tag} className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                                                {tag}
-                                            </span>
-                                        ))}
+                                        {item.tags &&
+                                            item.tags.map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                                >
+                                                    {tag}
+                                                </span>
+                                            ))}
                                     </div>
                                 </div>
 
@@ -183,7 +185,7 @@ export default function Index({ announcements, filters, allTags }: Props) {
                                     <Link href={route('announcements.show', item.slug)}>{item.title}</Link>
                                 </h2>
 
-                                <p className="mb-4 text-muted-foreground text-sm leading-relaxed">{item.summary}</p>
+                                <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{item.summary}</p>
 
                                 <div className="flex items-center justify-between border-t pt-4 dark:border-zinc-800">
                                     <Link
@@ -200,21 +202,21 @@ export default function Index({ announcements, filters, allTags }: Props) {
                                 </div>
                             </article>
                         ))}
-                        
+
                         {/* Pagination Links */}
                         {announcements.last_page > 1 && (
-                            <div className="flex justify-center items-center gap-2 mt-8">
+                            <div className="mt-8 flex items-center justify-center gap-2">
                                 {announcements.links.map((link, i) => (
                                     <button
                                         key={i}
                                         disabled={!link.url}
                                         onClick={() => router.visit(link.url!)}
-                                        className={`px-3.5 py-2 rounded-lg text-sm border font-medium transition-all ${
+                                        className={`rounded-lg border px-3.5 py-2 text-sm font-medium transition-all ${
                                             link.active
-                                                ? 'bg-[#079C4E] border-[#079C4E] text-white'
+                                                ? 'border-[#079C4E] bg-[#079C4E] text-white'
                                                 : !link.url
-                                                  ? 'opacity-40 cursor-not-allowed border-transparent'
-                                                  : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300'
+                                                  ? 'cursor-not-allowed border-transparent opacity-40'
+                                                  : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300'
                                         }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

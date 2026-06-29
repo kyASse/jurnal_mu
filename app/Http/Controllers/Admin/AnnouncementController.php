@@ -19,7 +19,7 @@ class AnnouncementController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('target_audience', 'like', "%{$search}%");
+                    ->orWhere('target_audience', 'like', "%{$search}%");
             });
         }
 
@@ -61,7 +61,7 @@ class AnnouncementController extends Controller
 
         $data = [
             'title' => $validated['title'],
-            'slug' => Str::slug($validated['title']) . '-' . Str::random(5),
+            'slug' => Str::slug($validated['title']).'-'.Str::random(5),
             'summary' => ($validated['summary'] ?? null) ?: $this->makeExcerpt($validated['body']),
             'body' => $validated['body'],
             'target_audience' => $validated['target_audience'],
@@ -163,6 +163,7 @@ class AnnouncementController extends Controller
     private function makeExcerpt(string $body): string
     {
         $plain = strip_tags($body);
+
         return Str::limit($plain, 150, '...');
     }
 }

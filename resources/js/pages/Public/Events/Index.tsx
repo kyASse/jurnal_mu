@@ -136,13 +136,13 @@ export default function Index({ agendas, filters, types = [], universities = [] 
                 <div className="mb-8 flex justify-center border-b">
                     <button
                         onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'upcoming' })}
-                        className={`px-6 py-3 text-sm font-semibold border-b-2 transition-all ${timeFilter === 'upcoming' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'upcoming' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                         Upcoming Events
                     </button>
                     <button
                         onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'past' })}
-                        className={`px-6 py-3 text-sm font-semibold border-b-2 transition-all ${timeFilter === 'past' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'past' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                         Past Events
                     </button>

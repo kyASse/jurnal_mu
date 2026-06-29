@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -66,7 +66,10 @@ export default function Edit({ announcement }: Props) {
 
             <div className="mx-auto max-w-4xl p-6">
                 <div className="mb-6 flex items-center justify-between">
-                    <Link href={route('admin.announcements.index')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#079C4E] hover:underline">
+                    <Link
+                        href={route('admin.announcements.index')}
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#079C4E] hover:underline"
+                    >
                         <ArrowLeft className="h-4 w-4" /> Back to List
                     </Link>
                 </div>
@@ -111,9 +114,14 @@ export default function Edit({ announcement }: Props) {
 
                             <div>
                                 <Label htmlFor="attachment">Document Attachment (Upload to replace. Max 5MB)</Label>
-                                <Input id="attachment" type="file" onChange={(e) => setData('attachment', e.target.files ? e.target.files[0] : null)} className="mt-1" />
+                                <Input
+                                    id="attachment"
+                                    type="file"
+                                    onChange={(e) => setData('attachment', e.target.files ? e.target.files[0] : null)}
+                                    className="mt-1"
+                                />
                                 {announcement.attachment_name && (
-                                    <span className="text-xs text-muted-foreground block mt-1">Current: {announcement.attachment_name}</span>
+                                    <span className="mt-1 block text-xs text-muted-foreground">Current: {announcement.attachment_name}</span>
                                 )}
                             </div>
                         </div>
@@ -126,16 +134,32 @@ export default function Edit({ announcement }: Props) {
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
                                 <Label htmlFor="published_at">Schedule Publish Date</Label>
-                                <Input id="published_at" type="datetime-local" value={data.published_at} onChange={(e) => setData('published_at', e.target.value)} className="mt-1" />
+                                <Input
+                                    id="published_at"
+                                    type="datetime-local"
+                                    value={data.published_at}
+                                    onChange={(e) => setData('published_at', e.target.value)}
+                                    className="mt-1"
+                                />
                             </div>
 
                             <div className="flex items-center gap-6 pt-6">
                                 <label className="flex items-center space-x-2">
-                                    <input type="checkbox" checked={data.is_pinned} onChange={(e) => setData('is_pinned', e.target.checked)} className="h-4 w-4 text-emerald-600" />
+                                    <input
+                                        type="checkbox"
+                                        checked={data.is_pinned}
+                                        onChange={(e) => setData('is_pinned', e.target.checked)}
+                                        className="h-4 w-4 text-emerald-600"
+                                    />
                                     <span className="text-sm">Pin to Top</span>
                                 </label>
                                 <label className="flex items-center space-x-2">
-                                    <input type="checkbox" checked={data.is_active} onChange={(e) => setData('is_active', e.target.checked)} className="h-4 w-4 text-emerald-600" />
+                                    <input
+                                        type="checkbox"
+                                        checked={data.is_active}
+                                        onChange={(e) => setData('is_active', e.target.checked)}
+                                        className="h-4 w-4 text-emerald-600"
+                                    />
                                     <span className="text-sm">Published Status (Active)</span>
                                 </label>
                             </div>
@@ -143,7 +167,9 @@ export default function Edit({ announcement }: Props) {
 
                         <div className="flex justify-end gap-4 border-t pt-6">
                             <Link href={route('admin.announcements.index')}>
-                                <Button variant="outline" type="button">Cancel</Button>
+                                <Button variant="outline" type="button">
+                                    Cancel
+                                </Button>
                             </Link>
                             <Button type="submit" disabled={processing} className="bg-[#079C4E] hover:bg-[#068A44]">
                                 <Save className="mr-2 h-4 w-4" /> Save Changes

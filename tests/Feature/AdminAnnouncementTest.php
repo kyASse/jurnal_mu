@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\Announcement;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,12 +27,12 @@ it('allows super admin to create announcement with attachment', function () {
     ]);
 
     $response->assertRedirect(route('admin.announcements.index'));
-    
+
     $announcement = Announcement::first();
     expect($announcement->title)->toBe('Official Announcement')
         ->and($announcement->tags)->toEqual(['Policy', 'Update'])
         ->and($announcement->attachment_name)->toBe('document.pdf');
-        
+
     Storage::disk('local')->assertExists($announcement->attachment_path);
 });
 

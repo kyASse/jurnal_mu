@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Journal;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
@@ -40,7 +41,7 @@ it('allows super admin to export universities to csv', function () {
         'role_id' => $roleId,
     ]);
 
-    \App\Models\Journal::factory()->create([
+    Journal::factory()->create([
         'university_id' => $this->university->id,
         'user_id' => $user->id,
     ]);
@@ -69,7 +70,7 @@ it('allows super admin to export universities to csv', function () {
     expect($csvContent)->toContain('Original University Name');
     expect($csvContent)->toContain('ORIG');
 
-    $lines = explode("\n", str_replace("\r", "", $csvContent));
+    $lines = explode("\n", str_replace("\r", '', $csvContent));
     $univRow = collect($lines)->first(fn ($line) => str_contains($line, 'Original University Name'));
     expect($univRow)->not->toBeNull();
 

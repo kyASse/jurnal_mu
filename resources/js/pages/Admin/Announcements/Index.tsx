@@ -141,7 +141,9 @@ export default function Index({ announcements, filters }: Props) {
                                             <TableCell>{item.views} views</TableCell>
                                             <TableCell className="text-center">
                                                 <Button variant="ghost" size="sm" onClick={() => togglePinned(item.id)}>
-                                                    <Pin className={`h-4 w-4 ${item.is_pinned ? 'text-amber-500 fill-current' : 'text-gray-300 dark:text-zinc-700'}`} />
+                                                    <Pin
+                                                        className={`h-4 w-4 ${item.is_pinned ? 'fill-current text-amber-500' : 'text-gray-300 dark:text-zinc-700'}`}
+                                                    />
                                                 </Button>
                                             </TableCell>
                                             <TableCell className="text-center">
@@ -244,7 +246,7 @@ export default function Index({ announcements, filters }: Props) {
                                                 </p>
                                             </div>
                                             {item.is_pinned && (
-                                                <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 flex gap-1 items-center">
+                                                <Badge className="flex items-center gap-1 bg-amber-100 text-amber-800 hover:bg-amber-100">
                                                     <Pin className="h-3 w-3 fill-current" />
                                                     Pinned
                                                 </Badge>
