@@ -21,7 +21,7 @@ export default function PublicNavbar() {
     const [open, setOpen] = useState(false);
 
     return (
-        <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#079C4E] text-white backdrop-blur-md transition-all">
+        <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-primary text-white backdrop-blur-md transition-all">
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-3">
                     <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
@@ -54,7 +54,7 @@ export default function PublicNavbar() {
 
                         {auth?.user ? (
                             <Link href={route('dashboard')}>
-                                <Button variant="secondary" className="border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100">
+                                <Button variant="secondary" className="border-0 bg-white font-bold text-primary hover:bg-gray-100">
                                     <LayoutDashboard className="mr-2 h-4 w-4" />
                                     <span>Dashboard</span>
                                 </Button>
@@ -67,7 +67,7 @@ export default function PublicNavbar() {
                                     </Button>
                                 </Link>
                                 <Link href={route('register')}>
-                                    <Button className="border-0 bg-[#FCEE1F] px-3 font-bold text-black hover:bg-[#e3d51b] sm:px-4">Register</Button>
+                                    <Button className="border-0 bg-accent-gradient px-3 font-bold text-white hover:bg-accent-gradient/90 sm:px-4">Register</Button>
                                 </Link>
                             </>
                         )}
@@ -83,7 +83,7 @@ export default function PublicNavbar() {
                         </SheetTrigger>
                         <SheetContent
                             side="right"
-                            className="flex w-[300px] flex-col justify-between border-white/10 bg-[#079C4E] p-6 text-white sm:max-w-sm"
+                            className="flex w-[300px] flex-col justify-between border-white/10 bg-primary p-6 text-white sm:max-w-sm"
                         >
                             <div className="flex flex-col gap-6">
                                 <SheetHeader className="border-b border-white/10 p-0 pb-4">
@@ -123,7 +123,7 @@ export default function PublicNavbar() {
                                         <Link href={route('dashboard')} onClick={() => setOpen(false)}>
                                             <Button
                                                 variant="secondary"
-                                                className="w-full border-0 bg-white font-bold text-[#079C4E] hover:bg-gray-100"
+                                                className="w-full border-0 bg-white font-bold text-primary   hover:bg-gray-100"
                                             >
                                                 <LayoutDashboard className="mr-2 h-4 w-4" />
                                                 Dashboard
@@ -132,12 +132,12 @@ export default function PublicNavbar() {
                                     ) : (
                                         <>
                                             <Link href={route('login')} onClick={() => setOpen(false)}>
-                                                <Button variant="ghost" className="w-full text-white hover:bg-white/20 hover:text-white">
+                                                <Button variant="ghost" className="w-full border border-white text-white hover:bg-white/20 hover:text-white">
                                                     Log in
                                                 </Button>
                                             </Link>
                                             <Link href={route('register')} onClick={() => setOpen(false)}>
-                                                <Button className="w-full border-0 bg-[#FCEE1F] font-bold text-black hover:bg-[#e3d51b]">
+                                                <Button className="w-full border-0 bg-accent-gradient font-bold text-white hover:bg-accent-gradient/90">
                                                     Register
                                                 </Button>
                                             </Link>
