@@ -203,6 +203,51 @@ export default function Dashboard({ stats, statistics, announcements = [] }: Das
                     </div>
                 )}
 
+                {/* University Distribution Table (Super Admin Only) */}
+                {isSuperAdmin && stats.universities_distribution && stats.universities_distribution.length > 0 && (
+                    <div className="mt-2 rounded-xl border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-neutral-950">
+                        <div className="flex items-center justify-between border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
+                            <div>
+                                <h3 className="text-lg font-semibold">Distribusi Jurnal per Universitas</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Top {Math.min(10, stats.universities_distribution.length)} universitas dengan jurnal terbanyak
+                                </p>
+                            </div>
+                            {stats.universities_distribution.length > 10 && (
+                                <Link href="/admin/universities" className="text-sm font-medium text-primary hover:underline">
+                                    Lihat Semua ({stats.universities_distribution.length})
+                                </Link>
+                            )}
+                        </div>
+                        <div className="min-w-full overflow-x-auto">
+                            <table className="w-full min-w-[600px]">
+                                <thead className="border-b border-sidebar-border/70 dark:border-sidebar-border">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">#</th>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">Universitas</th>
+                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">Jumlah Jurnal</th>
+                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">Persentase</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-sidebar-border/70 dark:divide-sidebar-border">
+                                    {stats.universities_distribution.slice(0, 10).map((university, index) => {
+                                        const percentage =
+                                            stats.total_journals > 0 ? ((university.count / stats.total_journals) * 100).toFixed(1) : '0.0';
+                                        return (
+                                            <tr key={university.id} className="transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
+                                                <td className="px-6 py-4 text-sm text-muted-foreground">{index + 1}</td>
+                                                <td className="px-6 py-4 text-sm font-medium">{university.name}</td>
+                                                <td className="px-6 py-4 text-right text-sm font-semibold">{university.count}</td>
+                                                <td className="px-6 py-4 text-right text-sm text-muted-foreground">{percentage}%</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
                 {/* Announcements Widget */}
                 {announcements && announcements.length > 0 && (
                     <div className="mt-2 rounded-xl border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-neutral-950">
@@ -268,51 +313,6 @@ export default function Dashboard({ stats, statistics, announcements = [] }: Das
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* University Distribution Table (Super Admin Only) */}
-                {isSuperAdmin && stats.universities_distribution && stats.universities_distribution.length > 0 && (
-                    <div className="mt-2 rounded-xl border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-neutral-950">
-                        <div className="flex items-center justify-between border-b border-sidebar-border/70 p-6 dark:border-sidebar-border">
-                            <div>
-                                <h3 className="text-lg font-semibold">Distribusi Jurnal per Universitas</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Top {Math.min(10, stats.universities_distribution.length)} universitas dengan jurnal terbanyak
-                                </p>
-                            </div>
-                            {stats.universities_distribution.length > 10 && (
-                                <Link href="/admin/universities" className="text-sm font-medium text-primary hover:underline">
-                                    Lihat Semua ({stats.universities_distribution.length})
-                                </Link>
-                            )}
-                        </div>
-                        <div className="min-w-full overflow-x-auto">
-                            <table className="w-full min-w-[600px]">
-                                <thead className="border-b border-sidebar-border/70 dark:border-sidebar-border">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">#</th>
-                                        <th className="px-6 py-3 text-left text-sm font-medium text-muted-foreground">Universitas</th>
-                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">Jumlah Jurnal</th>
-                                        <th className="px-6 py-3 text-right text-sm font-medium text-muted-foreground">Persentase</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-sidebar-border/70 dark:divide-sidebar-border">
-                                    {stats.universities_distribution.slice(0, 10).map((university, index) => {
-                                        const percentage =
-                                            stats.total_journals > 0 ? ((university.count / stats.total_journals) * 100).toFixed(1) : '0.0';
-                                        return (
-                                            <tr key={university.id} className="transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
-                                                <td className="px-6 py-4 text-sm text-muted-foreground">{index + 1}</td>
-                                                <td className="px-6 py-4 text-sm font-medium">{university.name}</td>
-                                                <td className="px-6 py-4 text-right text-sm font-semibold">{university.count}</td>
-                                                <td className="px-6 py-4 text-right text-sm text-muted-foreground">{percentage}%</td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 )}
