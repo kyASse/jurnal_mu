@@ -269,7 +269,6 @@ export default function Welcome() {
                                 <Button
                                     type="submit"
                                     className="h-11 flex-shrink-0 rounded-full bg-secondary px-6 text-white hover:bg-secondary/90 disabled:opacity-70"
-                                    onClick={handleSearch}
                                     disabled={isSearching}
                                 >
                                     {isSearching ? 'Loading...' : 'Search'}
