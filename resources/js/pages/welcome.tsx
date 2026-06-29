@@ -173,10 +173,7 @@ export default function Welcome() {
                         <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-accent opacity-10 mix-blend-overlay blur-3xl"></div>
                         <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-secondary opacity-20 mix-blend-multiply blur-3xl"></div>
 
-                        <div
-                            className="absolute inset-0 opacity-5"
-                            style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}
-                        ></div>
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
                     </div>
 
                     <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-28">
