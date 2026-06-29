@@ -78,4 +78,12 @@ describe('Welcome Page Redesign', () => {
         expect(content).not.toContain('#1a2a75');
         expect(content).not.toContain('#fcee1f');
     });
+
+    it('should contain the transparent cube pattern in welcome.tsx', () => {
+        const welcomePath = path.resolve(__dirname, '../welcome.tsx');
+        const content = fs.readFileSync(welcomePath, 'utf8');
+        // Assert that at least two occurrences of the cube pattern exist (one for CTA, one for Hero)
+        const occurrences = (content.match(/bg-\[url\('https:\/\/www\.transparenttextures\.com\/patterns\/cubes\.png'\)\]/g) || []).length;
+        expect(occurrences).toBeGreaterThanOrEqual(2);
+    });
 });
