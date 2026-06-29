@@ -33,6 +33,7 @@ class Agenda extends Model
         'location_link',
         'registration_link',
         'price',
+        'currency',
         'quota',
         'contact_person_name',
         'contact_person_phone',
