@@ -1,8 +1,8 @@
 # JurnalMu Operational Runbook
 
-**Version:** 1.0  
-**Last Updated:** February 17, 2026  
-**Applicable To:** v1.1+ Production Environment  
+**Version:** 1.2  
+**Last Updated:** June 30, 2026  
+**Applicable To:** v1.2+ Production Environment  
 **Owner:** Development & Operations Team
 
 ---
@@ -36,7 +36,7 @@ This runbook provides step-by-step procedures for common operational tasks, inci
 **Checklist:**
 ```bash
 # 1. Check application status
-curl https://journalmu.org/health
+curl https://jurnalmu.org/health
 # Expected: {"status":"healthy"}
 
 # 2. Check error logs
@@ -59,15 +59,25 @@ php artisan tinker
 >>> exit
 # Expected: PDO connection object
 
-# 6. Verify queue worker is running
+# 6. Verify queue workers are running
 ps aux | grep "queue:work"
-# Expected: Process running
+# Expected: Process running for default queue and harvesting queue
 
 # 7. Check recent backups
 ls -lh storage/app/backups/ | head -5
 # or
 ls -lh /path/to/backup/location/
 # Expected: Backup from today or yesterday
+
+# 8. Check OAI-PMH harvesting logs for failures
+php artisan oai:logs
+# Expected: Recent runs, review any "failed" status logs
+
+# 9. Check CSV imports for failures
+php artisan tinker
+>>> DB::table('csv_imports')->where('status', 'failed')->count();
+>>> exit
+# Expected: 0 (investigate if > 0)
 ```
 
 **If any check fails:**
@@ -87,10 +97,12 @@ php artisan tinker
 >>> DB::table('journals')->whereDate('created_at', today())->count();
 >>> DB::table('journal_assessments')->whereDate('created_at', today())->count();
 >>> DB::table('users')->whereDate('created_at', today())->count();
+>>> DB::table('tickets')->whereDate('created_at', today())->count();
+>>> DB::table('articles')->whereDate('created_at', today())->count();
 >>> exit
 
 # Log summary in operations log
-echo "$(date): Journals: X, Assessments: Y, New Users: Z" >> /var/log/jurnal_mu_ops.log
+echo "$(date): Journals: J, Assessments: A, Users: U, Tickets: T, Articles: H" >> /var/log/jurnal_mu_ops.log
 ```
 
 ---
@@ -165,6 +177,8 @@ php artisan tinker
 >>> echo "Assessments Submitted: " . DB::table('journal_assessments')->where('status', 'submitted')->whereBetween('created_at', [$weekStart, $weekEnd])->count() . "\n";
 >>> echo "New Users: " . DB::table('users')->whereBetween('created_at', [$weekStart, $weekEnd])->count() . "\n";
 >>> echo "Active Universities: " . DB::table('users')->where('is_active', true)->distinct('university_id')->count() . "\n";
+>>> echo "Support Tickets Opened: " . DB::table('tickets')->whereBetween('created_at', [$weekStart, $weekEnd])->count() . "\n";
+>>> echo "Articles Sync Status (Harvested): " . DB::table('articles')->whereBetween('created_at', [$weekStart, $weekEnd])->count() . "\n";
 >>> exit
 ```
 
@@ -197,7 +211,7 @@ npm update
 # - Memory usage peaks
 
 # 3. Database Optimization
-mysql -u root -p jurnal_mu -e "OPTIMIZE TABLE journals, journal_assessments, users;"
+mysql -u root -p jurnal_mu -e "OPTIMIZE TABLE journals, journal_assessments, users, agendas, tickets, ticket_messages, news, csv_imports, articles, oai_harvesting_logs;"
 
 # 4. Log Rotation
 find storage/logs/*.log -mtime +30 -delete
@@ -670,28 +684,37 @@ php artisan tinker
 ### Scenario 3: Queue Worker Crashed
 
 **Symptoms:**
-- Emails not being sent
-- Background jobs not processing
+- Emails/notifications not being sent (default queue)
+- OAI-PMH sync or CSV imports stuck in "pending" or "processing" (harvesting queue)
 - Failed jobs accumulating
 
 **Fix:**
 ```bash
-# 1. Check if worker is running
+# 1. Check if workers are running
 ps aux | grep "queue:work"
+# Ensure processes for both --queue=default and --queue=harvesting exist
 
-# 2. If not running, start it
+# 2. If not running and using Supervisor (recommended)
+# Check worker status
+sudo supervisorctl status
+
+# Restart workers
+sudo supervisorctl restart jurnal-mu-worker:*
+sudo supervisorctl restart jurnal_mu-harvesting:*
+
+# 3. If running manually (development/emergency)
 cd /path/to/jurnal_mu
-nohup php artisan queue:work --tries=3 --timeout=90 > storage/logs/queue.log 2>&1 &
-
-# 3. If using Supervisor (recommended)
-sudo supervisorctl status jurnal-mu-worker
-sudo supervisorctl restart jurnal-mu-worker
+# Start default worker
+nohup php artisan queue:work database --queue=default --tries=3 --timeout=90 > storage/logs/queue.log 2>&1 &
+# Start harvesting worker
+nohup php artisan queue:work database --queue=harvesting --sleep=3 --tries=3 --max-time=3600 > storage/logs/worker-harvesting.log 2>&1 &
 
 # 4. Process failed jobs
 php artisan queue:retry all
 
-# 5. Monitor for 15 minutes
-tail -f storage/logs/queue.log
+# 5. Monitor logs
+tail -f storage/logs/laravel.log
+tail -f storage/logs/worker-harvesting.log
 ```
 
 **Prevention:**
@@ -958,7 +981,7 @@ Track weekly:
 
 ---
 
-**Document Version:** 1.0  
+**Document Version:** 1.2  
 **Created:** February 17, 2026  
-**Last Updated:** February 17, 2026  
-**Next Review:** May 17, 2026
+**Last Updated:** June 30, 2026  
+**Next Review:** September 30, 2026
