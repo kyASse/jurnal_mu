@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![JurnalMu Landing Page](https://github.com/user-attachments/assets/3c6c0520-84a2-421d-b116-b87eea4669e1)
+![JurnalMu Landing Page](docs/screenshots/landing_page_screenshot.png)
 
 **Platform Manajemen Jurnal Ilmiah untuk Perguruan Tinggi Muhammadiyah (PTM) se-Indonesia**
 
@@ -31,52 +31,53 @@
 
 ## Fitur Utama
 
+### Halaman Publik (Public Page)
+- **Landing Page / Homepage**: Hero section modern, pencarian cepat, statistik dinamis (distribusi SINTA, total jurnal & universitas), dan daftar jurnal unggulan.
+- **Journal Explorer**: Fitur pencarian dan filter interaktif berdasarkan universitas, bidang keilmuan, peringkat SINTA, akreditasi DIKTI, dan platform indeksasi (Scopus, DOAJ, dll).
+- **Detail Jurnal Akademik**: Menampilkan informasi lengkap jurnal, profil dewan redaksi, cakupan keilmuan, status akreditasi, data indeksasi, tombol sitasi interaktif (mendukung gaya APA, Harvard, MLA, dll), serta daftar artikel terbaru.
+- **Events & Agenda Portal**: Portal agenda PTM dengan filter lokasi dan universitas, countdown timer waktu kegiatan, detail kuota, sistem deteksi harga tiket (multi-mata uang), serta integrasi link pendaftaran.
+- **Announcements System**: Halaman informasi terpusat untuk pengumuman penting terkait pengelolaan jurnal PTM.
+- **Responsive Navigation**: Desain menu ramah perangkat seluler (mobile sheet navigation) dan fitur toggle tema (Light/Dark).
+
 ### Authentication & Authorization
-- Login dengan email/password
-- **Google OAuth Integration** untuk kemudahan akses
-- Role-based access control (RBAC) dengan 3 level:
-  - **Super Admin**: Akses penuh ke semua data PTM
-  - **Admin Kampus**: Mengelola jurnal dan user di kampusnya
-  - **User (Pengelola Jurnal)**: Mengelola jurnal yang ditugaskan
+- Login aman menggunakan email/password.
+- **Integrasi Google OAuth** untuk kemudahan pendaftaran & masuk sistem.
+- Role-Based Access Control (RBAC) dengan 4 level otorisasi:
+  - **Super Admin**: Otoritas penuh untuk konfigurasi sistem, universitas, user, pengumuman, dan data master.
+  - **Admin Kampus**: Mengelola data jurnal, mengundang user/reviewer, menetapkan tugas review, serta memonitor progres evaluasi di tingkat universitas.
+  - **User (Pengelola Jurnal)**: Mengelola profil jurnal, melakukan sinkronisasi metadata OAI-PMH, dan mengajukan evaluasi borang mandiri.
+  - **Reviewer**: Akses dashboard penilaian, mengisi borang skor indikator, memberikan feedback naratif, dan mengunggah dokumen review.
 
-### Dashboard Role-Based
-- Statistik yang disesuaikan berdasarkan role pengguna
-- Ringkasan data jurnal, asesmen, dan skor rata-rata
-- Monitoring status self-assessment
+### Dashboard & Monitoring
+- Dashboard statistik dinamis yang disesuaikan untuk masing-masing role pengguna.
+- Visualisasi skor rata-rata asesmen jurnal dan monitoring status borang evaluasi.
+- Grafik distribusi jurnal dan keaktifan universitas PTM se-Indonesia (Super Admin).
 
-### Manajemen Universitas (Super Admin)
-- CRUD Perguruan Tinggi Muhammadiyah
-- Data lengkap: nama, kode, alamat, kontak, logo
-- Search dan filter berdasarkan status
+### Manajemen Data Master & Universitas
+- Manajemen Perguruan Tinggi Muhammadiyah (PTM): data identitas lengkap, logo instansi, serta ekspor data beserta statistik jurnal & user.
+- Manajemen Bidang Keilmuan secara hierarki (parent-child relationship).
+- Manajemen Pengumuman dan Agendas/Events (CRUD & upload thumbnail).
+- Fitur sorting interaktif dan ekspor data universitas.
 
-### Manajemen Admin Kampus (Super Admin)
-- CRUD Administrator untuk setiap PTM
-- Assignment admin ke universitas tertentu
-- Tracking aktivitas dan last login
+### OAI-PMH Article Harvester & Sync
+- Modul otomatisasi pengumpulan artikel akademik langsung dari OAI-PMH provider eksternal.
+- Pemetaan metadata Dublin Core (judul, penulis, deskripsi, tanggal terbit, dsb) ke dalam database JurnalMu.
+- Fitur manual harvest, scheduled queue harvesting (menggunakan supervisor/worker queue), dan opsi **Force Sync** untuk menghindari redundansi data.
 
-### Manajemen User/Pengelola Jurnal (Admin Kampus)
-- CRUD User yang di-scope ke universitas sendiri
-- Assign pengelola ke jurnal tertentu
-- Monitoring aktivitas pengelola
+### Self-Assessment & Review Workflow
+- Borang evaluasi mandiri jurnal dengan 12 indikator penilaian yang dibagi ke dalam 3 kategori (Kelengkapan Administrasi, Kualitas Konten, dan Proses Editorial).
+- Perhitungan skor otomatis dan status penyerahan borang (Draft, Submitted, Under Review, Approved).
+- **Reviewer Workspace**: Antarmuka penilaian layar terpisah (split-screen) antara detail pengajuan jurnal dengan formulir input nilai & feedback dewan penilai.
+- Alur persetujuan terstruktur (approval workflow) dari reviewer hingga level admin.
 
-### Manajemen Jurnal (User)
-- Input data jurnal lengkap (ISSN, E-ISSN, URL, dll)
-- Klasifikasi berdasarkan bidang ilmu
-- Status akreditasi dan peringkat SINTA
+### Pembinaan Jurnal (Coaching)
+- Modul asistensi dan pembinaan terpadu untuk meningkatkan kualitas jurnal.
+- Penugasan mentor pembimbing ke jurnal-jurnal tertentu.
+- Riwayat komunikasi, saran, dan tracking progres peningkatan standar jurnal menuju akreditasi nasional/internasional.
 
-### Self-Assessment (User)
-- Borang evaluasi dengan 12 indikator penilaian
-- 3 kategori utama:
-  - Kelengkapan Administrasi
-  - Kualitas Konten
-  - Proses Editorial
-- Auto-calculate skor total
-- Status draft/submitted untuk tracking progress
-
-### Settings & Profile
-- Update profil pengguna
-- Ubah password
-- Pengaturan tema (Light/Dark/System)
+### Fitur Pengaturan & Profil
+- Pembaruan informasi profil pribadi dan penggantian password.
+- Pengaturan preferensi tema (Light, Dark, System) yang responsif.
 
 ---
 
@@ -200,17 +201,6 @@ composer dev
 
 ---
 
-## Default Credentials
-
-Setelah menjalankan seeder, gunakan kredensial berikut untuk testing:
-
-| Role | Email | Password |
-|------|-------|----------|
-| Super Admin | `superadmin@ajm.ac.id` | `password123` |
-| Admin Kampus (UAD) | `admin.uad@ajm.ac.id` | `password123` |
-| User (Pengelola Jurnal) | `andi.prasetyo@uad.ac.id` | `password123` |
-
----
 
 ## Project Structure
 

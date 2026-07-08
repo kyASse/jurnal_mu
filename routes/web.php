@@ -83,6 +83,97 @@ Route::get('/storage/{path}', function (string $path) {
     }
 })->where('path', '.+')->name('storage.serve');
 
+Route::get('/health', function () {
+    $status = 'healthy';
+    $services = [
+        'database' => 'unknown',
+        'cache' => 'unknown',
+        'storage' => 'unknown',
+        'app_key' => 'unknown',
+    ];
+    $errors = [];
+
+    // 1. Check App Key
+    if (!empty(config('app.key'))) {
+        $services['app_key'] = 'configured';
+    } else {
+        $services['app_key'] = 'missing';
+        $status = 'unhealthy';
+        $errors[] = 'APP_KEY is not configured';
+    }
+
+    // 2. Check Database Connection & Responsiveness
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        \Illuminate\Support\Facades\DB::select('SELECT 1');
+        $services['database'] = 'connected';
+    } catch (\Exception $e) {
+        $services['database'] = 'disconnected';
+        $status = 'unhealthy';
+        $errors[] = 'Database error: ' . $e->getMessage();
+    }
+
+    // 3. Check Cache Service (Write & Read Test)
+    try {
+        \Illuminate\Support\Facades\Cache::put('health_check_temp', true, 10);
+        $cacheWorking = \Illuminate\Support\Facades\Cache::get('health_check_temp') === true;
+        \Illuminate\Support\Facades\Cache::forget('health_check_temp');
+
+        $services['cache'] = $cacheWorking ? 'working' : 'non-functional';
+        if (!$cacheWorking) {
+            $status = 'unhealthy';
+            $errors[] = 'Cache read/write test failed';
+        }
+    } catch (\Exception $e) {
+        $services['cache'] = 'error';
+        $status = 'unhealthy';
+        $errors[] = 'Cache error: ' . $e->getMessage();
+    }
+
+    // 4. Check Storage Write Permission
+    try {
+        $tempFile = storage_path('app/health_check_test.txt');
+        if (@file_put_contents($tempFile, 'health') !== false) {
+            @unlink($tempFile);
+            $services['storage'] = 'writable';
+        } else {
+            $services['storage'] = 'read-only';
+            $status = 'unhealthy';
+            $errors[] = 'Storage directory is not writable';
+        }
+    } catch (\Exception $e) {
+        $services['storage'] = 'error';
+        $status = 'unhealthy';
+        $errors[] = 'Storage error: ' . $e->getMessage();
+    }
+
+    // 5. Check Queue backlog
+    try {
+        if ($services['database'] === 'connected') {
+            $pendingJobs = \Illuminate\Support\Facades\DB::table('jobs')->count();
+            $failedJobs = \Illuminate\Support\Facades\DB::table('failed_jobs')->count();
+            $services['queue'] = [
+                'pending_jobs' => $pendingJobs,
+                'failed_jobs' => $failedJobs,
+            ];
+        }
+    } catch (\Exception $e) {
+        $services['queue'] = 'error';
+    }
+
+    $response = [
+        'status' => $status,
+        'timestamp' => now()->toIso8601String(),
+        'services' => $services,
+    ];
+
+    if (!empty($errors)) {
+        $response['errors'] = $errors;
+    }
+
+    return response()->json($response, $status === 'healthy' ? 200 : 500);
+});
+
 //  Laman Page
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
