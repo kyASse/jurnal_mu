@@ -44,6 +44,15 @@ Dokumentasi fitur-fitur dan implementasinya
   - `PEMBINAAN_CONTROLLERS_IMPLEMENTATION.md`
   - `PEMBINAAN_QUICK_REFERENCE.md`
 
+- **Langganan DOI & Similarity Check** ✨ **NEW**
+  - `doi-subscription/README.md` - Index modul langganan DOI
+  - `doi-subscription/PRD.md` - Product Requirements Document
+  - `doi-subscription/ARCHITECTURE.md` - System Architecture & Security
+  - `doi-subscription/SCHEMA.md` - Database Schema & ERD
+  - `doi-subscription/ALGORITHM.md` - Business Logic & State Machine
+  - `doi-subscription/UI_DESIGN.md` - UI/UX Design System & Wireframes
+  - `doi-subscription/TESTING_LOGS.md` - QA & Test Execution Matrix
+
 - **Lainnya**
   - `BROWSE_UNIVERSITIES_IMPLEMENTATION.md` - Fitur browse universitas
   - `CACHE_IMPLEMENTATION_SUMMARY.md` - Implementasi cache
