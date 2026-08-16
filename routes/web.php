@@ -19,6 +19,8 @@ use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
+use App\Http\Controllers\AdminKampus\DoiInvoiceController as AdminKampusDoiInvoiceController;
+use App\Http\Controllers\AdminKampus\DoiPaymentProofController as AdminKampusDoiPaymentProofController;
 use App\Http\Controllers\AdminKampus\DoiSubscriptionController as AdminKampusDoiSubscriptionController;
 use App\Http\Controllers\AdminKampus\JournalApprovalController;
 use App\Http\Controllers\AdminKampus\JournalController as AdminKampusJournalController;
@@ -44,6 +46,8 @@ use App\Http\Controllers\ReviewerController as MainReviewerController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\AssessmentIssueController;
+use App\Http\Controllers\User\DoiInvoiceController as UserDoiInvoiceController;
+use App\Http\Controllers\User\DoiPaymentProofController as UserDoiPaymentProofController;
 use App\Http\Controllers\User\DoiSubscriptionController as UserDoiSubscriptionController;
 use App\Http\Controllers\User\JournalController as UserJournalController;
 use App\Http\Controllers\User\PembinaanController as UserPembinaanController;
@@ -607,9 +611,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\AdminKampus\TicketController::class, 'reply'])->name('tickets.reply');
         Route::patch('tickets/{ticket}/status', [App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
 
-        // DOI Subscription Dashboard
+        // DOI Subscription Dashboard & Invoices
         Route::get('doi-subscription', [AdminKampusDoiSubscriptionController::class, 'index'])
             ->name('doi-subscription.index');
+
+        Route::prefix('doi')->name('doi.')->group(function () {
+            Route::get('invoices', [AdminKampusDoiInvoiceController::class, 'index'])->name('invoices.index');
+            Route::get('invoices/{invoice}', [AdminKampusDoiInvoiceController::class, 'show'])->name('invoices.show');
+            Route::post('invoices/{invoice}/payment-proof', [AdminKampusDoiPaymentProofController::class, 'store'])->name('invoices.payment-proof.store');
+            Route::get('payment-proofs/{paymentProof}', [AdminKampusDoiPaymentProofController::class, 'show'])->name('payment-proofs.show');
+        });
 
         // API Location lookup
         Route::get('locations/provinces', [LocationController::class, 'provinces'])
@@ -735,9 +746,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\User\TicketController::class, 'reply'])
             ->name('tickets.reply');
 
-        // DOI Subscription Dashboard
+        // DOI Subscription Dashboard & Invoices
         Route::get('doi-subscription', [UserDoiSubscriptionController::class, 'index'])
             ->name('doi-subscription.index');
+
+        Route::prefix('doi')->name('doi.')->group(function () {
+            Route::get('invoices', [UserDoiInvoiceController::class, 'index'])->name('invoices.index');
+            Route::get('invoices/{invoice}', [UserDoiInvoiceController::class, 'show'])->name('invoices.show');
+            Route::post('invoices/{invoice}/payment-proof', [UserDoiPaymentProofController::class, 'store'])->name('invoices.payment-proof.store');
+            Route::get('payment-proofs/{paymentProof}', [UserDoiPaymentProofController::class, 'show'])->name('payment-proofs.show');
+        });
     });
 
     /*
