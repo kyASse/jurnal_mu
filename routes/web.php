@@ -621,6 +621,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('invoices/{invoice}/payment-proof', [AdminKampusDoiPaymentProofController::class, 'store'])->name('invoices.payment-proof.store');
             Route::get('payment-proofs/{paymentProof}', [AdminKampusDoiPaymentProofController::class, 'show'])->name('payment-proofs.show');
         });
+        Route::get('doi-subscription/invoices', fn () => redirect()->route('admin-kampus.doi.invoices.index'));
+        Route::get('doi-subscription/invoices/{invoice}', fn ($invoice) => redirect()->route('admin-kampus.doi.invoices.show', $invoice));
 
         // API Location lookup
         Route::get('locations/provinces', [LocationController::class, 'provinces'])
@@ -756,6 +758,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('invoices/{invoice}/payment-proof', [UserDoiPaymentProofController::class, 'store'])->name('invoices.payment-proof.store');
             Route::get('payment-proofs/{paymentProof}', [UserDoiPaymentProofController::class, 'show'])->name('payment-proofs.show');
         });
+        Route::get('doi-subscription/invoices', fn () => redirect()->route('user.doi.invoices.index'));
+        Route::get('doi-subscription/invoices/{invoice}', fn ($invoice) => redirect()->route('user.doi.invoices.show', $invoice));
     });
 
     /*
