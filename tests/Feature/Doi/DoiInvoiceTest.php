@@ -133,7 +133,7 @@ class DoiInvoiceTest extends TestCase
 
     public function test_admin_kampus_can_upload_payment_proof_for_unpaid_invoice(): void
     {
-        Storage::fake('local');
+        Storage::fake('doi_proofs');
 
         $file = UploadedFile::fake()->create('receipt.pdf', 500, 'application/pdf');
 
@@ -163,12 +163,12 @@ class DoiInvoiceTest extends TestCase
 
         $proof = DoiPaymentProof::where('invoice_id', $this->invoice->id)->first();
         $this->assertNotNull($proof);
-        Storage::disk('local')->assertExists($proof->file_path);
+        Storage::disk('doi_proofs')->assertExists($proof->file_path);
     }
 
     public function test_upload_payment_proof_validates_mime_and_size(): void
     {
-        Storage::fake('local');
+        Storage::fake('doi_proofs');
 
         // Invalid MIME type (text file)
         $invalidFile = UploadedFile::fake()->create('document.txt', 100, 'text/plain');
@@ -203,9 +203,9 @@ class DoiInvoiceTest extends TestCase
 
     public function test_admin_kampus_can_stream_own_payment_proof(): void
     {
-        Storage::fake('local');
+        Storage::fake('doi_proofs');
         $filePath = 'doi/payment_proofs/test_receipt.pdf';
-        Storage::disk('local')->put($filePath, 'fake pdf content');
+        Storage::disk('doi_proofs')->put($filePath, 'fake pdf content');
 
         $proof = DoiPaymentProof::create([
             'invoice_id' => $this->invoice->id,
@@ -230,9 +230,9 @@ class DoiInvoiceTest extends TestCase
 
     public function test_user_cannot_access_other_university_payment_proof(): void
     {
-        Storage::fake('local');
+        Storage::fake('doi_proofs');
         $filePath = 'doi/payment_proofs/other_receipt.pdf';
-        Storage::disk('local')->put($filePath, 'fake pdf content');
+        Storage::disk('doi_proofs')->put($filePath, 'fake pdf content');
 
         $proof = DoiPaymentProof::create([
             'invoice_id' => $this->invoice->id,
@@ -263,7 +263,7 @@ class DoiInvoiceTest extends TestCase
 
     public function test_cannot_upload_payment_proof_for_paid_invoice(): void
     {
-        Storage::fake('local');
+        Storage::fake('doi_proofs');
         $this->invoice->update(['status' => InvoiceStatus::PAID]);
 
         $file = UploadedFile::fake()->create('receipt.pdf', 500, 'application/pdf');

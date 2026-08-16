@@ -40,11 +40,11 @@ class DoiPaymentProofController extends Controller
     {
         $this->authorize('view', $paymentProof);
 
-        if (! Storage::disk('local')->exists($paymentProof->file_path)) {
+        if (! Storage::disk('doi_proofs')->exists($paymentProof->file_path)) {
             abort(404, 'File bukti pembayaran tidak ditemukan.');
         }
 
-        return Storage::disk('local')->response(
+        return Storage::disk('doi_proofs')->response(
             $paymentProof->file_path,
             $paymentProof->file_name,
             [

@@ -51,8 +51,8 @@ class StorePaymentProofAction
         $this->validateFile($file);
 
         return DB::transaction(function () use ($invoice, $file, $data, $user) {
-            $folder = 'doi/payment_proofs/' . Carbon::now()->format('Y/m');
-            $storedPath = $file->store($folder, 'local');
+            $folder = 'proofs/' . Carbon::now()->format('Y/m');
+            $storedPath = $file->store($folder, 'doi_proofs');
 
             $userId = $user?->id ?? auth()->id() ?? $invoice->user_id;
 
