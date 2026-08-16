@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
+use App\Http\Controllers\AdminKampus\DoiSubscriptionController as AdminKampusDoiSubscriptionController;
 use App\Http\Controllers\AdminKampus\JournalApprovalController;
 use App\Http\Controllers\AdminKampus\JournalController as AdminKampusJournalController;
 use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
@@ -43,6 +44,7 @@ use App\Http\Controllers\ReviewerController as MainReviewerController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\AssessmentIssueController;
+use App\Http\Controllers\User\DoiSubscriptionController as UserDoiSubscriptionController;
 use App\Http\Controllers\User\JournalController as UserJournalController;
 use App\Http\Controllers\User\PembinaanController as UserPembinaanController;
 use App\Http\Controllers\User\ProfilController;
@@ -605,6 +607,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\AdminKampus\TicketController::class, 'reply'])->name('tickets.reply');
         Route::patch('tickets/{ticket}/status', [App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
 
+        // DOI Subscription Dashboard
+        Route::get('doi-subscription', [AdminKampusDoiSubscriptionController::class, 'index'])
+            ->name('doi-subscription.index');
+
         // API Location lookup
         Route::get('locations/provinces', [LocationController::class, 'provinces'])
             ->name('locations.provinces');
@@ -728,6 +734,10 @@ Route::middleware(['auth'])->group(function () {
         ]);
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\User\TicketController::class, 'reply'])
             ->name('tickets.reply');
+
+        // DOI Subscription Dashboard
+        Route::get('doi-subscription', [UserDoiSubscriptionController::class, 'index'])
+            ->name('doi-subscription.index');
     });
 
     /*
