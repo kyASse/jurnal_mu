@@ -71,4 +71,48 @@ describe('AppSidebar', () => {
         expect(screen.getByText('News Management')).toBeInTheDocument();
         expect(screen.getByText('Announcements')).toBeInTheDocument();
     });
+
+    it('renders Langganan DOI for Admin Kampus', async () => {
+        const { AppSidebar } = await import('../app-sidebar');
+
+        vi.mocked(usePage).mockReturnValue({
+            props: {
+                auth: {
+                    user: {
+                        id: 2,
+                        name: 'Admin Kampus',
+                        role: {
+                            name: ROLE_NAMES.ADMIN_KAMPUS,
+                        },
+                    },
+                },
+            },
+        } as any);
+
+        render(<AppSidebar />);
+        expect(screen.getByText('Langganan DOI')).toBeInTheDocument();
+        expect(screen.getByText('Profil Universitas')).toBeInTheDocument();
+    });
+
+    it('renders Langganan DOI for Pengelola Jurnal (User)', async () => {
+        const { AppSidebar } = await import('../app-sidebar');
+
+        vi.mocked(usePage).mockReturnValue({
+            props: {
+                auth: {
+                    user: {
+                        id: 3,
+                        name: 'Pengelola Jurnal',
+                        role: {
+                            name: ROLE_NAMES.USER,
+                        },
+                    },
+                },
+            },
+        } as any);
+
+        render(<AppSidebar />);
+        expect(screen.getByText('Langganan DOI')).toBeInTheDocument();
+        expect(screen.getByText('Jurnal')).toBeInTheDocument();
+    });
 });
