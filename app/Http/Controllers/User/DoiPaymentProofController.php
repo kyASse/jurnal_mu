@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Actions\Doi\UploadPaymentProofAction;
+use App\Actions\Doi\StorePaymentProofAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Doi\StorePaymentProofRequest;
 use App\Models\DoiInvoice;
@@ -19,15 +19,15 @@ class DoiPaymentProofController extends Controller
     public function store(
         StorePaymentProofRequest $request,
         DoiInvoice $invoice,
-        UploadPaymentProofAction $action
+        StorePaymentProofAction $action
     ): RedirectResponse {
         $validated = $request->validated();
 
         $action->execute(
             $invoice,
-            $request->user(),
             $request->file('payment_proof'),
-            $validated
+            $validated,
+            $request->user()
         );
 
         return back()->with('success', 'Bukti pembayaran berhasil diunggah dan sedang menunggu verifikasi.');

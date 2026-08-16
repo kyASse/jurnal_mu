@@ -278,6 +278,6 @@ class DoiInvoiceTest extends TestCase
                 'payment_proof' => $file,
             ]);
 
-        $response->assertStatus(422);
+        $response->assertSessionHasErrors(['invoice']);
     }
 }

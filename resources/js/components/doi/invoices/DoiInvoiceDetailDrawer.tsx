@@ -37,6 +37,7 @@ interface DoiInvoiceDetailDrawerProps {
     bankAccounts: DoiBankAccountData[];
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    initialTab?: 'detail' | 'pay' | 'history';
     onSubmitPaymentProof?: (formData: FormData) => void;
     isSubmitting?: boolean;
     errors?: Record<string, string>;
@@ -85,13 +86,20 @@ export function DoiInvoiceDetailDrawer({
     bankAccounts,
     open,
     onOpenChange,
+    initialTab = 'detail',
     onSubmitPaymentProof,
     isSubmitting = false,
     errors = {},
     onViewProofFile,
     className,
 }: DoiInvoiceDetailDrawerProps) {
-    const [activeTab, setActiveTab] = React.useState<'detail' | 'pay' | 'history'>('detail');
+    const [activeTab, setActiveTab] = React.useState<'detail' | 'pay' | 'history'>(initialTab);
+
+    React.useEffect(() => {
+        if (open) {
+            setActiveTab(initialTab);
+        }
+    }, [open, initialTab]);
 
     if (!invoice) return null;
 

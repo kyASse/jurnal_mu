@@ -11,7 +11,7 @@ import {
     DoiEmptyState,
 } from '@/components/doi';
 import { DoiActiveInvoiceData, DoiPackageData, DoiQuotaLogData, DoiSubscriptionData } from '@/types/doi';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Globe, Building2, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -70,11 +70,11 @@ export default function AdminKampusDoiDashboard({
     };
 
     const handleUploadProof = (invoiceId: number) => {
-        console.log('Upload proof for invoice:', invoiceId);
+        router.visit(route('admin-kampus.doi.invoices.index', { invoice_id: invoiceId, action: 'pay' }));
     };
 
     const handleViewInvoiceDetail = (invoiceId: number) => {
-        console.log('View invoice detail:', invoiceId);
+        router.visit(route('admin-kampus.doi.invoices.index', { invoice_id: invoiceId }));
     };
 
     return (

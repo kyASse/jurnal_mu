@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +21,7 @@ interface DoiActiveInvoiceCardProps {
     invoice: DoiActiveInvoiceData | null;
     onUploadProof?: (invoiceId: number) => void;
     onViewDetail?: (invoiceId: number) => void;
+    isUserRole?: boolean;
     className?: string;
 }
 
@@ -100,6 +102,8 @@ export function DoiActiveInvoiceCard({
               borderStyle: 'border-amber-200 dark:border-amber-900/60',
               icon: Clock,
           };
+
+    const invoiceRoute = isUserRole ? 'user.doi.invoices.index' : 'admin-kampus.doi.invoices.index';
 
     return (
         <Card className={cn('relative overflow-hidden shadow-xs transition-all hover:shadow-md', statusConfig.borderStyle, className)}>
@@ -195,7 +199,7 @@ export function DoiActiveInvoiceCard({
 
                 {/* Action CTAs */}
                 <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
-                    {onViewDetail && (
+                    {onViewDetail ? (
                         <Button
                             type="button"
                             variant="outline"
@@ -206,9 +210,21 @@ export function DoiActiveInvoiceCard({
                             <FileText className="mr-1.5 size-3.5" />
                             Rincian Faktur
                         </Button>
+                    ) : (
+                        <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="text-xs shadow-2xs"
+                        >
+                            <Link href={route(invoiceRoute, { invoice_id: invoice.id })}>
+                                <FileText className="mr-1.5 size-3.5" />
+                                Rincian Faktur
+                            </Link>
+                        </Button>
                     )}
 
-                    {onUploadProof && (
+                    {onUploadProof ? (
                         <Button
                             type="button"
                             size="sm"
@@ -221,7 +237,23 @@ export function DoiActiveInvoiceCard({
                             )}
                         >
                             <UploadCloud className="mr-1.5 size-3.5" />
-                            {isProofRejected ? 'Unggah Ulang Bukti Bayar' : 'Unggah Bukti Bayar'}
+                            {isProofRejected ? 'Unggah Ulang Bukti Bayar' : 'Bayar Sekarang'}
+                        </Button>
+                    ) : (
+                        <Button
+                            asChild
+                            size="sm"
+                            className={cn(
+                                'text-xs shadow-2xs',
+                                isProofRejected
+                                    ? 'bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-600'
+                                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            )}
+                        >
+                            <Link href={route(invoiceRoute, { invoice_id: invoice.id, action: 'pay' })}>
+                                <UploadCloud className="mr-1.5 size-3.5" />
+                                {isProofRejected ? 'Unggah Ulang Bukti Bayar' : 'Bayar Sekarang'}
+                            </Link>
                         </Button>
                     )}
                 </div>
