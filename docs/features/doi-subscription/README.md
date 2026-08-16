@@ -15,6 +15,7 @@
 | **[4. ALGORITHM.md](./ALGORITHM.md)** | **Business Logic & State Machine**: Algoritma nomor invoice unik, upload multi-layer file security, state machine verifikasi approval/reject, dan scheduler grace period. |
 | **[5. UI_DESIGN.md](./UI_DESIGN.md)** | **UI/UX Design Specification**: Design tokens, wireframe detail Dashboard (Bento grid), Tagihan Pembayaran, Bukti Pembayaran Dropzone, dan Split-View Admin Review Drawer. |
 | **[6. TESTING_LOGS.md](./TESTING_LOGS.md)** | **QA & Test Matrix**: Skenario Unit Test, Feature Test, Security IDOR/MIME Test, Scheduler Test, serta panduan eksekusi test pada Docker container. |
+| **[7. DEVELOPMENT_STAGES.md](./DEVELOPMENT_STAGES.md)** | **Tahapan Pengembangan per Modul**: Roadmap 7 modul berurutan dari Fondasi Database hingga QA Testing. |
 
 ---
 

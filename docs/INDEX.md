@@ -46,6 +46,7 @@ Dokumentasi fitur-fitur dan implementasinya
 
 - **Langganan DOI & Similarity Check** ✨ **NEW**
   - `doi-subscription/README.md` - Index modul langganan DOI
+  - `doi-subscription/DEVELOPMENT_STAGES.md` - Tahapan pengembangan per modul
   - `doi-subscription/PRD.md` - Product Requirements Document
   - `doi-subscription/ARCHITECTURE.md` - System Architecture & Security
   - `doi-subscription/SCHEMA.md` - Database Schema & ERD
