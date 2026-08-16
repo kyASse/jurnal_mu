@@ -34,6 +34,10 @@ class DatabaseSeeder extends Seeder
             PembinaanSeeder::class,         // 11. Pembinaan System (depends on: journals, users, templates)
             UadSeeder::class,               // 12. UAD specific test data
             NewsSeeder::class,              // 13. News Articles (depends on: users)
+
+            // === DOI Subscription System ===
+            DoiPackageSeeder::class,        // 14. DOI Packages (no dependencies)
+            DoiBankAccountSeeder::class,    // 15. DOI Bank Accounts (no dependencies)
         ]);
 
         $this->command->info('');

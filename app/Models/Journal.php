@@ -220,6 +220,22 @@ class Journal extends Model
         return $this->articles()->recent()->limit($limit);
     }
 
+    /**
+     * Get the latest DOI subscription for this journal
+     */
+    public function doiSubscription()
+    {
+        return $this->hasOne(DoiSubscription::class, 'journal_id')->latestOfMany();
+    }
+
+    /**
+     * Get all DOI subscriptions for this journal
+     */
+    public function doiSubscriptions()
+    {
+        return $this->hasMany(DoiSubscription::class, 'journal_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
