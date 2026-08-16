@@ -90,6 +90,23 @@ class University extends Model
         });
     }
 
+    /**
+     * Get all DOI subscriptions for this university
+     */
+    public function doiSubscriptions()
+    {
+        return $this->hasMany(DoiSubscription::class);
+    }
+
+    /**
+     * Get active DOI subscription for this university
+     */
+    public function activeDoiSubscription()
+    {
+        return $this->hasOne(DoiSubscription::class, 'university_id')
+            ->where('status', \App\Enums\Doi\SubscriptionStatus::ACTIVE);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
