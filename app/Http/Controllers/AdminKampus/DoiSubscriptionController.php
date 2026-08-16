@@ -21,6 +21,16 @@ class DoiSubscriptionController extends Controller
      */
     public function index(Request $request): Response
     {
+        return Inertia::render('AdminKampus/Doi/Dashboard', $this->getDashboardProps($request));
+    }
+
+    /**
+     * Prepare dashboard props data for the current user's university.
+     *
+     * @return array<string, mixed>
+     */
+    protected function getDashboardProps(Request $request): array
+    {
         $user = $request->user();
         $university = $user->university;
 
@@ -120,13 +130,13 @@ class DoiSubscriptionController extends Controller
             ? Journal::where('university_id', $user->university_id)->count()
             : 0;
 
-        return Inertia::render('AdminKampus/Doi/Dashboard', [
+        return [
             'subscription' => $subscriptionData,
             'activeInvoice' => $invoiceData,
             'recentQuotaLogs' => $recentQuotaLogs,
             'packages' => $packages,
             'universityName' => $university?->name ?? 'Institusi',
             'journalsCount' => $journalsCount,
-        ]);
+        ];
     }
 }

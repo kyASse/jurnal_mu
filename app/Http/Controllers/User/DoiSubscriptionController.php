@@ -14,9 +14,6 @@ class DoiSubscriptionController extends BaseController
      */
     public function index(Request $request): Response
     {
-        $response = parent::index($request);
-        $props = $response->toResponse($request)->getOriginalContent()['page']['props'];
-
-        return Inertia::render('User/Doi/Dashboard', $props);
+        return Inertia::render('User/Doi/Dashboard', $this->getDashboardProps($request));
     }
 }
