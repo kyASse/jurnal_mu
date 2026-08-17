@@ -6,4 +6,5 @@ export * from './DoiQuotaLogTable';
 export * from './DoiPackageDrawer';
 export * from './DoiEmptyState';
 export * from './invoices';
+export * from './admin';
 
