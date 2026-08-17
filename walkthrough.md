@@ -1,58 +1,57 @@
-# Walkthrough: DOI Subscription Module 3 (Invoices Management & Manual Bank Payment Proof)
+# Walkthrough: DOI Subscription Module 4 (Super Admin Management & Verification Drawer)
 
-**Target Branch**: `feat/doi-subscription-module-3`  
-**Status**: COMPLETE & VERIFIED
-
----
-
-## 1. Accomplishments
-
-Modul 3 mengimplementasikan antarmuka dan backend manajemen tagihan (*Invoices*) serta alur pembayaran transfer manual dengan formulir unggah bukti bayar (*Payment Proof*) interaktif, live dropzone preview, instruksi rekening bank resmi Diktilitbang PPM, dan authorized private file streaming:
-
-1. **Backend Routing & Controllers**:
-   - [`app/Http/Requests/Doi/StorePaymentProofRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/StorePaymentProofRequest.php): Validasi ketat format file (`jpg`, `jpeg`, `png`, `pdf`), ukuran maksimal 5MB, data bank pengirim, dan proteksi invoice yang sudah lunas.
-   - [`app/Http/Controllers/AdminKampus/DoiInvoiceController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/AdminKampus/DoiInvoiceController.php): Listing invoice terisolasi per-institusi, agregasi statistik (`total`, `unpaid`, `paid`), dan data rekening resmi Diktilitbang PPM.
-   - [`app/Http/Controllers/AdminKampus/DoiPaymentProofController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/AdminKampus/DoiPaymentProofController.php): Handler upload bukti pembayaran ke disk privat `doi_proofs` dan secure streaming endpoint.
-   - [`app/Http/Controllers/User/DoiInvoiceController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/User/DoiInvoiceController.php) & [`User/DoiPaymentProofController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/User/DoiPaymentProofController.php): Portal pengelola jurnal.
-   - [`routes/web.php`](file:///c:/xampp/htdocs/jurnal_mu/routes/web.php): Registrasi rute `/admin-kampus/doi-subscription/invoices` dan `/user/doi-subscription/invoices`.
-
-2. **Frontend Reusable Bento & Interactive Components**:
-   - [`resources/js/components/doi/invoices/DoiInvoiceStatsCard.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/invoices/DoiInvoiceStatsCard.tsx): 3 Bento summary tiles dengan format monospaced tabular numerals.
-   - [`resources/js/components/doi/invoices/DoiBankAccountsCard.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/invoices/DoiBankAccountsCard.tsx): Kartu rekening bank resmi Diktilitbang PPM Muhammadiyah (BSI & Mandiri) dengan tombol *1-Click Copy* nomor rekening.
-   - [`resources/js/components/doi/invoices/DoiPaymentProofDropzone.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/invoices/DoiPaymentProofDropzone.tsx): Drag-and-drop file uploader dengan live thumbnail gambar / icon PDF preview.
-   - [`resources/js/components/doi/invoices/DoiPaymentProofForm.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/invoices/DoiPaymentProofForm.tsx): Formulir pengiriman transfer (Bank Pengirim, No Rekening, Tanggal, Nominal, Catatan).
-   - [`resources/js/components/doi/invoices/DoiVerificationTimeline.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/invoices/DoiVerificationTimeline.tsx): Linimasa riwayat status verifikasi dan alert merah catatan admin jika terjadi penolakan.
-   - [`resources/js/components/doi/invoices/DoiInvoiceDetailDrawer.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/invoices/DoiInvoiceDetailDrawer.tsx): Slide-over sheet rincian invoice & checkout action.
-   - [`resources/js/components/doi/invoices/DoiInvoiceTable.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/invoices/DoiInvoiceTable.tsx): Tabel data invoice dengan search, tab filter status (`Semua`, `Belum Bayar`, `Menunggu Verifikasi`, `Lunas`), dan pagination.
-
-3. **Pages & Navigation**:
-   - [`resources/js/pages/AdminKampus/Doi/Invoices/Index.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/pages/AdminKampus/Doi/Invoices/Index.tsx): Halaman utama manajemen tagihan Admin Kampus.
-   - [`resources/js/pages/User/Doi/Invoices/Index.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/pages/User/Doi/Invoices/Index.tsx): Halaman monitoring tagihan Pengelola Jurnal.
-   - [`resources/js/components/doi/DoiActiveInvoiceCard.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/DoiActiveInvoiceCard.tsx): Integrasi trigger pembayaran langsung dari dashboard utama.
+**Target Branch:** `feat/doi-subscription-module-4`  
+**Status:** COMPLETED & FULLY VERIFIED (100% Tests Passing, Build Clean)
 
 ---
 
-## 2. Verification Results
+## 1. Accomplishments Overview
 
-### Frontend Vite Build
-```text
-✓ built in 17.14s (0 TypeScript errors)
-```
+Modul 4 mengimplementasikan pusat kendali terpadu **Super Admin DOI Command Center** untuk Majelis Diktilitbang PPM Muhammadiyah:
+1. **Top National Bento Metrics**: 4 kartu metrik agregasi nasional (Total PTMA Aktif, Antrian Verifikasi dengan Live Pulsing Amber Dot, Konsumsi Kuota Similarity Terpakai, Total Pendapatan Faktur Lunas).
+2. **Interactive Split-View Verification Drawer**:
+   - **Document Viewer**: Live preview gambar resi atau PDF embed dengan tombol `Zoom In (+)`, `Zoom Out (-)`, `Rotate 90°`, dan `Buka Berkas Asli / Download`.
+   - **Transaction Review & Decision**: Otomatisasi perbandingan nominal tagihan vs nominal transfer (`MATCH` / `MISMATCH` badge), detail rekening bank, tombol `[Setujui & Perpanjang +1 Tahun]`, dan form penolakan `[Tolak Bukti]` dengan validasi catatan wajib.
+3. **Master Langganan PTMA**: Tabel pemantauan seluruh universitas & jurnal se-Indonesia dengan filter status, pencarian, progress kuota, dan modal penyesuaian kuota manual (`DoiQuotaAdjustDialog`).
+4. **Manajemen Master Paket & Rekening Bank**: Tab CRUD paket langganan dan rekening bank resmi Diktilitbang PPM.
+5. **Sidebar Navigation**: Menu `Kelola DOI (Diktilitbang)` di bawah bagian Super Admin.
 
-### Full DOI Backend Regression Suite
-```text
-docker exec -i jurnal-mu-app php artisan test --filter=Doi
+---
 
-PASS  Tests\Unit\Doi\DoiActionsTest (4 tests)
-PASS  Tests\Unit\Doi\DoiEnumsTest (5 tests)
-PASS  Tests\Unit\Doi\DoiEventsTest (3 tests)
-PASS  Tests\Unit\Doi\DoiModelRelationshipTest (6 tests)
-PASS  Tests\Unit\Doi\DoiQuotaManagerServiceTest (4 tests)
-PASS  Tests\Feature\Doi\DoiDashboardTest (5 tests)
-PASS  Tests\Feature\Doi\DoiDatabaseFoundationTest (1 test)
-PASS  Tests\Feature\Doi\DoiInvoiceTest (8 tests)
-PASS  Tests\Feature\Doi\DoiSecurityPolicyTest (3 tests)
+## 2. File & Component Breakdown
 
-Tests:    39 passed (356 assertions)
-Duration: 28.15s
-```
+### Backend Controllers, FormRequests, & Routes
+- [`app/Http/Requests/Doi/Admin/VerifyPaymentProofRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/VerifyPaymentProofRequest.php)
+- [`app/Http/Requests/Doi/Admin/AdjustQuotaRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/AdjustQuotaRequest.php)
+- [`app/Http/Requests/Doi/Admin/DoiPackageRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/DoiPackageRequest.php)
+- [`app/Http/Requests/Doi/Admin/DoiBankAccountRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/DoiBankAccountRequest.php)
+- [`app/Http/Controllers/Admin/Doi/AdminDoiManagementController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiManagementController.php)
+- [`app/Http/Controllers/Admin/Doi/AdminDoiVerificationController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiVerificationController.php)
+- [`app/Http/Controllers/Admin/Doi/AdminDoiSubscriptionController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiSubscriptionController.php)
+- [`app/Http/Controllers/Admin/Doi/AdminDoiPackageController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiPackageController.php)
+- [`app/Http/Controllers/Admin/Doi/AdminDoiBankAccountController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiBankAccountController.php)
+- [`routes/web.php`](file:///c:/xampp/htdocs/jurnal_mu/routes/web.php) (Prefix `/admin/doi-management`)
+
+### Frontend Components & Page
+- [`resources/js/types/doi.ts`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/types/doi.ts)
+- [`resources/js/components/doi/admin/DoiAdminStatsCards.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiAdminStatsCards.tsx)
+- [`resources/js/components/doi/admin/DoiDocumentViewer.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiDocumentViewer.tsx)
+- [`resources/js/components/doi/admin/DoiVerificationDrawer.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiVerificationDrawer.tsx)
+- [`resources/js/components/doi/admin/DoiVerificationTable.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiVerificationTable.tsx)
+- [`resources/js/components/doi/admin/DoiSubscriptionsMasterTable.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiSubscriptionsMasterTable.tsx)
+- [`resources/js/components/doi/admin/DoiQuotaAdjustDialog.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiQuotaAdjustDialog.tsx)
+- [`resources/js/components/doi/admin/DoiPackageManagementTab.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiPackageManagementTab.tsx)
+- [`resources/js/components/doi/admin/DoiBankAccountManagementTab.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiBankAccountManagementTab.tsx)
+- [`resources/js/pages/Admin/Doi/Index.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/pages/Admin/Doi/Index.tsx)
+- [`resources/js/components/app-sidebar.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/app-sidebar.tsx)
+
+---
+
+## 3. Verification Results
+
+### Automated Tests
+- `tests/Feature/Doi/AdminDoiManagementTest.php`: **8 passed (58 assertions)**
+- Full DOI Test Suite: **47 passed (414 assertions)**
+
+### Frontend Build
+- `npm run build`: built in **23.77s** (0 errors).
