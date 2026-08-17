@@ -119,5 +119,56 @@ class DoiDemoDataSeeder extends Seeder
                 'total_price' => 7500000,
             ]);
         }
+
+        // 4. Ensure Dewi Kartika (Pengelola Jurnal) is attached to UAD & has access
+        $dewi = User::where('email', 'dewi.kartika@uad.ac.id')->first();
+        if ($dewi) {
+            $dewi->update(['university_id' => $uad->id]);
+
+            // If Dewi manages a journal, ensure journal subscription/invoice also exists
+            $journal = $dewi->journals()->first();
+            if ($journal) {
+                $journalSub = DoiSubscription::updateOrCreate(
+                    ['journal_id' => $journal->id],
+                    [
+                        'university_id' => $uad->id,
+                        'doi_package_id' => $package->id,
+                        'status' => SubscriptionStatus::ACTIVE,
+                        'start_date' => Carbon::now()->subMonth(),
+                        'end_date' => Carbon::now()->addMonths(11),
+                        'active_prefix' => '10.12928',
+                        'similarity_quota_total' => 100,
+                        'similarity_quota_used' => 12,
+                    ]
+                );
+
+                $journalInvoice = DoiInvoice::firstOrCreate(
+                    ['invoice_number' => 'INV/DOI/202608/0003'],
+                    [
+                        'subscription_id' => $journalSub->id,
+                        'university_id' => $uad->id,
+                        'user_id' => $dewi->id,
+                        'subtotal' => 2500000,
+                        'discount' => 0,
+                        'tax' => 0,
+                        'total_amount' => 2500000,
+                        'status' => InvoiceStatus::UNPAID,
+                        'period_start' => Carbon::now()->subMonth(),
+                        'period_end' => Carbon::now()->addMonths(11),
+                        'due_date' => Carbon::now()->addDays(20),
+                    ]
+                );
+
+                if ($journalInvoice->items()->count() === 0) {
+                    $journalInvoice->items()->create([
+                        'item_type' => \App\Enums\Doi\InvoiceItemType::ANNUAL_FEE,
+                        'description' => 'Paket Langganan DOI Jurnal ' . $journal->name,
+                        'quantity' => 1,
+                        'unit_price' => 2500000,
+                        'total_price' => 2500000,
+                    ]);
+                }
+            }
+        }
     }
 }

@@ -22,8 +22,16 @@ class DoiInvoiceController extends Controller
             ->where(function ($q) use ($user) {
                 if ($user->university_id) {
                     $q->where('university_id', $user->university_id);
-                } else {
-                    $q->where('user_id', $user->id);
+                }
+                $q->orWhere('user_id', $user->id);
+
+                if (method_exists($user, 'journals')) {
+                    $journalIds = $user->journals()->pluck('journals.id')->toArray();
+                    if (! empty($journalIds)) {
+                        $q->orWhereHas('subscription', function ($subQ) use ($journalIds) {
+                            $subQ->whereIn('journal_id', $journalIds);
+                        });
+                    }
                 }
             });
 
