@@ -5,3 +5,5 @@ export * from './DoiActiveInvoiceCard';
 export * from './DoiQuotaLogTable';
 export * from './DoiPackageDrawer';
 export * from './DoiEmptyState';
+export * from './invoices';
+

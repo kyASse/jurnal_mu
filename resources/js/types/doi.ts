@@ -1,3 +1,5 @@
+import { PaginatedData } from './index';
+
 export type SubscriptionStatusType = 'active' | 'inactive' | 'pending_verification' | 'grace_period' | 'expired';
 
 export type InvoiceStatusType = 'unpaid' | 'pending_verification' | 'paid' | 'expired' | 'cancelled';
@@ -28,13 +30,15 @@ export interface DoiBankAccountData {
     account_number: string;
     account_holder: string;
     branch_name?: string | null;
-    is_active: boolean;
+    branch?: string | null;
+    qr_code_path?: string | null;
+    is_active?: boolean;
 }
 
 export interface DoiInvoiceItemData {
     id: number;
-    invoice_id: number;
-    item_type: InvoiceItemType;
+    invoice_id?: number;
+    item_type?: InvoiceItemType;
     description: string;
     quantity: number;
     unit_price: number | string;
@@ -44,24 +48,25 @@ export interface DoiInvoiceItemData {
 
 export interface DoiPaymentProofData {
     id: number;
-    invoice_id: number;
-    user_id: number;
+    invoice_id?: number;
+    user_id?: number;
     bank_sender: string;
     account_name: string;
     bank_destination_id?: number | null;
+    bank_destination?: string | DoiBankAccountData | null;
     transfer_amount: number | string;
     transfer_date: string;
-    file_path: string;
+    file_path?: string;
     file_name: string;
-    file_size: number;
-    mime_type: string;
+    file_size?: number;
+    mime_type?: string;
     status: PaymentProofStatusType;
+    status_label?: string;
     verified_by?: number | null;
     verified_at?: string | null;
     admin_notes?: string | null;
     created_at: string;
     updated_at?: string;
-    bank_destination?: DoiBankAccountData;
     user?: {
         id: number;
         name: string;
@@ -76,9 +81,9 @@ export interface DoiPaymentProofData {
 export interface DoiActiveInvoiceData {
     id: number;
     invoice_number: string;
-    subscription_id: number;
-    university_id: number;
-    user_id: number;
+    subscription_id?: number;
+    university_id?: number;
+    user_id?: number;
     period_start: string;
     period_end: string;
     subtotal: number | string;
@@ -97,6 +102,81 @@ export interface DoiActiveInvoiceData {
     latest_payment_proof?: DoiPaymentProofData | null;
     is_overdue?: boolean;
     days_until_due?: number;
+}
+
+export interface DoiInvoiceDetailData {
+    id: number;
+    invoice_number: string;
+    subscription_id?: number;
+    subtotal: number | string;
+    discount: number | string;
+    tax: number | string;
+    total_amount: number | string;
+    due_date: string;
+    paid_at?: string | null;
+    status: InvoiceStatusType;
+    status_label?: string;
+    status_color?: string;
+    period_start?: string;
+    period_end?: string;
+    package_name?: string;
+    package?: {
+        name: string;
+        code?: string;
+        description?: string | null;
+    } | null;
+    items_count?: number;
+    items?: DoiInvoiceItemData[];
+    payment_proofs?: DoiPaymentProofData[];
+    latest_payment_proof?: DoiPaymentProofData | {
+        id: number;
+        status: PaymentProofStatusType;
+        status_label?: string;
+        admin_notes?: string | null;
+        created_at?: string;
+    } | null;
+    university_name?: string;
+    university?: {
+        id: number;
+        name: string;
+        short_name?: string;
+    };
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface DoiInvoiceStatsData {
+    total_invoices: number;
+    unpaid_amount: number;
+    paid_amount: number;
+    unpaid_count?: number;
+    paid_count?: number;
+    pending_count?: number;
+}
+
+export interface DoiInvoicesPageProps {
+    invoices: PaginatedData<DoiInvoiceDetailData>;
+    bankAccounts: DoiBankAccountData[];
+    stats?: DoiInvoiceStatsData;
+    filters?: {
+        status?: string;
+        search?: string;
+    };
+}
+
+export interface StorePaymentProofFormData {
+    bank_sender: string;
+    account_name: string;
+    bank_destination_id: number | string;
+    transfer_amount: number | string;
+    transfer_date: string;
+    notes?: string;
+    payment_proof: File | null;
 }
 
 export interface DoiQuotaLogData {
@@ -163,3 +243,4 @@ export interface DoiDashboardProps {
     registeredJournalsCount: number;
     canManageSubscription?: boolean;
 }
+
