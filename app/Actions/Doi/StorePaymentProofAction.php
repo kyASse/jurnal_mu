@@ -12,6 +12,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class StorePaymentProofAction
@@ -52,6 +53,7 @@ class StorePaymentProofAction
 
         return DB::transaction(function () use ($invoice, $file, $data, $user) {
             $folder = 'proofs/' . Carbon::now()->format('Y/m');
+            Storage::disk('doi_proofs')->makeDirectory($folder);
             $storedPath = $file->store($folder, 'doi_proofs');
 
             $userId = $user?->id ?? auth()->id() ?? $invoice->user_id;
