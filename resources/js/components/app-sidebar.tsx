@@ -93,6 +93,11 @@ export function AppSidebar() {
             icon: Library,
         },
         {
+            title: 'Kelola DOI (Diktilitbang)',
+            href: route('admin.doi-management.index'),
+            icon: Globe,
+        },
+        {
             title: 'Pembinaan',
             href: route('admin.pembinaan.index'),
             icon: Award,

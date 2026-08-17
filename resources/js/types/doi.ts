@@ -244,3 +244,69 @@ export interface DoiDashboardProps {
     canManageSubscription?: boolean;
 }
 
+export interface DoiAdminStatsData {
+    total_subscriptions: number;
+    active_subscriptions: number;
+    pending_proofs_count: number;
+    total_revenue: number;
+    used_similarity_quota?: number;
+    total_similarity_quota?: number;
+}
+
+export interface SuperAdminDoiManagementProps {
+    stats: DoiAdminStatsData;
+    pendingProofs: (DoiPaymentProofData & {
+        invoice?: DoiActiveInvoiceData & {
+            university?: { id: number; name: string; short_name?: string; code?: string };
+            subscription?: DoiSubscriptionData & { package?: DoiPackageData };
+        };
+    })[];
+    subscriptions: PaginatedData<DoiSubscriptionData>;
+    packages: (DoiPackageData & { subscriptions_count?: number })[];
+    bankAccounts: DoiBankAccountData[];
+    filters?: {
+        status?: string;
+        search?: string;
+    };
+}
+
+export interface VerificationReviewData {
+    proof: DoiPaymentProofData & {
+        invoice?: DoiActiveInvoiceData & {
+            university?: { id: number; name: string; short_name?: string; code?: string };
+            subscription?: DoiSubscriptionData & { package?: DoiPackageData };
+        };
+    };
+    invoice?: DoiInvoiceDetailData | DoiActiveInvoiceData | null;
+    subscription?: DoiSubscriptionData | null;
+}
+
+export interface AdjustQuotaFormData {
+    amount: number;
+    change_type?: QuotaChangeType;
+    description: string;
+}
+
+export interface DoiPackageFormData {
+    name: string;
+    slug?: string;
+    code: string;
+    description?: string | null;
+    price_annual: number | string;
+    prefix_included: boolean;
+    similarity_quota_included: number;
+    is_active: boolean;
+}
+
+export interface DoiBankAccountFormData {
+    bank_name: string;
+    account_number: string;
+    account_holder: string;
+    branch_name?: string | null;
+    branch?: string | null;
+    qr_code_path?: string | null;
+    is_active: boolean;
+    display_order?: number;
+}
+
+
