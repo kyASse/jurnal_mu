@@ -6,6 +6,11 @@ use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
 use App\Http\Controllers\Admin\DataMasterController;
+use App\Http\Controllers\Admin\Doi\AdminDoiBankAccountController;
+use App\Http\Controllers\Admin\Doi\AdminDoiManagementController;
+use App\Http\Controllers\Admin\Doi\AdminDoiPackageController;
+use App\Http\Controllers\Admin\Doi\AdminDoiSubscriptionController;
+use App\Http\Controllers\Admin\Doi\AdminDoiVerificationController;
 use App\Http\Controllers\Admin\EssayQuestionController;
 use App\Http\Controllers\Admin\EvaluationCategoryController;
 use App\Http\Controllers\Admin\EvaluationIndicatorController;
@@ -453,6 +458,29 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('announcements', AnnouncementController::class);
         Route::post('announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
         Route::post('announcements/{announcement}/toggle-pinned', [AnnouncementController::class, 'togglePinned'])->name('announcements.toggle-pinned');
+
+        // DOI Management
+        Route::prefix('doi-management')->name('doi-management.')->group(function () {
+            Route::get('/', [AdminDoiManagementController::class, 'index'])->name('index');
+
+            // Payment Proof Verification & File Stream
+            Route::post('payment-proofs/{paymentProof}/approve', [AdminDoiVerificationController::class, 'approve'])->name('payment-proofs.approve');
+            Route::post('payment-proofs/{paymentProof}/reject', [AdminDoiVerificationController::class, 'reject'])->name('payment-proofs.reject');
+            Route::get('payment-proofs/{paymentProof}/stream', [AdminDoiVerificationController::class, 'stream'])->name('payment-proofs.stream');
+
+            // Quota Adjustment
+            Route::post('subscriptions/{subscription}/adjust-quota', [AdminDoiSubscriptionController::class, 'adjustQuota'])->name('subscriptions.adjust-quota');
+
+            // Package Management
+            Route::post('packages', [AdminDoiPackageController::class, 'store'])->name('packages.store');
+            Route::put('packages/{package}', [AdminDoiPackageController::class, 'update'])->name('packages.update');
+            Route::delete('packages/{package}', [AdminDoiPackageController::class, 'destroy'])->name('packages.destroy');
+
+            // Bank Account Management
+            Route::post('bank-accounts', [AdminDoiBankAccountController::class, 'store'])->name('bank-accounts.store');
+            Route::put('bank-accounts/{bankAccount}', [AdminDoiBankAccountController::class, 'update'])->name('bank-accounts.update');
+            Route::delete('bank-accounts/{bankAccount}', [AdminDoiBankAccountController::class, 'destroy'])->name('bank-accounts.destroy');
+        });
 
     });
 
