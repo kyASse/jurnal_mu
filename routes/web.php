@@ -644,6 +644,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('doi-subscription.index');
 
         Route::prefix('doi')->name('doi.')->group(function () {
+            Route::post('subscribe', [AdminKampusDoiSubscriptionController::class, 'subscribe'])->name('subscribe');
             Route::get('invoices', [AdminKampusDoiInvoiceController::class, 'index'])->name('invoices.index');
             Route::get('invoices/{invoice}', [AdminKampusDoiInvoiceController::class, 'show'])->name('invoices.show');
             Route::post('invoices/{invoice}/payment-proof', [AdminKampusDoiPaymentProofController::class, 'store'])->name('invoices.payment-proof.store');

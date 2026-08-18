@@ -2,20 +2,76 @@
 
 namespace App\Http\Controllers\AdminKampus;
 
+use App\Actions\Doi\GenerateInvoiceAction;
 use App\Enums\Doi\InvoiceStatus;
+use App\Enums\Doi\SubscriptionStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Doi\SubscribeDoiPackageRequest;
 use App\Models\DoiInvoice;
 use App\Models\DoiPackage;
 use App\Models\DoiSimilarityQuotaLog;
 use App\Models\DoiSubscription;
 use App\Models\Journal;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DoiSubscriptionController extends Controller
 {
+    /**
+     * Subscribe institutional university to a DOI package and generate invoice.
+     */
+    public function subscribe(
+        SubscribeDoiPackageRequest $request,
+        GenerateInvoiceAction $generateInvoiceAction
+    ): RedirectResponse {
+        $user = $request->user();
+        $universityId = $user->university_id;
+        $packageId = (int) $request->validated('package_id');
+        $package = DoiPackage::findOrFail($packageId);
+
+        // Check if university already has an active unpaid or pending verification invoice
+        $existingInvoice = DoiInvoice::where('university_id', $universityId)
+            ->whereIn('status', [InvoiceStatus::UNPAID, InvoiceStatus::PENDING_VERIFICATION])
+            ->latest('id')
+            ->first();
+
+        if ($existingInvoice) {
+            return redirect()
+                ->route('admin-kampus.doi.invoices.index', [
+                    'invoice_id' => $existingInvoice->id,
+                    'action' => 'pay',
+                ])
+                ->with('warning', 'Anda sudah memiliki tagihan aktif yang belum selesai dibayar.');
+        }
+
+        $subscription = DoiSubscription::firstOrCreate(
+            ['university_id' => $universityId],
+            [
+                'doi_package_id' => $package->id,
+                'status' => SubscriptionStatus::INACTIVE,
+            ]
+        );
+
+        if ($subscription->doi_package_id !== $package->id) {
+            $subscription->doi_package_id = $package->id;
+            $subscription->save();
+        }
+
+        $subscription->load('package');
+
+        $invoice = $generateInvoiceAction->execute($subscription, $user);
+
+        return redirect()
+            ->route('admin-kampus.doi.invoices.index', [
+                'invoice_id' => $invoice->id,
+                'action' => 'pay',
+            ])
+            ->with('success', 'Paket berhasil dipilih. Tagihan telah diterbitkan, silakan lakukan konfirmasi pembayaran.');
+    }
+
     /**
      * Display the institutional DOI & Similarity Check subscription dashboard.
      */
