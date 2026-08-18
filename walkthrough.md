@@ -1,57 +1,55 @@
-# Walkthrough: DOI Subscription Module 4 (Super Admin Management & Verification Drawer)
+# Walkthrough: DOI Subscription Module 5 (Background Scheduler & Notifikasi Email / In-App)
 
-**Target Branch:** `feat/doi-subscription-module-4`  
+**Target Branch:** `feat/doi-subscription-module-5`  
 **Status:** COMPLETED & FULLY VERIFIED (100% Tests Passing, Build Clean)
 
 ---
 
 ## 1. Accomplishments Overview
 
-Modul 4 mengimplementasikan pusat kendali terpadu **Super Admin DOI Command Center** untuk Majelis Diktilitbang PPM Muhammadiyah:
-1. **Top National Bento Metrics**: 4 kartu metrik agregasi nasional (Total PTMA Aktif, Antrian Verifikasi dengan Live Pulsing Amber Dot, Konsumsi Kuota Similarity Terpakai, Total Pendapatan Faktur Lunas).
-2. **Interactive Split-View Verification Drawer**:
-   - **Document Viewer**: Live preview gambar resi atau PDF embed dengan tombol `Zoom In (+)`, `Zoom Out (-)`, `Rotate 90°`, dan `Buka Berkas Asli / Download`.
-   - **Transaction Review & Decision**: Otomatisasi perbandingan nominal tagihan vs nominal transfer (`MATCH` / `MISMATCH` badge), detail rekening bank, tombol `[Setujui & Perpanjang +1 Tahun]`, dan form penolakan `[Tolak Bukti]` dengan validasi catatan wajib.
-3. **Master Langganan PTMA**: Tabel pemantauan seluruh universitas & jurnal se-Indonesia dengan filter status, pencarian, progress kuota, dan modal penyesuaian kuota manual (`DoiQuotaAdjustDialog`).
-4. **Manajemen Master Paket & Rekening Bank**: Tab CRUD paket langganan dan rekening bank resmi Diktilitbang PPM.
-5. **Sidebar Navigation**: Menu `Kelola DOI (Diktilitbang)` di bawah bagian Super Admin.
+Modul 5 menyempurnakan otomatisasi background scheduler dan siklus notifikasi transaksional terpadu (Mail Markdown + Database In-App) untuk ekosistem langganan DOI:
+1. **Background Console Scheduler (`routes/console.php`)**:
+   - `doi:check-expiring-subscriptions` (`CheckExpiringDoiSubscriptionsCommand.php`): Evaluasi harian pukul `01:00 WIB` untuk mendeteksi `end_date` langganan $\to$ transisi otomatis ke `GRACE_PERIOD` (D+0 s.d D+7) atau `EXPIRED` (> D+7) + dispatch `DoiSubscriptionStatusChangedNotification`.
+   - `doi:send-due-reminders` (`SendInvoiceDueReminderCommand.php`): Pindaian harian pukul `08:00 WIB` untuk faktur `UNPAID` $\to$ dispatch `DoiInvoiceDueReminderNotification` pada interval H-30, H-14, H-7, H-1, H-0, dan overdue.
+2. **Event Listeners Terdaftar (`app/Listeners/Doi/`)**:
+   - `SendPaymentProofUploadedNotification`: Menangkap event `PaymentProofUploaded` saat bukti bayar diunggah $\to$ notifikasi otomatis ke semua Super Admin (`Role::SUPER_ADMIN`).
+   - `SendSubscriptionActivatedNotification`: Menangkap event `SubscriptionActivated` saat Super Admin menyetujui faktur $\to$ notifikasi konfirmasi lunas & aktivasi langganan $+1$ tahun ke Institusi/User.
+   - `SendPaymentProofRejectedNotification`: Menangkap event `PaymentProofRejected` saat Super Admin menolak faktur $\to$ notifikasi alasan penolakan beserta catatan admin ke Institusi/User.
+3. **Dual-Channel Delivery (`mail` + `database`)**:
+   - Saluran email Markdown responsif dengan tombol CTA interaktif dan format currency monospaced.
+   - Saluran database JSON terstruktur di tabel `notifications` untuk indikator lonceng / in-app navbar.
+   - Asinkron (`ShouldQueue`) untuk performa tinggi tanpa membebani respon HTTP.
 
 ---
 
 ## 2. File & Component Breakdown
 
-### Backend Controllers, FormRequests, & Routes
-- [`app/Http/Requests/Doi/Admin/VerifyPaymentProofRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/VerifyPaymentProofRequest.php)
-- [`app/Http/Requests/Doi/Admin/AdjustQuotaRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/AdjustQuotaRequest.php)
-- [`app/Http/Requests/Doi/Admin/DoiPackageRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/DoiPackageRequest.php)
-- [`app/Http/Requests/Doi/Admin/DoiBankAccountRequest.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Requests/Doi/Admin/DoiBankAccountRequest.php)
-- [`app/Http/Controllers/Admin/Doi/AdminDoiManagementController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiManagementController.php)
-- [`app/Http/Controllers/Admin/Doi/AdminDoiVerificationController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiVerificationController.php)
-- [`app/Http/Controllers/Admin/Doi/AdminDoiSubscriptionController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiSubscriptionController.php)
-- [`app/Http/Controllers/Admin/Doi/AdminDoiPackageController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiPackageController.php)
-- [`app/Http/Controllers/Admin/Doi/AdminDoiBankAccountController.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Http/Controllers/Admin/Doi/AdminDoiBankAccountController.php)
-- [`routes/web.php`](file:///c:/xampp/htdocs/jurnal_mu/routes/web.php) (Prefix `/admin/doi-management`)
+### Console Commands & Scheduler
+- [`app/Console/Commands/Doi/CheckExpiringDoiSubscriptionsCommand.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Console/Commands/Doi/CheckExpiringDoiSubscriptionsCommand.php)
+- [`app/Console/Commands/Doi/SendInvoiceDueReminderCommand.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Console/Commands/Doi/SendInvoiceDueReminderCommand.php)
+- [`routes/console.php`](file:///c:/xampp/htdocs/jurnal_mu/routes/console.php)
 
-### Frontend Components & Page
-- [`resources/js/types/doi.ts`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/types/doi.ts)
-- [`resources/js/components/doi/admin/DoiAdminStatsCards.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiAdminStatsCards.tsx)
-- [`resources/js/components/doi/admin/DoiDocumentViewer.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiDocumentViewer.tsx)
-- [`resources/js/components/doi/admin/DoiVerificationDrawer.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiVerificationDrawer.tsx)
-- [`resources/js/components/doi/admin/DoiVerificationTable.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiVerificationTable.tsx)
-- [`resources/js/components/doi/admin/DoiSubscriptionsMasterTable.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiSubscriptionsMasterTable.tsx)
-- [`resources/js/components/doi/admin/DoiQuotaAdjustDialog.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiQuotaAdjustDialog.tsx)
-- [`resources/js/components/doi/admin/DoiPackageManagementTab.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiPackageManagementTab.tsx)
-- [`resources/js/components/doi/admin/DoiBankAccountManagementTab.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/doi/admin/DoiBankAccountManagementTab.tsx)
-- [`resources/js/pages/Admin/Doi/Index.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/pages/Admin/Doi/Index.tsx)
-- [`resources/js/components/app-sidebar.tsx`](file:///c:/xampp/htdocs/jurnal_mu/resources/js/components/app-sidebar.tsx)
+### Notifications & Listeners
+- [`app/Notifications/Doi/DoiPaymentProofUploadedNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Notifications/Doi/DoiPaymentProofUploadedNotification.php)
+- [`app/Notifications/Doi/DoiSubscriptionActivatedNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Notifications/Doi/DoiSubscriptionActivatedNotification.php)
+- [`app/Notifications/Doi/DoiPaymentProofRejectedNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Notifications/Doi/DoiPaymentProofRejectedNotification.php)
+- [`app/Notifications/Doi/DoiInvoiceDueReminderNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Notifications/Doi/DoiInvoiceDueReminderNotification.php)
+- [`app/Notifications/Doi/DoiSubscriptionStatusChangedNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Notifications/Doi/DoiSubscriptionStatusChangedNotification.php)
+- [`app/Listeners/Doi/SendPaymentProofUploadedNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Listeners/Doi/SendPaymentProofUploadedNotification.php)
+- [`app/Listeners/Doi/SendSubscriptionActivatedNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Listeners/Doi/SendSubscriptionActivatedNotification.php)
+- [`app/Listeners/Doi/SendPaymentProofRejectedNotification.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Listeners/Doi/SendPaymentProofRejectedNotification.php)
+- [`app/Providers/AppServiceProvider.php`](file:///c:/xampp/htdocs/jurnal_mu/app/Providers/AppServiceProvider.php)
+
+### Automated Test Suite
+- [`tests/Feature/Doi/DoiSchedulerAndNotificationTest.php`](file:///c:/xampp/htdocs/jurnal_mu/tests/Feature/Doi/DoiSchedulerAndNotificationTest.php)
 
 ---
 
 ## 3. Verification Results
 
 ### Automated Tests
-- `tests/Feature/Doi/AdminDoiManagementTest.php`: **8 passed (58 assertions)**
-- Full DOI Test Suite: **47 passed (414 assertions)**
+- `tests/Feature/Doi/DoiSchedulerAndNotificationTest.php`: **6 passed (11 assertions)**
+- Full DOI Test Suite: **53 passed (425 assertions)**
 
 ### Frontend Build
-- `npm run build`: built in **23.77s** (0 errors).
+- `npm run build`: built in **59.08s** (0 errors).

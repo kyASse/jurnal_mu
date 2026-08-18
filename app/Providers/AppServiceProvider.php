@@ -20,6 +20,13 @@ use App\Policies\JournalAssessmentPolicy;
 use App\Policies\JournalPolicy;
 use App\Policies\UniversityPolicy;
 use App\Policies\UserPolicy;
+use App\Events\Doi\PaymentProofRejected;
+use App\Events\Doi\PaymentProofUploaded;
+use App\Events\Doi\SubscriptionActivated;
+use App\Listeners\Doi\SendPaymentProofRejectedNotification;
+use App\Listeners\Doi\SendPaymentProofUploadedNotification;
+use App\Listeners\Doi\SendSubscriptionActivatedNotification;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -97,5 +104,19 @@ class AppServiceProvider extends ServiceProvider
 
             return false;
         });
+
+        // DOI Event Listeners
+        Event::listen(
+            PaymentProofUploaded::class,
+            SendPaymentProofUploadedNotification::class
+        );
+        Event::listen(
+            SubscriptionActivated::class,
+            SendSubscriptionActivatedNotification::class
+        );
+        Event::listen(
+            PaymentProofRejected::class,
+            SendPaymentProofRejectedNotification::class
+        );
     }
 }
