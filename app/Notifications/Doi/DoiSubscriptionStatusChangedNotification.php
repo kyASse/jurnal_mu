@@ -31,7 +31,7 @@ class DoiSubscriptionStatusChangedNotification extends Notification implements S
             ->subject('Perubahan Status Langganan DOI')
             ->greeting('Halo,')
             ->line('Status langganan DOI Anda (Paket: '.$packageName.') telah berubah dari "'.$this->oldStatus.'" menjadi "'.$this->newStatus.'".')
-            ->action('Lihat Detail Langganan', route('user.doi.subscriptions.index'))
+            ->action('Lihat Detail Langganan', route('user.doi-subscription.index'))
             ->line('Jika Anda memiliki pertanyaan, silakan hubungi tim dukungan kami.');
     }
 
@@ -42,7 +42,7 @@ class DoiSubscriptionStatusChangedNotification extends Notification implements S
             'old_status' => $this->oldStatus,
             'new_status' => $this->newStatus,
             'message' => 'Status langganan DOI Anda telah berubah menjadi '.$this->newStatus.'.',
-            'action_url' => route('user.doi.subscriptions.index'),
+            'action_url' => route('user.doi-subscription.index'),
         ];
     }
 }

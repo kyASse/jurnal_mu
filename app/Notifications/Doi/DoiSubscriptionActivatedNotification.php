@@ -36,7 +36,7 @@ class DoiSubscriptionActivatedNotification extends Notification implements Shoul
             ->line('Paket: '.$packageName)
             ->line('Masa Berlaku: '.$startDate.' s/d '.$endDate)
             ->line('Total Kuota Similarity: '.number_format($this->subscription->similarity_quota_total))
-            ->action('Lihat Dashboard DOI', route('user.doi.subscriptions.index'))
+            ->action('Lihat Dashboard DOI', route('user.doi-subscription.index'))
             ->line('Terima kasih telah menggunakan layanan kami.');
     }
 
@@ -47,7 +47,7 @@ class DoiSubscriptionActivatedNotification extends Notification implements Shoul
             'payment_proof_id' => $this->paymentProof?->id,
             'package_name' => $this->subscription->package?->name,
             'message' => 'Langganan DOI Anda telah berhasil diaktifkan.',
-            'action_url' => route('user.doi.subscriptions.index'),
+            'action_url' => route('user.doi-subscription.index'),
         ];
     }
 }
