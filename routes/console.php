@@ -24,3 +24,18 @@ Schedule::command('journals:refresh-featured')
     ->withoutOverlapping()
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/refresh-featured.log'));
+
+// Evaluasi harian langganan DOI yang akan / sudah kadaluwarsa (01:00 WIB)
+Schedule::command('doi:check-expiring-subscriptions')
+    ->dailyAt('01:00')
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+// Pengingat harian jatuh tempo faktur DOI (08:00 WIB)
+Schedule::command('doi:send-due-reminders')
+    ->dailyAt('08:00')
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->runInBackground();
+

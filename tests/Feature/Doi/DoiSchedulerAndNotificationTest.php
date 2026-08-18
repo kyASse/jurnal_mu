@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Doi;
 
+use App\Enums\Doi\SubscriptionStatus;
 use App\Events\Doi\PaymentProofRejected;
 use App\Events\Doi\PaymentProofUploaded;
 use App\Events\Doi\SubscriptionActivated;
@@ -13,9 +14,11 @@ use App\Models\DoiSubscription;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
+use App\Notifications\Doi\DoiInvoiceDueReminderNotification;
 use App\Notifications\Doi\DoiPaymentProofRejectedNotification;
 use App\Notifications\Doi\DoiPaymentProofUploadedNotification;
 use App\Notifications\Doi\DoiSubscriptionActivatedNotification;
+use App\Notifications\Doi\DoiSubscriptionStatusChangedNotification;
 use Database\Seeders\DoiBankAccountSeeder;
 use Database\Seeders\DoiPackageSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -135,6 +138,75 @@ class DoiSchedulerAndNotificationTest extends TestCase
             function (DoiPaymentProofRejectedNotification $notification) {
                 return $notification->adminNotes === 'Proof image is blurry' ||
                        $notification->paymentProof->admin_notes === 'Proof image is blurry';
+            }
+        );
+    }
+
+    public function test_check_expiring_subscriptions_command_transitions_active_to_grace_period(): void
+    {
+        Notification::fake();
+
+        $this->subscription->update([
+            'status' => SubscriptionStatus::ACTIVE,
+            'end_date' => now()->subDays(3),
+        ]);
+
+        $this->artisan('doi:check-expiring-subscriptions')
+            ->assertSuccessful();
+
+        $this->assertEquals(SubscriptionStatus::GRACE_PERIOD, $this->subscription->fresh()->status);
+
+        Notification::assertSentTo(
+            [$this->user],
+            DoiSubscriptionStatusChangedNotification::class,
+            function (DoiSubscriptionStatusChangedNotification $notification) {
+                return $notification->subscription->id === $this->subscription->id
+                    && $notification->newStatus === SubscriptionStatus::GRACE_PERIOD->value;
+            }
+        );
+    }
+
+    public function test_check_expiring_subscriptions_command_transitions_grace_period_to_expired_after_7_days(): void
+    {
+        Notification::fake();
+
+        $this->subscription->update([
+            'status' => SubscriptionStatus::GRACE_PERIOD,
+            'end_date' => now()->subDays(10),
+        ]);
+
+        $this->artisan('doi:check-expiring-subscriptions')
+            ->assertSuccessful();
+
+        $this->assertEquals(SubscriptionStatus::EXPIRED, $this->subscription->fresh()->status);
+
+        Notification::assertSentTo(
+            [$this->user],
+            DoiSubscriptionStatusChangedNotification::class,
+            function (DoiSubscriptionStatusChangedNotification $notification) {
+                return $notification->subscription->id === $this->subscription->id
+                    && $notification->newStatus === SubscriptionStatus::EXPIRED->value;
+            }
+        );
+    }
+
+    public function test_send_invoice_due_reminder_command_sends_notification_for_unpaid_invoices(): void
+    {
+        Notification::fake();
+
+        $this->invoice->update([
+            'status' => \App\Enums\Doi\InvoiceStatus::UNPAID,
+            'due_date' => now()->addDays(7),
+        ]);
+
+        $this->artisan('doi:send-due-reminders')
+            ->assertSuccessful();
+
+        Notification::assertSentTo(
+            [$this->user],
+            DoiInvoiceDueReminderNotification::class,
+            function (DoiInvoiceDueReminderNotification $notification) {
+                return $notification->invoice->id === $this->invoice->id;
             }
         );
     }
