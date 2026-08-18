@@ -46,6 +46,7 @@ export default function AdminKampusDoiDashboard({
 }: AdminKampusDoiDashboardProps) {
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [selectedPackage, setSelectedPackage] = React.useState<DoiPackageData | null>(null);
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
 
     const handleOpenPackageDetail = (pkg?: DoiPackageData) => {
         if (pkg) {
@@ -59,6 +60,20 @@ export default function AdminKampusDoiDashboard({
     const handleSelectPackageFromEmpty = (pkg: DoiPackageData) => {
         setSelectedPackage(pkg);
         setDrawerOpen(true);
+    };
+
+    const handleSubscribe = (pkg: DoiPackageData) => {
+        setIsSubmitting(true);
+        router.post(
+            route('admin-kampus.doi.subscribe'),
+            { package_id: pkg.id },
+            {
+                onFinish: () => setIsSubmitting(false),
+                onSuccess: () => {
+                    setDrawerOpen(false);
+                },
+            }
+        );
     };
 
     const handleRenew = () => {
@@ -184,6 +199,8 @@ export default function AdminKampusDoiDashboard({
                     onOpenChange={setDrawerOpen}
                     subscription={subscription}
                     packageData={selectedPackage}
+                    onSubscribe={handleSubscribe}
+                    isSubmitting={isSubmitting}
                 />
             </div>
         </AppLayout>
