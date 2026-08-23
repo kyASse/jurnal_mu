@@ -151,7 +151,7 @@ interface Props {
 
 export default function UniversitiesIndex({ universities, pendingUniversities = [], filters, can }: Props) {
     const { flash } = usePage<SharedData>().props;
-    const safeFilters = filters && !Array.isArray(filters) ? filters : {};
+    const safeFilters = (filters && !Array.isArray(filters) ? filters : {}) as Partial<Props['filters']>;
     const [search, setSearch] = useState(safeFilters.search || '');
     const [isActiveFilter, setIsActiveFilter] = useState(safeFilters.is_active || '');
     const [accreditationFilter, setAccreditationFilter] = useState(safeFilters.accreditation_status || '');
@@ -189,7 +189,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
     }, [flash]);
 
     useEffect(() => {
-        const currentFilters = filters && !Array.isArray(filters) ? filters : {};
+        const currentFilters = (filters && !Array.isArray(filters) ? filters : {}) as Partial<Props['filters']>;
         setSearch(currentFilters.search || '');
         setIsActiveFilter(currentFilters.is_active || '');
         setAccreditationFilter(currentFilters.accreditation_status || '');

@@ -79,7 +79,7 @@ class PublicUniversityController extends Controller
 
     public function show(University $university, Request $request): Response
     {
-        if (! $university->is_active || ! $university->journals()->where('is_active', true)->where('approval_status', 'approved')->exists()) {
+        if (!$university->is_active || !$university->journals()->where('is_active', true)->where('approval_status', 'approved')->exists()) {
             abort(404);
         }
 
@@ -223,7 +223,7 @@ class PublicUniversityController extends Controller
             }
         }
 
-        $startYear = ! empty($establishedYears) ? min($establishedYears) : (int) date('Y') - 4;
+        $startYear = !empty($establishedYears) ? min($establishedYears) : (int) date('Y') - 4;
         $endYear = (int) date('Y');
         if ($startYear < 1900) {
             $startYear = 2020;

@@ -151,7 +151,7 @@ class UserApprovalController extends Controller
         }
 
         // Only allow reverting approved or rejected users
-        if (! in_array($user->approval_status, ['approved', 'rejected'])) {
+        if (!in_array($user->approval_status, ['approved', 'rejected'])) {
             return back()->with('error', 'Hanya user yang sudah diapprove atau ditolak yang bisa di-revert.');
         }
 

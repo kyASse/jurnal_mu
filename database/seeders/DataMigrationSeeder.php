@@ -38,7 +38,7 @@ class DataMigrationSeeder extends Seeder
             ->where('is_active', true)
             ->first();
 
-        if (! $template) {
+        if (!$template) {
             $this->command->error('❌ ERROR: BAN-PT template not found! Run AccreditationTemplateSeeder first.');
 
             return;
@@ -130,7 +130,7 @@ class DataMigrationSeeder extends Seeder
         foreach ($legacyIndicators as $indicator) {
             $key = "{$indicator->category}::{$indicator->sub_category}";
 
-            if (! isset($subCategoryMapping[$key])) {
+            if (!isset($subCategoryMapping[$key])) {
                 $this->command->error("  ✗ FAILED: Indicator {$indicator->code} - No sub_category found for '{$key}'");
                 $failedCount++;
 

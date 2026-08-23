@@ -149,7 +149,7 @@ class EvaluationCategory extends Model
             })
             ->exists();
 
-        return ! $indicatorsUsedInAssessments;
+        return !$indicatorsUsedInAssessments;
     }
 
     /**

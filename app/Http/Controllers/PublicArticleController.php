@@ -80,15 +80,15 @@ class PublicArticleController extends Controller
         $facetBaseQuery = clone $baseQuery;
 
         // Apply sidebar filters to the main query
-        if (! empty($selectedSubjects)) {
+        if (!empty($selectedSubjects)) {
             $baseQuery->whereHas('journal', function ($query) use ($selectedSubjects) {
                 $query->whereIn('scientific_field_id', $selectedSubjects);
             });
         }
-        if (! empty($selectedJournals)) {
+        if (!empty($selectedJournals)) {
             $baseQuery->whereIn('journal_id', $selectedJournals);
         }
-        if (! empty($selectedYears)) {
+        if (!empty($selectedYears)) {
             $baseQuery->where(function ($query) use ($selectedYears) {
                 foreach ($selectedYears as $year) {
                     $query->orWhereBetween('publication_date', ["{$year}-01-01", "{$year}-12-31"]);

@@ -44,7 +44,7 @@ class UadSeeder extends Seeder
             ?? User::where('email', 'dewi.kartika@uad.ac.id')->first()
             ?? User::first();
 
-        if (! $user) {
+        if (!$user) {
             $this->command->error('❌ No user found to associate with journals. Please run general seeders first.');
 
             return;

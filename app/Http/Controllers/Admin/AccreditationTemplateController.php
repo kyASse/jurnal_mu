@@ -177,7 +177,7 @@ class AccreditationTemplateController extends Controller
     {
         $this->authorize('view', $template);
 
-        if (! $template->canBeDeleted()) {
+        if (!$template->canBeDeleted()) {
             return back()->with('error', 'Template tidak dapat dihapus karena merupakan satu-satunya template aktif dengan tipe ini, atau memiliki kategori/pertanyaan/indikator di dalamnya.');
         }
 
@@ -224,7 +224,7 @@ class AccreditationTemplateController extends Controller
     {
         $this->authorize('toggleActive', $template);
 
-        $template->is_active = ! $template->is_active;
+        $template->is_active = !$template->is_active;
         $template->save();
 
         $status = $template->is_active ? 'diaktifkan' : 'dinonaktifkan';

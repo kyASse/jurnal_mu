@@ -225,7 +225,7 @@ class AssessmentController extends Controller
         $this->authorize('update', $assessment);
 
         // Only draft assessments can be edited
-        if (! $assessment->isEditable()) {
+        if (!$assessment->isEditable()) {
             return redirect()->route('user.assessments.show', $assessment->id)
                 ->withErrors(['error' => 'Assessment yang sudah disubmit tidak dapat diedit.']);
         }
@@ -262,7 +262,7 @@ class AssessmentController extends Controller
         $this->authorize('update', $assessment);
 
         // Only draft assessments can be updated
-        if (! $assessment->isEditable()) {
+        if (!$assessment->isEditable()) {
             return redirect()->route('user.assessments.show', $assessment->id)
                 ->withErrors(['error' => 'Assessment yang sudah disubmit tidak dapat diedit.']);
         }
@@ -349,7 +349,7 @@ class AssessmentController extends Controller
         // Authorization
         $this->authorize('update', $assessment);
 
-        if (! $assessment->isEditable()) {
+        if (!$assessment->isEditable()) {
             return back()->withErrors(['error' => 'Assessment sudah disubmit sebelumnya.']);
         }
 
@@ -382,7 +382,7 @@ class AssessmentController extends Controller
         $this->authorize('delete', $assessment);
 
         // Only draft assessments can be deleted
-        if (! $assessment->isEditable()) {
+        if (!$assessment->isEditable()) {
             return back()->withErrors(['error' => 'Assessment yang sudah disubmit tidak dapat dihapus.']);
         }
 
@@ -421,7 +421,7 @@ class AssessmentController extends Controller
         // Check authorization (user must own the assessment or be admin)
         $this->authorize('view', $attachment->assessmentResponse->journalAssessment);
 
-        if (! Storage::disk('local')->exists($attachment->file_path)) {
+        if (!Storage::disk('local')->exists($attachment->file_path)) {
             abort(404, 'File tidak ditemukan.');
         }
 
@@ -510,7 +510,7 @@ class AssessmentController extends Controller
             ]);
 
             // Save responses
-            if (! empty($validated['responses'])) {
+            if (!empty($validated['responses'])) {
                 foreach ($validated['responses'] as $responseData) {
                     $indicator = EvaluationIndicator::find($responseData['evaluation_indicator_id']);
                     $score = $this->calculateScore($indicator, $responseData);
@@ -532,7 +532,7 @@ class AssessmentController extends Controller
             }
 
             // Save issues
-            if (! empty($validated['issues'])) {
+            if (!empty($validated['issues'])) {
                 // Delete existing issues
                 $assessment->issues()->delete();
 
@@ -549,7 +549,7 @@ class AssessmentController extends Controller
             }
 
             // Save journal metadata
-            if (! empty($validated['journal_metadata'])) {
+            if (!empty($validated['journal_metadata'])) {
                 // Delete existing metadata
                 $assessment->journalMetadata()->delete();
 
