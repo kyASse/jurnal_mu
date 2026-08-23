@@ -6,3 +6,4 @@ export * from './DoiSubscriptionsMasterTable';
 export * from './DoiQuotaAdjustDialog';
 export * from './DoiPackageManagementTab';
 export * from './DoiBankAccountManagementTab';
+export * from './DoiHelpdeskSettingsCard';

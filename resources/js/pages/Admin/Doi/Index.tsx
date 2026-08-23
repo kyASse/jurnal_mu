@@ -18,6 +18,7 @@ import {
     DoiQuotaAdjustDialog,
     DoiPackageManagementTab,
     DoiBankAccountManagementTab,
+    DoiHelpdeskSettingsCard,
 } from '@/components/doi/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ export default function SuperAdminDoiIndex({
     subscriptions,
     packages = [],
     bankAccounts = [],
+    doiSettings,
     filters,
 }: SuperAdminDoiManagementProps) {
     const [activeTab, setActiveTab] = React.useState<string>('verification');
@@ -365,8 +367,8 @@ export default function SuperAdminDoiIndex({
                         />
                     </TabsContent>
 
-                    {/* Tab 3: Paket Langganan */}
-                    <TabsContent value="packages" className="mt-6 space-y-4">
+                    {/* Tab 3: Paket Langganan & Helpdesk */}
+                    <TabsContent value="packages" className="mt-6 space-y-6">
                         <DoiPackageManagementTab
                             packages={packages}
                             onCreatePackage={handleCreatePackage}
@@ -374,6 +376,8 @@ export default function SuperAdminDoiIndex({
                             onDeletePackage={handleDeletePackage}
                             isSubmitting={isSubmitting}
                         />
+
+                        <DoiHelpdeskSettingsCard settings={doiSettings} />
                     </TabsContent>
 
                     {/* Tab 4: Rekening Bank Resmi */}

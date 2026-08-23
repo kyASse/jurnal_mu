@@ -42,11 +42,15 @@ import {
     XCircle,
     Sparkles,
     Shield,
-    FileText,
-    AlertCircle,
-    Check,
+    Star,
+    ListChecks,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const DEFAULT_FEATURES = [
+    'Prefix Resmi Crossref Atas Nama Institusi',
+    'Deposit DOI Tanpa Batas',
+];
 
 interface DoiPackageManagementTabProps {
     packages: (DoiPackageData & { subscriptions_count?: number })[];
@@ -76,8 +80,27 @@ export function DoiPackageManagementTab({
     const [similarityQuota, setSimilarityQuota] = React.useState<number | string>(500);
     const [prefixIncluded, setPrefixIncluded] = React.useState(true);
     const [isActive, setIsActive] = React.useState(true);
+    const [isFeatured, setIsFeatured] = React.useState(false);
+    const [badgeText, setBadgeText] = React.useState('');
+    const [sortOrder, setSortOrder] = React.useState<number | string>(0);
+    const [features, setFeatures] = React.useState<string[]>(DEFAULT_FEATURES);
     const [description, setDescription] = React.useState('');
     const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
+
+    const handleFeatureChange = (index: number, val: string) => {
+        const next = [...features];
+        next[index] = val;
+        setFeatures(next);
+    };
+
+    const handleAddFeature = () => {
+        setFeatures([...features, '']);
+    };
+
+    const handleRemoveFeature = (index: number) => {
+        const next = features.filter((_, i) => i !== index);
+        setFeatures(next.length > 0 ? next : ['']);
+    };
 
     const handleOpenCreate = () => {
         setEditingPackage(null);
@@ -87,6 +110,10 @@ export function DoiPackageManagementTab({
         setSimilarityQuota(500);
         setPrefixIncluded(true);
         setIsActive(true);
+        setIsFeatured(false);
+        setBadgeText('');
+        setSortOrder(0);
+        setFeatures([...DEFAULT_FEATURES]);
         setDescription('');
         setFormErrors({});
         setDialogOpen(true);
@@ -100,6 +127,10 @@ export function DoiPackageManagementTab({
         setSimilarityQuota(pkg.similarity_quota_included);
         setPrefixIncluded(pkg.prefix_included);
         setIsActive(pkg.is_active);
+        setIsFeatured(Boolean(pkg.is_featured));
+        setBadgeText(pkg.badge_text || '');
+        setSortOrder(pkg.sort_order ?? 0);
+        setFeatures(pkg.features && pkg.features.length > 0 ? [...pkg.features] : ['']);
         setDescription(pkg.description || '');
         setFormErrors({});
         setDialogOpen(true);
@@ -125,6 +156,10 @@ export function DoiPackageManagementTab({
             similarity_quota_included: Number(similarityQuota) || 0,
             prefix_included: prefixIncluded,
             is_active: isActive,
+            is_featured: isFeatured,
+            badge_text: badgeText.trim() || null,
+            sort_order: Number(sortOrder) || 0,
+            features: features.map((f) => f.trim()).filter(Boolean),
             description: description.trim() || null,
         };
 
@@ -174,6 +209,7 @@ export function DoiPackageManagementTab({
                             <TableHead className="text-xs font-semibold">Nama & Kode Paket</TableHead>
                             <TableHead className="text-xs font-semibold">Biaya Tahunan</TableHead>
                             <TableHead className="text-xs font-semibold">Fasilitas Termasuk</TableHead>
+                            <TableHead className="text-xs font-semibold">Urutan</TableHead>
                             <TableHead className="text-xs font-semibold">Langganan Aktif</TableHead>
                             <TableHead className="text-xs font-semibold">Status</TableHead>
                             <TableHead className="text-right text-xs font-semibold">Aksi</TableHead>
@@ -182,7 +218,7 @@ export function DoiPackageManagementTab({
                     <TableBody>
                         {packages.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="py-10 text-center text-xs text-muted-foreground">
+                                <TableCell colSpan={7} className="py-10 text-center text-xs text-muted-foreground">
                                     Belum ada paket langganan. Klik &quot;Tambah Paket Baru&quot; untuk membuat.
                                 </TableCell>
                             </TableRow>
@@ -191,8 +227,19 @@ export function DoiPackageManagementTab({
                                 <TableRow key={pkg.id} className="transition-colors hover:bg-muted/40">
                                     {/* Name & Code */}
                                     <TableCell className="text-xs">
-                                        <div className="space-y-0.5">
-                                            <p className="font-bold text-foreground">{pkg.name}</p>
+                                        <div className="space-y-1">
+                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                <p className="font-bold text-foreground">{pkg.name}</p>
+                                                {pkg.is_featured && (
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="gap-1 border-amber-300/60 bg-amber-50 px-1.5 py-0 text-[10px] font-semibold text-amber-700 dark:border-amber-700/60 dark:bg-amber-950/50 dark:text-amber-300"
+                                                    >
+                                                        <Star className="size-2.5 fill-amber-500 text-amber-500" />
+                                                        {pkg.badge_text || 'Featured'}
+                                                    </Badge>
+                                                )}
+                                            </div>
                                             <div className="flex items-center gap-1.5">
                                                 <Badge variant="outline" className="font-mono text-[10px] uppercase">
                                                     {pkg.code}
@@ -223,7 +270,18 @@ export function DoiPackageManagementTab({
                                                 <Shield className="size-3" />
                                                 <span>{pkg.prefix_included ? 'Termasuk Prefix DOI' : 'Tanpa Prefix'}</span>
                                             </div>
+                                            {pkg.features && pkg.features.length > 0 && (
+                                                <div className="flex items-center gap-1 text-xs text-primary font-medium">
+                                                    <ListChecks className="size-3" />
+                                                    <span>{pkg.features.length} Fasilitas</span>
+                                                </div>
+                                            )}
                                         </div>
+                                    </TableCell>
+
+                                    {/* Sort order */}
+                                    <TableCell className="font-mono text-xs text-muted-foreground">
+                                        {pkg.sort_order ?? 0}
                                     </TableCell>
 
                                     {/* Subscriptions count */}
@@ -280,7 +338,7 @@ export function DoiPackageManagementTab({
 
             {/* Create / Edit Dialog */}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent className="sm:max-w-lg">
+                <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
                     <form onSubmit={handleFormSubmit}>
                         <DialogHeader>
                             <div className="flex items-center gap-2">
@@ -290,7 +348,7 @@ export function DoiPackageManagementTab({
                                 </DialogTitle>
                             </div>
                             <DialogDescription className="text-xs">
-                                Tentukan parameter harga, kuota similarity, dan status paket
+                                Tentukan parameter harga, fasilitas, kuota similarity, dan status paket
                             </DialogDescription>
                         </DialogHeader>
 
@@ -364,6 +422,22 @@ export function DoiPackageManagementTab({
                                 />
                             </div>
 
+                            {/* Sort Order */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="pkg_sort_order" className="text-xs font-semibold">
+                                    Urutan Tampil (Sort Order)
+                                </Label>
+                                <Input
+                                    id="pkg_sort_order"
+                                    type="number"
+                                    min="0"
+                                    value={sortOrder}
+                                    onChange={(e) => setSortOrder(e.target.value)}
+                                    placeholder="0"
+                                    className="h-8 font-mono text-xs"
+                                />
+                            </div>
+
                             {/* Prefix Included Toggle */}
                             <div className="flex items-center justify-between rounded-lg border p-2.5">
                                 <div>
@@ -377,6 +451,86 @@ export function DoiPackageManagementTab({
                                     checked={prefixIncluded}
                                     onCheckedChange={setPrefixIncluded}
                                 />
+                            </div>
+
+                            {/* Featured Package Toggle */}
+                            <div className="flex items-center justify-between rounded-lg border p-2.5">
+                                <div>
+                                    <Label htmlFor="is_featured" className="cursor-pointer text-xs font-semibold flex items-center gap-1">
+                                        <Star className="size-3.5 text-amber-500 fill-amber-500" />
+                                        Paket Unggulan
+                                    </Label>
+                                    <p className="text-[10px] text-muted-foreground">Sorot & beri badge khusus</p>
+                                </div>
+                                <Switch
+                                    id="is_featured"
+                                    checked={isFeatured}
+                                    onCheckedChange={setIsFeatured}
+                                />
+                            </div>
+
+                            {/* Badge Text (if featured or optional) */}
+                            {isFeatured && (
+                                <div className="col-span-2 space-y-1.5">
+                                    <Label htmlFor="pkg_badge_text" className="text-xs font-semibold">
+                                        Label Badge Rekomendasi
+                                    </Label>
+                                    <Input
+                                        id="pkg_badge_text"
+                                        value={badgeText}
+                                        onChange={(e) => setBadgeText(e.target.value)}
+                                        placeholder="cth: Paling Populer, Direkomendasikan"
+                                        className="h-8 text-xs"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Features Repeater Section */}
+                            <div className="col-span-2 space-y-2 rounded-lg border bg-muted/20 p-3">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <Label className="text-xs font-semibold flex items-center gap-1.5">
+                                            <ListChecks className="size-3.5 text-primary" />
+                                            Daftar Fasilitas & Keuntungan Paket
+                                        </Label>
+                                        <p className="text-[10px] text-muted-foreground">
+                                            Poin fitur yang ditampilkan di kartu & drawer rincian paket
+                                        </p>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleAddFeature}
+                                        className="h-7 gap-1 text-xs"
+                                    >
+                                        <Plus className="size-3" />
+                                        <span>Tambah Fasilitas</span>
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-2 pt-1">
+                                    {features.map((feature, idx) => (
+                                        <div key={idx} className="flex items-center gap-2">
+                                            <Input
+                                                value={feature}
+                                                onChange={(e) => handleFeatureChange(idx, e.target.value)}
+                                                placeholder={`Fasilitas ${idx + 1}...`}
+                                                className="h-8 text-xs bg-background"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleRemoveFeature(idx)}
+                                                className="h-8 w-8 p-0 text-muted-foreground hover:text-rose-600"
+                                                title="Hapus fasilitas"
+                                            >
+                                                <Trash2 className="size-3.5" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* Description */}
