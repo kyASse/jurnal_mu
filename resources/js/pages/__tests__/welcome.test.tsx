@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import Welcome from '../welcome';
 import fs from 'fs';
 import path from 'path';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import Welcome from '../welcome';
 
 const { mockGet } = vi.hoisted(() => {
     return {
@@ -30,7 +30,18 @@ vi.mock('@inertiajs/react', () => {
         usePage: () => ({
             props: {
                 auth: { user: null },
-                featuredJournals: [],
+                featuredJournals: [
+                    {
+                        id: 1,
+                        title: 'Jurnal Ilmiah Farmasi',
+                        sinta_rank: 'S1',
+                        sinta_rank_label: 'SINTA 1',
+                        issn: '2085-1234',
+                        e_issn: '2548-5678',
+                        university: 'Universitas Muhammadiyah Surakarta',
+                        indexation_labels: ['Scopus', 'WoS'],
+                    },
+                ],
                 totalUniversities: 10,
                 totalJournals: 50,
                 totalArticles: 100,
@@ -48,29 +59,12 @@ vi.mock('@/layouts/public-layout', () => ({
     default: ({ children }: any) => <div data-testid="public-layout">{children}</div>,
 }));
 
-// Mock child components to prevent import errors
+// Mock child components
 vi.mock('@/components/public-navbar', () => ({
-    default: () => <div data-testid="public-navbar" />
+    default: () => <div data-testid="public-navbar" />,
 }));
 vi.mock('@/components/public-footer', () => ({
-    default: () => <div data-testid="public-footer" />
-}));
-
-// Mock Lucide icons
-vi.mock('lucide-react', () => ({
-    ArrowRight: () => <span>ArrowRight</span>,
-    BookOpen: () => <span>BookOpen</span>,
-    Calendar: () => <span>Calendar</span>,
-    ChevronDown: () => <span>ChevronDown</span>,
-    Clock: () => <span>Clock</span>,
-    Download: () => <span>Download</span>,
-    FileText: () => <span>FileText</span>,
-    GraduationCap: () => <span>GraduationCap</span>,
-    LayoutDashboard: () => <span>LayoutDashboard</span>,
-    Library: () => <span>Library</span>,
-    MapPin: () => <span>MapPin</span>,
-    Search: () => <span>Search</span>,
-    User: () => <span>User</span>,
+    default: () => <div data-testid="public-footer" />,
 }));
 
 beforeEach(() => {
@@ -78,9 +72,11 @@ beforeEach(() => {
 });
 
 describe('Welcome Page Redesign', () => {
-    it('should render welcome page without crashing', () => {
+    it('should render welcome page with hero and featured bento without crashing', () => {
         render(<Welcome />);
-        expect(screen.getByText(/Discover Muhammadiyah/i)).toBeInTheDocument();
+        expect(screen.getByText(/Eksplorasi Keunggulan/i)).toBeInTheDocument();
+        expect(screen.getByText(/Jurnal Terakreditasi Unggulan/i)).toBeInTheDocument();
+        expect(screen.getByText('Jurnal Ilmiah Farmasi')).toBeInTheDocument();
     });
 
     it('should not contain hardcoded green, old navy, or yellow hex colors in welcome.tsx', () => {
@@ -108,19 +104,18 @@ describe('Welcome Page Redesign', () => {
 
     it('should have accessibility labels on search input', () => {
         render(<Welcome />);
-        const searchInput = screen.getByPlaceholderText(/Search for journals/i);
+        const searchInput = screen.getByPlaceholderText(/Cari nama jurnal/i);
         expect(searchInput).toHaveAttribute('aria-label', 'Search academic content');
     });
 
     it('should perform client-side search using Inertia router', async () => {
         render(<Welcome />);
-        const searchInput = screen.getByPlaceholderText(/Search for journals/i);
+        const searchInput = screen.getByPlaceholderText(/Cari nama jurnal/i);
         fireEvent.change(searchInput, { target: { value: 'physics' } });
-        
+
         const searchButton = screen.getByRole('button', { name: /Search/i });
         fireEvent.click(searchButton);
 
         expect(mockGet).toHaveBeenCalled();
     });
 });
-

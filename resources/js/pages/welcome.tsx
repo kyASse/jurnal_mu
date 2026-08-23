@@ -1,16 +1,15 @@
 import { type EventCardProps } from '@/components/event-card';
-import JournalCard from '@/components/journal-card';
+import FeaturedJournalBento from '@/components/featured-journal-bento';
+import HeroSection from '@/components/hero-section';
 import PublicFooter from '@/components/public-footer';
 import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type SharedData } from '@/types';
-import { Head, Link, usePage, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     BookOpen,
     Calendar,
-    ChevronDown,
     Clock,
     Download,
     FileText,
@@ -21,7 +20,7 @@ import {
     Search,
     User,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface WelcomeProps extends SharedData {
     laravelVersion: string;
@@ -99,43 +98,24 @@ export default function Welcome() {
         if (!searchQuery.trim() || isSearching) return;
 
         setIsSearching(true);
-        const params = searchType === 'journals'
-            ? { search: searchQuery }
-            : searchType === 'articles'
-              ? { q: searchQuery }
-              : { search: searchQuery };
+        const params =
+            searchType === 'journals'
+                ? { search: searchQuery }
+                : searchType === 'articles'
+                  ? { q: searchQuery }
+                  : { search: searchQuery };
 
-        const routeName = searchType === 'journals'
-            ? 'journals.index'
-            : searchType === 'articles'
-              ? 'browse.articles'
-              : 'browse.universities';
+        const routeName =
+            searchType === 'journals'
+                ? 'journals.index'
+                : searchType === 'articles'
+                  ? 'browse.articles'
+                  : 'browse.universities';
 
         router.get(route(routeName), params, {
-            onFinish: () => setIsSearching(false)
+            onFinish: () => setIsSearching(false),
         });
     };
-
-    const links = [
-        { label: 'Browse Journals', href: route('journals.index') },
-        { label: 'Browse Articles', href: route('browse.articles') },
-        { label: 'Browse Universities', href: route('browse.universities') },
-    ];
-
-    const [currentLinkIndex, setCurrentLinkIndex] = useState(0);
-    const [isFading, setIsFading] = useState(false);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setIsFading(true);
-            setTimeout(() => {
-                setCurrentLinkIndex((prev) => (prev + 1) % links.length);
-                setIsFading(false);
-            }, 300);
-        }, 4000);
-
-        return () => clearInterval(interval);
-    }, [links.length]);
 
     const downloadRis = (article: WelcomeProps['featuredArticles'][number]) => {
         const year = article.publication_date ? new Date(article.publication_date).getFullYear() : new Date().getFullYear();
@@ -173,216 +153,26 @@ export default function Welcome() {
         <>
             <Head title="JurnalMu - Muhammadiyah Journal Portal" />
 
-            <div className="min-h-screen bg-gray-50 font-sans text-gray-900 selection:bg-primary selection:text-white dark:bg-zinc-950 dark:text-zinc-100">
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-primary selection:text-white dark:bg-zinc-950 dark:text-zinc-100">
                 <PublicNavbar />
 
-                {/* HERO SECTION */}
-                <div className="relative pt-16">
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 z-0 overflow-hidden bg-gradient-to-br from-primary to-secondary dark:from-[#151a43] dark:to-[#6b1013] pb-32">
-                        <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-accent opacity-10 mix-blend-overlay blur-3xl"></div>
-                        <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-secondary opacity-20 mix-blend-multiply blur-3xl"></div>
-
-                        {/* Subtle Self-Contained Geometric Mesh Overlay */}
-                        <div
-                            className="absolute inset-0 opacity-[0.07] dark:opacity-[0.12]"
-                            style={{
-                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h16v16H0V0zm16 16h16v16H16V16zM0 16h16v16H0V16zM16 0h16v16H16V0z' fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
-                                backgroundSize: '24px 24px',
-                            }}
-                        />
-                    </div>
-
-                    <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-28">
-                        <h1
-                            className="font-heading mb-6 text-4xl font-bold tracking-tight text-white sm:text-6xl"
-                            style={{ fontFamily: '"El Messiri", serif' }}
-                        >
-                            Discover Muhammadiyah's <br /> <span className="text-accent">Scientific Excellence</span>
-                        </h1>
-                        <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 sm:text-xl">
-                            The central portal for academic journals, research papers, and scholarly works from Muhammadiyah Universities across
-                            Indonesia.
-                        </p>
-
-                        {/* Search Bar */}
-                        <div className="mx-auto max-w-2xl">
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleSearch();
-                                }}
-                                className="relative flex items-center rounded-full bg-white p-1.5 pl-4 shadow-2xl focus-within:ring-4 focus-within:ring-accent/50"
-                            >
-                                <Search className="h-5 w-5 flex-shrink-0 text-gray-400" />
-                                <input
-                                    type="text"
-                                    aria-label="Search academic content"
-                                    disabled={isSearching}
-                                    placeholder={
-                                        searchType === 'journals'
-                                            ? 'Search for journals, publisher, or ISSN...'
-                                            : searchType === 'articles'
-                                              ? 'Search for article title, author, or abstract...'
-                                              : 'Search for university name or code...'
-                                    }
-                                    className="h-11 w-full border-0 bg-transparent px-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:ring-offset-0 focus:outline-none sm:text-base"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-
-                                {/* Divider */}
-                                <div className="mx-2 h-6 w-[1px] flex-shrink-0 bg-gray-200" />
-
-                                {/* Dropdown Selector */}
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button
-                                            type="button"
-                                            disabled={isSearching}
-                                            className="mr-2 flex flex-shrink-0 items-center gap-1.5 rounded-md px-3 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none disabled:opacity-50"
-                                        >
-                                            {searchType === 'journals' && <Library className="h-4 w-4 text-gray-500" />}
-                                            {searchType === 'articles' && <BookOpen className="h-4 w-4 text-gray-500" />}
-                                            {searchType === 'universities' && <GraduationCap className="h-4 w-4 text-gray-500" />}
-                                            <span className="capitalize">{searchType}</span>
-                                            <ChevronDown className="h-4 w-4 text-gray-400" />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-40">
-                                        <DropdownMenuItem
-                                            onClick={() => setSearchType('journals')}
-                                            className="flex cursor-pointer items-center gap-2"
-                                        >
-                                            <Library className="h-4 w-4 text-gray-400" />
-                                            <span>Journals</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => setSearchType('articles')}
-                                            className="flex cursor-pointer items-center gap-2"
-                                        >
-                                            <BookOpen className="h-4 w-4 text-gray-400" />
-                                            <span>Articles</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => setSearchType('universities')}
-                                            className="flex cursor-pointer items-center gap-2"
-                                        >
-                                            <GraduationCap className="h-4 w-4 text-gray-400" />
-                                            <span>Universities</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                <Button
-                                    type="submit"
-                                    className="h-11 flex-shrink-0 rounded-full bg-secondary px-6 text-white hover:bg-secondary/90 disabled:opacity-70"
-                                    disabled={isSearching}
-                                >
-                                    {isSearching ? 'Loading...' : 'Search'}
-                                </Button>
-                            </form>
-                            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-white/80">
-                                <span>Can't find what you're looking for?</span>
-                                <div className="inline-flex h-5 items-center overflow-hidden">
-                                    <Link
-                                        href={links[currentLinkIndex].href}
-                                        className={`inline-flex items-center font-semibold text-accent transition-all duration-300 ease-out hover:underline ${
-                                            isFading ? 'translate-y-3 scale-95 opacity-0' : 'translate-y-0 scale-100 opacity-100'
-                                        }`}
-                                    >
-                                        {links[currentLinkIndex].label}
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="relative z-20 mx-auto -mt-16 max-w-5xl px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
-                            {/* Total Journals Stat Card */}
-                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-primary bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
-                                <div className="absolute -top-4 -right-4 rounded-full bg-primary/10 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-primary/25"></div>
-                                <div className="relative flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">Total Journals</p>
-                                        <p className="mt-2 text-4xl font-black text-gray-900 dark:text-white">
-                                            {new Intl.NumberFormat('id-ID').format(totalJournals || 0)}
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl bg-primary/10 p-4 text-primary dark:bg-primary/20">
-                                        <Library className="h-8 w-8" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Total Articles Stat Card */}
-                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-secondary bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
-                                <div className="absolute -top-4 -right-4 rounded-full bg-secondary/10 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-secondary/25"></div>
-                                <div className="relative flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">Total Articles</p>
-                                        <p className="mt-2 text-4xl font-black text-gray-900 dark:text-white">
-                                            {new Intl.NumberFormat('id-ID').format(totalArticles || 0)}
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl bg-secondary/10 p-4 text-secondary dark:bg-secondary/20 dark:text-white">
-                                        <BookOpen className="h-8 w-8" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Total Universities Stat Card */}
-                            <div className="group relative overflow-hidden rounded-2xl border-l-4 border-l-accent bg-white p-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl dark:bg-zinc-900">
-                                <div className="absolute -top-4 -right-4 rounded-full bg-accent/10 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-accent/20"></div>
-                                <div className="relative flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                                            Total Universities
-                                        </p>
-                                        <p className="mt-2 text-4xl font-black text-gray-900 dark:text-white">
-                                            {new Intl.NumberFormat('id-ID').format(totalUniversities || 0)}
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl bg-accent/20 p-4 text-yellow-700 dark:bg-accent/10 dark:text-yellow-400">
-                                        <GraduationCap className="h-8 w-8" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/* REDESIGNED HERO SECTION (Soft Structuralism + Double-Bezel Metrics) */}
+                <HeroSection
+                    totalJournals={totalJournals}
+                    totalArticles={totalArticles}
+                    totalUniversities={totalUniversities}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    searchType={searchType}
+                    setSearchType={setSearchType}
+                    onSearch={handleSearch}
+                    isSearching={isSearching}
+                />
 
                 {/* MAIN CONTENT AREA */}
-                <main className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-                    {/* Featured Journals Section */}
-                    <div className="mb-12 flex items-end justify-between">
-                        <div>
-                            <h2 className="font-heading text-3xl font-bold text-primary" style={{ fontFamily: '"El Messiri", serif' }}>
-                                Featured Journals
-                            </h2>
-                            <p className="mt-2 text-gray-600 dark:text-gray-400">High-impact research from our network.</p>
-                        </div>
-                        <Link href={route('journals.index')} className="group flex items-center font-semibold text-secondary hover:text-primary">
-                            View All Journals
-                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Link>
-                    </div>
-
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        {featuredJournals.map((journal) => (
-                            <JournalCard
-                                key={journal.id}
-                                id={journal.id}
-                                title={journal.title}
-                                sinta_rank={journal.sinta_rank}
-                                issn={journal.issn}
-                                e_issn={journal.e_issn}
-                                university={journal.university}
-                                indexation_labels={journal.indexation_labels}
-                            />
-                        ))}
-                    </div>
+                <main className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+                    {/* REDESIGNED FEATURED JOURNALS BENTO SHOWCASE */}
+                    <FeaturedJournalBento journals={featuredJournals} />
 
                     {/* FEATURED ARTICLES SECTION */}
                     {featuredArticles && featuredArticles.length > 0 && (
