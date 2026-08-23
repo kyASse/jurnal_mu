@@ -19,6 +19,10 @@ export interface DoiPackageData {
     price_annual: number | string;
     prefix_included: boolean;
     similarity_quota_included: number;
+    features?: string[] | null;
+    is_featured?: boolean;
+    badge_text?: string | null;
+    sort_order?: number;
     is_active: boolean;
     created_at?: string;
     updated_at?: string;
@@ -235,6 +239,14 @@ export interface DoiSubscriptionData {
     quota_logs?: DoiQuotaLogData[];
 }
 
+export interface DoiSettingsData {
+    doi_helpdesk_email?: string;
+    doi_helpdesk_phone?: string;
+    doi_helpdesk_hours?: string;
+    doi_helpdesk_notes?: string;
+    [key: string]: string | undefined;
+}
+
 export interface DoiDashboardProps {
     subscription: DoiSubscriptionData | null;
     activeInvoice: DoiActiveInvoiceData | null;
@@ -242,6 +254,7 @@ export interface DoiDashboardProps {
     availablePackages: DoiPackageData[];
     registeredJournalsCount: number;
     canManageSubscription?: boolean;
+    doiSettings?: DoiSettingsData;
 }
 
 export interface DoiAdminStatsData {
@@ -264,6 +277,7 @@ export interface SuperAdminDoiManagementProps {
     subscriptions: PaginatedData<DoiSubscriptionData>;
     packages: (DoiPackageData & { subscriptions_count?: number })[];
     bankAccounts: DoiBankAccountData[];
+    doiSettings?: DoiSettingsData;
     filters?: {
         status?: string;
         search?: string;
@@ -295,6 +309,10 @@ export interface DoiPackageFormData {
     price_annual: number | string;
     prefix_included: boolean;
     similarity_quota_included: number;
+    features?: string[];
+    is_featured?: boolean;
+    badge_text?: string | null;
+    sort_order?: number;
     is_active: boolean;
 }
 
