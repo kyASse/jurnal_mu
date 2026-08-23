@@ -183,7 +183,14 @@ export default function Welcome() {
                         <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-accent opacity-10 mix-blend-overlay blur-3xl"></div>
                         <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-secondary opacity-20 mix-blend-multiply blur-3xl"></div>
 
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+                        {/* Subtle Self-Contained Geometric Mesh Overlay */}
+                        <div
+                            className="absolute inset-0 opacity-[0.07] dark:opacity-[0.12]"
+                            style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h16v16H0V0zm16 16h16v16H16V16zM0 16h16v16H0V16zM16 0h16v16H16V0z' fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+                                backgroundSize: '24px 24px',
+                            }}
+                        />
                     </div>
 
                     <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-28">
@@ -634,48 +641,46 @@ export default function Welcome() {
 
                     {/* JOURNALS BY SUBJECT SECTION */}
                     {scientificFields && scientificFields.length > 0 && (
-                        <div className="relative left-1/2 mt-24 w-screen -translate-x-1/2 bg-primary px-4 py-20 text-white sm:px-6 lg:px-8 dark:bg-zinc-950">
-                            <div className="mx-auto max-w-7xl">
-                                <div className="grid gap-12 lg:grid-cols-[1fr_3fr]">
-                                    {/* Header / Title area */}
-                                    <div className="space-y-6">
-                                        <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                                            <LayoutDashboard className="h-8 w-8 text-accent" />
-                                        </div>
-                                        <h2 className="font-heading text-3xl font-bold" style={{ fontFamily: '"El Messiri", serif' }}>
-                                            Journals by Subject
-                                        </h2>
-                                        <p className="text-blue-100">
-                                            Explore our extensive collection of journals categorized by scientific fields, showcasing the diverse
-                                            research output from Muhammadiyah Universities across Indonesia.
-                                        </p>
-                                        <Button
-                                            asChild
-                                            variant="outline"
-                                            className="mt-4 rounded-full border-white/30 bg-transparent text-white hover:bg-white hover:text-primary"
-                                        >
-                                            <Link href={route('journals.index')}>
-                                                View all journals
-                                                <ArrowRight className="ml-2 h-4 w-4" />
-                                            </Link>
-                                        </Button>
+                        <div className="mt-28 overflow-hidden rounded-3xl bg-primary px-6 py-16 text-white sm:px-12 lg:py-20 dark:bg-zinc-900 border border-primary/20 dark:border-zinc-800 shadow-xl">
+                            <div className="grid gap-12 lg:grid-cols-[1fr_3fr]">
+                                {/* Header / Title area */}
+                                <div className="space-y-6">
+                                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
+                                        <LayoutDashboard className="h-8 w-8 text-accent" />
                                     </div>
+                                    <h2 className="font-heading text-3xl font-bold" style={{ fontFamily: '"El Messiri", serif' }}>
+                                        Journals by Subject
+                                    </h2>
+                                    <p className="text-blue-100">
+                                        Explore our extensive collection of journals categorized by scientific fields, showcasing the diverse
+                                        research output from Muhammadiyah Universities across Indonesia.
+                                    </p>
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        className="mt-4 rounded-full border-white/30 bg-transparent text-white hover:bg-white hover:text-primary"
+                                    >
+                                        <Link href={route('journals.index')}>
+                                            View all journals
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Link>
+                                    </Button>
+                                </div>
 
-                                    {/* Subjects Grid */}
-                                    <div className="grid gap-x-8 gap-y-0 sm:grid-cols-2">
-                                        {scientificFields.map((field) => (
-                                            <Link
-                                                key={field.id}
-                                                href={route('journals.index', { scientific_field_id: field.id })}
-                                                className="group flex w-full items-center justify-between border-b border-white/10 py-5 transition-colors hover:border-white/40"
-                                            >
-                                                <span className="font-medium text-blue-50 transition-colors group-hover:text-white">
-                                                    {field.name}
-                                                </span>
-                                                <ArrowRight className="h-4 w-4 text-white/0 transition-all group-hover:-translate-x-1 group-hover:text-white/50" />
-                                            </Link>
-                                        ))}
-                                    </div>
+                                {/* Subjects Grid */}
+                                <div className="grid gap-x-8 gap-y-0 sm:grid-cols-2">
+                                    {scientificFields.map((field) => (
+                                        <Link
+                                            key={field.id}
+                                            href={route('journals.index', { scientific_field_id: field.id })}
+                                            className="group flex w-full items-center justify-between border-b border-white/10 py-5 transition-colors hover:border-white/40"
+                                        >
+                                            <span className="font-medium text-blue-50 transition-colors group-hover:text-white">
+                                                {field.name}
+                                            </span>
+                                            <ArrowRight className="h-4 w-4 text-white/0 transition-all group-hover:-translate-x-1 group-hover:text-white/50" />
+                                        </Link>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -683,7 +688,13 @@ export default function Welcome() {
 
                     {/* CTA Section */}
                     <div className="mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary dark:from-[#151a43] dark:to-[#6b1013] text-white shadow-2xl">
-                        <div className="relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] px-6 py-16 text-center sm:px-12 lg:py-20">
+                        <div
+                            className="relative px-6 py-16 text-center sm:px-12 lg:py-20"
+                            style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h16v16H0V0zm16 16h16v16H16V16zM0 16h16v16H0V16zM16 0h16v16H16V0z' fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+                                backgroundSize: '24px 24px',
+                            }}
+                        >
                             <div className="relative z-10 mx-auto max-w-3xl">
                                 <h2
                                     className="font-heading text-3xl font-bold tracking-tight sm:text-4xl"
