@@ -173,7 +173,7 @@ export default function Welcome() {
         <>
             <Head title="JurnalMu - Muhammadiyah Journal Portal" />
 
-            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-primary selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
+            <div className="min-h-screen bg-gray-50 font-sans text-gray-900 selection:bg-primary selection:text-white dark:bg-zinc-950 dark:text-zinc-100">
                 <PublicNavbar />
 
                 {/* HERO SECTION */}
@@ -407,7 +407,7 @@ export default function Welcome() {
                                 {featuredArticles.map((article) => (
                                     <div
                                         key={article.id}
-                                        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
+                                        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
                                     >
                                         <div className="space-y-3">
                                             {article.journal?.title && (
@@ -446,44 +446,50 @@ export default function Welcome() {
                                             </div>
                                         </div>
 
-                                        <div className="mt-6 flex flex-wrap items-center gap-3">
-                                            {article.pdf_url ? (
-                                                <Button asChild size="sm" className="bg-primary text-white hover:bg-primary/90">
-                                                    <a href={article.pdf_url} target="_blank" rel="noopener noreferrer">
-                                                        Read Full PDF
-                                                    </a>
-                                                </Button>
-                                            ) : article.article_url ? (
-                                                <Button asChild size="sm" className="bg-primary text-white hover:bg-primary/90">
-                                                    <a href={article.article_url} target="_blank" rel="noopener noreferrer">
-                                                        View Article
-                                                    </a>
-                                                </Button>
-                                            ) : null}
-                                            <Button asChild variant="outline" size="sm" className="border-gray-200 dark:border-gray-700">
-                                                <a href={article.google_scholar_url} target="_blank" rel="noopener noreferrer">
-                                                    Google Scholar
-                                                </a>
-                                            </Button>
+                                        <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-4 dark:border-zinc-800/80">
+                                            <div>
+                                                {article.pdf_url ? (
+                                                    <Button asChild size="sm" className="bg-primary font-semibold text-white hover:bg-primary/90">
+                                                        <a href={article.pdf_url} target="_blank" rel="noopener noreferrer">
+                                                            Read Full PDF
+                                                        </a>
+                                                    </Button>
+                                                ) : article.article_url ? (
+                                                    <Button asChild size="sm" className="bg-primary font-semibold text-white hover:bg-primary/90">
+                                                        <a href={article.article_url} target="_blank" rel="noopener noreferrer">
+                                                            View Article
+                                                        </a>
+                                                    </Button>
+                                                ) : null}
+                                            </div>
 
-                                            {article.doi && (
-                                                <Button asChild size="sm" variant="outline" className="text-gray-700 dark:text-gray-300">
-                                                    <a href={article.doi_url} target="_blank" rel="noopener noreferrer">
-                                                        <FileText className="mr-1 h-4 w-4" />
-                                                        DOI
+                                            <div className="flex items-center gap-1.5">
+                                                <Button asChild variant="outline" size="sm" className="border-gray-200 text-xs dark:border-zinc-700 dark:text-zinc-300">
+                                                    <a href={article.google_scholar_url} target="_blank" rel="noopener noreferrer">
+                                                        Scholar
                                                     </a>
                                                 </Button>
-                                            )}
 
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => downloadRis(article)}
-                                                className="border-primary/20 text-primary hover:bg-primary/10"
-                                            >
-                                                <Download className="mr-1 h-4 w-4" />
-                                                Export RIS
-                                            </Button>
+                                                {article.doi && (
+                                                    <Button asChild size="sm" variant="outline" className="border-gray-200 text-xs text-gray-700 dark:border-zinc-700 dark:text-zinc-300">
+                                                        <a href={article.doi_url} target="_blank" rel="noopener noreferrer" title="View Digital Object Identifier">
+                                                            <FileText className="mr-1 h-3.5 w-3.5" />
+                                                            DOI
+                                                        </a>
+                                                    </Button>
+                                                )}
+
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => downloadRis(article)}
+                                                    className="border-primary/20 text-xs text-primary hover:bg-primary/10 dark:border-primary/40"
+                                                    title="Export RIS Citation"
+                                                >
+                                                    <Download className="mr-1 h-3.5 w-3.5" />
+                                                    RIS
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -527,11 +533,11 @@ export default function Welcome() {
                                             key={event.id}
                                             href={route('events.show', event.slug)}
                                             aria-label={`View details of event: ${event.title}`}
-                                            className="group flex animate-fade-in-up flex-col items-start gap-6 border-b border-gray-200 py-8 transition-all hover:border-primary sm:flex-row sm:items-center dark:border-gray-800"
+                                            className="group flex animate-fade-in-up flex-col items-start gap-6 border-b border-gray-200 py-8 transition-all hover:border-primary sm:flex-row sm:items-center dark:border-zinc-800"
                                             style={{ animationDelay: `${index * 150}ms` }}
                                         >
                                             {/* Date Box */}
-                                            <div className="flex w-24 shrink-0 flex-col items-center justify-center rounded-2xl bg-gray-50 py-4 text-center transition-colors group-hover:bg-primary/10 dark:bg-gray-900/50">
+                                            <div className="flex w-24 shrink-0 flex-col items-center justify-center rounded-2xl bg-gray-50 py-4 text-center transition-colors group-hover:bg-primary/10 dark:bg-zinc-900/60">
                                                 <span className="text-sm font-bold tracking-wider text-primary">{month}</span>
                                                 <span className="mt-1 text-3xl font-black text-gray-900 dark:text-white">{day}</span>
                                             </div>
@@ -570,7 +576,7 @@ export default function Welcome() {
                                             </div>
 
                                             {/* Hover Arrow */}
-                                            <div className="hidden shrink-0 items-center justify-center rounded-full bg-gray-100 p-4 text-gray-400 transition-all duration-300 group-hover:bg-primary group-hover:text-white sm:flex dark:bg-gray-800">
+                                            <div className="hidden shrink-0 items-center justify-center rounded-full bg-gray-100 p-4 text-gray-400 transition-all duration-300 group-hover:bg-primary group-hover:text-white sm:flex dark:bg-zinc-800">
                                                 <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
                                             </div>
                                         </Link>
@@ -606,7 +612,7 @@ export default function Welcome() {
                                     <Link
                                         key={uni.id}
                                         href={route('browse.universities.show', uni.id)}
-                                        className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-zinc-900"
+                                        className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
                                     >
                                         {/* Logo or Initials placeholder */}
                                         <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2 group-hover:border-primary/20 dark:border-zinc-800 dark:bg-zinc-800">
