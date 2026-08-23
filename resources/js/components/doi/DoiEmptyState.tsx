@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DoiPackageData } from '@/types/doi';
+import { DoiPackageData, DoiSettingsData } from '@/types/doi';
 import {
     Sparkles,
     Check,
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 
 interface DoiEmptyStateProps {
     packages: DoiPackageData[];
+    settings?: DoiSettingsData;
     onSelectPackage?: (pkg: DoiPackageData) => void;
     className?: string;
 }
@@ -71,7 +72,8 @@ export function DoiEmptyState({
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {packages.map((pkg) => {
-                        const isFeatured = pkg.code.toLowerCase().includes('platinum') || pkg.code.toLowerCase().includes('gold');
+                        const isFeatured = Boolean(pkg.is_featured);
+                        const badgeText = pkg.badge_text || 'Rekomendasi';
 
                         return (
                             <Card
@@ -85,7 +87,7 @@ export function DoiEmptyState({
                             >
                                 {isFeatured && (
                                     <div className="absolute top-0 right-0 bg-primary px-3 py-1 rounded-bl-lg text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                                        Rekomendasi
+                                        {badgeText}
                                     </div>
                                 )}
 
@@ -112,33 +114,17 @@ export function DoiEmptyState({
 
                                 <CardContent className="space-y-3 pb-6">
                                     <div className="space-y-2 border-t pt-4 text-xs">
-                                        <div className="flex items-center gap-2">
-                                            <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                            <span className="text-foreground/90">
-                                                Prefix Crossref Resmi Kampus
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                            <span className="text-foreground/90">
-                                                Deposit Artikel Tanpa Batas
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                            <span className="font-medium text-foreground">
-                                                Kuota {pkg.similarity_quota_included} Dokumen Uji Plagiasi
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                            <span className="text-foreground/90">
-                                                Dukungan Teknis & Konsultasi
-                                            </span>
-                                        </div>
+                                        {(pkg.features && pkg.features.length > 0 ? pkg.features : [
+                                            'Prefix Crossref Resmi Kampus',
+                                            'Deposit Artikel Tanpa Batas',
+                                            `Kuota ${pkg.similarity_quota_included} Dokumen Uji Plagiasi`,
+                                            'Dukungan Teknis & Konsultasi',
+                                        ]).map((feature, idx) => (
+                                            <div key={idx} className="flex items-center gap-2">
+                                                <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                                                <span className="text-foreground/90">{feature}</span>
+                                            </div>
+                                        ))}
                                     </div>
                                 </CardContent>
 

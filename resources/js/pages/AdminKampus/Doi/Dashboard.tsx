@@ -10,7 +10,7 @@ import {
     DoiPackageDrawer,
     DoiEmptyState,
 } from '@/components/doi';
-import { DoiActiveInvoiceData, DoiPackageData, DoiQuotaLogData, DoiSubscriptionData } from '@/types/doi';
+import { DoiActiveInvoiceData, DoiPackageData, DoiQuotaLogData, DoiSettingsData, DoiSubscriptionData } from '@/types/doi';
 import { Head, router } from '@inertiajs/react';
 import { Globe, Building2, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ interface AdminKampusDoiDashboardProps {
     activeInvoice: DoiActiveInvoiceData | null;
     recentQuotaLogs: DoiQuotaLogData[];
     packages: DoiPackageData[];
+    doiSettings?: DoiSettingsData;
     universityName: string;
     journalsCount: number;
 }
@@ -41,6 +42,7 @@ export default function AdminKampusDoiDashboard({
     activeInvoice,
     recentQuotaLogs = [],
     packages = [],
+    doiSettings,
     universityName = 'Institusi',
     journalsCount = 0,
 }: AdminKampusDoiDashboardProps) {
@@ -189,6 +191,7 @@ export default function AdminKampusDoiDashboard({
                     /* Empty State when no active subscription exists */
                     <DoiEmptyState
                         packages={packages}
+                        settings={doiSettings}
                         onSelectPackage={handleSelectPackageFromEmpty}
                     />
                 )}
@@ -199,6 +202,7 @@ export default function AdminKampusDoiDashboard({
                     onOpenChange={setDrawerOpen}
                     subscription={subscription}
                     packageData={selectedPackage}
+                    settings={doiSettings}
                     onSubscribe={handleSubscribe}
                     isSubmitting={isSubmitting}
                 />
