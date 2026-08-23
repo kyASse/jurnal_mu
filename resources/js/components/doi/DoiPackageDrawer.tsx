@@ -22,14 +22,19 @@ import {
     Shield,
     ExternalLink,
     PhoneCall,
+    Sparkles,
+    Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { router } from '@inertiajs/react';
 
 interface DoiPackageDrawerProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     subscription: DoiSubscriptionData | null;
     packageData?: DoiPackageData | null;
+    onSubscribe?: (pkg: DoiPackageData) => void;
+    isSubmitting?: boolean;
 }
 
 function formatRupiah(amount: number | string): string {
@@ -59,7 +64,12 @@ export function DoiPackageDrawer({
     onOpenChange,
     subscription,
     packageData,
+    onSubscribe,
+    isSubmitting: externalIsSubmitting,
 }: DoiPackageDrawerProps) {
+    const [internalSubmitting, setInternalSubmitting] = React.useState(false);
+    const isSubmitting = externalIsSubmitting ?? internalSubmitting;
+
     const currentPackage = packageData || subscription?.package;
     const packageName = currentPackage?.name || 'Paket Langganan Crossref';
     const packageCode = currentPackage?.code || 'PKG-DOI';
@@ -75,6 +85,26 @@ export function DoiPackageDrawer({
         'Dukungan Teknis Prioritas Majelis Diktilitbang PPM',
         'Pemeliharaan Tahunan & Notifikasi Masa Berakhir Otomatis',
     ];
+
+    const handleConfirmSubscribe = () => {
+        if (!currentPackage) return;
+        if (onSubscribe) {
+            onSubscribe(currentPackage);
+            return;
+        }
+
+        router.post(
+            route('admin-kampus.doi.subscribe'),
+            { package_id: currentPackage.id },
+            {
+                onStart: () => setInternalSubmitting(true),
+                onFinish: () => setInternalSubmitting(false),
+                onSuccess: () => {
+                    onOpenChange(false);
+                },
+            }
+        );
+    };
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
@@ -199,15 +229,50 @@ export function DoiPackageDrawer({
                     </div>
                 </div>
 
-                <SheetFooter className="p-0 pt-4 border-t">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => onOpenChange(false)}
-                    >
-                        Tutup
-                    </Button>
+                <SheetFooter className="p-0 pt-4 border-t flex flex-col gap-3 sm:flex-col">
+                    {currentPackage && (
+                        <div className="flex items-center justify-between rounded-lg bg-muted/60 p-3 text-xs border border-border/80">
+                            <span className="text-muted-foreground font-medium">Total Biaya Tahunan:</span>
+                            <div className="flex items-baseline gap-1">
+                                <span className="font-mono font-bold text-sm text-foreground">
+                                    {formatRupiah(priceAnnual)}
+                                </span>
+                                <span className="text-[11px] font-normal text-muted-foreground">/ Thn</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex flex-col sm:flex-row gap-2 w-full">
+                        {currentPackage && (
+                            <Button
+                                type="button"
+                                className="w-full sm:flex-1 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs font-semibold"
+                                onClick={handleConfirmSubscribe}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" />
+                                        <span>Memproses...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles className="size-4" />
+                                        <span>Konfirmasi & Ajukan Paket Ini</span>
+                                    </>
+                                )}
+                            </Button>
+                        )}
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className={cn("w-full", currentPackage ? "sm:w-auto" : "w-full")}
+                            onClick={() => onOpenChange(false)}
+                            disabled={isSubmitting}
+                        >
+                            Tutup
+                        </Button>
+                    </div>
                 </SheetFooter>
             </SheetContent>
         </Sheet>
