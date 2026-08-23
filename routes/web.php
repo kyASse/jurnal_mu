@@ -480,6 +480,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('bank-accounts', [AdminDoiBankAccountController::class, 'store'])->name('bank-accounts.store');
             Route::put('bank-accounts/{bankAccount}', [AdminDoiBankAccountController::class, 'update'])->name('bank-accounts.update');
             Route::delete('bank-accounts/{bankAccount}', [AdminDoiBankAccountController::class, 'destroy'])->name('bank-accounts.destroy');
+
+            // DOI Helpdesk Settings
+            Route::post('settings', [AdminDoiManagementController::class, 'updateSettings'])->name('settings.update');
         });
 
     });

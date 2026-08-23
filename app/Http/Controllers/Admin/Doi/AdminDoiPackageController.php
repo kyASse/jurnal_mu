@@ -23,6 +23,11 @@ class AdminDoiPackageController extends Controller
 
         $validated['prefix_included'] = $request->boolean('prefix_included', true);
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_featured'] = $request->boolean('is_featured', false);
+        $validated['sort_order'] = (int) ($validated['sort_order'] ?? 0);
+        if ($request->has('features')) {
+            $validated['features'] = array_values(array_filter($request->input('features', []) ?? []));
+        }
 
         DoiPackage::create($validated);
 
@@ -42,6 +47,11 @@ class AdminDoiPackageController extends Controller
 
         $validated['prefix_included'] = $request->boolean('prefix_included', true);
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_featured'] = $request->boolean('is_featured', false);
+        $validated['sort_order'] = (int) ($validated['sort_order'] ?? 0);
+        if ($request->has('features')) {
+            $validated['features'] = array_values(array_filter($request->input('features', []) ?? []));
+        }
 
         $package->update($validated);
 
