@@ -54,11 +54,104 @@ export default function HeroSection({
 
     return (
         <section className="relative overflow-hidden pt-28 pb-20 md:pt-36 md:pb-28">
-            {/* Ambient Background Radial Mesh */}
-            <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
-                <div className="absolute -top-32 -left-20 h-[32rem] w-[32rem] rounded-full bg-primary/8 blur-[120px] dark:bg-primary/15" />
-                <div className="absolute top-1/3 -right-20 h-[28rem] w-[28rem] rounded-full bg-secondary/6 blur-[100px] dark:bg-secondary/12" />
-                <div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-accent/10 blur-[90px] dark:bg-accent/5" />
+            {/* Ambient Background Radial Mesh & Academic Contour Waves */}
+            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                {/* Dual-Tone Chromatic Glow Orbs */}
+                <div className="absolute -top-36 -left-28 h-[38rem] w-[38rem] rounded-full bg-primary/12 blur-[140px] dark:bg-primary/20" />
+                <div className="absolute top-1/4 -right-28 h-[34rem] w-[34rem] rounded-full bg-secondary/10 blur-[130px] dark:bg-secondary/18" />
+                <div className="absolute -bottom-20 left-1/3 h-96 w-96 rounded-full bg-accent/15 blur-[100px] dark:bg-accent/8" />
+
+                {/* Academic Contour Waves Vector Layer */}
+                <div
+                    className="absolute inset-0 flex items-center justify-center opacity-40 dark:opacity-30"
+                    style={{
+                        maskImage: 'radial-gradient(ellipse 75% 65% at 50% 42%, black 25%, transparent 80%)',
+                        WebkitMaskImage: 'radial-gradient(ellipse 75% 65% at 50% 42%, black 25%, transparent 80%)',
+                    }}
+                >
+                    <svg
+                        viewBox="0 0 1440 800"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-full w-full object-cover"
+                        preserveAspectRatio="none"
+                    >
+                        <defs>
+                            <linearGradient id="waveNavyRed1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#2C368A" stopOpacity="0.8" />
+                                <stop offset="50%" stopColor="#5C6BC0" stopOpacity="0.4" />
+                                <stop offset="100%" stopColor="#E8242A" stopOpacity="0.7" />
+                            </linearGradient>
+                            <linearGradient id="waveNavyRed2" x1="100%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stopColor="#E8242A" stopOpacity="0.7" />
+                                <stop offset="60%" stopColor="#7E22CE" stopOpacity="0.3" />
+                                <stop offset="100%" stopColor="#2C368A" stopOpacity="0.6" />
+                            </linearGradient>
+                            <linearGradient id="waveGoldAccent" x1="0%" y1="50%" x2="100%" y2="50%">
+                                <stop offset="0%" stopColor="#2C368A" stopOpacity="0.3" />
+                                <stop offset="50%" stopColor="#EAB308" stopOpacity="0.5" />
+                                <stop offset="100%" stopColor="#E8242A" stopOpacity="0.3" />
+                            </linearGradient>
+                        </defs>
+
+                        {/* Topographic Academic Ribbon Curves */}
+                        <path
+                            d="M-100 120 C 300 20, 500 240, 900 110 C 1200 10, 1400 180, 1600 100"
+                            stroke="url(#waveNavyRed1)"
+                            strokeWidth="1.2"
+                            strokeDasharray="4 4"
+                        />
+                        <path
+                            d="M-100 180 C 250 80, 550 300, 950 170 C 1250 80, 1450 240, 1600 160"
+                            stroke="url(#waveNavyRed1)"
+                            strokeWidth="1.5"
+                        />
+                        <path
+                            d="M-100 240 C 200 140, 600 360, 1000 230 C 1300 140, 1480 300, 1600 220"
+                            stroke="url(#waveGoldAccent)"
+                            strokeWidth="1"
+                        />
+                        <path
+                            d="M-100 300 C 150 200, 650 420, 1050 290 C 1350 200, 1500 360, 1600 280"
+                            stroke="url(#waveNavyRed2)"
+                            strokeWidth="1.5"
+                        />
+                        <path
+                            d="M-100 360 C 100 260, 700 480, 1100 350 C 1400 260, 1520 420, 1600 340"
+                            stroke="url(#waveNavyRed2)"
+                            strokeWidth="1.2"
+                            strokeDasharray="6 6"
+                        />
+                        <path
+                            d="M-100 420 C 50 320, 750 540, 1150 410 C 1450 320, 1550 480, 1600 400"
+                            stroke="url(#waveNavyRed1)"
+                            strokeWidth="1"
+                        />
+                        <path
+                            d="M-100 480 C 0 380, 800 600, 1200 470 C 1480 380, 1580 540, 1600 460"
+                            stroke="url(#waveGoldAccent)"
+                            strokeWidth="1.5"
+                        />
+                        <path
+                            d="M-100 540 C -50 440, 850 660, 1250 530 C 1500 440, 1600 600, 1600 520"
+                            stroke="url(#waveNavyRed2)"
+                            strokeWidth="1.2"
+                        />
+
+                        {/* Subtle Symmetrical Echo Curves */}
+                        <path
+                            d="M-100 600 C 350 720, 700 450, 1100 620 C 1350 720, 1550 580, 1600 640"
+                            stroke="url(#waveNavyRed1)"
+                            strokeWidth="1"
+                            strokeDasharray="3 3"
+                        />
+                        <path
+                            d="M-100 660 C 400 780, 750 510, 1150 680 C 1400 780, 1580 640, 1600 700"
+                            stroke="url(#waveNavyRed2)"
+                            strokeWidth="1.2"
+                        />
+                    </svg>
+                </div>
             </div>
 
             <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
