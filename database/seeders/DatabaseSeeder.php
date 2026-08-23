@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             // === DOI Subscription System ===
             DoiPackageSeeder::class,        // 14. DOI Packages (no dependencies)
             DoiBankAccountSeeder::class,    // 15. DOI Bank Accounts (no dependencies)
+            DoiSettingSeeder::class,        // 16. DOI Settings (no dependencies)
         ]);
 
         $this->command->info('');
