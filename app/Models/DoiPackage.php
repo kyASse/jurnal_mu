@@ -30,6 +30,10 @@ class DoiPackage extends Model
         'price_annual',
         'prefix_included',
         'similarity_quota_included',
+        'features',
+        'is_featured',
+        'badge_text',
+        'sort_order',
         'is_active',
     ];
 
@@ -42,6 +46,9 @@ class DoiPackage extends Model
         'price_annual' => 'decimal:2',
         'prefix_included' => 'boolean',
         'similarity_quota_included' => 'integer',
+        'features' => 'array',
+        'is_featured' => 'boolean',
+        'sort_order' => 'integer',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -73,5 +80,13 @@ class DoiPackage extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope query to ordered packages
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order', 'asc')->orderBy('price_annual', 'asc');
     }
 }

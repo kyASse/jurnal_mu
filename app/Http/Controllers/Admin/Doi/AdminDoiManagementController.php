@@ -6,11 +6,14 @@ use App\Enums\Doi\InvoiceStatus;
 use App\Enums\Doi\PaymentProofStatus;
 use App\Enums\Doi\SubscriptionStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Doi\Admin\DoiSettingRequest;
 use App\Models\DoiBankAccount;
 use App\Models\DoiInvoice;
 use App\Models\DoiPackage;
 use App\Models\DoiPaymentProof;
+use App\Models\DoiSetting;
 use App\Models\DoiSubscription;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -49,9 +52,11 @@ class AdminDoiManagementController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $packages = DoiPackage::withCount('subscriptions')->get();
+        $packages = DoiPackage::withCount('subscriptions')->ordered()->get();
 
         $bankAccounts = DoiBankAccount::orderBy('display_order')->get();
+
+        $doiSettings = DoiSetting::getAllAsMap();
 
         return Inertia::render('Admin/Doi/Index', [
             'stats' => $stats,
@@ -59,6 +64,19 @@ class AdminDoiManagementController extends Controller
             'subscriptions' => $subscriptions,
             'packages' => $packages,
             'bankAccounts' => $bankAccounts,
+            'doiSettings' => $doiSettings,
         ]);
+    }
+
+    /**
+     * Update DOI helpdesk settings.
+     */
+    public function updateSettings(DoiSettingRequest $request): RedirectResponse
+    {
+        foreach ($request->validated() as $key => $value) {
+            DoiSetting::set($key, $value, 'string', 'helpdesk');
+        }
+
+        return back()->with('success', 'Pengaturan helpdesk DOI berhasil diperbarui.');
     }
 }

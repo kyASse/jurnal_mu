@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Doi\SubscribeDoiPackageRequest;
 use App\Models\DoiInvoice;
 use App\Models\DoiPackage;
+use App\Models\DoiSetting;
 use App\Models\DoiSimilarityQuotaLog;
 use App\Models\DoiSubscription;
 use App\Models\Journal;
@@ -123,7 +124,7 @@ class DoiSubscriptionController extends Controller
                     'user_name' => $log->user?->name,
                 ]);
         } else {
-            $packages = DoiPackage::active()->orderBy('price_annual')->get();
+            $packages = DoiPackage::active()->ordered()->get();
         }
 
         $subscriptionData = null;
@@ -158,6 +159,10 @@ class DoiSubscriptionController extends Controller
                     'description' => $subscription->package->description,
                     'price_annual' => (float) $subscription->package->price_annual,
                     'similarity_quota_included' => $subscription->package->similarity_quota_included,
+                    'features' => $subscription->package->features,
+                    'is_featured' => (bool) $subscription->package->is_featured,
+                    'badge_text' => $subscription->package->badge_text,
+                    'sort_order' => (int) $subscription->package->sort_order,
                 ] : null,
             ];
         }
@@ -191,6 +196,7 @@ class DoiSubscriptionController extends Controller
             'activeInvoice' => $invoiceData,
             'recentQuotaLogs' => $recentQuotaLogs,
             'packages' => $packages,
+            'doiSettings' => DoiSetting::getAllAsMap(),
             'universityName' => $university?->name ?? 'Institusi',
             'journalsCount' => $journalsCount,
         ];

@@ -34,6 +34,11 @@ class DoiPackageRequest extends FormRequest
             'price_annual' => ['required', 'numeric', 'min:0'],
             'prefix_included' => ['boolean'],
             'similarity_quota_included' => ['required', 'integer', 'min:0'],
+            'features' => ['nullable', 'array'],
+            'features.*' => ['required', 'string', 'max:255'],
+            'is_featured' => ['boolean'],
+            'badge_text' => ['nullable', 'string', 'max:50'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['boolean'],
         ];
     }

@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DoiPackageData, DoiSubscriptionData } from '@/types/doi';
+import { DoiPackageData, DoiSettingsData, DoiSubscriptionData } from '@/types/doi';
 import {
     Layers,
     CheckCircle2,
@@ -33,6 +33,7 @@ interface DoiPackageDrawerProps {
     onOpenChange: (open: boolean) => void;
     subscription: DoiSubscriptionData | null;
     packageData?: DoiPackageData | null;
+    settings?: DoiSettingsData;
     onSubscribe?: (pkg: DoiPackageData) => void;
     isSubmitting?: boolean;
 }
@@ -64,6 +65,7 @@ export function DoiPackageDrawer({
     onOpenChange,
     subscription,
     packageData,
+    settings,
     onSubscribe,
     isSubmitting: externalIsSubmitting,
 }: DoiPackageDrawerProps) {
@@ -76,15 +78,17 @@ export function DoiPackageDrawer({
     const priceAnnual = currentPackage?.price_annual || 0;
     const quota = currentPackage?.similarity_quota_included ?? subscription?.similarity_quota_total ?? 0;
 
-    const benefits = [
-        'Prefix Resmi Crossref Atas Nama Institusi',
-        'Deposit DOI Tanpa Batas (Unlimited) untuk Seluruh Jurnal Terdaftar',
-        `Alokasi Kuota Uji Plagiasi (${quota} Dokumen / Periode)`,
-        'Integrasi Metadata Otomatis Melalui OAI-PMH',
-        'Laporan Statistik & Dashboard Sentralisasi Kampus',
-        'Dukungan Teknis Prioritas Majelis Diktilitbang PPM',
-        'Pemeliharaan Tahunan & Notifikasi Masa Berakhir Otomatis',
-    ];
+    const benefits = (currentPackage?.features && currentPackage.features.length > 0)
+        ? currentPackage.features
+        : [
+            'Prefix Resmi Crossref Atas Nama Institusi',
+            'Deposit DOI Tanpa Batas (Unlimited) untuk Seluruh Jurnal Terdaftar',
+            `Alokasi Kuota Uji Plagiasi (${quota} Dokumen / Periode)`,
+            'Integrasi Metadata Otomatis Melalui OAI-PMH',
+            'Laporan Statistik & Dashboard Sentralisasi Kampus',
+            'Dukungan Teknis Prioritas Majelis Diktilitbang PPM',
+            'Pemeliharaan Tahunan & Notifikasi Masa Berakhir Otomatis',
+        ];
 
     const handleConfirmSubscribe = () => {
         if (!currentPackage) return;
@@ -209,21 +213,21 @@ export function DoiPackageDrawer({
                         </div>
 
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                            Hubungi Tim Layanan Jurnal & DOI Majelis Diktilitbang Pimpinan Pusat Muhammadiyah jika institusi Anda memerlukan penyesuaian khusus atau mengalami kendala deposit DOI.
+                            {settings?.doi_helpdesk_notes || 'Hubungi Tim Layanan Jurnal & DOI Majelis Diktilitbang Pimpinan Pusat Muhammadiyah jika institusi Anda memerlukan penyesuaian khusus atau mengalami kendala deposit DOI.'}
                         </p>
 
                         <div className="space-y-2 pt-1">
                             <a
-                                href="mailto:jurnal@diktilitbangmuhammadiyah.org"
+                                href={`mailto:${settings?.doi_helpdesk_email || 'jurnal@diktilitbangmuhammadiyah.org'}`}
                                 className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                             >
                                 <Mail className="size-3.5" />
-                                <span>jurnal@diktilitbangmuhammadiyah.org</span>
+                                <span>{settings?.doi_helpdesk_email || 'jurnal@diktilitbangmuhammadiyah.org'}</span>
                             </a>
 
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <PhoneCall className="size-3.5" />
-                                <span>Hotline: +62 812-3456-7890 (Hari Kerja)</span>
+                                <span>Hotline: {settings?.doi_helpdesk_phone || '+62 812-3456-7890'} ({settings?.doi_helpdesk_hours || 'Hari Kerja, 08:00 - 16:00 WIB'})</span>
                             </div>
                         </div>
                     </div>

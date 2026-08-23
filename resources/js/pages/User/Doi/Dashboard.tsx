@@ -8,7 +8,7 @@ import {
     DoiQuotaLogTable,
     DoiPackageDrawer,
 } from '@/components/doi';
-import { DoiActiveInvoiceData, DoiPackageData, DoiQuotaLogData, DoiSubscriptionData } from '@/types/doi';
+import { DoiActiveInvoiceData, DoiPackageData, DoiQuotaLogData, DoiSettingsData, DoiSubscriptionData } from '@/types/doi';
 import { Head } from '@inertiajs/react';
 import { Globe, Building2, HelpCircle, Info, ShieldCheck, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 
 interface UserDoiDashboardProps {
     subscription: DoiSubscriptionData | null;
-    activeInvoice: DoiActiveInvoiceData | null;
+    activeInvoice?: DoiActiveInvoiceData | null;
     recentQuotaLogs: DoiQuotaLogData[];
     packages: DoiPackageData[];
+    doiSettings?: DoiSettingsData;
     universityName: string;
     journalsCount: number;
 }
@@ -38,6 +39,7 @@ export default function UserDoiDashboard({
     subscription,
     recentQuotaLogs = [],
     packages = [],
+    doiSettings,
     universityName = 'Institusi',
     journalsCount = 0,
 }: UserDoiDashboardProps) {
@@ -179,6 +181,7 @@ export default function UserDoiDashboard({
                     onOpenChange={setDrawerOpen}
                     subscription={subscription}
                     packageData={selectedPackage}
+                    settings={doiSettings}
                 />
             </div>
         </AppLayout>
