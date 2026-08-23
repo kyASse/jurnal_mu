@@ -1,36 +1,13 @@
-import * as React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import {
-    DoiSubscriptionData,
-    SubscriptionStatusType,
-} from '@/types/doi';
-import { PaginatedData } from '@/types/index';
-import {
-    Search,
-    Building2,
-    Copy,
-    Check,
-    Sparkles,
-    Calendar,
-    CheckCircle2,
-    Clock,
-    AlertTriangle,
-    XCircle,
-    SlidersHorizontal,
-    Layers,
-} from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { DoiSubscriptionData, SubscriptionStatusType } from '@/types/doi';
+import { PaginatedData } from '@/types/index';
+import { AlertTriangle, Building2, Calendar, Check, CheckCircle2, Clock, Copy, Layers, Search, Sparkles, XCircle } from 'lucide-react';
+import * as React from 'react';
 
 interface DoiSubscriptionsMasterTableProps {
     subscriptions: PaginatedData<DoiSubscriptionData> | DoiSubscriptionData[];
@@ -128,9 +105,7 @@ export function DoiSubscriptionsMasterTable({
                 {/* Status Tabs */}
                 <div className="flex flex-wrap items-center gap-1">
                     {FILTER_OPTIONS.map((filter) => {
-                        const isActive =
-                            currentFilter === filter.value ||
-                            (filter.value === 'all' && (!currentFilter || currentFilter === ''));
+                        const isActive = currentFilter === filter.value || (filter.value === 'all' && (!currentFilter || currentFilter === ''));
                         return (
                             <Button
                                 key={filter.value}
@@ -149,13 +124,13 @@ export function DoiSubscriptionsMasterTable({
                 {/* Search input */}
                 {onSearchChange && (
                     <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-72">
-                        <Search className="absolute left-2.5 top-2.5 size-3.5 text-muted-foreground" />
+                        <Search className="absolute top-2.5 left-2.5 size-3.5 text-muted-foreground" />
                         <Input
                             type="text"
                             placeholder="Cari PTMA, prefix, atau paket..."
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            className="h-8 pl-8 pr-3 text-xs"
+                            className="h-8 pr-3 pl-8 text-xs"
                         />
                     </form>
                 )}
@@ -245,9 +220,7 @@ export function DoiSubscriptionsMasterTable({
                                         {/* Package */}
                                         <TableCell className="text-xs">
                                             <div className="space-y-0.5">
-                                                <p className="font-medium text-foreground">
-                                                    {sub.package?.name || 'Paket Standar'}
-                                                </p>
+                                                <p className="font-medium text-foreground">{sub.package?.name || 'Paket Standar'}</p>
                                                 {sub.package?.code && (
                                                     <Badge variant="outline" className="text-[10px] uppercase">
                                                         {sub.package.code}
@@ -263,9 +236,7 @@ export function DoiSubscriptionsMasterTable({
                                                     <span className="font-mono font-medium text-foreground">
                                                         {usedQuota} / {totalQuota}
                                                     </span>
-                                                    <span className="font-mono text-muted-foreground">
-                                                        {quotaPercent}%
-                                                    </span>
+                                                    <span className="font-mono text-muted-foreground">{quotaPercent}%</span>
                                                 </div>
                                                 <Progress
                                                     value={quotaPercent}
@@ -274,8 +245,8 @@ export function DoiSubscriptionsMasterTable({
                                                         quotaPercent > 90
                                                             ? '[&>div]:bg-rose-500'
                                                             : quotaPercent > 75
-                                                            ? '[&>div]:bg-amber-500'
-                                                            : '[&>div]:bg-indigo-500'
+                                                              ? '[&>div]:bg-amber-500'
+                                                              : '[&>div]:bg-indigo-500',
                                                     )}
                                                 />
                                             </div>
@@ -284,10 +255,7 @@ export function DoiSubscriptionsMasterTable({
                                         {/* Period & Status */}
                                         <TableCell className="text-xs">
                                             <div className="space-y-1">
-                                                <Badge
-                                                    variant="outline"
-                                                    className={cn('text-[11px] font-medium', statusConfig.className)}
-                                                >
+                                                <Badge variant="outline" className={cn('text-[11px] font-medium', statusConfig.className)}>
                                                     <StatusIcon className="mr-1 size-3" />
                                                     {statusConfig.label}
                                                 </Badge>

@@ -1,16 +1,8 @@
-import * as React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { DoiQuotaLogData, QuotaChangeType } from '@/types/doi';
-import { History, Plus, Minus, Settings2, RefreshCw, Sparkles, Inbox } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { DoiQuotaLogData, QuotaChangeType } from '@/types/doi';
+import { History, Inbox, Minus, RefreshCw, Settings2, Sparkles } from 'lucide-react';
 
 interface DoiQuotaLogTableProps {
     logs: DoiQuotaLogData[];
@@ -66,16 +58,12 @@ export function DoiQuotaLogTable({ logs = [], className }: DoiQuotaLogTableProps
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <History className="size-4 text-muted-foreground" />
-                    <h3 className="text-sm font-semibold text-foreground">
-                        Riwayat Aktivitas Kuota Similarity
-                    </h3>
+                    <h3 className="text-sm font-semibold text-foreground">Riwayat Aktivitas Kuota Similarity</h3>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                    Menampilkan {logs.length} transaksi terakhir
-                </span>
+                <span className="text-xs text-muted-foreground">Menampilkan {logs.length} transaksi terakhir</span>
             </div>
 
-            <div className="rounded-lg border bg-card shadow-xs overflow-hidden">
+            <div className="overflow-hidden rounded-lg border bg-card shadow-xs">
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-muted/40">
@@ -103,21 +91,15 @@ export function DoiQuotaLogTable({ logs = [], className }: DoiQuotaLogTableProps
                                 const formattedAmount = `${isNegative ? '-' : '+'}${Math.abs(log.amount)}`;
 
                                 return (
-                                    <TableRow key={log.id} className="hover:bg-muted/30 transition-colors">
+                                    <TableRow key={log.id} className="transition-colors hover:bg-muted/30">
                                         {/* Timestamp */}
-                                        <TableCell className="font-mono text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+                                        <TableCell className="font-mono text-xs whitespace-nowrap text-muted-foreground tabular-nums">
                                             {formatDateTimeIndo(log.created_at)}
                                         </TableCell>
 
                                         {/* Change Type Badge */}
                                         <TableCell>
-                                            <Badge
-                                                variant="outline"
-                                                className={cn(
-                                                    'gap-1 text-[11px] font-medium',
-                                                    typeConfig.className
-                                                )}
-                                            >
+                                            <Badge variant="outline" className={cn('gap-1 text-[11px] font-medium', typeConfig.className)}>
                                                 <typeConfig.icon className="size-3" />
                                                 {typeConfig.label}
                                             </Badge>
@@ -127,11 +109,9 @@ export function DoiQuotaLogTable({ logs = [], className }: DoiQuotaLogTableProps
                                         <TableCell className="max-w-[280px]">
                                             <div className="flex flex-col">
                                                 {log.journal?.title ? (
-                                                    <span className="font-medium text-foreground text-xs line-clamp-1">
-                                                        {log.journal.title}
-                                                    </span>
+                                                    <span className="line-clamp-1 text-xs font-medium text-foreground">{log.journal.title}</span>
                                                 ) : null}
-                                                <span className="text-[11px] text-muted-foreground line-clamp-1">
+                                                <span className="line-clamp-1 text-[11px] text-muted-foreground">
                                                     {log.description || 'Tidak ada catatan tambahan'}
                                                 </span>
                                             </div>
@@ -142,9 +122,7 @@ export function DoiQuotaLogTable({ logs = [], className }: DoiQuotaLogTableProps
                                             <span
                                                 className={cn(
                                                     'font-mono text-xs font-semibold tabular-nums',
-                                                    isNegative
-                                                        ? 'text-rose-600 dark:text-rose-400'
-                                                        : 'text-emerald-600 dark:text-emerald-400'
+                                                    isNegative ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400',
                                                 )}
                                             >
                                                 {formattedAmount} Dokumen

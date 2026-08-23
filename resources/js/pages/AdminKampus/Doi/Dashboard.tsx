@@ -1,20 +1,20 @@
-import * as React from 'react';
-import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
 import {
-    DoiStatusHero,
+    DoiActiveInvoiceCard,
+    DoiEmptyState,
+    DoiPackageDrawer,
     DoiPrefixCard,
     DoiQuotaGauge,
-    DoiActiveInvoiceCard,
     DoiQuotaLogTable,
-    DoiPackageDrawer,
-    DoiEmptyState,
+    DoiStatusHero,
 } from '@/components/doi';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
+import { BreadcrumbItem } from '@/types';
 import { DoiActiveInvoiceData, DoiPackageData, DoiQuotaLogData, DoiSettingsData, DoiSubscriptionData } from '@/types/doi';
 import { Head, router } from '@inertiajs/react';
-import { Globe, Building2, HelpCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Building2, Globe, HelpCircle } from 'lucide-react';
+import * as React from 'react';
 
 interface AdminKampusDoiDashboardProps {
     subscription: DoiSubscriptionData | null;
@@ -74,7 +74,7 @@ export default function AdminKampusDoiDashboard({
                 onSuccess: () => {
                     setDrawerOpen(false);
                 },
-            }
+            },
         );
     };
 
@@ -98,17 +98,15 @@ export default function AdminKampusDoiDashboard({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Langganan DOI & Similarity Check" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
                 {/* Header Section */}
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div className="flex items-center gap-2">
                             <Globe className="h-6 w-6 text-primary" />
-                            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                                Langganan DOI & Similarity Check
-                            </h1>
+                            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Langganan DOI & Similarity Check</h1>
                         </div>
-                        <p className="mt-1 text-sm text-muted-foreground flex items-center gap-1.5">
+                        <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                             <Building2 className="size-4 shrink-0 text-muted-foreground/70" />
                             <span>
                                 Pengelolaan Crossref DOI dan kuota iThenticate untuk{' '}
@@ -119,12 +117,7 @@ export default function AdminKampusDoiDashboard({
 
                     {subscription && (
                         <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleOpenPackageDetail()}
-                                className="text-xs shadow-2xs"
-                            >
+                            <Button variant="outline" size="sm" onClick={() => handleOpenPackageDetail()} className="text-xs shadow-2xs">
                                 <HelpCircle className="mr-1.5 size-3.5" />
                                 Informasi Layanan
                             </Button>
@@ -136,26 +129,13 @@ export default function AdminKampusDoiDashboard({
                 {subscription ? (
                     <div className="space-y-6">
                         {/* Status Hero Card */}
-                        <DoiStatusHero
-                            subscription={subscription}
-                            onOpenDrawer={() => handleOpenPackageDetail()}
-                            onRenew={handleRenew}
-                        />
+                        <DoiStatusHero subscription={subscription} onOpenDrawer={() => handleOpenPackageDetail()} onRenew={handleRenew} />
 
                         {/* Bento Grid: Metrics and Invoices */}
-                        <div
-                            className={cn(
-                                'grid grid-cols-1 gap-6',
-                                activeInvoice ? 'lg:grid-cols-3' : 'md:grid-cols-2'
-                            )}
-                        >
+                        <div className={cn('grid grid-cols-1 gap-6', activeInvoice ? 'lg:grid-cols-3' : 'md:grid-cols-2')}>
                             {/* Prefix Crossref Card */}
                             <div>
-                                <DoiPrefixCard
-                                    prefix={subscription.active_prefix}
-                                    registeredJournalsCount={journalsCount}
-                                    className="h-full"
-                                />
+                                <DoiPrefixCard prefix={subscription.active_prefix} registeredJournalsCount={journalsCount} className="h-full" />
                             </div>
 
                             {/* Similarity Check Quota Gauge */}
@@ -183,17 +163,13 @@ export default function AdminKampusDoiDashboard({
                         </div>
 
                         {/* Quota Activity Audit Table */}
-                        <div className="rounded-xl border bg-card p-4 sm:p-6 shadow-xs">
+                        <div className="rounded-xl border bg-card p-4 shadow-xs sm:p-6">
                             <DoiQuotaLogTable logs={recentQuotaLogs} />
                         </div>
                     </div>
                 ) : (
                     /* Empty State when no active subscription exists */
-                    <DoiEmptyState
-                        packages={packages}
-                        settings={doiSettings}
-                        onSelectPackage={handleSelectPackageFromEmpty}
-                    />
+                    <DoiEmptyState packages={packages} settings={doiSettings} onSelectPackage={handleSelectPackageFromEmpty} />
                 )}
 
                 {/* Package Detail Drawer */}

@@ -1,9 +1,8 @@
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DoiSubscriptionData, SubscriptionStatusType } from '@/types/doi';
-import { Calendar, Layers, RefreshCw, AlertTriangle, ShieldCheck, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { DoiSubscriptionData, SubscriptionStatusType } from '@/types/doi';
+import { AlertTriangle, Calendar, Clock, Layers, RefreshCw, ShieldCheck } from 'lucide-react';
 
 interface DoiStatusHeroProps {
     subscription: DoiSubscriptionData | null;
@@ -35,12 +34,7 @@ function getDaysRemaining(endDateStr?: string | null): number | null {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-export function DoiStatusHero({
-    subscription,
-    onOpenDrawer,
-    onRenew,
-    className,
-}: DoiStatusHeroProps) {
+export function DoiStatusHero({ subscription, onOpenDrawer, onRenew, className }: DoiStatusHeroProps) {
     if (!subscription) return null;
 
     const daysRemaining = subscription.days_remaining ?? getDaysRemaining(subscription.end_date);
@@ -54,7 +48,8 @@ export function DoiStatusHero({
             dotColor: 'bg-emerald-500',
             pulseColor: 'bg-emerald-400',
             badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
-            heroGradient: 'from-emerald-50/70 via-background to-background dark:from-emerald-950/20 dark:via-background dark:to-background border-emerald-100 dark:border-emerald-900/40',
+            heroGradient:
+                'from-emerald-50/70 via-background to-background dark:from-emerald-950/20 dark:via-background dark:to-background border-emerald-100 dark:border-emerald-900/40',
             label: 'Aktif',
             icon: ShieldCheck,
         },
@@ -63,7 +58,8 @@ export function DoiStatusHero({
             dotColor: 'bg-amber-500',
             pulseColor: 'bg-amber-400',
             badgeBg: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
-            heroGradient: 'from-amber-50/70 via-background to-background dark:from-amber-950/20 dark:via-background dark:to-background border-amber-100 dark:border-amber-900/40',
+            heroGradient:
+                'from-amber-50/70 via-background to-background dark:from-amber-950/20 dark:via-background dark:to-background border-amber-100 dark:border-amber-900/40',
             label: 'Masa Tenggang',
             icon: AlertTriangle,
         },
@@ -72,7 +68,8 @@ export function DoiStatusHero({
             dotColor: 'bg-blue-500',
             pulseColor: 'bg-blue-400',
             badgeBg: 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800',
-            heroGradient: 'from-blue-50/70 via-background to-background dark:from-blue-950/20 dark:via-background dark:to-background border-blue-100 dark:border-blue-900/40',
+            heroGradient:
+                'from-blue-50/70 via-background to-background dark:from-blue-950/20 dark:via-background dark:to-background border-blue-100 dark:border-blue-900/40',
             label: 'Menunggu Verifikasi',
             icon: Clock,
         },
@@ -81,7 +78,8 @@ export function DoiStatusHero({
             dotColor: 'bg-rose-500',
             pulseColor: 'bg-rose-400',
             badgeBg: 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800',
-            heroGradient: 'from-rose-50/70 via-background to-background dark:from-rose-950/20 dark:via-background dark:to-background border-rose-100 dark:border-rose-900/40',
+            heroGradient:
+                'from-rose-50/70 via-background to-background dark:from-rose-950/20 dark:via-background dark:to-background border-rose-100 dark:border-rose-900/40',
             label: 'Kadaluwarsa',
             icon: AlertTriangle,
         },
@@ -90,7 +88,8 @@ export function DoiStatusHero({
             dotColor: 'bg-slate-400',
             pulseColor: 'bg-slate-300',
             badgeBg: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800',
-            heroGradient: 'from-slate-50 via-background to-background dark:from-slate-900/40 dark:via-background dark:to-background border-slate-200 dark:border-slate-800',
+            heroGradient:
+                'from-slate-50 via-background to-background dark:from-slate-900/40 dark:via-background dark:to-background border-slate-200 dark:border-slate-800',
             label: 'Tidak Aktif',
             icon: AlertTriangle,
         },
@@ -101,11 +100,7 @@ export function DoiStatusHero({
 
     return (
         <div
-            className={cn(
-                'relative overflow-hidden rounded-xl border bg-gradient-to-r p-5 shadow-xs sm:p-6',
-                currentConfig.heroGradient,
-                className
-            )}
+            className={cn('relative overflow-hidden rounded-xl border bg-gradient-to-r p-5 shadow-xs sm:p-6', currentConfig.heroGradient, className)}
             role="region"
             aria-label="Status Langganan DOI"
         >
@@ -115,37 +110,21 @@ export function DoiStatusHero({
                     <div className="relative mt-1 flex h-4 w-4 shrink-0 items-center justify-center">
                         {status === 'active' || status === 'grace_period' ? (
                             <span
-                                className={cn(
-                                    'absolute inline-flex h-full w-full animate-ping rounded-full opacity-75',
-                                    currentConfig.pulseColor
-                                )}
+                                className={cn('absolute inline-flex h-full w-full animate-ping rounded-full opacity-75', currentConfig.pulseColor)}
                             />
                         ) : null}
-                        <span
-                            className={cn(
-                                'relative inline-flex h-3 w-3 rounded-full shadow-xs',
-                                currentConfig.dotColor
-                            )}
-                        />
+                        <span className={cn('relative inline-flex h-3 w-3 rounded-full shadow-xs', currentConfig.dotColor)} />
                     </div>
 
                     {/* Main Information */}
                     <div className="space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2">
-                            <Badge
-                                variant="outline"
-                                className={cn(
-                                    'font-medium tracking-wide transition-colors',
-                                    currentConfig.badgeBg
-                                )}
-                            >
+                            <Badge variant="outline" className={cn('font-medium tracking-wide transition-colors', currentConfig.badgeBg)}>
                                 <currentConfig.icon className="mr-1 size-3" />
                                 {currentConfig.label}
                             </Badge>
 
-                            <span className="font-semibold text-foreground text-sm sm:text-base">
-                                {packageName}
-                            </span>
+                            <span className="text-sm font-semibold text-foreground sm:text-base">{packageName}</span>
 
                             {daysRemaining !== null && status === 'active' && (
                                 <Badge
@@ -154,19 +133,17 @@ export function DoiStatusHero({
                                         'font-mono text-xs tabular-nums',
                                         isExpiringSoon
                                             ? 'border-amber-300 bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-200'
-                                            : 'border-slate-200 bg-background/80 text-muted-foreground dark:border-slate-700'
+                                            : 'border-slate-200 bg-background/80 text-muted-foreground dark:border-slate-700',
                                     )}
                                 >
-                                    {daysRemaining > 0
-                                        ? `Sisa ${daysRemaining} Hari`
-                                        : 'Berakhir Hari Ini'}
+                                    {daysRemaining > 0 ? `Sisa ${daysRemaining} Hari` : 'Berakhir Hari Ini'}
                                 </Badge>
                             )}
 
                             {status === 'expired' && (
                                 <Badge
                                     variant="outline"
-                                    className="border-rose-300 bg-rose-50 font-mono text-rose-900 text-xs dark:bg-rose-950 dark:text-rose-200"
+                                    className="border-rose-300 bg-rose-50 font-mono text-xs text-rose-900 dark:bg-rose-950 dark:text-rose-200"
                                 >
                                     Telah Berakhir
                                 </Badge>
@@ -174,18 +151,16 @@ export function DoiStatusHero({
                         </div>
 
                         {/* Validity Period */}
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-xs sm:text-sm">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground sm:text-sm">
                             <div className="flex items-center gap-1.5">
                                 <Calendar className="size-3.5" />
                                 <span>
                                     Periode: {formatDateIndo(subscription.start_date)} s.d.{' '}
-                                    <span className="font-medium text-foreground">
-                                        {formatDateIndo(subscription.end_date)}
-                                    </span>
+                                    <span className="font-medium text-foreground">{formatDateIndo(subscription.end_date)}</span>
                                 </span>
                             </div>
                             {isExpiringSoon && status === 'active' && (
-                                <span className="font-medium text-amber-600 text-xs dark:text-amber-400">
+                                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
                                     ⚠️ Masa aktif segera berakhir, mohon lakukan perpanjangan
                                 </span>
                             )}
@@ -200,7 +175,7 @@ export function DoiStatusHero({
                             variant="outline"
                             size="sm"
                             onClick={onOpenDrawer}
-                            className="bg-background/80 hover:bg-accent text-xs sm:text-sm shadow-2xs"
+                            className="bg-background/80 text-xs shadow-2xs hover:bg-accent sm:text-sm"
                         >
                             <Layers className="mr-1.5 size-3.5" />
                             Detail Paket
@@ -211,7 +186,7 @@ export function DoiStatusHero({
                         <Button
                             size="sm"
                             onClick={onRenew}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs sm:text-sm shadow-2xs"
+                            className="bg-primary text-xs text-primary-foreground shadow-2xs hover:bg-primary/90 sm:text-sm"
                         >
                             <RefreshCw className="mr-1.5 size-3.5" />
                             Perpanjang Sekarang

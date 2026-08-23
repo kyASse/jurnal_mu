@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Doi\SubscriptionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -104,7 +105,7 @@ class University extends Model
     public function activeDoiSubscription()
     {
         return $this->hasOne(DoiSubscription::class, 'university_id')
-            ->where('status', \App\Enums\Doi\SubscriptionStatus::ACTIVE);
+            ->where('status', SubscriptionStatus::ACTIVE);
     }
 
     /*
@@ -126,7 +127,7 @@ class University extends Model
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (! $search) {
+        if (!$search) {
             return $query;
         }
 
@@ -143,7 +144,7 @@ class University extends Model
      */
     public function scopeByAccreditation($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -155,7 +156,7 @@ class University extends Model
      */
     public function scopeByCluster($query, ?string $cluster)
     {
-        if (! $cluster) {
+        if (!$cluster) {
             return $query;
         }
 

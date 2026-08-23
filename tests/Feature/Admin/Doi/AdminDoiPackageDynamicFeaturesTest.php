@@ -7,7 +7,6 @@ use App\Models\DoiSetting;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
-use Database\Seeders\DoiPackageSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -17,7 +16,9 @@ class AdminDoiPackageDynamicFeaturesTest extends TestCase
     use DatabaseTransactions;
 
     protected User $superAdmin;
+
     protected User $adminKampus;
+
     protected University $university;
 
     protected function setUp(): void

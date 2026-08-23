@@ -21,13 +21,21 @@ class DoiSecurityPolicyTest extends TestCase
     use DatabaseTransactions;
 
     protected User $superAdmin;
+
     protected User $adminKampusA;
+
     protected User $adminKampusB;
+
     protected User $userA;
+
     protected User $userB;
+
     protected University $universityA;
+
     protected University $universityB;
+
     protected DoiPackage $package;
+
     protected DoiBankAccount $bankAccount;
 
     protected function setUp(): void

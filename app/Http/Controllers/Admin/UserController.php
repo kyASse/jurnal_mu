@@ -76,7 +76,7 @@ class UserController extends Controller
                 ])->toArray();
 
                 // Add primary role if not already in roles array
-                if ($user->role && ! collect($userRoles)->contains('id', $user->role->id)) {
+                if ($user->role && !collect($userRoles)->contains('id', $user->role->id)) {
                     $userRoles[] = [
                         'id' => $user->role->id,
                         'name' => $user->role->name,
@@ -216,7 +216,7 @@ class UserController extends Controller
         $this->authorize('manage-users');
 
         // Verify it's a User
-        if (! $user->isUser()) {
+        if (!$user->isUser()) {
             abort(404, 'Pengelola Jurnal not found.');
         }
 
@@ -268,7 +268,7 @@ class UserController extends Controller
         $this->authorize('manage-users');
 
         // Verify it's a User
-        if (! $user->isUser() && ! $user->isPengelolaJurnal()) {
+        if (!$user->isUser() && !$user->isPengelolaJurnal()) {
             abort(404, 'User not found.');
         }
 
@@ -326,7 +326,7 @@ class UserController extends Controller
         $this->authorize('manage-users');
 
         // Verify it's a User
-        if (! $user->isUser() && ! $user->isPengelolaJurnal()) {
+        if (!$user->isUser() && !$user->isPengelolaJurnal()) {
             abort(404, 'User not found.');
         }
 
@@ -373,7 +373,7 @@ class UserController extends Controller
         $user->update(['is_reviewer' => $hasReviewerRole]);
 
         // Update password if provided
-        if (! empty($validated['password'])) {
+        if (!empty($validated['password'])) {
             $user->update([
                 'password' => Hash::make($validated['password']),
             ]);
@@ -394,7 +394,7 @@ class UserController extends Controller
         $user->load('role');
 
         // Verify it's a User
-        if (! $user->isUser()) {
+        if (!$user->isUser()) {
             abort(404, 'Pengelola Jurnal not found.');
         }
 
@@ -421,13 +421,13 @@ class UserController extends Controller
         $user->load('role');
 
         // Verify it's a User
-        if (! $user->isUser()) {
+        if (!$user->isUser()) {
             abort(404, 'Pengelola Jurnal not found.');
         }
 
         // Toggle active status
         $user->update([
-            'is_active' => ! $user->is_active,
+            'is_active' => !$user->is_active,
         ]);
 
         $status = $user->is_active ? 'activated' : 'deactivated';

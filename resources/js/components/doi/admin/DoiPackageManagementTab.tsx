@@ -1,26 +1,3 @@
-import * as React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,26 +8,21 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { DoiPackageData, DoiPackageFormData } from '@/types/doi';
-import { formatRupiah } from './DoiAdminStatsCards';
-import {
-    Package,
-    Plus,
-    Edit2,
-    Trash2,
-    CheckCircle2,
-    XCircle,
-    Sparkles,
-    Shield,
-    Star,
-    ListChecks,
-} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { DoiPackageData, DoiPackageFormData } from '@/types/doi';
+import { CheckCircle2, Edit2, ListChecks, Package, Plus, Shield, Sparkles, Star, Trash2, XCircle } from 'lucide-react';
+import * as React from 'react';
+import { formatRupiah } from '../invoices/DoiInvoiceStatsCard';
 
-const DEFAULT_FEATURES = [
-    'Prefix Resmi Crossref Atas Nama Institusi',
-    'Deposit DOI Tanpa Batas',
-];
+const DEFAULT_FEATURES = ['Prefix Resmi Crossref Atas Nama Institusi', 'Deposit DOI Tanpa Batas'];
 
 interface DoiPackageManagementTabProps {
     packages: (DoiPackageData & { subscriptions_count?: number })[];
@@ -190,12 +162,7 @@ export function DoiPackageManagementTab({
                     </p>
                 </div>
 
-                <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleOpenCreate}
-                    className="h-8 bg-primary text-xs text-primary-foreground shadow-2xs"
-                >
+                <Button type="button" size="sm" onClick={handleOpenCreate} className="h-8 bg-primary text-xs text-primary-foreground shadow-2xs">
                     <Plus className="mr-1.5 size-3.5" />
                     Tambah Paket Baru
                 </Button>
@@ -245,7 +212,10 @@ export function DoiPackageManagementTab({
                                                     {pkg.code}
                                                 </Badge>
                                                 {pkg.description && (
-                                                    <span className="truncate text-[11px] text-muted-foreground max-w-[200px]" title={pkg.description}>
+                                                    <span
+                                                        className="max-w-[200px] truncate text-[11px] text-muted-foreground"
+                                                        title={pkg.description}
+                                                    >
                                                         {pkg.description}
                                                     </span>
                                                 )}
@@ -266,12 +236,12 @@ export function DoiPackageManagementTab({
                                                 <Sparkles className="size-3 text-indigo-600 dark:text-indigo-400" />
                                                 <span>{pkg.similarity_quota_included} Kuota Turnitin</span>
                                             </div>
-                                            <div className="flex items-center gap-1 text-muted-foreground text-[11px]">
+                                            <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                                                 <Shield className="size-3" />
                                                 <span>{pkg.prefix_included ? 'Termasuk Prefix DOI' : 'Tanpa Prefix'}</span>
                                             </div>
                                             {pkg.features && pkg.features.length > 0 && (
-                                                <div className="flex items-center gap-1 text-xs text-primary font-medium">
+                                                <div className="flex items-center gap-1 text-xs font-medium text-primary">
                                                     <ListChecks className="size-3" />
                                                     <span>{pkg.features.length} Fasilitas</span>
                                                 </div>
@@ -280,25 +250,27 @@ export function DoiPackageManagementTab({
                                     </TableCell>
 
                                     {/* Sort order */}
-                                    <TableCell className="font-mono text-xs text-muted-foreground">
-                                        {pkg.sort_order ?? 0}
-                                    </TableCell>
+                                    <TableCell className="font-mono text-xs text-muted-foreground">{pkg.sort_order ?? 0}</TableCell>
 
                                     {/* Subscriptions count */}
                                     <TableCell className="text-xs">
-                                        <span className="font-mono font-medium text-foreground">
-                                            {pkg.subscriptions_count ?? 0} PTMA
-                                        </span>
+                                        <span className="font-mono font-medium text-foreground">{pkg.subscriptions_count ?? 0} PTMA</span>
                                     </TableCell>
 
                                     {/* Status */}
                                     <TableCell>
                                         {pkg.is_active ? (
-                                            <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-[11px] font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                            <Badge
+                                                variant="outline"
+                                                className="border-emerald-200 bg-emerald-50 text-[11px] font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                            >
                                                 <CheckCircle2 className="mr-1 size-3" /> Aktif
                                             </Badge>
                                         ) : (
-                                            <Badge variant="outline" className="bg-slate-100 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                                            <Badge
+                                                variant="outline"
+                                                className="bg-slate-100 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                                            >
                                                 <XCircle className="mr-1 size-3" /> Nonaktif
                                             </Badge>
                                         )}
@@ -365,9 +337,7 @@ export function DoiPackageManagementTab({
                                     placeholder="cth: Paket Utama Crossref + Turnitin"
                                     className="h-8 text-xs"
                                 />
-                                {formErrors.name && (
-                                    <p className="text-[11px] text-rose-600">{formErrors.name}</p>
-                                )}
+                                {formErrors.name && <p className="text-[11px] text-rose-600">{formErrors.name}</p>}
                             </div>
 
                             {/* Code */}
@@ -382,9 +352,7 @@ export function DoiPackageManagementTab({
                                     placeholder="PKG-STANDARD"
                                     className="h-8 font-mono text-xs uppercase"
                                 />
-                                {formErrors.code && (
-                                    <p className="text-[11px] text-rose-600">{formErrors.code}</p>
-                                )}
+                                {formErrors.code && <p className="text-[11px] text-rose-600">{formErrors.code}</p>}
                             </div>
 
                             {/* Annual Price */}
@@ -401,9 +369,7 @@ export function DoiPackageManagementTab({
                                     placeholder="5000000"
                                     className="h-8 font-mono text-xs"
                                 />
-                                {formErrors.price_annual && (
-                                    <p className="text-[11px] text-rose-600">{formErrors.price_annual}</p>
-                                )}
+                                {formErrors.price_annual && <p className="text-[11px] text-rose-600">{formErrors.price_annual}</p>}
                             </div>
 
                             {/* Similarity Quota */}
@@ -446,27 +412,19 @@ export function DoiPackageManagementTab({
                                     </Label>
                                     <p className="text-[10px] text-muted-foreground">Fasilitas prefix Crossref</p>
                                 </div>
-                                <Switch
-                                    id="prefix_included"
-                                    checked={prefixIncluded}
-                                    onCheckedChange={setPrefixIncluded}
-                                />
+                                <Switch id="prefix_included" checked={prefixIncluded} onCheckedChange={setPrefixIncluded} />
                             </div>
 
                             {/* Featured Package Toggle */}
                             <div className="flex items-center justify-between rounded-lg border p-2.5">
                                 <div>
-                                    <Label htmlFor="is_featured" className="cursor-pointer text-xs font-semibold flex items-center gap-1">
-                                        <Star className="size-3.5 text-amber-500 fill-amber-500" />
+                                    <Label htmlFor="is_featured" className="flex cursor-pointer items-center gap-1 text-xs font-semibold">
+                                        <Star className="size-3.5 fill-amber-500 text-amber-500" />
                                         Paket Unggulan
                                     </Label>
                                     <p className="text-[10px] text-muted-foreground">Sorot & beri badge khusus</p>
                                 </div>
-                                <Switch
-                                    id="is_featured"
-                                    checked={isFeatured}
-                                    onCheckedChange={setIsFeatured}
-                                />
+                                <Switch id="is_featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
                             </div>
 
                             {/* Badge Text (if featured or optional) */}
@@ -489,7 +447,7 @@ export function DoiPackageManagementTab({
                             <div className="col-span-2 space-y-2 rounded-lg border bg-muted/20 p-3">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <Label className="text-xs font-semibold flex items-center gap-1.5">
+                                        <Label className="flex items-center gap-1.5 text-xs font-semibold">
                                             <ListChecks className="size-3.5 text-primary" />
                                             Daftar Fasilitas & Keuntungan Paket
                                         </Label>
@@ -497,13 +455,7 @@ export function DoiPackageManagementTab({
                                             Poin fitur yang ditampilkan di kartu & drawer rincian paket
                                         </p>
                                     </div>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handleAddFeature}
-                                        className="h-7 gap-1 text-xs"
-                                    >
+                                    <Button type="button" variant="outline" size="sm" onClick={handleAddFeature} className="h-7 gap-1 text-xs">
                                         <Plus className="size-3" />
                                         <span>Tambah Fasilitas</span>
                                     </Button>
@@ -516,7 +468,7 @@ export function DoiPackageManagementTab({
                                                 value={feature}
                                                 onChange={(e) => handleFeatureChange(idx, e.target.value)}
                                                 placeholder={`Fasilitas ${idx + 1}...`}
-                                                className="h-8 text-xs bg-background"
+                                                className="h-8 bg-background text-xs"
                                             />
                                             <Button
                                                 type="button"
@@ -558,30 +510,15 @@ export function DoiPackageManagementTab({
                                         Paket aktif dapat dipilih oleh PTMA saat pendaftaran/perpanjangan
                                     </p>
                                 </div>
-                                <Switch
-                                    id="is_active"
-                                    checked={isActive}
-                                    onCheckedChange={setIsActive}
-                                />
+                                <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
                             </div>
                         </div>
 
                         <DialogFooter className="gap-2 sm:gap-0">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setDialogOpen(false)}
-                                className="h-8 text-xs"
-                            >
+                            <Button type="button" variant="outline" size="sm" onClick={() => setDialogOpen(false)} className="h-8 text-xs">
                                 Batal
                             </Button>
-                            <Button
-                                type="submit"
-                                size="sm"
-                                disabled={isSubmitting}
-                                className="h-8 bg-primary text-xs text-primary-foreground"
-                            >
+                            <Button type="submit" size="sm" disabled={isSubmitting} className="h-8 bg-primary text-xs text-primary-foreground">
                                 {editingPackage ? 'Simpan Perubahan' : 'Buat Paket'}
                             </Button>
                         </DialogFooter>
@@ -593,19 +530,14 @@ export function DoiPackageManagementTab({
             <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => !open && setDeleteTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-base font-bold">
-                            Hapus Paket {deleteTarget?.name}?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle className="text-base font-bold">Hapus Paket {deleteTarget?.name}?</AlertDialogTitle>
                         <AlertDialogDescription className="text-xs">
                             Paket yang memiliki riwayat langganan terkait tidak dapat dihapus. Tindakan ini tidak dapat dibatalkan.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel className="h-8 text-xs">Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleConfirmDelete}
-                            className="h-8 bg-rose-600 text-xs text-white hover:bg-rose-700"
-                        >
+                        <AlertDialogAction onClick={handleConfirmDelete} className="h-8 bg-rose-600 text-xs text-white hover:bg-rose-700">
                             Hapus Paket
                         </AlertDialogAction>
                     </AlertDialogFooter>

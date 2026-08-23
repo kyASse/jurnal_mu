@@ -1,38 +1,13 @@
-import * as React from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    DoiSubscriptionData,
-    AdjustQuotaFormData,
-    QuotaChangeType,
-} from '@/types/doi';
-import {
-    Sparkles,
-    Building2,
-    ArrowRight,
-    PlusCircle,
-    MinusCircle,
-    AlertCircle,
-    Check,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AdjustQuotaFormData, DoiSubscriptionData, QuotaChangeType } from '@/types/doi';
+import { AlertCircle, ArrowRight, Building2, Check, Sparkles } from 'lucide-react';
+import * as React from 'react';
 
 interface DoiQuotaAdjustDialogProps {
     subscription: DoiSubscriptionData | null;
@@ -43,14 +18,7 @@ interface DoiQuotaAdjustDialogProps {
     className?: string;
 }
 
-export function DoiQuotaAdjustDialog({
-    subscription,
-    open,
-    onOpenChange,
-    onConfirm,
-    isSubmitting = false,
-    className,
-}: DoiQuotaAdjustDialogProps) {
+export function DoiQuotaAdjustDialog({ subscription, open, onOpenChange, onConfirm, isSubmitting = false, className }: DoiQuotaAdjustDialogProps) {
     const [amount, setAmount] = React.useState<number | string>(50);
     const [changeType, setChangeType] = React.useState<QuotaChangeType>('adjustment');
     const [description, setDescription] = React.useState<string>('');
@@ -106,24 +74,18 @@ export function DoiQuotaAdjustDialog({
                                 <Sparkles className="size-4" />
                             </div>
                             <div>
-                                <DialogTitle className="text-base font-bold text-foreground">
-                                    Penyesuaian Kuota Similarity
-                                </DialogTitle>
-                                <DialogDescription className="text-xs">
-                                    Kelola penambahan kuota pemeriksaan Turnitin untuk PTMA
-                                </DialogDescription>
+                                <DialogTitle className="text-base font-bold text-foreground">Penyesuaian Kuota Similarity</DialogTitle>
+                                <DialogDescription className="text-xs">Kelola penambahan kuota pemeriksaan Turnitin untuk PTMA</DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4 text-xs">
                         {/* Subscription Info Box */}
-                        <div className="rounded-xl border border-slate-200 bg-muted/30 p-3 dark:border-slate-800 dark:bg-muted/10 space-y-2">
+                        <div className="space-y-2 rounded-xl border border-slate-200 bg-muted/30 p-3 dark:border-slate-800 dark:bg-muted/10">
                             <div className="flex items-center gap-2">
                                 <Building2 className="size-4 text-muted-foreground" />
-                                <span className="font-semibold text-foreground">
-                                    {subscription.university?.name || 'Universitas'}
-                                </span>
+                                <span className="font-semibold text-foreground">{subscription.university?.name || 'Universitas'}</span>
                             </div>
 
                             <div className="grid grid-cols-3 gap-2 border-t pt-2 text-center text-[11px] dark:border-slate-800">
@@ -137,9 +99,7 @@ export function DoiQuotaAdjustDialog({
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">Sisa Kuota:</span>
-                                    <p className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                                        {currentRemaining}
-                                    </p>
+                                    <p className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{currentRemaining}</p>
                                 </div>
                             </div>
                         </div>
@@ -150,10 +110,7 @@ export function DoiQuotaAdjustDialog({
                                 <Label htmlFor="change_type" className="text-xs font-semibold">
                                     Tipe Perubahan
                                 </Label>
-                                <Select
-                                    value={changeType}
-                                    onValueChange={(val) => setChangeType(val as QuotaChangeType)}
-                                >
+                                <Select value={changeType} onValueChange={(val) => setChangeType(val as QuotaChangeType)}>
                                     <SelectTrigger id="change_type" className="h-8 text-xs">
                                         <SelectValue placeholder="Pilih Tipe" />
                                     </SelectTrigger>
@@ -241,12 +198,7 @@ export function DoiQuotaAdjustDialog({
                         >
                             Batal
                         </Button>
-                        <Button
-                            type="submit"
-                            size="sm"
-                            disabled={isSubmitting}
-                            className="h-8 bg-primary text-xs text-primary-foreground"
-                        >
+                        <Button type="submit" size="sm" disabled={isSubmitting} className="h-8 bg-primary text-xs text-primary-foreground">
                             {isSubmitting ? (
                                 'Menyimpan...'
                             ) : (

@@ -1,19 +1,13 @@
-import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { DoiBankAccountData, DoiInvoiceDetailData, DoiActiveInvoiceData, StorePaymentProofFormData } from '@/types/doi';
-import { DoiPaymentProofDropzone } from './DoiPaymentProofDropzone';
-import { Loader2, Send, CreditCard, Building2, Calendar, User, DollarSign, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DoiActiveInvoiceData, DoiBankAccountData, DoiInvoiceDetailData } from '@/types/doi';
+import { Building2, Calendar, CreditCard, DollarSign, FileText, Loader2, Send, User } from 'lucide-react';
+import * as React from 'react';
+import { DoiPaymentProofDropzone } from './DoiPaymentProofDropzone';
 
 interface DoiPaymentProofFormProps {
     invoice: DoiInvoiceDetailData | DoiActiveInvoiceData;
@@ -38,12 +32,8 @@ export function DoiPaymentProofForm({
 
     const [bankSender, setBankSender] = React.useState('');
     const [accountName, setAccountName] = React.useState('');
-    const [bankDestinationId, setBankDestinationId] = React.useState<string>(
-        bankAccounts.length > 0 ? String(bankAccounts[0].id) : ''
-    );
-    const [transferAmount, setTransferAmount] = React.useState<string>(
-        invoice.total_amount ? String(invoice.total_amount) : ''
-    );
+    const [bankDestinationId, setBankDestinationId] = React.useState<string>(bankAccounts.length > 0 ? String(bankAccounts[0].id) : '');
+    const [transferAmount, setTransferAmount] = React.useState<string>(invoice.total_amount ? String(invoice.total_amount) : '');
     const [transferDate, setTransferDate] = React.useState<string>(today);
     const [notes, setNotes] = React.useState('');
     const [proofFile, setProofFile] = React.useState<File | null>(null);
@@ -98,9 +88,7 @@ export function DoiPaymentProofForm({
                         ))}
                     </SelectContent>
                 </Select>
-                {errors.bank_destination_id && (
-                    <p className="text-xs text-rose-600">{errors.bank_destination_id}</p>
-                )}
+                {errors.bank_destination_id && <p className="text-xs text-rose-600">{errors.bank_destination_id}</p>}
             </div>
 
             {/* Bank Sender & Account Name in 2 Cols */}
@@ -120,9 +108,7 @@ export function DoiPaymentProofForm({
                         className="text-xs sm:text-sm"
                         required
                     />
-                    {errors.bank_sender && (
-                        <p className="text-xs text-rose-600">{errors.bank_sender}</p>
-                    )}
+                    {errors.bank_sender && <p className="text-xs text-rose-600">{errors.bank_sender}</p>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -140,9 +126,7 @@ export function DoiPaymentProofForm({
                         className="text-xs sm:text-sm"
                         required
                     />
-                    {errors.account_name && (
-                        <p className="text-xs text-rose-600">{errors.account_name}</p>
-                    )}
+                    {errors.account_name && <p className="text-xs text-rose-600">{errors.account_name}</p>}
                 </div>
             </div>
 
@@ -165,9 +149,7 @@ export function DoiPaymentProofForm({
                         className="font-mono text-xs sm:text-sm"
                         required
                     />
-                    {errors.transfer_amount && (
-                        <p className="text-xs text-rose-600">{errors.transfer_amount}</p>
-                    )}
+                    {errors.transfer_amount && <p className="text-xs text-rose-600">{errors.transfer_amount}</p>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -185,9 +167,7 @@ export function DoiPaymentProofForm({
                         className="text-xs sm:text-sm"
                         required
                     />
-                    {errors.transfer_date && (
-                        <p className="text-xs text-rose-600">{errors.transfer_date}</p>
-                    )}
+                    {errors.transfer_date && <p className="text-xs text-rose-600">{errors.transfer_date}</p>}
                 </div>
             </div>
 
@@ -206,9 +186,7 @@ export function DoiPaymentProofForm({
                     disabled={isSubmitting}
                     className="resize-none text-xs sm:text-sm"
                 />
-                {errors.notes && (
-                    <p className="text-xs text-rose-600">{errors.notes}</p>
-                )}
+                {errors.notes && <p className="text-xs text-rose-600">{errors.notes}</p>}
             </div>
 
             {/* Dropzone for Payment Proof */}
@@ -216,25 +194,13 @@ export function DoiPaymentProofForm({
                 <Label className="text-xs font-semibold">
                     Unggah Bukti Struk/Slip Transfer <span className="text-rose-500">*</span>
                 </Label>
-                <DoiPaymentProofDropzone
-                    value={proofFile}
-                    onChange={setProofFile}
-                    error={errors.payment_proof}
-                    disabled={isSubmitting}
-                />
+                <DoiPaymentProofDropzone value={proofFile} onChange={setProofFile} error={errors.payment_proof} disabled={isSubmitting} />
             </div>
 
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-2 pt-2">
                 {onCancel && (
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={onCancel}
-                        disabled={isSubmitting}
-                        className="text-xs"
-                    >
+                    <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isSubmitting} className="text-xs">
                         Batal
                     </Button>
                 )}

@@ -55,7 +55,7 @@ return new class extends Migration
                     DB::table('journals')
                         ->where('id', $journal->id)
                         ->update([
-                            'oai_pmh_url' => ! empty($urls) ? $urls[0] : '',
+                            'oai_pmh_url' => !empty($urls) ? $urls[0] : '',
                         ]);
                 }
             });

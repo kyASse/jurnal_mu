@@ -10,7 +10,6 @@ use App\Models\DoiBankAccount;
 use App\Models\DoiInvoice;
 use App\Models\DoiPackage;
 use App\Models\DoiPaymentProof;
-use App\Models\DoiSimilarityQuotaLog;
 use App\Models\DoiSubscription;
 use App\Models\Role;
 use App\Models\University;
@@ -28,13 +27,21 @@ class AdminDoiManagementTest extends TestCase
     use DatabaseTransactions;
 
     protected User $superAdmin;
+
     protected User $adminKampus;
+
     protected User $userPengelola;
+
     protected University $university;
+
     protected DoiPackage $package;
+
     protected DoiSubscription $subscription;
+
     protected DoiInvoice $invoice;
+
     protected DoiBankAccount $bankAccount;
+
     protected DoiPaymentProof $paymentProof;
 
     protected function setUp(): void

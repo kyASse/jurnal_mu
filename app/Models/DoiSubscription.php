@@ -132,7 +132,7 @@ class DoiSubscription extends Model
      */
     public function getIsExpiringSoonAttribute(): bool
     {
-        if (! $this->end_date) {
+        if (!$this->end_date) {
             return false;
         }
 

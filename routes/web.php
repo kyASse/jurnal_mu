@@ -58,6 +58,8 @@ use App\Http\Controllers\User\JournalController as UserJournalController;
 use App\Http\Controllers\User\PembinaanController as UserPembinaanController;
 use App\Http\Controllers\User\ProfilController;
 use App\Models\Role;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -115,30 +117,30 @@ Route::get('/health', function () {
 
     // 2. Check Database Connection & Responsiveness
     try {
-        \Illuminate\Support\Facades\DB::connection()->getPdo();
-        \Illuminate\Support\Facades\DB::select('SELECT 1');
+        DB::connection()->getPdo();
+        DB::select('SELECT 1');
         $services['database'] = 'connected';
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $services['database'] = 'disconnected';
         $status = 'unhealthy';
-        $errors[] = 'Database error: ' . $e->getMessage();
+        $errors[] = 'Database error: '.$e->getMessage();
     }
 
     // 3. Check Cache Service (Write & Read Test)
     try {
-        \Illuminate\Support\Facades\Cache::put('health_check_temp', true, 10);
-        $cacheWorking = \Illuminate\Support\Facades\Cache::get('health_check_temp') === true;
-        \Illuminate\Support\Facades\Cache::forget('health_check_temp');
+        Cache::put('health_check_temp', true, 10);
+        $cacheWorking = Cache::get('health_check_temp') === true;
+        Cache::forget('health_check_temp');
 
         $services['cache'] = $cacheWorking ? 'working' : 'non-functional';
         if (!$cacheWorking) {
             $status = 'unhealthy';
             $errors[] = 'Cache read/write test failed';
         }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $services['cache'] = 'error';
         $status = 'unhealthy';
-        $errors[] = 'Cache error: ' . $e->getMessage();
+        $errors[] = 'Cache error: '.$e->getMessage();
     }
 
     // 4. Check Storage Write Permission
@@ -152,23 +154,23 @@ Route::get('/health', function () {
             $status = 'unhealthy';
             $errors[] = 'Storage directory is not writable';
         }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $services['storage'] = 'error';
         $status = 'unhealthy';
-        $errors[] = 'Storage error: ' . $e->getMessage();
+        $errors[] = 'Storage error: '.$e->getMessage();
     }
 
     // 5. Check Queue backlog
     try {
         if ($services['database'] === 'connected') {
-            $pendingJobs = \Illuminate\Support\Facades\DB::table('jobs')->count();
-            $failedJobs = \Illuminate\Support\Facades\DB::table('failed_jobs')->count();
+            $pendingJobs = DB::table('jobs')->count();
+            $failedJobs = DB::table('failed_jobs')->count();
             $services['queue'] = [
                 'pending_jobs' => $pendingJobs,
                 'failed_jobs' => $failedJobs,
             ];
         }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $services['queue'] = 'error';
     }
 

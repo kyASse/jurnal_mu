@@ -41,14 +41,14 @@ class JournalsImport
     {
         $file = fopen($filePath, 'r');
 
-        if (! $file) {
+        if (!$file) {
             throw new \Exception('Unable to open CSV file');
         }
 
         // Read header row
         $headers = fgetcsv($file);
 
-        if (! $headers) {
+        if (!$headers) {
             fclose($file);
             throw new \Exception('CSV file is empty or invalid');
         }
@@ -66,7 +66,7 @@ class JournalsImport
         $requiredHeaders = ['title', 'e_issn', 'url', 'oai_url'];
         $missingHeaders = array_diff($requiredHeaders, $headers);
 
-        if (! empty($missingHeaders)) {
+        if (!empty($missingHeaders)) {
             fclose($file);
             throw new \Exception('Kolom wajib berikut tidak ditemukan dalam file CSV: '.implode(', ', $missingHeaders));
         }
@@ -154,7 +154,7 @@ class JournalsImport
                 'first_published_year' => $validated['publication_year'] ?? null,
                 'sinta_rank' => $sintaRank,
                 'url' => $validated['url'] ?? null,
-                'oai_urls' => isset($validated['oai_url']) && ! empty($validated['oai_url']) ? [$validated['oai_url']] : [],
+                'oai_urls' => isset($validated['oai_url']) && !empty($validated['oai_url']) ? [$validated['oai_url']] : [],
                 'email' => $validated['email'] ?? null,
                 'phone' => $validated['phone'] ?? null,
                 'university_id' => $this->universityId,
@@ -256,14 +256,14 @@ class JournalsImport
     {
         $query = Journal::where('university_id', $this->universityId);
 
-        if (! empty($validated['issn'])) {
+        if (!empty($validated['issn'])) {
             $exists = (clone $query)->where('issn', $validated['issn'])->exists();
             if ($exists) {
                 return true;
             }
         }
 
-        if (! empty($validated['e_issn'])) {
+        if (!empty($validated['e_issn'])) {
             $exists = (clone $query)->where('e_issn', $validated['e_issn'])->exists();
             if ($exists) {
                 return true;

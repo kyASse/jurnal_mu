@@ -1,42 +1,14 @@
-import * as React from 'react';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-} from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import {
-    DoiPaymentProofData,
-    DoiInvoiceDetailData,
-    DoiActiveInvoiceData,
-    DoiSubscriptionData,
-    DoiBankAccountData,
-} from '@/types/doi';
-import { DoiDocumentViewer } from './DoiDocumentViewer';
-import { formatRupiah } from './DoiAdminStatsCards';
-import {
-    CheckCircle2,
-    XCircle,
-    Clock,
-    AlertCircle,
-    Building2,
-    Receipt,
-    CreditCard,
-    Calendar,
-    User,
-    ArrowRightLeft,
-    Check,
-    AlertTriangle,
-    ShieldCheck,
-    HelpCircle,
-} from 'lucide-react';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { DoiActiveInvoiceData, DoiBankAccountData, DoiPaymentProofData, DoiSubscriptionData } from '@/types/doi';
+import { AlertCircle, AlertTriangle, Building2, Check, CheckCircle2, Clock, Receipt, ShieldCheck, User, XCircle } from 'lucide-react';
+import * as React from 'react';
+import { formatRupiah } from '../invoices/DoiInvoiceStatsCard';
+import { DoiDocumentViewer } from './DoiDocumentViewer';
 
 export interface DoiVerificationDrawerProof extends DoiPaymentProofData {
     invoice?: DoiActiveInvoiceData & {
@@ -87,9 +59,7 @@ export function DoiVerificationDrawer({
     const isUnderpaid = invoiceTotal > 0 && transferAmount < invoiceTotal;
 
     // Stream URL for document proof
-    const documentUrl = proof.id
-        ? `/admin/doi-management/payment-proofs/${proof.id}/stream`
-        : proof.file_path || null;
+    const documentUrl = proof.id ? `/admin/doi-management/payment-proofs/${proof.id}/stream` : proof.file_path || null;
 
     const handleApprove = () => {
         if (onApprove) {
@@ -109,9 +79,7 @@ export function DoiVerificationDrawer({
     };
 
     const bankDest =
-        typeof proof.bank_destination === 'object' && proof.bank_destination !== null
-            ? (proof.bank_destination as DoiBankAccountData)
-            : null;
+        typeof proof.bank_destination === 'object' && proof.bank_destination !== null ? (proof.bank_destination as DoiBankAccountData) : null;
 
     const bankDestName = bankDest?.bank_name || (typeof proof.bank_destination === 'string' ? proof.bank_destination : 'Rekening Resmi');
     const bankDestNumber = bankDest?.account_number || '';
@@ -122,8 +90,8 @@ export function DoiVerificationDrawer({
             <SheetContent
                 side="right"
                 className={cn(
-                    'flex flex-col w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl p-0 overflow-hidden sm:border-l dark:border-slate-800',
-                    className
+                    'flex w-full flex-col overflow-hidden p-0 sm:max-w-3xl sm:border-l md:max-w-4xl lg:max-w-5xl xl:max-w-6xl dark:border-slate-800',
+                    className,
                 )}
             >
                 {/* Header */}
@@ -134,9 +102,7 @@ export function DoiVerificationDrawer({
                                 <ShieldCheck className="size-5" />
                             </div>
                             <div>
-                                <SheetTitle className="text-base font-bold text-foreground">
-                                    Verifikasi Pembayaran #{proof.id}
-                                </SheetTitle>
+                                <SheetTitle className="text-base font-bold text-foreground">Verifikasi Pembayaran #{proof.id}</SheetTitle>
                                 <SheetDescription className="text-xs">
                                     Faktur: {invoice?.invoice_number || '-'} &bull; Diajukan pada {proof.created_at}
                                 </SheetDescription>
@@ -146,15 +112,24 @@ export function DoiVerificationDrawer({
                         {/* Status Badge */}
                         <div className="flex items-center gap-2">
                             {proof.status === 'approved' ? (
-                                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                <Badge
+                                    variant="outline"
+                                    className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                >
                                     <CheckCircle2 className="mr-1 size-3" /> Disetujui
                                 </Badge>
                             ) : proof.status === 'rejected' ? (
-                                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                                <Badge
+                                    variant="outline"
+                                    className="border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                                >
                                     <XCircle className="mr-1 size-3" /> Ditolak
                                 </Badge>
                             ) : (
-                                <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                                <Badge
+                                    variant="outline"
+                                    className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                                >
                                     <Clock className="mr-1 size-3" /> Menunggu Verifikasi
                                 </Badge>
                             )}
@@ -167,7 +142,7 @@ export function DoiVerificationDrawer({
                     {/* Left Column: Interactive Document Viewer (7 cols on lg) */}
                     <div className="flex flex-col bg-slate-950/95 p-4 lg:col-span-7">
                         <div className="mb-2 flex items-center justify-between text-xs text-slate-300">
-                            <span className="font-semibold uppercase tracking-wider">Berkas Bukti Transfer</span>
+                            <span className="font-semibold tracking-wider uppercase">Berkas Bukti Transfer</span>
                             <span className="text-[11px] text-slate-400">Gunakan tombol zoom & rotasi untuk inspeksi detail</span>
                         </div>
 
@@ -183,22 +158,20 @@ export function DoiVerificationDrawer({
                     </div>
 
                     {/* Right Column: Review Details & Decision Panel (5 cols on lg) */}
-                    <div className="flex flex-col justify-between overflow-y-auto bg-card p-5 lg:col-span-5 space-y-6">
+                    <div className="flex flex-col justify-between space-y-6 overflow-y-auto bg-card p-5 lg:col-span-5">
                         <div className="space-y-5">
                             {/* Institution & Invoice Meta Card */}
                             <div className="space-y-3 rounded-xl border border-slate-200 bg-muted/30 p-3.5 text-xs dark:border-slate-800 dark:bg-muted/10">
                                 <div className="flex items-start gap-2.5">
-                                    <Building2 className="mt-0.5 size-4 text-primary shrink-0" />
+                                    <Building2 className="mt-0.5 size-4 shrink-0 text-primary" />
                                     <div>
                                         <span className="text-muted-foreground">Institusi / PTMA:</span>
-                                        <p className="font-bold text-foreground">
-                                            {invoice?.university?.name || 'Universitas Muhammadiyah'}
-                                        </p>
+                                        <p className="font-bold text-foreground">{invoice?.university?.name || 'Universitas Muhammadiyah'}</p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-2.5">
-                                    <Receipt className="mt-0.5 size-4 text-primary shrink-0" />
+                                    <Receipt className="mt-0.5 size-4 shrink-0 text-primary" />
                                     <div>
                                         <span className="text-muted-foreground">Paket Langganan:</span>
                                         <p className="font-semibold text-foreground">
@@ -208,7 +181,7 @@ export function DoiVerificationDrawer({
                                 </div>
 
                                 <div className="flex items-start gap-2.5">
-                                    <User className="mt-0.5 size-4 text-primary shrink-0" />
+                                    <User className="mt-0.5 size-4 shrink-0 text-primary" />
                                     <div>
                                         <span className="text-muted-foreground">Pengunggah:</span>
                                         <p className="font-medium text-foreground">
@@ -221,9 +194,7 @@ export function DoiVerificationDrawer({
                             {/* Nominal Comparison Card */}
                             <div className="rounded-xl border border-slate-200 bg-muted/20 p-4 dark:border-slate-800 dark:bg-muted/10">
                                 <div className="mb-3 flex items-center justify-between">
-                                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                        Komparasi Nominal
-                                    </span>
+                                    <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Komparasi Nominal</span>
                                     {isExactMatch && (
                                         <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                                             <Check className="mr-1 size-3" /> MATCH TEPAT
@@ -244,15 +215,11 @@ export function DoiVerificationDrawer({
                                 <div className="grid grid-cols-2 gap-3 text-xs">
                                     <div className="rounded-lg border bg-background p-2.5">
                                         <span className="text-[11px] text-muted-foreground">Nominal Ditransfer:</span>
-                                        <p className="font-mono text-base font-bold text-foreground tabular-nums">
-                                            {formatRupiah(transferAmount)}
-                                        </p>
+                                        <p className="font-mono text-base font-bold text-foreground tabular-nums">{formatRupiah(transferAmount)}</p>
                                     </div>
                                     <div className="rounded-lg border bg-background p-2.5">
                                         <span className="text-[11px] text-muted-foreground">Total Tagihan Faktur:</span>
-                                        <p className="font-mono text-base font-bold text-primary tabular-nums">
-                                            {formatRupiah(invoiceTotal)}
-                                        </p>
+                                        <p className="font-mono text-base font-bold text-primary tabular-nums">{formatRupiah(invoiceTotal)}</p>
                                     </div>
                                 </div>
 
@@ -262,7 +229,7 @@ export function DoiVerificationDrawer({
                                         <span
                                             className={cn(
                                                 'font-mono font-semibold tabular-nums',
-                                                difference > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400'
+                                                difference > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400',
                                             )}
                                         >
                                             {difference > 0 ? `+ ${formatRupiah(difference)}` : `- ${formatRupiah(Math.abs(difference))}`}
@@ -273,9 +240,7 @@ export function DoiVerificationDrawer({
 
                             {/* Bank Details Card */}
                             <div className="space-y-2 rounded-xl border border-slate-200 bg-muted/20 p-3.5 text-xs dark:border-slate-800 dark:bg-muted/10">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                    Detail Rekening Transfer
-                                </span>
+                                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Detail Rekening Transfer</span>
 
                                 <div className="grid grid-cols-2 gap-2 pt-1">
                                     <div>
@@ -306,9 +271,7 @@ export function DoiVerificationDrawer({
                                     <Label htmlFor="admin_notes" className="text-xs font-semibold text-foreground">
                                         Catatan Verifikasi Admin
                                     </Label>
-                                    <span className="text-[11px] text-muted-foreground">
-                                        (Wajib jika ditolak)
-                                    </span>
+                                    <span className="text-[11px] text-muted-foreground">(Wajib jika ditolak)</span>
                                 </div>
                                 <Textarea
                                     id="admin_notes"
@@ -331,14 +294,12 @@ export function DoiVerificationDrawer({
                         </div>
 
                         {/* Action Buttons Section */}
-                        <div className="border-t pt-4 space-y-2 dark:border-slate-800">
+                        <div className="space-y-2 border-t pt-4 dark:border-slate-800">
                             {proof.status === 'pending' ? (
                                 <>
                                     {showApproveConfirm ? (
                                         <div className="space-y-2 rounded-lg border border-emerald-200 bg-emerald-50/50 p-3 text-xs dark:border-emerald-900/50 dark:bg-emerald-950/20">
-                                            <p className="font-semibold text-emerald-900 dark:text-emerald-200">
-                                                Konfirmasi Persetujuan Pembayaran?
-                                            </p>
+                                            <p className="font-semibold text-emerald-900 dark:text-emerald-200">Konfirmasi Persetujuan Pembayaran?</p>
                                             <p className="text-emerald-800/80 dark:text-emerald-300/80">
                                                 Faktur akan ditandai LUNAS dan langganan DOI institusi akan diaktifkan secara otomatis.
                                             </p>
@@ -392,9 +353,7 @@ export function DoiVerificationDrawer({
                             ) : (
                                 <div className="text-center text-xs text-muted-foreground">
                                     Bukti pembayaran ini telah berstatus{' '}
-                                    <span className="font-semibold text-foreground">
-                                        {proof.status === 'approved' ? 'Disetujui' : 'Ditolak'}
-                                    </span>
+                                    <span className="font-semibold text-foreground">{proof.status === 'approved' ? 'Disetujui' : 'Ditolak'}</span>
                                 </div>
                             )}
                         </div>

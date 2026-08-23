@@ -3,13 +3,10 @@
 namespace Tests\Feature\Doi;
 
 use App\Enums\Doi\InvoiceStatus;
-use App\Enums\Doi\PaymentProofStatus;
 use App\Enums\Doi\QuotaChangeType;
 use App\Enums\Doi\SubscriptionStatus;
-use App\Models\DoiBankAccount;
 use App\Models\DoiInvoice;
 use App\Models\DoiPackage;
-use App\Models\DoiPaymentProof;
 use App\Models\DoiSimilarityQuotaLog;
 use App\Models\DoiSubscription;
 use App\Models\Journal;
@@ -28,10 +25,15 @@ class DoiDashboardTest extends TestCase
     use DatabaseTransactions;
 
     protected User $adminKampus;
+
     protected User $userPengelola;
+
     protected University $university;
+
     protected DoiPackage $package;
+
     protected DoiSubscription $subscription;
+
     protected Journal $journal;
 
     protected function setUp(): void

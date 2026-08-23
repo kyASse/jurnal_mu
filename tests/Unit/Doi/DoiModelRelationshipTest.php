@@ -27,9 +27,13 @@ class DoiModelRelationshipTest extends TestCase
     use DatabaseTransactions;
 
     protected University $university;
+
     protected User $user;
+
     protected User $adminUser;
+
     protected ScientificField $scientificField;
+
     protected Journal $journal;
 
     protected function setUp(): void

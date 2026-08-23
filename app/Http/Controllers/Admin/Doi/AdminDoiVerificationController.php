@@ -55,7 +55,7 @@ class AdminDoiVerificationController extends Controller
     {
         $this->authorize('view', $paymentProof);
 
-        if (! Storage::disk('doi_proofs')->exists($paymentProof->file_path)) {
+        if (!Storage::disk('doi_proofs')->exists($paymentProof->file_path)) {
             abort(404, 'File bukti pembayaran tidak ditemukan.');
         }
 

@@ -18,12 +18,6 @@ class VerifyPaymentProofAction
 {
     /**
      * Verify payment proof (approve or reject) and update related invoice and subscription.
-     *
-     * @param  DoiPaymentProof  $proof
-     * @param  bool  $isApproved
-     * @param  string|null  $adminNotes
-     * @param  User|null  $verifier
-     * @return DoiPaymentProof
      */
     public function execute(
         DoiPaymentProof $proof,
@@ -60,7 +54,7 @@ class VerifyPaymentProofAction
                     $startDate = $subscription->start_date ? Carbon::parse($subscription->start_date) : $now->copy();
                     $currentEndDate = $subscription->end_date ? Carbon::parse($subscription->end_date) : null;
 
-                    if (! $subscription->start_date || $subscription->status === SubscriptionStatus::EXPIRED) {
+                    if (!$subscription->start_date || $subscription->status === SubscriptionStatus::EXPIRED) {
                         $startDate = $now->copy();
                         $newEndDate = $startDate->copy()->addYear();
                     } elseif ($currentEndDate && $currentEndDate->isFuture()) {

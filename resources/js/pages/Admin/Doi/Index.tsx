@@ -1,36 +1,23 @@
-import * as React from 'react';
-import { Head, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
-import {
-    SuperAdminDoiManagementProps,
-    DoiSubscriptionData,
-    AdjustQuotaFormData,
-    DoiPackageFormData,
-    DoiBankAccountFormData,
-} from '@/types/doi';
 import {
     DoiAdminStatsCards,
-    DoiVerificationTable,
-    DoiVerificationDrawer,
-    DoiVerificationDrawerProof,
-    DoiSubscriptionsMasterTable,
-    DoiQuotaAdjustDialog,
-    DoiPackageManagementTab,
     DoiBankAccountManagementTab,
     DoiHelpdeskSettingsCard,
+    DoiPackageManagementTab,
+    DoiQuotaAdjustDialog,
+    DoiSubscriptionsMasterTable,
+    DoiVerificationDrawer,
+    DoiVerificationDrawerProof,
+    DoiVerificationTable,
 } from '@/components/doi/admin';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-    RefreshCw,
-    ShieldAlert,
-    Building2,
-    Package,
-    Landmark,
-    Layers,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
+import { AdjustQuotaFormData, DoiBankAccountFormData, DoiPackageFormData, DoiSubscriptionData, SuperAdminDoiManagementProps } from '@/types/doi';
+import { Head, router } from '@inertiajs/react';
+import { Building2, Landmark, Package, RefreshCw, ShieldAlert } from 'lucide-react';
+import * as React from 'react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -99,11 +86,11 @@ export default function SuperAdminDoiIndex({
                     toast.success('Bukti pembayaran berhasil disetujui & langganan diaktifkan.');
                 },
                 onError: (errors) => {
-                    const errMsg = Object.values(errors)[0] as string || 'Gagal memverifikasi pembayaran.';
+                    const errMsg = (Object.values(errors)[0] as string) || 'Gagal memverifikasi pembayaran.';
                     toast.error(errMsg);
                 },
                 onFinish: () => setIsSubmitting(false),
-            }
+            },
         );
     };
 
@@ -121,11 +108,11 @@ export default function SuperAdminDoiIndex({
                     toast.success('Bukti pembayaran berhasil ditolak dan status dikembalikan.');
                 },
                 onError: (errors) => {
-                    const errMsg = Object.values(errors)[0] as string || 'Gagal menolak pembayaran.';
+                    const errMsg = (Object.values(errors)[0] as string) || 'Gagal menolak pembayaran.';
                     toast.error(errMsg);
                 },
                 onFinish: () => setIsSubmitting(false),
-            }
+            },
         );
     };
 
@@ -134,7 +121,7 @@ export default function SuperAdminDoiIndex({
         router.get(
             route('admin.doi-management.index'),
             { search, status: filters?.status, tab: 'subscriptions' },
-            { preserveState: true, preserveScroll: true, only: ['subscriptions'] }
+            { preserveState: true, preserveScroll: true, only: ['subscriptions'] },
         );
     };
 
@@ -142,7 +129,7 @@ export default function SuperAdminDoiIndex({
         router.get(
             route('admin.doi-management.index'),
             { status: status === 'all' ? undefined : status, search: filters?.search, tab: 'subscriptions' },
-            { preserveState: true, preserveScroll: true, only: ['subscriptions'] }
+            { preserveState: true, preserveScroll: true, only: ['subscriptions'] },
         );
     };
 
@@ -176,22 +163,22 @@ export default function SuperAdminDoiIndex({
                     toast.success('Penyesuaian kuota similarity berhasil diterapkan.');
                 },
                 onError: (errors) => {
-                    const errMsg = Object.values(errors)[0] as string || 'Gagal menyesuaikan kuota.';
+                    const errMsg = (Object.values(errors)[0] as string) || 'Gagal menyesuaikan kuota.';
                     toast.error(errMsg);
                 },
                 onFinish: () => setIsSubmitting(false),
-            }
+            },
         );
     };
 
     // Package Management Handlers
     const handleCreatePackage = (data: DoiPackageFormData) => {
         setIsSubmitting(true);
-        router.post(route('admin.doi-management.packages.store'), data as unknown as Record<string, unknown>, {
+        router.post(route('admin.doi-management.packages.store'), data as any, {
             preserveScroll: true,
             onSuccess: () => toast.success('Paket langganan baru berhasil dibuat.'),
             onError: (errors) => {
-                const errMsg = Object.values(errors)[0] as string || 'Gagal membuat paket.';
+                const errMsg = (Object.values(errors)[0] as string) || 'Gagal membuat paket.';
                 toast.error(errMsg);
             },
             onFinish: () => setIsSubmitting(false),
@@ -200,11 +187,11 @@ export default function SuperAdminDoiIndex({
 
     const handleUpdatePackage = (id: number, data: DoiPackageFormData) => {
         setIsSubmitting(true);
-        router.put(route('admin.doi-management.packages.update', id), data as unknown as Record<string, unknown>, {
+        router.put(route('admin.doi-management.packages.update', id), data as any, {
             preserveScroll: true,
             onSuccess: () => toast.success('Paket langganan berhasil diperbarui.'),
             onError: (errors) => {
-                const errMsg = Object.values(errors)[0] as string || 'Gagal memperbarui paket.';
+                const errMsg = (Object.values(errors)[0] as string) || 'Gagal memperbarui paket.';
                 toast.error(errMsg);
             },
             onFinish: () => setIsSubmitting(false),
@@ -217,7 +204,7 @@ export default function SuperAdminDoiIndex({
             preserveScroll: true,
             onSuccess: () => toast.success('Paket langganan berhasil dihapus.'),
             onError: (errors) => {
-                const errMsg = Object.values(errors)[0] as string || 'Gagal menghapus paket.';
+                const errMsg = (Object.values(errors)[0] as string) || 'Gagal menghapus paket.';
                 toast.error(errMsg);
             },
             onFinish: () => setIsSubmitting(false),
@@ -227,11 +214,11 @@ export default function SuperAdminDoiIndex({
     // Bank Account Management Handlers
     const handleCreateBankAccount = (data: DoiBankAccountFormData) => {
         setIsSubmitting(true);
-        router.post(route('admin.doi-management.bank-accounts.store'), data as unknown as Record<string, unknown>, {
+        router.post(route('admin.doi-management.bank-accounts.store'), data as any, {
             preserveScroll: true,
             onSuccess: () => toast.success('Rekening bank resmi berhasil ditambahkan.'),
             onError: (errors) => {
-                const errMsg = Object.values(errors)[0] as string || 'Gagal menambahkan rekening.';
+                const errMsg = (Object.values(errors)[0] as string) || 'Gagal menambahkan rekening.';
                 toast.error(errMsg);
             },
             onFinish: () => setIsSubmitting(false),
@@ -240,11 +227,11 @@ export default function SuperAdminDoiIndex({
 
     const handleUpdateBankAccount = (id: number, data: DoiBankAccountFormData) => {
         setIsSubmitting(true);
-        router.put(route('admin.doi-management.bank-accounts.update', id), data as unknown as Record<string, unknown>, {
+        router.put(route('admin.doi-management.bank-accounts.update', id), data as any, {
             preserveScroll: true,
             onSuccess: () => toast.success('Rekening bank berhasil diperbarui.'),
             onError: (errors) => {
-                const errMsg = Object.values(errors)[0] as string || 'Gagal memperbarui rekening.';
+                const errMsg = (Object.values(errors)[0] as string) || 'Gagal memperbarui rekening.';
                 toast.error(errMsg);
             },
             onFinish: () => setIsSubmitting(false),
@@ -257,7 +244,7 @@ export default function SuperAdminDoiIndex({
             preserveScroll: true,
             onSuccess: () => toast.success('Rekening bank berhasil dihapus.'),
             onError: (errors) => {
-                const errMsg = Object.values(errors)[0] as string || 'Gagal menghapus rekening.';
+                const errMsg = (Object.values(errors)[0] as string) || 'Gagal menghapus rekening.';
                 toast.error(errMsg);
             },
             onFinish: () => setIsSubmitting(false),
@@ -283,18 +270,13 @@ export default function SuperAdminDoiIndex({
                             Pusat Kendali Layanan DOI & Similarity Check
                         </h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Kelola verifikasi pembayaran bukti transfer, alokasi kuota Turnitin PTMA, paket aktivasi tahunan, dan nomor rekening resmi.
+                            Kelola verifikasi pembayaran bukti transfer, alokasi kuota Turnitin PTMA, paket aktivasi tahunan, dan nomor rekening
+                            resmi.
                         </p>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleRefresh}
-                            disabled={isRefreshing}
-                            className="gap-2"
-                        >
+                        <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing} className="gap-2">
                             <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                             Segarkan Data
                         </Button>
@@ -302,14 +284,11 @@ export default function SuperAdminDoiIndex({
                 </div>
 
                 {/* Top Metrics Cards */}
-                <DoiAdminStatsCards
-                    stats={stats}
-                    onViewPendingQueue={() => setActiveTab('verification')}
-                />
+                <DoiAdminStatsCards stats={stats} onViewPendingQueue={() => setActiveTab('verification')} />
 
                 {/* Main Interactive Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid h-auto w-full grid-cols-2 gap-1.5 p-1.5 sm:flex sm:w-auto sm:inline-flex">
+                    <TabsList className="grid h-auto w-full grid-cols-2 gap-1.5 p-1.5 sm:flex sm:inline-flex sm:w-auto">
                         <TabsTrigger value="verification" className="gap-2 py-2 text-xs sm:text-sm">
                             <ShieldAlert className="size-4 text-amber-500" />
                             <span>Antrian Verifikasi</span>
@@ -348,10 +327,7 @@ export default function SuperAdminDoiIndex({
 
                     {/* Tab 1: Antrian Verifikasi (Pending Queue) */}
                     <TabsContent value="verification" className="mt-6 space-y-4">
-                        <DoiVerificationTable
-                            pendingProofs={pendingProofs as DoiVerificationDrawerProof[]}
-                            onReviewProof={handleReviewProof}
-                        />
+                        <DoiVerificationTable pendingProofs={pendingProofs as DoiVerificationDrawerProof[]} onReviewProof={handleReviewProof} />
                     </TabsContent>
 
                     {/* Tab 2: Master Langganan PTMA */}

@@ -1,8 +1,8 @@
-import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { DoiAdminStatsData } from '@/types/doi';
-import { Building2, Clock, Sparkles, Wallet, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DoiAdminStatsData } from '@/types/doi';
+import { ArrowUpRight, Building2, Clock, Sparkles, Wallet } from 'lucide-react';
+import { formatRupiah } from '../invoices/DoiInvoiceStatsCard';
 
 interface DoiAdminStatsCardsProps {
     stats: DoiAdminStatsData;
@@ -10,22 +10,7 @@ interface DoiAdminStatsCardsProps {
     className?: string;
 }
 
-export function formatRupiah(amount: number | string): string {
-    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    if (isNaN(num)) return 'Rp 0';
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(num);
-}
-
-export function DoiAdminStatsCards({
-    stats,
-    onViewPendingQueue,
-    className,
-}: DoiAdminStatsCardsProps) {
+export function DoiAdminStatsCards({ stats, onViewPendingQueue, className }: DoiAdminStatsCardsProps) {
     const totalSubscriptions = stats?.total_subscriptions ?? 0;
     const activeSubscriptions = stats?.active_subscriptions ?? 0;
     const pendingProofsCount = stats?.pending_proofs_count ?? 0;
@@ -33,10 +18,7 @@ export function DoiAdminStatsCards({
     const usedQuota = stats?.used_similarity_quota ?? 0;
     const totalQuota = stats?.total_similarity_quota ?? 0;
 
-    const activePercentage =
-        totalSubscriptions > 0
-            ? Math.round((activeSubscriptions / totalSubscriptions) * 100)
-            : 0;
+    const activePercentage = totalSubscriptions > 0 ? Math.round((activeSubscriptions / totalSubscriptions) * 100) : 0;
 
     return (
         <div className={cn('grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4', className)}>
@@ -44,9 +26,7 @@ export function DoiAdminStatsCards({
             <Card className="relative overflow-hidden border-slate-200/80 bg-gradient-to-br from-card via-card to-emerald-500/5 shadow-xs transition-all hover:shadow-md dark:border-slate-800 dark:to-emerald-950/20">
                 <CardContent className="p-5">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            PTMA Aktif Langganan
-                        </span>
+                        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">PTMA Aktif Langganan</span>
                         <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
                             <Building2 className="size-4" />
                         </div>
@@ -58,15 +38,10 @@ export function DoiAdminStatsCards({
                                 <span className="font-mono text-3xl font-extrabold tracking-tight text-foreground tabular-nums">
                                     {activeSubscriptions}
                                 </span>
-                                <span className="font-mono text-sm font-medium text-muted-foreground tabular-nums">
-                                    / {totalSubscriptions} PTMA
-                                </span>
+                                <span className="font-mono text-sm font-medium text-muted-foreground tabular-nums">/ {totalSubscriptions} PTMA</span>
                             </div>
                             <p className="mt-1 text-xs text-muted-foreground">
-                                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                    {activePercentage}%
-                                </span>{' '}
-                                dari total pendaftar
+                                <span className="font-semibold text-emerald-600 dark:text-emerald-400">{activePercentage}%</span> dari total pendaftar
                             </p>
                         </div>
                     </div>
@@ -79,16 +54,14 @@ export function DoiAdminStatsCards({
                 className={cn(
                     'relative overflow-hidden border-slate-200/80 bg-gradient-to-br from-card via-card shadow-xs transition-all hover:shadow-md dark:border-slate-800',
                     pendingProofsCount > 0
-                        ? 'cursor-pointer border-amber-300/80 to-amber-500/10 dark:border-amber-700/60 dark:to-amber-950/30 ring-1 ring-amber-500/20'
-                        : 'to-slate-500/5 dark:to-slate-900/20'
+                        ? 'cursor-pointer border-amber-300/80 to-amber-500/10 ring-1 ring-amber-500/20 dark:border-amber-700/60 dark:to-amber-950/30'
+                        : 'to-slate-500/5 dark:to-slate-900/20',
                 )}
             >
                 <CardContent className="p-5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                Antrean Verifikasi
-                            </span>
+                            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Antrean Verifikasi</span>
                             {pendingProofsCount > 0 && (
                                 <span className="relative flex size-2.5">
                                     <span className="absolute inline-flex size-full animate-ping rounded-full bg-amber-400 opacity-75" />
@@ -101,7 +74,7 @@ export function DoiAdminStatsCards({
                                 'flex size-9 items-center justify-center rounded-xl',
                                 pendingProofsCount > 0
                                     ? 'bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400'
-                                    : 'bg-muted text-muted-foreground'
+                                    : 'bg-muted text-muted-foreground',
                             )}
                         >
                             <Clock className="size-4" />
@@ -114,9 +87,7 @@ export function DoiAdminStatsCards({
                                 <span
                                     className={cn(
                                         'font-mono text-3xl font-extrabold tracking-tight tabular-nums',
-                                        pendingProofsCount > 0
-                                            ? 'text-amber-600 dark:text-amber-400'
-                                            : 'text-foreground'
+                                        pendingProofsCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-foreground',
                                     )}
                                 >
                                     {pendingProofsCount}
@@ -141,9 +112,7 @@ export function DoiAdminStatsCards({
             <Card className="relative overflow-hidden border-slate-200/80 bg-gradient-to-br from-card via-card to-indigo-500/5 shadow-xs transition-all hover:shadow-md dark:border-slate-800 dark:to-indigo-950/20">
                 <CardContent className="p-5">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Kuota Similarity
-                        </span>
+                        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Kuota Similarity</span>
                         <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
                             <Sparkles className="size-4" />
                         </div>
@@ -161,9 +130,7 @@ export function DoiAdminStatsCards({
                                     </span>
                                 )}
                             </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Dokumen Turnitin dicek
-                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">Dokumen Turnitin dicek</p>
                         </div>
                     </div>
                 </CardContent>
@@ -173,9 +140,7 @@ export function DoiAdminStatsCards({
             <Card className="relative overflow-hidden border-slate-200/80 bg-gradient-to-br from-card via-card to-blue-500/5 shadow-xs transition-all hover:shadow-md dark:border-slate-800 dark:to-blue-950/20">
                 <CardContent className="p-5">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Total Pendapatan Terverifikasi
-                        </span>
+                        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Total Pendapatan Terverifikasi</span>
                         <div className="flex size-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
                             <Wallet className="size-4" />
                         </div>
@@ -186,9 +151,7 @@ export function DoiAdminStatsCards({
                             <div className="font-mono text-2xl font-extrabold tracking-tight text-foreground tabular-nums sm:text-3xl">
                                 {formatRupiah(totalRevenue)}
                             </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Total penerimaan faktur lunas
-                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">Total penerimaan faktur lunas</p>
                         </div>
                     </div>
                 </CardContent>

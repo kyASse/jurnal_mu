@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Events\Doi\PaymentProofRejected;
+use App\Events\Doi\PaymentProofUploaded;
+use App\Events\Doi\SubscriptionActivated;
+use App\Listeners\Doi\SendPaymentProofRejectedNotification;
+use App\Listeners\Doi\SendPaymentProofUploadedNotification;
+use App\Listeners\Doi\SendSubscriptionActivatedNotification;
 use App\Models\AccreditationTemplate;
 use App\Models\EssayQuestion;
 use App\Models\EvaluationCategory;
@@ -20,12 +26,6 @@ use App\Policies\JournalAssessmentPolicy;
 use App\Policies\JournalPolicy;
 use App\Policies\UniversityPolicy;
 use App\Policies\UserPolicy;
-use App\Events\Doi\PaymentProofRejected;
-use App\Events\Doi\PaymentProofUploaded;
-use App\Events\Doi\SubscriptionActivated;
-use App\Listeners\Doi\SendPaymentProofRejectedNotification;
-use App\Listeners\Doi\SendPaymentProofUploadedNotification;
-use App\Listeners\Doi\SendSubscriptionActivatedNotification;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;

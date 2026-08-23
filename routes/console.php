@@ -38,4 +38,3 @@ Schedule::command('doi:send-due-reminders')
     ->timezone('Asia/Jakarta')
     ->withoutOverlapping()
     ->runInBackground();
-

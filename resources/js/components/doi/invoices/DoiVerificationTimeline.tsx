@@ -1,20 +1,9 @@
-import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DoiPaymentProofData, PaymentProofStatusType } from '@/types/doi';
-import { formatRupiah } from './DoiInvoiceStatsCard';
-import {
-    Clock,
-    CheckCircle2,
-    XCircle,
-    FileText,
-    ExternalLink,
-    AlertCircle,
-    Calendar,
-    Building2,
-    ShieldAlert,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DoiPaymentProofData, PaymentProofStatusType } from '@/types/doi';
+import { CheckCircle2, Clock, FileText, ShieldAlert, XCircle } from 'lucide-react';
+import { formatRupiah } from './DoiInvoiceStatsCard';
 
 interface DoiVerificationTimelineProps {
     paymentProofs?: DoiPaymentProofData[];
@@ -49,41 +38,32 @@ function getStatusBadgeConfig(status: PaymentProofStatusType) {
     }
 }
 
-export function DoiVerificationTimeline({
-    paymentProofs = [],
-    onViewProof,
-    className,
-}: DoiVerificationTimelineProps) {
+export function DoiVerificationTimeline({ paymentProofs = [], onViewProof, className }: DoiVerificationTimelineProps) {
     if (!paymentProofs || paymentProofs.length === 0) {
         return (
             <div className={cn('flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center', className)}>
-                <Clock className="size-8 text-muted-foreground/50 mb-2" />
+                <Clock className="mb-2 size-8 text-muted-foreground/50" />
                 <p className="text-sm font-medium text-foreground">Belum ada riwayat pembayaran</p>
-                <p className="text-xs text-muted-foreground">
-                    Bukti pembayaran yang diunggah akan muncul dan terlacak di sini.
-                </p>
+                <p className="text-xs text-muted-foreground">Bukti pembayaran yang diunggah akan muncul dan terlacak di sini.</p>
             </div>
         );
     }
 
     return (
         <div className={cn('space-y-4', className)}>
-            <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+            <div className="relative space-y-6 pl-6 before:absolute before:top-2 before:bottom-2 before:left-2.5 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
                 {paymentProofs.map((proof, idx) => {
                     const statusConfig = getStatusBadgeConfig(proof.status);
                     const StatusIcon = statusConfig.icon;
-                    const destinationName =
-                        typeof proof.bank_destination === 'string'
-                            ? proof.bank_destination
-                            : proof.bank_destination?.bank_name;
+                    const destinationName = typeof proof.bank_destination === 'string' ? proof.bank_destination : proof.bank_destination?.bank_name;
 
                     return (
                         <div key={proof.id || idx} className="relative space-y-2">
                             {/* Timeline bullet */}
                             <span
                                 className={cn(
-                                    'absolute -left-6 top-1 flex size-5 items-center justify-center rounded-full ring-4 ring-offset-background',
-                                    statusConfig.dotColor
+                                    'absolute top-1 -left-6 flex size-5 items-center justify-center rounded-full ring-4 ring-offset-background',
+                                    statusConfig.dotColor,
                                 )}
                             >
                                 <span className="size-2 rounded-full bg-white" />
@@ -93,16 +73,11 @@ export function DoiVerificationTimeline({
                             <div className="rounded-lg border border-slate-200 bg-card p-3.5 shadow-2xs dark:border-slate-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="flex items-center gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className={cn('text-[11px] font-medium', statusConfig.className)}
-                                        >
+                                        <Badge variant="outline" className={cn('text-[11px] font-medium', statusConfig.className)}>
                                             <StatusIcon className="mr-1 size-3" />
                                             {proof.status_label || statusConfig.label}
                                         </Badge>
-                                        <span className="text-xs text-muted-foreground">
-                                            {proof.created_at}
-                                        </span>
+                                        <span className="text-xs text-muted-foreground">{proof.created_at}</span>
                                     </div>
 
                                     {onViewProof && (
@@ -129,21 +104,15 @@ export function DoiVerificationTimeline({
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">Nominal Ditransfer:</span>
-                                        <p className="font-mono font-bold text-foreground">
-                                            {formatRupiah(proof.transfer_amount)}
-                                        </p>
+                                        <p className="font-mono font-bold text-foreground">{formatRupiah(proof.transfer_amount)}</p>
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">Bank Tujuan PPM:</span>
-                                        <p className="font-medium text-foreground">
-                                            {destinationName || 'Rekening PPM'}
-                                        </p>
+                                        <p className="font-medium text-foreground">{destinationName || 'Rekening PPM'}</p>
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">Tanggal Transfer:</span>
-                                        <p className="font-medium text-foreground">
-                                            {proof.transfer_date}
-                                        </p>
+                                        <p className="font-medium text-foreground">{proof.transfer_date}</p>
                                     </div>
                                 </div>
 
@@ -157,12 +126,13 @@ export function DoiVerificationTimeline({
                                                     Catatan Penolakan oleh Administrator:
                                                 </p>
                                                 <p className="italic">
-                                                    "{proof.admin_notes || 'Bukti pembayaran tidak memenuhi kriteria validasi. Harap unggah ulang struk bukti transfer yang jelas.'}"
+                                                    "
+                                                    {proof.admin_notes ||
+                                                        'Bukti pembayaran tidak memenuhi kriteria validasi. Harap unggah ulang struk bukti transfer yang jelas.'}
+                                                    "
                                                 </p>
                                                 {proof.verified_at && (
-                                                    <p className="text-[11px] text-rose-700 dark:text-rose-400">
-                                                        Ditinjau pada: {proof.verified_at}
-                                                    </p>
+                                                    <p className="text-[11px] text-rose-700 dark:text-rose-400">Ditinjau pada: {proof.verified_at}</p>
                                                 )}
                                             </div>
                                         </div>

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DoiBankAccountData } from '@/types/doi';
-import { Building2, Copy, Check, Info, Landmark } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { DoiBankAccountData } from '@/types/doi';
+import { Building2, Check, Copy, Info, Landmark } from 'lucide-react';
+import * as React from 'react';
 
 interface DoiBankAccountsCardProps {
     bankAccounts?: DoiBankAccountData[];
@@ -31,15 +31,11 @@ const DEFAULT_BANK_ACCOUNTS: DoiBankAccountData[] = [
     },
 ];
 
-export function DoiBankAccountsCard({
-    bankAccounts,
-    invoiceNumber,
-    className,
-}: DoiBankAccountsCardProps) {
+export function DoiBankAccountsCard({ bankAccounts, invoiceNumber, className }: DoiBankAccountsCardProps) {
     const [copiedAccount, setCopiedAccount] = React.useState<string | null>(null);
     const [copiedInvoice, setCopiedInvoice] = React.useState(false);
 
-    const accounts = (bankAccounts && bankAccounts.length > 0) ? bankAccounts : DEFAULT_BANK_ACCOUNTS;
+    const accounts = bankAccounts && bankAccounts.length > 0 ? bankAccounts : DEFAULT_BANK_ACCOUNTS;
 
     const handleCopy = (text: string, type: 'account' | 'invoice') => {
         navigator.clipboard.writeText(text);
@@ -61,15 +57,11 @@ export function DoiBankAccountsCard({
                             <Landmark className="size-4" />
                         </div>
                         <div>
-                            <CardTitle className="text-sm font-semibold sm:text-base">
-                                Rekening Pembayaran Resmi
-                            </CardTitle>
-                            <CardDescription className="text-xs">
-                                Transfer hanya ke rekening resmi Diktilitbang PPM berikut
-                            </CardDescription>
+                            <CardTitle className="text-sm font-semibold sm:text-base">Rekening Pembayaran Resmi</CardTitle>
+                            <CardDescription className="text-xs">Transfer hanya ke rekening resmi Diktilitbang PPM berikut</CardDescription>
                         </div>
                     </div>
-                    <Badge variant="outline" className="border-primary/30 bg-primary/5 text-primary text-[11px]">
+                    <Badge variant="outline" className="border-primary/30 bg-primary/5 text-[11px] text-primary">
                         Verifikasi Manual
                     </Badge>
                 </div>
@@ -86,19 +78,19 @@ export function DoiBankAccountsCard({
                             >
                                 <div className="space-y-1.5">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5 font-semibold text-foreground text-xs sm:text-sm">
+                                        <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground sm:text-sm">
                                             <Building2 className="size-3.5 text-muted-foreground" />
                                             {account.bank_name}
                                         </div>
                                         {(account.branch_name || account.branch) && (
-                                            <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                                            <span className="max-w-[120px] truncate text-[10px] text-muted-foreground">
                                                 {account.branch_name || account.branch}
                                             </span>
                                         )}
                                     </div>
 
                                     <div className="flex items-center justify-between rounded-md bg-muted/50 px-2.5 py-1.5 dark:bg-muted/20">
-                                        <span className="font-mono text-sm font-bold tracking-wider text-foreground sm:text-base tabular-nums">
+                                        <span className="font-mono text-sm font-bold tracking-wider text-foreground tabular-nums sm:text-base">
                                             {account.account_number}
                                         </span>
                                         <Button
@@ -119,10 +111,7 @@ export function DoiBankAccountsCard({
                                     </div>
 
                                     <div className="text-xs text-muted-foreground">
-                                        a.n.{' '}
-                                        <span className="font-medium text-foreground">
-                                            {account.account_holder}
-                                        </span>
+                                        a.n. <span className="font-medium text-foreground">{account.account_holder}</span>
                                     </div>
                                 </div>
                             </div>
@@ -137,12 +126,13 @@ export function DoiBankAccountsCard({
                         <div className="space-y-1">
                             <p className="font-semibold">Petunjuk Berita Transfer:</p>
                             <p className="leading-relaxed">
-                                Cantumkan <span className="font-semibold">Nomor Tagihan/Faktur</span> pada kolom berita/keterangan transfer untuk mempercepat proses verifikasi.
+                                Cantumkan <span className="font-semibold">Nomor Tagihan/Faktur</span> pada kolom berita/keterangan transfer untuk
+                                mempercepat proses verifikasi.
                             </p>
                             {invoiceNumber && (
                                 <div className="mt-1 flex items-center gap-2 pt-1">
                                     <span className="text-[11px] text-muted-foreground">Nomor Faktur Anda:</span>
-                                    <code className="rounded bg-background px-1.5 py-0.5 font-mono text-[11px] font-bold text-foreground border">
+                                    <code className="rounded border bg-background px-1.5 py-0.5 font-mono text-[11px] font-bold text-foreground">
                                         {invoiceNumber}
                                     </code>
                                     <Button
@@ -152,11 +142,7 @@ export function DoiBankAccountsCard({
                                         onClick={() => handleCopy(invoiceNumber, 'invoice')}
                                         className="h-6 px-1.5 text-[10px]"
                                     >
-                                        {copiedInvoice ? (
-                                            <Check className="size-3 text-emerald-600" />
-                                        ) : (
-                                            <Copy className="size-3" />
-                                        )}
+                                        {copiedInvoice ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
                                         <span className="ml-1">{copiedInvoice ? 'Tersalin' : 'Salin Faktur'}</span>
                                     </Button>
                                 </div>

@@ -1,9 +1,8 @@
-import * as React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileSearch, PlusCircle, CheckCircle2, AlertTriangle, AlertCircle, BarChart3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { AlertCircle, AlertTriangle, BarChart3, CheckCircle2, FileSearch, PlusCircle } from 'lucide-react';
 
 interface DoiQuotaGaugeProps {
     quotaTotal: number;
@@ -24,17 +23,11 @@ function formatDateIndo(dateStr?: string | null): string {
     }).format(date);
 }
 
-export function DoiQuotaGauge({
-    quotaTotal = 0,
-    quotaUsed = 0,
-    quotaResetDate,
-    onTopUp,
-    className,
-}: DoiQuotaGaugeProps) {
+export function DoiQuotaGauge({ quotaTotal = 0, quotaUsed = 0, quotaResetDate, onTopUp, className }: DoiQuotaGaugeProps) {
     const total = Math.max(0, quotaTotal);
     const used = Math.max(0, Math.min(quotaUsed, total));
     const remaining = Math.max(0, total - used);
-    
+
     // Remaining percentage (0-100)
     const remainingPercentage = total > 0 ? Math.round((remaining / total) * 100) : 0;
     // Used percentage for progress bar fill (0-100)
@@ -79,19 +72,12 @@ export function DoiQuotaGauge({
                             <FileSearch className="size-4" />
                         </div>
                         <div>
-                            <CardTitle className="text-base font-semibold text-foreground">
-                                Similarity Check
-                            </CardTitle>
-                            <CardDescription className="text-xs">
-                                Kuota Uji Plagiasi (iThenticate)
-                            </CardDescription>
+                            <CardTitle className="text-base font-semibold text-foreground">Similarity Check</CardTitle>
+                            <CardDescription className="text-xs">Kuota Uji Plagiasi (iThenticate)</CardDescription>
                         </div>
                     </div>
 
-                    <Badge
-                        variant="outline"
-                        className={cn('font-medium text-[11px]', statusConfig.badgeBg)}
-                    >
+                    <Badge variant="outline" className={cn('text-[11px] font-medium', statusConfig.badgeBg)}>
                         <statusConfig.icon className="mr-1 size-3" />
                         {statusConfig.label} ({remainingPercentage}% Sisa)
                     </Badge>
@@ -104,7 +90,7 @@ export function DoiQuotaGauge({
                     <div>
                         <span className="text-xs text-muted-foreground">Sisa Kuota Tersedia</span>
                         <div className="flex items-baseline gap-1.5">
-                            <span className="font-mono text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl tabular-nums">
+                            <span className="font-mono text-2xl font-extrabold tracking-tight text-foreground tabular-nums sm:text-3xl">
                                 {remaining}
                             </span>
                             <span className="text-xs text-muted-foreground">/ {total} Dokumen</span>
@@ -113,9 +99,7 @@ export function DoiQuotaGauge({
 
                     <div className="text-right">
                         <span className="text-xs text-muted-foreground">Tingkat Pemakaian</span>
-                        <p className="font-mono text-sm font-semibold text-foreground tabular-nums">
-                            {usedPercentage}%
-                        </p>
+                        <p className="font-mono text-sm font-semibold text-foreground tabular-nums">{usedPercentage}%</p>
                     </div>
                 </div>
 
@@ -123,10 +107,7 @@ export function DoiQuotaGauge({
                 <div className="space-y-1.5">
                     <div className="relative h-3 w-full overflow-hidden rounded-full bg-secondary/80 dark:bg-secondary">
                         <div
-                            className={cn(
-                                'h-full transition-all duration-700 ease-out rounded-full',
-                                statusConfig.barColor
-                            )}
+                            className={cn('h-full rounded-full transition-all duration-700 ease-out', statusConfig.barColor)}
                             style={{ width: `${Math.min(100, Math.max(usedPercentage, remainingPercentage === 0 ? 100 : 0))}%` }}
                             role="progressbar"
                             aria-valuenow={used}
@@ -136,7 +117,7 @@ export function DoiQuotaGauge({
                         />
                     </div>
 
-                    <div className="flex justify-between text-[11px] text-muted-foreground font-mono tabular-nums">
+                    <div className="flex justify-between font-mono text-[11px] text-muted-foreground tabular-nums">
                         <span>0 Terpakai</span>
                         <span>{total} Total</span>
                     </div>
@@ -145,18 +126,16 @@ export function DoiQuotaGauge({
                 {/* Detailed Breakdown stats */}
                 <div className="grid grid-cols-2 gap-2 rounded-lg border bg-muted/30 p-2.5 text-xs dark:bg-muted/10">
                     <div className="space-y-0.5">
-                        <span className="text-muted-foreground flex items-center gap-1">
+                        <span className="flex items-center gap-1 text-muted-foreground">
                             <BarChart3 className="size-3" />
                             Dokumen Terpakai
                         </span>
-                        <p className="font-mono font-semibold text-foreground tabular-nums">
-                            {used} Dokumen
-                        </p>
+                        <p className="font-mono font-semibold text-foreground tabular-nums">{used} Dokumen</p>
                     </div>
 
                     <div className="space-y-0.5">
                         <span className="text-muted-foreground">Masa Berlaku Kuota</span>
-                        <p className="font-medium text-foreground text-xs truncate">
+                        <p className="truncate text-xs font-medium text-foreground">
                             {quotaResetDate ? formatDateIndo(quotaResetDate) : 'Sesuai Langganan'}
                         </p>
                     </div>
@@ -170,7 +149,7 @@ export function DoiQuotaGauge({
                             variant="outline"
                             size="sm"
                             onClick={onTopUp}
-                            className="w-full gap-1.5 text-xs shadow-2xs border-emerald-300 hover:bg-emerald-50 hover:text-emerald-900 dark:border-emerald-800 dark:hover:bg-emerald-950 dark:hover:text-emerald-200"
+                            className="w-full gap-1.5 border-emerald-300 text-xs shadow-2xs hover:bg-emerald-50 hover:text-emerald-900 dark:border-emerald-800 dark:hover:bg-emerald-950 dark:hover:text-emerald-200"
                         >
                             <PlusCircle className="size-3.5" />
                             <span>Tambah Kuota Similarity</span>

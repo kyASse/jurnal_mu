@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Actions\Doi\GenerateInvoiceAction;
 use App\Enums\Doi\InvoiceItemType;
 use App\Enums\Doi\InvoiceStatus;
 use App\Enums\Doi\PaymentProofStatus;
@@ -151,7 +150,7 @@ class DoiDemoDataSeeder extends Seeder
                     if ($journalInvoice->items()->count() === 0) {
                         $journalInvoice->items()->create([
                             'item_type' => InvoiceItemType::ANNUAL_FEE,
-                            'description' => 'Paket Langganan DOI Jurnal ' . $journal->name,
+                            'description' => 'Paket Langganan DOI Jurnal '.$journal->name,
                             'quantity' => 1,
                             'unit_price' => 2500000,
                             'total_price' => 2500000,
@@ -209,12 +208,12 @@ class DoiDemoDataSeeder extends Seeder
             }
 
             // Create sample proof image in storage
-            $mockFolder = 'proofs/' . Carbon::now()->format('Y/m');
+            $mockFolder = 'proofs/'.Carbon::now()->format('Y/m');
             Storage::disk('doi_proofs')->makeDirectory($mockFolder);
-            $mockFilePath = $mockFolder . '/demo_resi_transfer_umy.png';
+            $mockFilePath = $mockFolder.'/demo_resi_transfer_umy.png';
 
             // Generate a simple 1x1 transparent/colored PNG base64 if file doesn't exist
-            if (! Storage::disk('doi_proofs')->exists($mockFilePath)) {
+            if (!Storage::disk('doi_proofs')->exists($mockFilePath)) {
                 $samplePng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAlgAAAGQAQMAAAB+K1ZfAAAABlBMVEUAAAD///+l2Z/dAAAAAXRSTlMAQObYZgAAAFRJREFUeNrtwTEBAAAAwqD1T20ND6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAY3cQAB+7G8LgAAAABJRU5ErkJggg==');
                 Storage::disk('doi_proofs')->put($mockFilePath, $samplePng);
             }

@@ -14,7 +14,6 @@ use App\Models\User;
 use App\Services\Doi\DoiQuotaManagerService;
 use Database\Seeders\DoiPackageSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use InvalidArgumentException;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -23,10 +22,15 @@ class DoiQuotaManagerServiceTest extends TestCase
     use DatabaseTransactions;
 
     protected University $university;
+
     protected User $user;
+
     protected User $adminUser;
+
     protected Journal $journal;
+
     protected DoiPackage $package;
+
     protected DoiQuotaManagerService $quotaManager;
 
     protected function setUp(): void
@@ -49,7 +53,7 @@ class DoiQuotaManagerServiceTest extends TestCase
         ]);
 
         $this->package = DoiPackage::where('code', 'DOI-INST-STD')->firstOrFail();
-        $this->quotaManager = new DoiQuotaManagerService();
+        $this->quotaManager = new DoiQuotaManagerService;
     }
 
     public function test_has_remaining_quota_evaluates_correctly(): void

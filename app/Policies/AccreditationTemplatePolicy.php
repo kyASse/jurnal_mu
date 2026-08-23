@@ -51,7 +51,7 @@ class AccreditationTemplatePolicy
      */
     public function delete(User $user, AccreditationTemplate $template): bool
     {
-        if (! $user->isSuperAdmin()) {
+        if (!$user->isSuperAdmin()) {
             return false;
         }
 

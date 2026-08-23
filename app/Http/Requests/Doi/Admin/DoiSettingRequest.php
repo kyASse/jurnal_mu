@@ -9,6 +9,7 @@ class DoiSettingRequest extends FormRequest
     public function authorize(): bool
     {
         $user = $this->user();
+
         return $user && $user->isSuperAdmin() && $user->is_active;
     }
 

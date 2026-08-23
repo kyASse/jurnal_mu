@@ -1,36 +1,15 @@
-import * as React from 'react';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-} from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import {
-    DoiInvoiceDetailData,
-    DoiBankAccountData,
-    InvoiceStatusType,
-} from '@/types/doi';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
+import { DoiBankAccountData, DoiInvoiceDetailData, InvoiceStatusType } from '@/types/doi';
+import { AlertCircle, AlertTriangle, CheckCircle2, Clock, CreditCard, History, Receipt, XCircle } from 'lucide-react';
+import * as React from 'react';
 import { DoiBankAccountsCard } from './DoiBankAccountsCard';
+import { formatRupiah } from './DoiInvoiceStatsCard';
 import { DoiPaymentProofForm } from './DoiPaymentProofForm';
 import { DoiVerificationTimeline } from './DoiVerificationTimeline';
-import { formatRupiah } from './DoiInvoiceStatsCard';
-import {
-    Receipt,
-    Calendar,
-    Clock,
-    CheckCircle2,
-    XCircle,
-    AlertCircle,
-    AlertTriangle,
-    CreditCard,
-    History,
-    FileCheck,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface DoiInvoiceDetailDrawerProps {
     invoice: DoiInvoiceDetailData | null;
@@ -113,10 +92,7 @@ export function DoiInvoiceDetailDrawer({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="right"
-                className={cn(
-                    'flex flex-col w-full sm:max-w-xl md:max-w-2xl p-0 overflow-hidden sm:border-l dark:border-slate-800',
-                    className
-                )}
+                className={cn('flex w-full flex-col overflow-hidden p-0 sm:max-w-xl sm:border-l md:max-w-2xl dark:border-slate-800', className)}
             >
                 {/* Header */}
                 <SheetHeader className="border-b bg-muted/30 px-6 py-4 dark:bg-muted/10">
@@ -126,9 +102,7 @@ export function DoiInvoiceDetailDrawer({
                                 <Receipt className="size-5" />
                             </div>
                             <div>
-                                <SheetTitle className="text-base font-bold text-foreground">
-                                    Faktur {invoice.invoice_number}
-                                </SheetTitle>
+                                <SheetTitle className="text-base font-bold text-foreground">Faktur {invoice.invoice_number}</SheetTitle>
                                 <SheetDescription className="text-xs">
                                     {invoice.package?.name || invoice.package_name || 'Langganan DOI Crossref'}
                                 </SheetDescription>
@@ -181,7 +155,7 @@ export function DoiInvoiceDetailDrawer({
                 </SheetHeader>
 
                 {/* Content area with smooth scrolling */}
-                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+                <div className="flex-1 space-y-6 overflow-y-auto px-6 py-4">
                     {/* DETAIL TAB */}
                     {activeTab === 'detail' && (
                         <div className="space-y-5">
@@ -195,20 +169,16 @@ export function DoiInvoiceDetailDrawer({
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">Batas Waktu Pembayaran:</span>
-                                    <p className="font-semibold text-foreground">
-                                        {invoice.due_date}
-                                    </p>
+                                    <p className="font-semibold text-foreground">{invoice.due_date}</p>
                                 </div>
                                 {invoice.university_name && (
                                     <div className="col-span-2">
                                         <span className="text-muted-foreground">Institusi:</span>
-                                        <p className="font-medium text-foreground">
-                                            {invoice.university_name}
-                                        </p>
+                                        <p className="font-medium text-foreground">{invoice.university_name}</p>
                                     </div>
                                 )}
                                 {invoice.paid_at && (
-                                    <div className="col-span-2 text-emerald-600 dark:text-emerald-400 font-medium">
+                                    <div className="col-span-2 font-medium text-emerald-600 dark:text-emerald-400">
                                         Lunas dibayar pada: {invoice.paid_at}
                                     </div>
                                 )}
@@ -216,9 +186,7 @@ export function DoiInvoiceDetailDrawer({
 
                             {/* Item breakdown table */}
                             <div className="space-y-2">
-                                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                    Item Tagihan
-                                </h4>
+                                <h4 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Item Tagihan</h4>
                                 <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
                                     <table className="w-full text-left text-xs">
                                         <thead className="border-b bg-muted/50 font-semibold text-foreground">
@@ -233,13 +201,9 @@ export function DoiInvoiceDetailDrawer({
                                             {invoice.items && invoice.items.length > 0 ? (
                                                 invoice.items.map((item, idx) => (
                                                     <tr key={item.id || idx}>
-                                                        <td className="p-2.5 font-medium text-foreground">
-                                                            {item.description}
-                                                        </td>
+                                                        <td className="p-2.5 font-medium text-foreground">{item.description}</td>
                                                         <td className="p-2.5 text-center font-mono">{item.quantity}</td>
-                                                        <td className="p-2.5 text-right font-mono tabular-nums">
-                                                            {formatRupiah(item.unit_price)}
-                                                        </td>
+                                                        <td className="p-2.5 text-right font-mono tabular-nums">{formatRupiah(item.unit_price)}</td>
                                                         <td className="p-2.5 text-right font-mono font-medium text-foreground tabular-nums">
                                                             {formatRupiah(item.total_price)}
                                                         </td>
@@ -276,34 +240,24 @@ export function DoiInvoiceDetailDrawer({
                                     </div>
                                 )}
                                 <Separator className="my-1.5" />
-                                <div className="flex justify-between font-bold text-foreground text-sm">
+                                <div className="flex justify-between text-sm font-bold text-foreground">
                                     <span>Total Tagihan:</span>
-                                    <span className="font-mono text-base tabular-nums text-primary">
-                                        {formatRupiah(invoice.total_amount)}
-                                    </span>
+                                    <span className="font-mono text-base text-primary tabular-nums">{formatRupiah(invoice.total_amount)}</span>
                                 </div>
                             </div>
 
                             {/* Bank transfer info shortcut */}
-                            {!isPaid && (
-                                <DoiBankAccountsCard
-                                    bankAccounts={bankAccounts}
-                                    invoiceNumber={invoice.invoice_number}
-                                />
-                            )}
+                            {!isPaid && <DoiBankAccountsCard bankAccounts={bankAccounts} invoiceNumber={invoice.invoice_number} />}
                         </div>
                     )}
 
                     {/* PAY TAB */}
                     {activeTab === 'pay' && onSubmitPaymentProof && (
                         <div className="space-y-5">
-                            <DoiBankAccountsCard
-                                bankAccounts={bankAccounts}
-                                invoiceNumber={invoice.invoice_number}
-                            />
+                            <DoiBankAccountsCard bankAccounts={bankAccounts} invoiceNumber={invoice.invoice_number} />
 
                             <div className="space-y-2">
-                                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                <h4 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                                     Formulir Konfirmasi Pembayaran
                                 </h4>
                                 <DoiPaymentProofForm
@@ -320,13 +274,8 @@ export function DoiInvoiceDetailDrawer({
                     {/* HISTORY TAB */}
                     {activeTab === 'history' && (
                         <div className="space-y-4">
-                            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                Log Verifikasi Pembayaran
-                            </h4>
-                            <DoiVerificationTimeline
-                                paymentProofs={invoice.payment_proofs}
-                                onViewProof={onViewProofFile}
-                            />
+                            <h4 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Log Verifikasi Pembayaran</h4>
+                            <DoiVerificationTimeline paymentProofs={invoice.payment_proofs} onViewProof={onViewProofFile} />
                         </div>
                     )}
                 </div>

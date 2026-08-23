@@ -1,13 +1,13 @@
-import * as React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 import { DoiSettingsData } from '@/types/doi';
 import { router } from '@inertiajs/react';
-import { Headphones, Mail, Phone, Clock, Save, Loader2, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { CheckCircle2, Clock, Headphones, Loader2, Mail, Phone, Save } from 'lucide-react';
+import * as React from 'react';
 
 interface DoiHelpdeskSettingsCardProps {
     settings?: DoiSettingsData;
@@ -20,7 +20,7 @@ export function DoiHelpdeskSettingsCard({ settings, className }: DoiHelpdeskSett
     const [hours, setHours] = React.useState(settings?.doi_helpdesk_hours || 'Senin - Jumat, 08:00 - 16:00 WIB');
     const [notes, setNotes] = React.useState(
         settings?.doi_helpdesk_notes ||
-        'Hubungi Tim Layanan Jurnal & DOI Majelis Diktilitbang Pimpinan Pusat Muhammadiyah jika institusi Anda memerlukan penyesuaian khusus atau mengalami kendala deposit DOI.'
+            'Hubungi Tim Layanan Jurnal & DOI Majelis Diktilitbang Pimpinan Pusat Muhammadiyah jika institusi Anda memerlukan penyesuaian khusus atau mengalami kendala deposit DOI.',
     );
     const [isSaving, setIsSaving] = React.useState(false);
     const [isSaved, setIsSaved] = React.useState(false);
@@ -57,7 +57,7 @@ export function DoiHelpdeskSettingsCard({ settings, className }: DoiHelpdeskSett
                 onError: () => {
                     setIsSaving(false);
                 },
-            }
+            },
         );
     };
 
@@ -80,7 +80,7 @@ export function DoiHelpdeskSettingsCard({ settings, className }: DoiHelpdeskSett
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div className="space-y-1.5">
-                            <Label htmlFor="doi_helpdesk_email" className="text-xs font-semibold flex items-center gap-1.5">
+                            <Label htmlFor="doi_helpdesk_email" className="flex items-center gap-1.5 text-xs font-semibold">
                                 <Mail className="size-3.5 text-muted-foreground" />
                                 Email Helpdesk
                             </Label>
@@ -96,7 +96,7 @@ export function DoiHelpdeskSettingsCard({ settings, className }: DoiHelpdeskSett
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label htmlFor="doi_helpdesk_phone" className="text-xs font-semibold flex items-center gap-1.5">
+                            <Label htmlFor="doi_helpdesk_phone" className="flex items-center gap-1.5 text-xs font-semibold">
                                 <Phone className="size-3.5 text-muted-foreground" />
                                 Hotline / WhatsApp
                             </Label>
@@ -111,7 +111,7 @@ export function DoiHelpdeskSettingsCard({ settings, className }: DoiHelpdeskSett
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label htmlFor="doi_helpdesk_hours" className="text-xs font-semibold flex items-center gap-1.5">
+                            <Label htmlFor="doi_helpdesk_hours" className="flex items-center gap-1.5 text-xs font-semibold">
                                 <Clock className="size-3.5 text-muted-foreground" />
                                 Jam Operasional Layanan
                             </Label>
@@ -139,12 +139,14 @@ export function DoiHelpdeskSettingsCard({ settings, className }: DoiHelpdeskSett
                         />
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t">
+                    <div className="flex items-center justify-between border-t pt-2">
                         {isSaved ? (
-                            <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                            <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
                                 <CheckCircle2 className="size-4" /> Pengaturan berhasil disimpan!
                             </span>
-                        ) : <span />}
+                        ) : (
+                            <span />
+                        )}
 
                         <Button
                             type="submit"

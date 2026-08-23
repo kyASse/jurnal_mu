@@ -27,7 +27,7 @@ class DoiInvoiceController extends Controller
 
                 if (method_exists($user, 'journals')) {
                     $journalIds = $user->journals()->pluck('journals.id')->toArray();
-                    if (! empty($journalIds)) {
+                    if (!empty($journalIds)) {
                         $q->orWhereHas('subscription', function ($subQ) use ($journalIds) {
                             $subQ->whereIn('journal_id', $journalIds);
                         });

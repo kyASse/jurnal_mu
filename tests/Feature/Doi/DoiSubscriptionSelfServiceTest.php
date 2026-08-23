@@ -20,8 +20,11 @@ class DoiSubscriptionSelfServiceTest extends TestCase
     use DatabaseTransactions;
 
     protected User $adminKampus;
+
     protected User $regularUser;
+
     protected University $university;
+
     protected DoiPackage $package;
 
     protected function setUp(): void
@@ -83,7 +86,7 @@ class DoiSubscriptionSelfServiceTest extends TestCase
             'status' => SubscriptionStatus::INACTIVE,
         ]);
 
-        $action = new GenerateInvoiceAction();
+        $action = new GenerateInvoiceAction;
         $existingInvoice = $action->execute($subscription, $this->adminKampus);
 
         $this->assertEquals(1, DoiInvoice::where('university_id', $this->university->id)->count());

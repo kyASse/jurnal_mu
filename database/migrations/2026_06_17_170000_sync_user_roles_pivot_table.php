@@ -19,7 +19,7 @@ return new class extends Migration
                 ->where('role_id', $user->role_id)
                 ->exists();
 
-            if (! $exists) {
+            if (!$exists) {
                 DB::table('user_roles')->insert([
                     'user_id' => $user->id,
                     'role_id' => $user->role_id,
@@ -43,7 +43,7 @@ return new class extends Migration
                     ->where('role_id', $reviewerRole->id)
                     ->exists();
 
-                if (! $exists) {
+                if (!$exists) {
                     DB::table('user_roles')->insert([
                         'user_id' => $user->id,
                         'role_id' => $reviewerRole->id,

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Doi;
 
+use App\Enums\Doi\InvoiceStatus;
+use App\Enums\Doi\PaymentProofStatus;
 use App\Enums\Doi\SubscriptionStatus;
 use App\Events\Doi\PaymentProofRejected;
 use App\Events\Doi\PaymentProofUploaded;
@@ -30,10 +32,15 @@ class DoiSchedulerAndNotificationTest extends TestCase
     use DatabaseTransactions;
 
     protected User $superAdmin;
+
     protected User $user;
+
     protected University $university;
+
     protected DoiSubscription $subscription;
+
     protected DoiInvoice $invoice;
+
     protected DoiPaymentProof $paymentProof;
 
     protected function setUp(): void
@@ -65,7 +72,7 @@ class DoiSchedulerAndNotificationTest extends TestCase
             'university_id' => $this->university->id,
             'journal_id' => null,
             'doi_package_id' => $package->id,
-            'status' => \App\Enums\Doi\SubscriptionStatus::INACTIVE,
+            'status' => SubscriptionStatus::INACTIVE,
             'start_date' => now(),
             'end_date' => now()->addYear(),
             'similarity_quota_total' => 100,
@@ -81,7 +88,7 @@ class DoiSchedulerAndNotificationTest extends TestCase
             'period_end' => now()->addYear(),
             'subtotal' => 500000,
             'total_amount' => 500000,
-            'status' => \App\Enums\Doi\InvoiceStatus::UNPAID,
+            'status' => InvoiceStatus::UNPAID,
             'due_date' => now()->addDays(7),
         ]);
 
@@ -97,7 +104,7 @@ class DoiSchedulerAndNotificationTest extends TestCase
             'file_name' => 'test.pdf',
             'file_size' => 1024,
             'mime_type' => 'application/pdf',
-            'status' => \App\Enums\Doi\PaymentProofStatus::PENDING,
+            'status' => PaymentProofStatus::PENDING,
             'admin_notes' => 'Proof image is blurry',
         ]);
     }
@@ -195,7 +202,7 @@ class DoiSchedulerAndNotificationTest extends TestCase
         Notification::fake();
 
         $this->invoice->update([
-            'status' => \App\Enums\Doi\InvoiceStatus::UNPAID,
+            'status' => InvoiceStatus::UNPAID,
             'due_date' => now()->addDays(7),
         ]);
 

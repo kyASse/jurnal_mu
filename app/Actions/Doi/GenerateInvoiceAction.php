@@ -15,12 +15,6 @@ class GenerateInvoiceAction
 {
     /**
      * Generate a new sequential invoice for a DOI subscription.
-     *
-     * @param  DoiSubscription  $subscription
-     * @param  User|null  $user
-     * @param  array  $customItems
-     * @param  array  $options
-     * @return DoiInvoice
      */
     public function execute(
         DoiSubscription $subscription,
@@ -54,7 +48,7 @@ class GenerateInvoiceAction
                 $sequence = (int) $matches[1] + 1;
             }
 
-            $invoiceNumber = $prefix . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+            $invoiceNumber = $prefix.str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
 
             // Prepare items
             $items = $customItems;

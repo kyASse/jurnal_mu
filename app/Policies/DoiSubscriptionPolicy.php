@@ -24,7 +24,7 @@ class DoiSubscriptionPolicy
             return true;
         }
 
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -48,7 +48,7 @@ class DoiSubscriptionPolicy
             return true;
         }
 
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -64,7 +64,7 @@ class DoiSubscriptionPolicy
             return true;
         }
 
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 

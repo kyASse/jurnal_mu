@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Doi;
 
 use App\Enums\Doi\InvoiceStatus;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePaymentProofRequest extends FormRequest
@@ -14,7 +15,7 @@ class StorePaymentProofRequest extends FormRequest
     {
         $invoice = $this->route('invoice');
 
-        if (! $invoice) {
+        if (!$invoice) {
             return false;
         }
 
@@ -24,7 +25,7 @@ class StorePaymentProofRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

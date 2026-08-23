@@ -4,6 +4,7 @@ namespace Tests\Feature\Doi;
 
 use App\Enums\Doi\InvoiceStatus;
 use App\Enums\Doi\PaymentProofStatus;
+use App\Enums\Doi\SubscriptionStatus;
 use App\Models\DoiBankAccount;
 use App\Models\DoiInvoice;
 use App\Models\DoiPackage;
@@ -26,11 +27,17 @@ class DoiInvoiceTest extends TestCase
     use DatabaseTransactions;
 
     protected User $adminKampus;
+
     protected User $userPengelola;
+
     protected University $university;
+
     protected DoiPackage $package;
+
     protected DoiSubscription $subscription;
+
     protected DoiInvoice $invoice;
+
     protected DoiBankAccount $bankAccount;
 
     protected function setUp(): void
@@ -65,7 +72,7 @@ class DoiInvoiceTest extends TestCase
             'university_id' => $this->university->id,
             'journal_id' => null,
             'doi_package_id' => $this->package->id,
-            'status' => \App\Enums\Doi\SubscriptionStatus::INACTIVE,
+            'status' => SubscriptionStatus::INACTIVE,
             'start_date' => Carbon::now(),
             'end_date' => Carbon::now()->addYear(),
             'similarity_quota_total' => 250,

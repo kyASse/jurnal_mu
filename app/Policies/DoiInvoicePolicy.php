@@ -24,7 +24,7 @@ class DoiInvoicePolicy
             return true;
         }
 
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -65,7 +65,7 @@ class DoiInvoicePolicy
             return true;
         }
 
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 

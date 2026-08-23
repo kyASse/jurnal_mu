@@ -40,7 +40,7 @@ class LppmApprovalController extends Controller
         // Get Admin Kampus role
         $adminKampusRole = Role::where('name', Role::ADMIN_KAMPUS)->first();
 
-        if (! $adminKampusRole) {
+        if (!$adminKampusRole) {
             return back()->with('error', 'Role Admin Kampus tidak ditemukan di sistem.');
         }
 
@@ -115,7 +115,7 @@ class LppmApprovalController extends Controller
         $this->authorize('approve', $user);
 
         // Only allow reverting approved or rejected LPPM registrations
-        if (! in_array($user->approval_status, ['approved', 'rejected'])) {
+        if (!in_array($user->approval_status, ['approved', 'rejected'])) {
             return back()->with('error', 'Hanya LPPM yang sudah diapprove atau ditolak yang bisa di-revert.');
         }
 

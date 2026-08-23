@@ -55,7 +55,7 @@ class JournalAssessmentPolicy
      */
     public function createForJournal(User $user, int $journalId): bool
     {
-        if (! $user->isUser()) {
+        if (!$user->isUser()) {
             return false;
         }
 
@@ -261,7 +261,7 @@ class JournalAssessmentPolicy
     public function assignReviewer(User $user, JournalAssessment $assessment): bool
     {
         // Only Super Admin (Dikti) can assign reviewers
-        if (! $user->isSuperAdmin()) {
+        if (!$user->isSuperAdmin()) {
             return false;
         }
 

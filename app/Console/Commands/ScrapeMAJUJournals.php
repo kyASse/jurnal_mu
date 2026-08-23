@@ -44,7 +44,7 @@ class ScrapeMAJUJournals extends Command
         // Get UAD university ID
         $this->uadUniversityId = University::where('name', 'like', '%Ahmad Dahlan%')->first()?->id;
 
-        if (! $this->uadUniversityId) {
+        if (!$this->uadUniversityId) {
             $this->error('UAD University not found in database. Please seed universities first.');
 
             return Command::FAILURE;
@@ -72,7 +72,7 @@ class ScrapeMAJUJournals extends Command
             try {
                 $journalData = $this->scrapeJournalDetail($uuid);
 
-                if ($journalData && ! $dryRun) {
+                if ($journalData && !$dryRun) {
                     $this->saveJournal($journalData);
                     $this->scrapedCount++;
                 } elseif ($journalData && $dryRun) {
@@ -121,7 +121,7 @@ class ScrapeMAJUJournals extends Command
                     ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'])
                     ->get('https://maju.uad.ac.id/beranda', ['page' => $page]);
 
-                if (! $response->successful()) {
+                if (!$response->successful()) {
                     break;
                 }
 
@@ -164,7 +164,7 @@ class ScrapeMAJUJournals extends Command
                     $href = $link->getAttribute('href');
                     if (preg_match('/jid=([a-f0-9\-]+)/', $href, $matches)) {
                         $uuid = $matches[1];
-                        if (! in_array($uuid, $journalUUIDs)) {
+                        if (!in_array($uuid, $journalUUIDs)) {
                             $journalUUIDs[] = $uuid;
 
                             // Check limit
@@ -196,7 +196,7 @@ class ScrapeMAJUJournals extends Command
             ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'])
             ->get('https://maju.uad.ac.id/detail', ['jid' => $uuid]);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             return null;
         }
 
@@ -266,7 +266,7 @@ class ScrapeMAJUJournals extends Command
         $nodes = $xpath->query("//img[contains(@src, '/covers/')]");
         if ($nodes->length > 0) {
             $src = $nodes->item(0)->getAttribute('src');
-            if (! Str::startsWith($src, 'http')) {
+            if (!Str::startsWith($src, 'http')) {
                 $src = 'https://maju.uad.ac.id'.$src;
             }
 
@@ -337,7 +337,7 @@ class ScrapeMAJUJournals extends Command
             $lines = explode("\n", $text);
             foreach ($lines as $line) {
                 $line = trim($line);
-                if (! empty($line) && ! Str::contains($line, ['Contact', 'Email', 'Phone', '@', 'http'])) {
+                if (!empty($line) && !Str::contains($line, ['Contact', 'Email', 'Phone', '@', 'http'])) {
                     if (strlen($line) > 5 && strlen($line) < 100) {
                         $data['editor_in_chief'] = $line;
                         break;

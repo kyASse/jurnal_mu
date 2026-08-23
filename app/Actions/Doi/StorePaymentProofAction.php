@@ -35,11 +35,6 @@ class StorePaymentProofAction
     /**
      * Store payment proof and update invoice status.
      *
-     * @param  DoiInvoice  $invoice
-     * @param  UploadedFile  $file
-     * @param  array  $data
-     * @param  User|null  $user
-     * @return DoiPaymentProof
      *
      * @throws ValidationException
      */
@@ -52,7 +47,7 @@ class StorePaymentProofAction
         $this->validateFile($file);
 
         return DB::transaction(function () use ($invoice, $file, $data, $user) {
-            $folder = 'proofs/' . Carbon::now()->format('Y/m');
+            $folder = 'proofs/'.Carbon::now()->format('Y/m');
             Storage::disk('doi_proofs')->makeDirectory($folder);
             $storedPath = $file->store($folder, 'doi_proofs');
 
@@ -92,7 +87,6 @@ class StorePaymentProofAction
     /**
      * Validate uploaded file mime and size.
      *
-     * @param  UploadedFile  $file
      * @throws ValidationException
      */
     protected function validateFile(UploadedFile $file): void
@@ -100,7 +94,7 @@ class StorePaymentProofAction
         $mime = $file->getMimeType();
         $size = $file->getSize();
 
-        if (! in_array($mime, $this->allowedMimeTypes)) {
+        if (!in_array($mime, $this->allowedMimeTypes)) {
             throw ValidationException::withMessages([
                 'payment_proof' => ['Format file tidak didukung. Unggah file gambar (JPG, PNG, WEBP) atau PDF.'],
             ]);

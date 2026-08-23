@@ -15,10 +15,10 @@ it('returns a successful health check status', function () {
             'queue' => [
                 'pending_jobs',
                 'failed_jobs',
-            ]
+            ],
         ],
     ]);
-    
+
     $response->assertJson([
         'status' => 'healthy',
         'services' => [

@@ -1,20 +1,11 @@
-import * as React from 'react';
+import { DoiInvoiceDetailDrawer, DoiInvoiceStatsCard, DoiInvoiceTable } from '@/components/doi/invoices';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, PaginatedData } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
-import {
-    DoiBankAccountData,
-    DoiInvoiceDetailData,
-    DoiInvoiceStatsData,
-} from '@/types/doi';
-import {
-    DoiInvoiceStatsCard,
-    DoiInvoiceTable,
-    DoiInvoiceDetailDrawer,
-} from '@/components/doi/invoices';
-import { Button } from '@/components/ui/button';
-import { Receipt, RefreshCw, Building2, ArrowLeft } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { DoiBankAccountData, DoiInvoiceDetailData, DoiInvoiceStatsData } from '@/types/doi';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeft, Building2, Receipt, RefreshCw } from 'lucide-react';
+import * as React from 'react';
 
 interface UserInvoicesIndexProps {
     invoices: PaginatedData<DoiInvoiceDetailData>;
@@ -116,7 +107,7 @@ export default function UserInvoicesIndex({
             {
                 preserveState: true,
                 preserveScroll: true,
-            }
+            },
         );
     };
 
@@ -131,7 +122,7 @@ export default function UserInvoicesIndex({
             {
                 preserveState: true,
                 preserveScroll: true,
-            }
+            },
         );
     };
 
@@ -162,42 +153,36 @@ export default function UserInvoicesIndex({
         setIsSubmitting(true);
         setErrors({});
 
-        router.post(
-            route('user.doi.invoices.payment-proof.store', selectedInvoice.id),
-            formData,
-            {
-                forceFormData: true,
-                onSuccess: () => {
-                    setIsSubmitting(false);
-                    setDrawerOpen(false);
-                },
-                onError: (errs) => {
-                    setIsSubmitting(false);
-                    setErrors(errs);
-                },
-            }
-        );
+        router.post(route('user.doi.invoices.payment-proof.store', selectedInvoice.id), formData, {
+            forceFormData: true,
+            onSuccess: () => {
+                setIsSubmitting(false);
+                setDrawerOpen(false);
+            },
+            onError: (errs) => {
+                setIsSubmitting(false);
+                setErrors(errs);
+            },
+        });
     };
 
     const handleRefresh = () => {
-        router.reload({ preserveScroll: true });
+        router.reload();
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Riwayat Faktur & Tagihan DOI Institusi" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+            <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div className="flex items-center gap-2">
                             <Receipt className="h-6 w-6 text-primary" />
-                            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                                Faktur & Tagihan DOI Institusi
-                            </h1>
+                            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Faktur & Tagihan DOI Institusi</h1>
                         </div>
-                        <p className="mt-1 text-sm text-muted-foreground flex items-center gap-1.5">
+                        <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                             <Building2 className="size-4 shrink-0 text-muted-foreground/70" />
                             <span>
                                 Informasi faktur pembayaran langganan Crossref DOI institusi{' '}
@@ -207,23 +192,13 @@ export default function UserInvoicesIndex({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button
-                            asChild
-                            variant="outline"
-                            size="sm"
-                            className="text-xs shadow-2xs"
-                        >
+                        <Button asChild variant="outline" size="sm" className="text-xs shadow-2xs">
                             <Link href={route('user.doi-subscription.index')}>
                                 <ArrowLeft className="mr-1.5 size-3.5" />
                                 Dashboard DOI
                             </Link>
                         </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleRefresh}
-                            className="text-xs shadow-2xs"
-                        >
+                        <Button variant="outline" size="sm" onClick={handleRefresh} className="text-xs shadow-2xs">
                             <RefreshCw className="mr-1.5 size-3.5" />
                             Segarkan
                         </Button>
@@ -234,7 +209,7 @@ export default function UserInvoicesIndex({
                 <DoiInvoiceStatsCard stats={calculatedStats} />
 
                 {/* Invoices List Table */}
-                <div className="space-y-4 rounded-xl border bg-card p-4 sm:p-6 shadow-xs">
+                <div className="space-y-4 rounded-xl border bg-card p-4 shadow-xs sm:p-6">
                     <DoiInvoiceTable
                         invoices={invoices}
                         currentFilter={filters.status || 'all'}

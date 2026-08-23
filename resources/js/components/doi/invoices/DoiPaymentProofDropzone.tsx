@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { UploadCloud, FileText, Image as ImageIcon, X, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AlertCircle, FileText, Image as ImageIcon, UploadCloud, X } from 'lucide-react';
+import * as React from 'react';
 
 interface DoiPaymentProofDropzoneProps {
     value: File | null;
@@ -121,14 +121,7 @@ export function DoiPaymentProofDropzone({
 
     return (
         <div className={cn('space-y-2', className)}>
-            <input
-                ref={inputRef}
-                type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={disabled}
-            />
+            <input ref={inputRef} type="file" accept=".jpg,.jpeg,.png,.pdf" className="hidden" onChange={handleFileChange} disabled={disabled} />
 
             {!value ? (
                 <div
@@ -142,7 +135,7 @@ export function DoiPaymentProofDropzone({
                             ? 'border-primary bg-primary/5'
                             : 'border-slate-300 hover:border-primary/50 hover:bg-muted/40 dark:border-slate-700 dark:hover:bg-muted/20',
                         displayError && 'border-rose-400 bg-rose-50/20 dark:border-rose-800 dark:bg-rose-950/20',
-                        disabled && 'cursor-not-allowed opacity-60'
+                        disabled && 'cursor-not-allowed opacity-60',
                     )}
                     role="button"
                     tabIndex={0}
@@ -153,26 +146,20 @@ export function DoiPaymentProofDropzone({
                         }
                     }}
                 >
-                    <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
+                    <div className="mb-3 flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <UploadCloud className="size-5" />
                     </div>
                     <p className="text-sm font-semibold text-foreground">
                         Tarik & Lepas Bukti Transfer di sini, atau <span className="text-primary underline">Pilih File</span>
                     </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        Mendukung format JPG, PNG, atau PDF (Maksimal {maxSizeMb}MB)
-                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">Mendukung format JPG, PNG, atau PDF (Maksimal {maxSizeMb}MB)</p>
                 </div>
             ) : (
                 <div className="relative flex items-center justify-between rounded-lg border border-slate-200 bg-card p-3.5 shadow-xs dark:border-slate-800">
                     <div className="flex items-center gap-3 overflow-hidden">
                         {previewUrl ? (
                             <div className="relative size-12 shrink-0 overflow-hidden rounded-md border bg-muted">
-                                <img
-                                    src={previewUrl}
-                                    alt="Preview Bukti Transfer"
-                                    className="h-full w-full object-cover"
-                                />
+                                <img src={previewUrl} alt="Preview Bukti Transfer" className="h-full w-full object-cover" />
                             </div>
                         ) : isPdf ? (
                             <div className="flex size-12 shrink-0 items-center justify-center rounded-md border border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-400">
@@ -185,13 +172,9 @@ export function DoiPaymentProofDropzone({
                         )}
 
                         <div className="min-w-0 flex-1 space-y-0.5">
-                            <p className="truncate text-xs font-semibold text-foreground sm:text-sm">
-                                {value.name}
-                            </p>
+                            <p className="truncate text-xs font-semibold text-foreground sm:text-sm">{value.name}</p>
                             <div className="flex items-center gap-2">
-                                <span className="font-mono text-[11px] text-muted-foreground">
-                                    {formatBytes(value.size)}
-                                </span>
+                                <span className="font-mono text-[11px] text-muted-foreground">{formatBytes(value.size)}</span>
                                 <Badge variant="secondary" className="px-1.5 py-0 text-[10px] uppercase">
                                     {isPdf ? 'PDF' : value.type.split('/')[1] || 'FILE'}
                                 </Badge>
@@ -199,7 +182,7 @@ export function DoiPaymentProofDropzone({
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                    <div className="flex shrink-0 items-center gap-1.5 pl-2">
                         <Button
                             type="button"
                             variant="outline"

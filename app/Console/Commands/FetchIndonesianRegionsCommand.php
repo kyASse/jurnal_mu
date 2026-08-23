@@ -74,7 +74,7 @@ class FetchIndonesianRegionsCommand extends Command
 
         $decoded = json_decode($raw, true);
 
-        if (! isset($decoded['data']) || ! is_array($decoded['data'])) {
+        if (!isset($decoded['data']) || !is_array($decoded['data'])) {
             return null;
         }
 

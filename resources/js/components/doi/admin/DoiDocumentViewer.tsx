@@ -1,20 +1,8 @@
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-    ZoomIn,
-    ZoomOut,
-    RotateCw,
-    Maximize2,
-    Minimize2,
-    Download,
-    RefreshCcw,
-    FileText,
-    ExternalLink,
-    AlertCircle,
-    Eye,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AlertCircle, Download, ExternalLink, Eye, FileText, Maximize2, Minimize2, RefreshCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
+import * as React from 'react';
 
 interface DoiDocumentViewerProps {
     src?: string | null;
@@ -33,14 +21,7 @@ export function formatFileSize(bytes?: number): string {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-export function DoiDocumentViewer({
-    src,
-    fileName = 'Bukti_Transfer',
-    mimeType,
-    fileSize,
-    className,
-    maxHeight = 480,
-}: DoiDocumentViewerProps) {
+export function DoiDocumentViewer({ src, fileName = 'Bukti_Transfer', mimeType, fileSize, className, maxHeight = 480 }: DoiDocumentViewerProps) {
     const [scale, setScale] = React.useState<number>(1);
     const [rotation, setRotation] = React.useState<number>(0);
     const [isFullscreen, setIsFullscreen] = React.useState<boolean>(false);
@@ -84,9 +65,7 @@ export function DoiDocumentViewer({
         return (
             <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-muted/20 p-6 text-center dark:border-slate-800">
                 <FileText className="size-10 text-muted-foreground/50" />
-                <p className="mt-2 text-sm font-medium text-muted-foreground">
-                    Tidak ada file bukti pembayaran terlampir
-                </p>
+                <p className="mt-2 text-sm font-medium text-muted-foreground">Tidak ada file bukti pembayaran terlampir</p>
             </div>
         );
     }
@@ -96,7 +75,7 @@ export function DoiDocumentViewer({
             className={cn(
                 'relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-950 text-slate-100 dark:border-slate-800',
                 isFullscreen && 'fixed inset-0 z-50 rounded-none border-none',
-                className
+                className,
             )}
         >
             {/* Top Toolbar */}
@@ -133,9 +112,7 @@ export function DoiDocumentViewer({
                                 <ZoomOut className="size-3.5" />
                             </Button>
 
-                            <span className="min-w-10 text-center font-mono text-[11px] text-slate-400">
-                                {Math.round(scale * 100)}%
-                            </span>
+                            <span className="min-w-10 text-center font-mono text-[11px] text-slate-400">{Math.round(scale * 100)}%</span>
 
                             <Button
                                 type="button"
@@ -201,7 +178,7 @@ export function DoiDocumentViewer({
             <div
                 className={cn(
                     'relative flex flex-1 items-center justify-center overflow-auto bg-slate-950 p-4 transition-all',
-                    !isFullscreen && 'min-h-[280px]'
+                    !isFullscreen && 'min-h-[280px]',
                 )}
                 style={{
                     maxHeight: isFullscreen ? 'calc(100vh - 48px)' : maxHeight,
@@ -222,9 +199,7 @@ export function DoiDocumentViewer({
                         <AlertCircle className="size-10 text-rose-500" />
                         <div>
                             <p className="text-sm font-medium text-slate-200">Gagal memuat pratinjau dokumen</p>
-                            <p className="text-xs text-slate-400">
-                                Berkas mungkin berformat khusus atau dibatasi keamanannya.
-                            </p>
+                            <p className="text-xs text-slate-400">Berkas mungkin berformat khusus atau dibatasi keamanannya.</p>
                         </div>
                         <a
                             href={src}
@@ -271,12 +246,7 @@ export function DoiDocumentViewer({
             {/* Bottom quick action footer */}
             <div className="flex items-center justify-between border-t border-slate-800 bg-slate-900/60 px-3 py-1.5 text-[11px] text-slate-400">
                 <span>Klik ikon unduh untuk menyimpan file asli</span>
-                <a
-                    href={src}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-primary-foreground hover:underline"
-                >
+                <a href={src} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary-foreground hover:underline">
                     <Eye className="size-3" /> Buka Tab Penuh
                 </a>
             </div>

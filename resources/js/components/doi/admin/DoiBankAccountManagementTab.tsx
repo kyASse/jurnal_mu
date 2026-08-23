@@ -1,25 +1,3 @@
-import * as React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -30,19 +8,17 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { DoiBankAccountData, DoiBankAccountFormData } from '@/types/doi';
-import {
-    Landmark,
-    Plus,
-    Edit2,
-    Trash2,
-    CheckCircle2,
-    XCircle,
-    Copy,
-    Check,
-    CreditCard,
-} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { DoiBankAccountData, DoiBankAccountFormData } from '@/types/doi';
+import { Check, CheckCircle2, Copy, CreditCard, Edit2, Landmark, Plus, Trash2, XCircle } from 'lucide-react';
+import * as React from 'react';
 
 interface DoiBankAccountManagementTabProps {
     bankAccounts: DoiBankAccountData[];
@@ -155,12 +131,7 @@ export function DoiBankAccountManagementTab({
                     </p>
                 </div>
 
-                <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleOpenCreate}
-                    className="h-8 bg-primary text-xs text-primary-foreground shadow-2xs"
-                >
+                <Button type="button" size="sm" onClick={handleOpenCreate} className="h-8 bg-primary text-xs text-primary-foreground shadow-2xs">
                     <Plus className="mr-1.5 size-3.5" />
                     Tambah Rekening Bank
                 </Button>
@@ -192,9 +163,7 @@ export function DoiBankAccountManagementTab({
                                 return (
                                     <TableRow key={acc.id} className="transition-colors hover:bg-muted/40">
                                         {/* Order */}
-                                        <TableCell className="font-mono text-xs text-muted-foreground">
-                                            #{acc.display_order ?? idx + 1}
-                                        </TableCell>
+                                        <TableCell className="font-mono text-xs text-muted-foreground">#{acc.display_order ?? idx + 1}</TableCell>
 
                                         {/* Bank & Branch */}
                                         <TableCell className="text-xs">
@@ -205,9 +174,7 @@ export function DoiBankAccountManagementTab({
                                                 <div>
                                                     <p className="font-bold text-foreground">{acc.bank_name}</p>
                                                     {(acc.branch_name || acc.branch) && (
-                                                        <p className="text-[11px] text-muted-foreground">
-                                                            {acc.branch_name || acc.branch}
-                                                        </p>
+                                                        <p className="text-[11px] text-muted-foreground">{acc.branch_name || acc.branch}</p>
                                                     )}
                                                 </div>
                                             </div>
@@ -231,18 +198,22 @@ export function DoiBankAccountManagementTab({
                                         </TableCell>
 
                                         {/* Account Holder */}
-                                        <TableCell className="text-xs font-medium text-foreground">
-                                            {acc.account_holder}
-                                        </TableCell>
+                                        <TableCell className="text-xs font-medium text-foreground">{acc.account_holder}</TableCell>
 
                                         {/* Status */}
                                         <TableCell>
-                                            {acc.is_active ?? true ? (
-                                                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-[11px] font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                            {(acc.is_active ?? true) ? (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-emerald-200 bg-emerald-50 text-[11px] font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                                >
                                                     <CheckCircle2 className="mr-1 size-3" /> Aktif
                                                 </Badge>
                                             ) : (
-                                                <Badge variant="outline" className="bg-slate-100 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                                                <Badge
+                                                    variant="outline"
+                                                    className="bg-slate-100 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                                                >
                                                     <XCircle className="mr-1 size-3" /> Nonaktif
                                                 </Badge>
                                             )}
@@ -310,9 +281,7 @@ export function DoiBankAccountManagementTab({
                                     placeholder="cth: Bank Syariah Indonesia (BSI)"
                                     className="h-8 text-xs"
                                 />
-                                {formErrors.bank_name && (
-                                    <p className="text-[11px] text-rose-600">{formErrors.bank_name}</p>
-                                )}
+                                {formErrors.bank_name && <p className="text-[11px] text-rose-600">{formErrors.bank_name}</p>}
                             </div>
 
                             {/* Account Number */}
@@ -327,9 +296,7 @@ export function DoiBankAccountManagementTab({
                                     placeholder="cth: 7123456789"
                                     className="h-8 font-mono text-xs"
                                 />
-                                {formErrors.account_number && (
-                                    <p className="text-[11px] text-rose-600">{formErrors.account_number}</p>
-                                )}
+                                {formErrors.account_number && <p className="text-[11px] text-rose-600">{formErrors.account_number}</p>}
                             </div>
 
                             {/* Account Holder */}
@@ -344,9 +311,7 @@ export function DoiBankAccountManagementTab({
                                     placeholder="cth: Perkumpulan Pengelola Jurnal PTMA"
                                     className="h-8 text-xs"
                                 />
-                                {formErrors.account_holder && (
-                                    <p className="text-[11px] text-rose-600">{formErrors.account_holder}</p>
-                                )}
+                                {formErrors.account_holder && <p className="text-[11px] text-rose-600">{formErrors.account_holder}</p>}
                             </div>
 
                             {/* Branch */}
@@ -386,34 +351,17 @@ export function DoiBankAccountManagementTab({
                                     <Label htmlFor="acc_is_active" className="cursor-pointer text-xs font-semibold">
                                         Status Rekening Aktif
                                     </Label>
-                                    <p className="text-[10px] text-muted-foreground">
-                                        Tampilkan rekening ini sebagai tujuan transfer resmi
-                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">Tampilkan rekening ini sebagai tujuan transfer resmi</p>
                                 </div>
-                                <Switch
-                                    id="acc_is_active"
-                                    checked={isActive}
-                                    onCheckedChange={setIsActive}
-                                />
+                                <Switch id="acc_is_active" checked={isActive} onCheckedChange={setIsActive} />
                             </div>
                         </div>
 
                         <DialogFooter className="gap-2 sm:gap-0">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setDialogOpen(false)}
-                                className="h-8 text-xs"
-                            >
+                            <Button type="button" variant="outline" size="sm" onClick={() => setDialogOpen(false)} className="h-8 text-xs">
                                 Batal
                             </Button>
-                            <Button
-                                type="submit"
-                                size="sm"
-                                disabled={isSubmitting}
-                                className="h-8 bg-primary text-xs text-primary-foreground"
-                            >
+                            <Button type="submit" size="sm" disabled={isSubmitting} className="h-8 bg-primary text-xs text-primary-foreground">
                                 {editingAccount ? 'Simpan Perubahan' : 'Tambah Rekening'}
                             </Button>
                         </DialogFooter>
@@ -425,19 +373,14 @@ export function DoiBankAccountManagementTab({
             <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => !open && setDeleteTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-base font-bold">
-                            Hapus Rekening {deleteTarget?.bank_name}?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle className="text-base font-bold">Hapus Rekening {deleteTarget?.bank_name}?</AlertDialogTitle>
                         <AlertDialogDescription className="text-xs">
                             Rekening yang telah memiliki riwayat bukti transfer terkait tidak dapat dihapus. Tindakan ini tidak dapat dibatalkan.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel className="h-8 text-xs">Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleConfirmDelete}
-                            className="h-8 bg-rose-600 text-xs text-white hover:bg-rose-700"
-                        >
+                        <AlertDialogAction onClick={handleConfirmDelete} className="h-8 bg-rose-600 text-xs text-white hover:bg-rose-700">
                             Hapus Rekening
                         </AlertDialogAction>
                     </AlertDialogFooter>

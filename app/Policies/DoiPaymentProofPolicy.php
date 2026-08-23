@@ -24,7 +24,7 @@ class DoiPaymentProofPolicy
             return true;
         }
 
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 

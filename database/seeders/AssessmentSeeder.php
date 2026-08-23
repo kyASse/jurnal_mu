@@ -256,7 +256,7 @@ class AssessmentSeeder extends Seeder
      */
     private function createAssessment(array $data): ?JournalAssessment
     {
-        if (! $data['journal_id'] || ! $data['user_id']) {
+        if (!$data['journal_id'] || !$data['user_id']) {
             return null;
         }
 
@@ -332,7 +332,7 @@ class AssessmentSeeder extends Seeder
     {
         $assessment = JournalAssessment::with('responses.evaluationIndicator')->find($assessmentId);
 
-        if (! $assessment) {
+        if (!$assessment) {
             return;
         }
 

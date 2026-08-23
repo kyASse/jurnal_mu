@@ -1,44 +1,25 @@
-import * as React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from '@/components/ui/pagination';
-import {
-    DoiInvoiceDetailData,
-    InvoiceStatusType,
-} from '@/types/doi';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+import { DoiInvoiceDetailData, InvoiceStatusType } from '@/types/doi';
 import { PaginatedData } from '@/types/index';
-import { formatRupiah } from './DoiInvoiceStatsCard';
 import {
-    Search,
-    Receipt,
-    Calendar,
-    Clock,
-    CheckCircle2,
-    XCircle,
     AlertCircle,
     AlertTriangle,
+    Calendar,
+    CheckCircle2,
+    Clock,
     FileText,
-    UploadCloud,
+    Receipt,
+    Search,
     ShieldAlert,
-    ExternalLink,
+    UploadCloud,
+    XCircle,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import * as React from 'react';
+import { formatRupiah } from './DoiInvoiceStatsCard';
 
 interface DoiInvoiceTableProps {
     invoices: PaginatedData<DoiInvoiceDetailData> | DoiInvoiceDetailData[];
@@ -110,7 +91,9 @@ export function DoiInvoiceTable({
     className,
 }: DoiInvoiceTableProps) {
     const isPaginated = 'data' in invoices;
-    const invoiceList: DoiInvoiceDetailData[] = isPaginated ? (invoices as PaginatedData<DoiInvoiceDetailData>).data : (invoices as DoiInvoiceDetailData[]);
+    const invoiceList: DoiInvoiceDetailData[] = isPaginated
+        ? (invoices as PaginatedData<DoiInvoiceDetailData>).data
+        : (invoices as DoiInvoiceDetailData[]);
     const pagination = isPaginated ? (invoices as PaginatedData<DoiInvoiceDetailData>) : null;
 
     const [searchInput, setSearchInput] = React.useState(currentSearch);
@@ -146,13 +129,13 @@ export function DoiInvoiceTable({
                 {/* Search input */}
                 {onSearchChange && (
                     <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-64">
-                        <Search className="absolute left-2.5 top-2.5 size-3.5 text-muted-foreground" />
+                        <Search className="absolute top-2.5 left-2.5 size-3.5 text-muted-foreground" />
                         <Input
                             type="text"
                             placeholder="Cari nomor faktur..."
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            className="h-8 pl-8 pr-3 text-xs"
+                            className="h-8 pr-3 pl-8 text-xs"
                         />
                     </form>
                 )}
@@ -181,11 +164,9 @@ export function DoiInvoiceTable({
                         ) : invoiceList.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={6} className="py-10 text-center">
-                                    <Receipt className="mx-auto size-8 text-muted-foreground/40 mb-2" />
+                                    <Receipt className="mx-auto mb-2 size-8 text-muted-foreground/40" />
                                     <p className="text-sm font-medium text-foreground">Tidak ada faktur ditemukan</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        Tidak ada data faktur yang sesuai dengan filter pencarian ini.
-                                    </p>
+                                    <p className="text-xs text-muted-foreground">Tidak ada data faktur yang sesuai dengan filter pencarian ini.</p>
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -231,9 +212,7 @@ export function DoiInvoiceTable({
                                         {/* Due Date / Paid Date */}
                                         <TableCell className="text-xs">
                                             {invoice.status === 'paid' && invoice.paid_at ? (
-                                                <span className="text-emerald-700 dark:text-emerald-400 font-medium">
-                                                    Lunas {invoice.paid_at}
-                                                </span>
+                                                <span className="font-medium text-emerald-700 dark:text-emerald-400">Lunas {invoice.paid_at}</span>
                                             ) : (
                                                 <div className="flex items-center gap-1 text-muted-foreground">
                                                     <Calendar className="size-3" />
@@ -245,15 +224,12 @@ export function DoiInvoiceTable({
                                         {/* Status */}
                                         <TableCell>
                                             <div className="flex flex-col items-start gap-1">
-                                                <Badge
-                                                    variant="outline"
-                                                    className={cn('text-[11px] font-medium', statusConfig.className)}
-                                                >
+                                                <Badge variant="outline" className={cn('text-[11px] font-medium', statusConfig.className)}>
                                                     <StatusIcon className="mr-1 size-3" />
                                                     {invoice.status_label || statusConfig.label}
                                                 </Badge>
                                                 {isRejected && (
-                                                    <span className="flex items-center gap-1 font-semibold text-rose-600 text-[10px] dark:text-rose-400">
+                                                    <span className="flex items-center gap-1 text-[10px] font-semibold text-rose-600 dark:text-rose-400">
                                                         <ShieldAlert className="size-3" /> Bukti Ditolak
                                                     </span>
                                                 )}
@@ -282,8 +258,8 @@ export function DoiInvoiceTable({
                                                         className={cn(
                                                             'h-7 px-2.5 text-xs shadow-2xs',
                                                             isRejected
-                                                                ? 'bg-rose-600 hover:bg-rose-700 text-white'
-                                                                : 'bg-primary text-primary-foreground'
+                                                                ? 'bg-rose-600 text-white hover:bg-rose-700'
+                                                                : 'bg-primary text-primary-foreground',
                                                         )}
                                                     >
                                                         <UploadCloud className="mr-1 size-3.5" />

@@ -1,31 +1,12 @@
-import * as React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { DoiPaymentProofData } from '@/types/doi';
-import { DoiVerificationDrawerProof } from './DoiVerificationDrawer';
-import { formatRupiah } from './DoiAdminStatsCards';
-import {
-    Search,
-    ShieldCheck,
-    Clock,
-    CheckCircle2,
-    Calendar,
-    Building2,
-    Receipt,
-    ArrowRight,
-    Sparkles,
-    FileText,
-} from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { Calendar, CheckCircle2, Clock, Search, ShieldCheck } from 'lucide-react';
+import * as React from 'react';
+import { formatRupiah } from '../invoices/DoiInvoiceStatsCard';
+import { DoiVerificationDrawerProof } from './DoiVerificationDrawer';
 
 interface DoiVerificationTableProps {
     pendingProofs: DoiVerificationDrawerProof[];
@@ -34,12 +15,7 @@ interface DoiVerificationTableProps {
     className?: string;
 }
 
-export function DoiVerificationTable({
-    pendingProofs,
-    onReviewProof,
-    isLoading = false,
-    className,
-}: DoiVerificationTableProps) {
+export function DoiVerificationTable({ pendingProofs, onReviewProof, isLoading = false, className }: DoiVerificationTableProps) {
     const [searchQuery, setSearchQuery] = React.useState('');
 
     const filteredProofs = React.useMemo(() => {
@@ -52,13 +28,7 @@ export function DoiVerificationTable({
             const uploaderName = proof.user?.name?.toLowerCase() || '';
             const bankSender = proof.bank_sender?.toLowerCase() || '';
 
-            return (
-                invoiceNum.includes(q) ||
-                univName.includes(q) ||
-                senderName.includes(q) ||
-                uploaderName.includes(q) ||
-                bankSender.includes(q)
-            );
+            return invoiceNum.includes(q) || univName.includes(q) || senderName.includes(q) || uploaderName.includes(q) || bankSender.includes(q);
         });
     }, [pendingProofs, searchQuery]);
 
@@ -72,30 +42,26 @@ export function DoiVerificationTable({
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-bold text-foreground">
-                                Antrean Verifikasi Pembayaran
-                            </h3>
+                            <h3 className="text-sm font-bold text-foreground">Antrean Verifikasi Pembayaran</h3>
                             {pendingProofs.length > 0 && (
                                 <Badge variant="secondary" className="font-mono text-xs font-semibold">
                                     {pendingProofs.length} Menunggu
                                 </Badge>
                             )}
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                            Tinjau berkas transfer dan konfirmasi aktivasi paket langganan DOI Crossref
-                        </p>
+                        <p className="text-xs text-muted-foreground">Tinjau berkas transfer dan konfirmasi aktivasi paket langganan DOI Crossref</p>
                     </div>
                 </div>
 
                 {/* Search input */}
                 <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-2.5 top-2.5 size-3.5 text-muted-foreground" />
+                    <Search className="absolute top-2.5 left-2.5 size-3.5 text-muted-foreground" />
                     <Input
                         type="text"
                         placeholder="Cari faktur, PTMA, atau pengirim..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-8 pl-8 pr-3 text-xs"
+                        className="h-8 pr-3 pl-8 text-xs"
                     />
                 </div>
             </div>
@@ -128,11 +94,10 @@ export function DoiVerificationTable({
                                             <div className="flex size-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
                                                 <CheckCircle2 className="size-6" />
                                             </div>
-                                            <p className="text-sm font-semibold text-foreground">
-                                                Tidak Ada Antrean Verifikasi
-                                            </p>
+                                            <p className="text-sm font-semibold text-foreground">Tidak Ada Antrean Verifikasi</p>
                                             <p className="max-w-md text-xs text-muted-foreground">
-                                                Semua bukti pembayaran telah diverifikasi dan disetujui. Bukti baru akan muncul di sini saat diunggah pengelola jurnal.
+                                                Semua bukti pembayaran telah diverifikasi dan disetujui. Bukti baru akan muncul di sini saat diunggah
+                                                pengelola jurnal.
                                             </p>
                                         </div>
                                     ) : (
@@ -146,9 +111,7 @@ export function DoiVerificationTable({
                             filteredProofs.map((proof) => {
                                 const invoice = proof.invoice;
                                 const univ = invoice?.university;
-                                const isMismatch =
-                                    invoice?.total_amount &&
-                                    Number(proof.transfer_amount) !== Number(invoice.total_amount);
+                                const isMismatch = invoice?.total_amount && Number(proof.transfer_amount) !== Number(invoice.total_amount);
 
                                 return (
                                     <TableRow
@@ -172,9 +135,7 @@ export function DoiVerificationTable({
                                         {/* University & Package */}
                                         <TableCell className="text-xs">
                                             <div className="space-y-0.5">
-                                                <p className="font-medium text-foreground">
-                                                    {univ?.name || 'Universitas Muhammadiyah'}
-                                                </p>
+                                                <p className="font-medium text-foreground">{univ?.name || 'Universitas Muhammadiyah'}</p>
                                                 <p className="text-[11px] text-muted-foreground">
                                                     {invoice?.subscription?.package?.name || 'Langganan DOI'}
                                                 </p>
@@ -184,12 +145,8 @@ export function DoiVerificationTable({
                                         {/* Sender & Bank */}
                                         <TableCell className="text-xs">
                                             <div className="space-y-0.5">
-                                                <p className="font-medium text-foreground">
-                                                    {proof.account_name}
-                                                </p>
-                                                <p className="text-[11px] text-muted-foreground">
-                                                    Bank {proof.bank_sender}
-                                                </p>
+                                                <p className="font-medium text-foreground">{proof.account_name}</p>
+                                                <p className="text-[11px] text-muted-foreground">Bank {proof.bank_sender}</p>
                                             </div>
                                         </TableCell>
 
@@ -203,9 +160,7 @@ export function DoiVerificationTable({
                                                     <p
                                                         className={cn(
                                                             'font-mono text-[11px] tabular-nums',
-                                                            isMismatch
-                                                                ? 'text-amber-600 dark:text-amber-400 font-semibold'
-                                                                : 'text-muted-foreground'
+                                                            isMismatch ? 'font-semibold text-amber-600 dark:text-amber-400' : 'text-muted-foreground',
                                                         )}
                                                     >
                                                         Tagihan: {formatRupiah(invoice.total_amount)}

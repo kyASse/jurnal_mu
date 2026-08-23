@@ -8,7 +8,6 @@ use App\Actions\Doi\VerifyPaymentProofAction;
 use App\Enums\Doi\InvoiceItemType;
 use App\Enums\Doi\InvoiceStatus;
 use App\Enums\Doi\PaymentProofStatus;
-use App\Enums\Doi\QuotaChangeType;
 use App\Enums\Doi\SubscriptionStatus;
 use App\Events\Doi\PaymentProofRejected;
 use App\Events\Doi\PaymentProofUploaded;
@@ -17,15 +16,14 @@ use App\Models\DoiBankAccount;
 use App\Models\DoiInvoice;
 use App\Models\DoiPackage;
 use App\Models\DoiPaymentProof;
-use App\Models\DoiSimilarityQuotaLog;
 use App\Models\DoiSubscription;
 use App\Models\Journal;
 use App\Models\ScientificField;
 use App\Models\University;
 use App\Models\User;
+use Carbon\Carbon;
 use Database\Seeders\DoiBankAccountSeeder;
 use Database\Seeders\DoiPackageSeeder;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -37,11 +35,17 @@ class DoiActionsTest extends TestCase
     use DatabaseTransactions;
 
     protected University $university;
+
     protected User $user;
+
     protected User $adminUser;
+
     protected ScientificField $scientificField;
+
     protected Journal $journal;
+
     protected DoiPackage $package;
+
     protected DoiBankAccount $bankAccount;
 
     protected function setUp(): void
@@ -84,7 +88,7 @@ class DoiActionsTest extends TestCase
             'status' => SubscriptionStatus::INACTIVE,
         ]);
 
-        $action = new GenerateInvoiceAction();
+        $action = new GenerateInvoiceAction;
 
         $invoice1 = $action->execute($subscription1, $this->user);
         $invoice2 = $action->execute($subscription2, $this->user);
@@ -142,7 +146,7 @@ class DoiActionsTest extends TestCase
 
         $file = UploadedFile::fake()->create('bukti_transfer.jpg', 500, 'image/jpeg');
 
-        $action = new StorePaymentProofAction();
+        $action = new StorePaymentProofAction;
         $proof = $action->execute($invoice, $file, [
             'bank_sender' => 'Bank Mandiri',
             'account_name' => 'Bendahara Jurnal Test',
@@ -209,7 +213,7 @@ class DoiActionsTest extends TestCase
             'status' => PaymentProofStatus::PENDING,
         ]);
 
-        $action = new VerifyPaymentProofAction();
+        $action = new VerifyPaymentProofAction;
         $result = $action->execute($proof, isApproved: true, adminNotes: 'Pembayaran valid & lunas', verifier: $this->adminUser);
 
         $this->assertEquals(PaymentProofStatus::APPROVED, $result->status);
@@ -283,7 +287,7 @@ class DoiActionsTest extends TestCase
             'status' => PaymentProofStatus::PENDING,
         ]);
 
-        $action = new VerifyPaymentProofAction();
+        $action = new VerifyPaymentProofAction;
         $result = $action->execute($proof, isApproved: false, adminNotes: 'Nominal transfer tidak sesuai tagihan', verifier: $this->adminUser);
 
         $this->assertEquals(PaymentProofStatus::REJECTED, $result->status);

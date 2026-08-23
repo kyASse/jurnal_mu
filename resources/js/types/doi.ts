@@ -37,6 +37,7 @@ export interface DoiBankAccountData {
     branch?: string | null;
     qr_code_path?: string | null;
     is_active?: boolean;
+    display_order?: number;
 }
 
 export interface DoiInvoiceItemData {
@@ -132,13 +133,16 @@ export interface DoiInvoiceDetailData {
     items_count?: number;
     items?: DoiInvoiceItemData[];
     payment_proofs?: DoiPaymentProofData[];
-    latest_payment_proof?: DoiPaymentProofData | {
-        id: number;
-        status: PaymentProofStatusType;
-        status_label?: string;
-        admin_notes?: string | null;
-        created_at?: string;
-    } | null;
+    latest_payment_proof?:
+        | DoiPaymentProofData
+        | {
+              id: number;
+              status: PaymentProofStatusType;
+              status_label?: string;
+              admin_notes?: string | null;
+              created_at?: string;
+          }
+        | null;
     university_name?: string;
     university?: {
         id: number;
@@ -326,5 +330,3 @@ export interface DoiBankAccountFormData {
     is_active: boolean;
     display_order?: number;
 }
-
-

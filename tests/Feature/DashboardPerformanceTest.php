@@ -201,7 +201,7 @@ describe('Large Dataset Handling', function () {
                 'user_id' => $this->user->id,
                 'university_id' => $this->university->id,
                 'scientific_field_id' => $fields->random()->id,
-                'indexations' => ! empty($indexations) ? $indexations : null,
+                'indexations' => !empty($indexations) ? $indexations : null,
                 'sinta_rank' => rand(0, 10) > 5 ? (string) rand(1, 6) : null,
             ]);
         }

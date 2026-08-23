@@ -24,7 +24,7 @@ class CheckJournalOwnership
         $user = $request->user();
 
         // Check if user is authenticated
-        if (! $user) {
+        if (!$user) {
             return redirect()->route('login');
         }
 
@@ -37,12 +37,12 @@ class CheckJournalOwnership
         $journal = $request->route('journal');
 
         // If no journal in route, continue (will be handled by controller)
-        if (! $journal) {
+        if (!$journal) {
             return $next($request);
         }
 
         // Ensure journal is Journal model instance
-        if (! $journal instanceof Journal) {
+        if (!$journal instanceof Journal) {
             $journal = Journal::findOrFail($journal);
         }
 

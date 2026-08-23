@@ -15,10 +15,6 @@ class DoiQuotaManagerService
 {
     /**
      * Check if a subscription has sufficient remaining similarity quota.
-     *
-     * @param DoiSubscription $subscription
-     * @param int $required
-     * @return bool
      */
     public function hasRemainingQuota(DoiSubscription $subscription, int $required = 1): bool
     {
@@ -32,12 +28,6 @@ class DoiQuotaManagerService
     /**
      * Deduct similarity quota from a subscription atomically.
      *
-     * @param DoiSubscription $subscription
-     * @param int $amount
-     * @param Journal|null $journal
-     * @param User|null $user
-     * @param string $description
-     * @return DoiSimilarityQuotaLog
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
@@ -90,12 +80,6 @@ class DoiQuotaManagerService
     /**
      * Add similarity quota to a subscription atomically.
      *
-     * @param DoiSubscription $subscription
-     * @param int $amount
-     * @param User|null $adminUser
-     * @param string $description
-     * @param QuotaChangeType $type
-     * @return DoiSimilarityQuotaLog
      *
      * @throws InvalidArgumentException
      */

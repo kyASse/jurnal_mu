@@ -22,7 +22,7 @@ class CheckUniversity
         $user = $request->user();
 
         // Check if user is authenticated
-        if (! $user) {
+        if (!$user) {
             return redirect()->route('login');
         }
 
@@ -32,7 +32,7 @@ class CheckUniversity
         }
 
         // Check if user belongs to a university
-        if (! $user->university_id) {
+        if (!$user->university_id) {
             abort(403, 'Your account is not associated with any university. Please contact administrator.');
         }
 
