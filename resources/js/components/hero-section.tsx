@@ -53,20 +53,29 @@ export default function HeroSection({
     const formattedUniversities = new Intl.NumberFormat('id-ID').format(totalUniversities || 0);
 
     return (
-        <section className="relative overflow-hidden pt-28 pb-20 md:pt-36 md:pb-28">
-            {/* Ambient Background Radial Mesh & Academic Contour Waves */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#121840] via-[#1f2868] to-[#480c1d] pt-28 pb-20 text-white md:pt-36 md:pb-28 dark:from-[#090d24] dark:via-[#131942] dark:to-[#380614]">
+            {/* Ambient Background Radial Mesh & Academic Vector Geometry */}
             <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-                {/* Dual-Tone Chromatic Glow Orbs */}
-                <div className="absolute -top-36 -left-28 h-[38rem] w-[38rem] rounded-full bg-primary/12 blur-[140px] dark:bg-primary/20" />
-                <div className="absolute top-1/4 -right-28 h-[34rem] w-[34rem] rounded-full bg-secondary/10 blur-[130px] dark:bg-secondary/18" />
-                <div className="absolute -bottom-20 left-1/3 h-96 w-96 rounded-full bg-accent/15 blur-[100px] dark:bg-accent/8" />
+                {/* Chromatic Glow Orbs: Rich Blue & Red Themes */}
+                <div className="absolute -top-40 -left-32 h-[42rem] w-[42rem] rounded-full bg-blue-500/20 blur-[140px] dark:bg-blue-600/25" />
+                <div className="absolute top-1/4 -right-32 h-[38rem] w-[38rem] rounded-full bg-secondary/30 blur-[130px] dark:bg-secondary/35" />
+                <div className="absolute -bottom-24 left-1/3 h-[28rem] w-[28rem] rounded-full bg-amber-400/15 blur-[110px] dark:bg-amber-400/10" />
 
-                {/* Academic Contour Waves Vector Layer */}
+                {/* Subtle Geometric Blueprint Dot Grid */}
                 <div
-                    className="absolute inset-0 flex items-center justify-center opacity-40 dark:opacity-30"
+                    className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
                     style={{
-                        maskImage: 'radial-gradient(ellipse 75% 65% at 50% 42%, black 25%, transparent 80%)',
-                        WebkitMaskImage: 'radial-gradient(ellipse 75% 65% at 50% 42%, black 25%, transparent 80%)',
+                        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.9) 1px, transparent 0)`,
+                        backgroundSize: '32px 32px',
+                    }}
+                />
+
+                {/* Academic Contour Waves & Vector Curves */}
+                <div
+                    className="absolute inset-0 flex items-center justify-center opacity-70 dark:opacity-60"
+                    style={{
+                        maskImage: 'radial-gradient(ellipse 85% 75% at 50% 40%, black 35%, transparent 90%)',
+                        WebkitMaskImage: 'radial-gradient(ellipse 85% 75% at 50% 40%, black 35%, transparent 90%)',
                     }}
                 >
                     <svg
@@ -77,78 +86,78 @@ export default function HeroSection({
                         preserveAspectRatio="none"
                     >
                         <defs>
-                            <linearGradient id="waveNavyRed1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#2C368A" stopOpacity="0.8" />
-                                <stop offset="50%" stopColor="#5C6BC0" stopOpacity="0.4" />
-                                <stop offset="100%" stopColor="#E8242A" stopOpacity="0.7" />
+                            <linearGradient id="heroWaveBlueRed1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.9" />
+                                <stop offset="45%" stopColor="#A78BFA" stopOpacity="0.6" />
+                                <stop offset="100%" stopColor="#FB7185" stopOpacity="0.85" />
                             </linearGradient>
-                            <linearGradient id="waveNavyRed2" x1="100%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stopColor="#E8242A" stopOpacity="0.7" />
-                                <stop offset="60%" stopColor="#7E22CE" stopOpacity="0.3" />
-                                <stop offset="100%" stopColor="#2C368A" stopOpacity="0.6" />
+                            <linearGradient id="heroWaveRedBlue2" x1="100%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stopColor="#F43F5E" stopOpacity="0.9" />
+                                <stop offset="55%" stopColor="#C084FC" stopOpacity="0.5" />
+                                <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.75" />
                             </linearGradient>
-                            <linearGradient id="waveGoldAccent" x1="0%" y1="50%" x2="100%" y2="50%">
-                                <stop offset="0%" stopColor="#2C368A" stopOpacity="0.3" />
-                                <stop offset="50%" stopColor="#EAB308" stopOpacity="0.5" />
-                                <stop offset="100%" stopColor="#E8242A" stopOpacity="0.3" />
+                            <linearGradient id="heroWaveGold" x1="0%" y1="50%" x2="100%" y2="50%">
+                                <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.4" />
+                                <stop offset="50%" stopColor="#FDE047" stopOpacity="0.8" />
+                                <stop offset="100%" stopColor="#F43F5E" stopOpacity="0.5" />
                             </linearGradient>
                         </defs>
 
-                        {/* Topographic Academic Ribbon Curves */}
+                        {/* Topographic Editorial Waves */}
                         <path
                             d="M-100 120 C 300 20, 500 240, 900 110 C 1200 10, 1400 180, 1600 100"
-                            stroke="url(#waveNavyRed1)"
-                            strokeWidth="1.2"
-                            strokeDasharray="4 4"
+                            stroke="url(#heroWaveBlueRed1)"
+                            strokeWidth="1.5"
+                            strokeDasharray="5 5"
                         />
                         <path
                             d="M-100 180 C 250 80, 550 300, 950 170 C 1250 80, 1450 240, 1600 160"
-                            stroke="url(#waveNavyRed1)"
-                            strokeWidth="1.5"
+                            stroke="url(#heroWaveBlueRed1)"
+                            strokeWidth="2"
                         />
                         <path
                             d="M-100 240 C 200 140, 600 360, 1000 230 C 1300 140, 1480 300, 1600 220"
-                            stroke="url(#waveGoldAccent)"
-                            strokeWidth="1"
+                            stroke="url(#heroWaveGold)"
+                            strokeWidth="1.25"
                         />
                         <path
                             d="M-100 300 C 150 200, 650 420, 1050 290 C 1350 200, 1500 360, 1600 280"
-                            stroke="url(#waveNavyRed2)"
-                            strokeWidth="1.5"
+                            stroke="url(#heroWaveRedBlue2)"
+                            strokeWidth="2"
                         />
                         <path
                             d="M-100 360 C 100 260, 700 480, 1100 350 C 1400 260, 1520 420, 1600 340"
-                            stroke="url(#waveNavyRed2)"
-                            strokeWidth="1.2"
+                            stroke="url(#heroWaveRedBlue2)"
+                            strokeWidth="1.5"
                             strokeDasharray="6 6"
                         />
                         <path
                             d="M-100 420 C 50 320, 750 540, 1150 410 C 1450 320, 1550 480, 1600 400"
-                            stroke="url(#waveNavyRed1)"
-                            strokeWidth="1"
+                            stroke="url(#heroWaveBlueRed1)"
+                            strokeWidth="1.25"
                         />
                         <path
                             d="M-100 480 C 0 380, 800 600, 1200 470 C 1480 380, 1580 540, 1600 460"
-                            stroke="url(#waveGoldAccent)"
-                            strokeWidth="1.5"
+                            stroke="url(#heroWaveGold)"
+                            strokeWidth="1.75"
                         />
                         <path
                             d="M-100 540 C -50 440, 850 660, 1250 530 C 1500 440, 1600 600, 1600 520"
-                            stroke="url(#waveNavyRed2)"
-                            strokeWidth="1.2"
+                            stroke="url(#heroWaveRedBlue2)"
+                            strokeWidth="1.5"
                         />
 
-                        {/* Subtle Symmetrical Echo Curves */}
+                        {/* Symmetrical Reflected Waves */}
                         <path
                             d="M-100 600 C 350 720, 700 450, 1100 620 C 1350 720, 1550 580, 1600 640"
-                            stroke="url(#waveNavyRed1)"
-                            strokeWidth="1"
-                            strokeDasharray="3 3"
+                            stroke="url(#heroWaveBlueRed1)"
+                            strokeWidth="1.25"
+                            strokeDasharray="4 4"
                         />
                         <path
                             d="M-100 660 C 400 780, 750 510, 1150 680 C 1400 780, 1580 640, 1600 700"
-                            stroke="url(#waveNavyRed2)"
-                            strokeWidth="1.2"
+                            stroke="url(#heroWaveRedBlue2)"
+                            strokeWidth="1.5"
                         />
                     </svg>
                 </div>
@@ -158,37 +167,37 @@ export default function HeroSection({
                 {/* Hero Header Content */}
                 <div className="mx-auto max-w-3xl text-center">
                     {/* Eyebrow Badge */}
-                    <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-1.5 text-[11px] font-semibold tracking-[0.25em] text-primary shadow-xs dark:border-primary/25 dark:bg-primary/10 dark:text-primary-foreground">
-                        <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white shadow-lg backdrop-blur-md dark:border-white/15 dark:bg-white/5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                         PORTAL REPOSITORI ILMIAH RESMI
                     </div>
 
                     {/* Headline */}
                     <h1
-                        className="font-heading mt-6 text-4xl leading-[1.15] font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-[4rem] dark:text-white"
+                        className="font-heading mt-6 text-4xl leading-[1.15] font-bold tracking-tight text-white sm:text-6xl lg:text-[4.25rem]"
                         style={{ fontFamily: '"El Messiri", serif' }}
                     >
                         Eksplorasi Keunggulan <br />
-                        <span className="bg-gradient-to-r from-primary via-indigo-600 to-secondary bg-clip-text text-transparent dark:from-indigo-400 dark:via-purple-300 dark:to-rose-400">
+                        <span className="bg-gradient-to-r from-amber-200 via-rose-200 to-rose-400 bg-clip-text text-transparent drop-shadow-sm">
                             Publikasi Ilmiah
                         </span>{' '}
                         Muhammadiyah
                     </h1>
 
                     {/* Subtitle */}
-                    <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg dark:text-slate-300">
+                    <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg dark:text-slate-300">
                         Pintu gerbang terpadu untuk ribuan jurnal terakreditasi, artikel bereputasi, dan riset inovatif dari Perguruan Tinggi Muhammadiyah &amp; ‘Aisyiyah se-Indonesia.
                     </p>
 
                     {/* Floating Capsule Search Bar with Double-Bezel */}
                     <div className="mx-auto mt-10 max-w-2xl">
-                        <div className="rounded-full bg-black/[0.03] p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.08] backdrop-blur-md dark:bg-white/[0.04] dark:ring-white/[0.1] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
+                        <div className="rounded-full bg-white/15 p-1.5 shadow-[0_25px_60px_rgba(0,0,0,0.35)] ring-1 ring-white/30 backdrop-blur-2xl dark:bg-white/10 dark:ring-white/20">
                             <form
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     onSearch();
                                 }}
-                                className="flex items-center rounded-full bg-white px-3 py-1.5 dark:bg-zinc-900"
+                                className="flex items-center rounded-full bg-white px-3 py-1.5 shadow-md dark:bg-zinc-900"
                             >
                                 <Search className="ml-2 h-5 w-5 shrink-0 text-slate-400" />
                                 <input
@@ -253,7 +262,7 @@ export default function HeroSection({
                                 <Button
                                     type="submit"
                                     disabled={isSearching}
-                                    className="h-10 shrink-0 rounded-full bg-primary px-6 text-xs font-semibold text-white shadow-sm transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-primary/90 hover:shadow-md active:scale-95 disabled:opacity-60"
+                                    className="h-10 shrink-0 rounded-full bg-secondary px-6 text-xs font-bold text-white shadow-md transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-secondary/90 hover:shadow-lg active:scale-95 disabled:opacity-60"
                                 >
                                     {isSearching ? 'Mencari...' : 'Search'}
                                 </Button>
@@ -261,12 +270,12 @@ export default function HeroSection({
                         </div>
 
                         {/* Animated Quick Link suggestion */}
-                        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-white/80 dark:text-slate-300">
                             <span>Pencarian cepat:</span>
                             <div className="inline-flex h-5 items-center overflow-hidden">
                                 <Link
                                     href={quickLinks[currentLinkIndex].href}
-                                    className={`inline-flex items-center font-medium text-primary transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:underline dark:text-indigo-400 ${
+                                    className={`inline-flex items-center font-semibold text-accent transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:underline ${
                                         isFading ? 'translate-y-3 scale-95 opacity-0' : 'translate-y-0 scale-100 opacity-100'
                                     }`}
                                 >
@@ -277,14 +286,14 @@ export default function HeroSection({
                     </div>
                 </div>
 
-                {/* 3 Metric Islands with Double-Bezel Architecture */}
+                {/* 3 Metric Islands with Floating Glass Double-Bezel Architecture */}
                 <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:gap-6">
                     {/* Total Journals */}
-                    <div className="rounded-2xl bg-black/[0.02] p-1.5 ring-1 ring-black/[0.05] shadow-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-md dark:bg-white/[0.03] dark:ring-white/[0.06]">
-                        <div className="flex h-full items-center justify-between rounded-xl bg-white p-5 border border-black/[0.02] dark:border-white/[0.02] dark:bg-zinc-900/90">
+                    <div className="rounded-2xl bg-white/10 p-1.5 ring-1 ring-white/20 shadow-xl backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:bg-white/15 hover:ring-white/30 hover:shadow-2xl dark:bg-white/5 dark:ring-white/10">
+                        <div className="flex h-full items-center justify-between rounded-xl bg-white p-5 border border-black/[0.03] dark:border-white/[0.03] dark:bg-zinc-900/95">
                             <div>
-                                <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">Total Jurnal</p>
-                                <p className="mt-1.5 font-mono text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">Total Jurnal</p>
+                                <p className="mt-1.5 font-mono text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                     {formattedJournals}
                                 </p>
                             </div>
@@ -295,11 +304,11 @@ export default function HeroSection({
                     </div>
 
                     {/* Total Articles */}
-                    <div className="rounded-2xl bg-black/[0.02] p-1.5 ring-1 ring-black/[0.05] shadow-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-md dark:bg-white/[0.03] dark:ring-white/[0.06]">
-                        <div className="flex h-full items-center justify-between rounded-xl bg-white p-5 border border-black/[0.02] dark:border-white/[0.02] dark:bg-zinc-900/90">
+                    <div className="rounded-2xl bg-white/10 p-1.5 ring-1 ring-white/20 shadow-xl backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:bg-white/15 hover:ring-white/30 hover:shadow-2xl dark:bg-white/5 dark:ring-white/10">
+                        <div className="flex h-full items-center justify-between rounded-xl bg-white p-5 border border-black/[0.03] dark:border-white/[0.03] dark:bg-zinc-900/95">
                             <div>
-                                <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">Total Artikel</p>
-                                <p className="mt-1.5 font-mono text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">Total Artikel</p>
+                                <p className="mt-1.5 font-mono text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                     {formattedArticles}
                                 </p>
                             </div>
@@ -310,11 +319,11 @@ export default function HeroSection({
                     </div>
 
                     {/* Total Universities */}
-                    <div className="rounded-2xl bg-black/[0.02] p-1.5 ring-1 ring-black/[0.05] shadow-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-md dark:bg-white/[0.03] dark:ring-white/[0.06]">
-                        <div className="flex h-full items-center justify-between rounded-xl bg-white p-5 border border-black/[0.02] dark:border-white/[0.02] dark:bg-zinc-900/90">
+                    <div className="rounded-2xl bg-white/10 p-1.5 ring-1 ring-white/20 shadow-xl backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:bg-white/15 hover:ring-white/30 hover:shadow-2xl dark:bg-white/5 dark:ring-white/10">
+                        <div className="flex h-full items-center justify-between rounded-xl bg-white p-5 border border-black/[0.03] dark:border-white/[0.03] dark:bg-zinc-900/95">
                             <div>
-                                <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">Perguruan Tinggi</p>
-                                <p className="mt-1.5 font-mono text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">Perguruan Tinggi</p>
+                                <p className="mt-1.5 font-mono text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                     {formattedUniversities}
                                 </p>
                             </div>
