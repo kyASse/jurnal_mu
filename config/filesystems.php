@@ -38,6 +38,14 @@ return [
             'report' => false,
         ],
 
+        'doi_proofs' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/doi_proofs'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

@@ -202,7 +202,7 @@ class EvaluationIndicator extends Model
      */
     public function isHierarchical(): bool
     {
-        return ! is_null($this->sub_category_id);
+        return !is_null($this->sub_category_id);
     }
 
     /**

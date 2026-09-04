@@ -26,7 +26,7 @@ class ProcessCsvImportJob implements ShouldQueue
     public function handle(): void
     {
         $csvImport = CsvImport::find($this->csvImportId);
-        if (! $csvImport) {
+        if (!$csvImport) {
             return;
         }
 
@@ -34,7 +34,7 @@ class ProcessCsvImportJob implements ShouldQueue
 
         try {
             $absolutePath = Storage::path($csvImport->filepath);
-            if (! Storage::exists($csvImport->filepath)) {
+            if (!Storage::exists($csvImport->filepath)) {
                 throw new \Exception('File CSV tidak ditemukan di storage.');
             }
 

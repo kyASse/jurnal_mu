@@ -30,7 +30,7 @@ class PembinaanPolicy
      */
     public function view(User $user, Pembinaan $pembinaan): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -83,7 +83,7 @@ class PembinaanPolicy
      */
     public function delete(User $user, Pembinaan $pembinaan): bool
     {
-        if (! $user->isSuperAdmin() || ! $user->is_active) {
+        if (!$user->isSuperAdmin() || !$user->is_active) {
             return false;
         }
 
@@ -127,7 +127,7 @@ class PembinaanPolicy
      */
     public function viewRegistrations(User $user, Pembinaan $pembinaan): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 

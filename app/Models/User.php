@@ -287,7 +287,7 @@ class User extends Authenticatable
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (! $search) {
+        if (!$search) {
             return $query;
         }
 
@@ -412,7 +412,7 @@ class User extends Authenticatable
         $userRoles = array_unique($userRoles);
 
         foreach ($roleNames as $roleName) {
-            if (! in_array($roleName, $userRoles)) {
+            if (!in_array($roleName, $userRoles)) {
                 return false;
             }
         }
@@ -428,7 +428,7 @@ class User extends Authenticatable
         $roleNames = $this->roles()->pluck('name')->toArray();
 
         // Add primary role if exists and not already in array
-        if ($this->role && ! in_array($this->role->name, $roleNames)) {
+        if ($this->role && !in_array($this->role->name, $roleNames)) {
             $roleNames[] = $this->role->name;
         }
 

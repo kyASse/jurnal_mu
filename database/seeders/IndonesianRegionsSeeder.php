@@ -13,7 +13,7 @@ class IndonesianRegionsSeeder extends Seeder
     {
         $jsonPath = database_path('data/indonesian_regions.json');
 
-        if (! file_exists($jsonPath)) {
+        if (!file_exists($jsonPath)) {
             if ($this->command) {
                 $this->command->error("JSON file not found at: {$jsonPath}");
             }

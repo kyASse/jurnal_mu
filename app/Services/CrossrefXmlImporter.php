@@ -55,7 +55,7 @@ class CrossrefXmlImporter
 
                 $titleNode = $articleNode->xpath('.//cr:titles/cr:title') ?: $articleNode->xpath('.//titles/title');
                 $title = $titleNode ? trim((string) $titleNode[0]) : null;
-                if (! $title) {
+                if (!$title) {
                     continue;
                 }
 
@@ -72,8 +72,8 @@ class CrossrefXmlImporter
                         $authorNode->registerXPathNamespace('cr', 'http://www.crossref.org/schema/4.3.6');
                         $givenNode = $authorNode->xpath('.//cr:given_name') ?: $authorNode->xpath('.//given_name');
                         $surnameNode = $authorNode->xpath('.//cr:surname') ?: $authorNode->xpath('.//surname');
-                        $given = ! empty($givenNode) ? trim((string) $givenNode[0]) : '';
-                        $surname = ! empty($surnameNode) ? trim((string) $surnameNode[0]) : '';
+                        $given = !empty($givenNode) ? trim((string) $givenNode[0]) : '';
+                        $surname = !empty($surnameNode) ? trim((string) $surnameNode[0]) : '';
                         $fullName = trim("{$given} {$surname}");
                         if ($fullName !== '') {
                             $authors[] = $fullName;
@@ -164,7 +164,7 @@ class CrossrefXmlImporter
 
     private function parseDateNode($dateNode): ?string
     {
-        if (! $dateNode) {
+        if (!$dateNode) {
             return null;
         }
         if ($dateNode instanceof \SimpleXMLElement) {

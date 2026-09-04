@@ -69,7 +69,7 @@ class AgendaController extends Controller
      */
     public function toggleActive(Agenda $event)
     {
-        $event->update(['is_active' => ! $event->is_active]);
+        $event->update(['is_active' => !$event->is_active]);
 
         return redirect()->back()->with('success', 'Status agenda berhasil diperbarui.');
     }
@@ -79,7 +79,7 @@ class AgendaController extends Controller
      */
     public function toggleFeatured(Agenda $event)
     {
-        $event->update(['is_featured' => ! $event->is_featured]);
+        $event->update(['is_featured' => !$event->is_featured]);
 
         return redirect()->back()->with('success', 'Status featured agenda berhasil diperbarui.');
     }

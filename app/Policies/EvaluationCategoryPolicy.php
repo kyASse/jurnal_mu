@@ -51,7 +51,7 @@ class EvaluationCategoryPolicy
      */
     public function delete(User $user, EvaluationCategory $category): bool
     {
-        if (! $user->isSuperAdmin()) {
+        if (!$user->isSuperAdmin()) {
             return false;
         }
 

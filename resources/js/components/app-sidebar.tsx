@@ -12,6 +12,7 @@ import {
     Building2,
     CalendarDays,
     ClipboardList,
+    Globe,
     LayoutGrid,
     Library,
     LifeBuoy,
@@ -92,6 +93,11 @@ export function AppSidebar() {
             icon: Library,
         },
         {
+            title: 'Kelola DOI (Diktilitbang)',
+            href: route('admin.doi-management.index'),
+            icon: Globe,
+        },
+        {
             title: 'Pembinaan',
             href: route('admin.pembinaan.index'),
             icon: Award,
@@ -141,6 +147,11 @@ export function AppSidebar() {
             icon: Library,
         },
         {
+            title: 'Langganan DOI',
+            href: route('admin-kampus.doi-subscription.index'),
+            icon: Globe,
+        },
+        {
             title: 'Agendas & Events',
             href: route('admin-kampus.events.index'),
             icon: CalendarDays,
@@ -180,6 +191,11 @@ export function AppSidebar() {
             title: 'Jurnal',
             href: route('user.journals.index'),
             icon: BookOpen,
+        },
+        {
+            title: 'Langganan DOI',
+            href: route('user.doi-subscription.index'),
+            icon: Globe,
         },
         {
             title: 'Pembinaan',

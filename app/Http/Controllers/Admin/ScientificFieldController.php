@@ -75,7 +75,7 @@ class ScientificFieldController extends Controller
 
             $rows = SimpleExcelReader::create($request->file('file')->path())
                 ->getRows()
-                ->filter(fn (array $row) => ! empty($row['code']) && ! empty($row['name']))
+                ->filter(fn (array $row) => !empty($row['code']) && !empty($row['name']))
                 ->values();
 
             $count = 0;
@@ -94,7 +94,7 @@ class ScientificFieldController extends Controller
 
                 $codes[] = $row['code'];
 
-                if (! empty($row['parent_code'])) {
+                if (!empty($row['parent_code'])) {
                     $parentCodes[] = $row['parent_code'];
                 }
 
@@ -109,13 +109,13 @@ class ScientificFieldController extends Controller
             $rows->each(function (array $row) use ($fieldsByCode) {
                 $field = $fieldsByCode->get($row['code']);
 
-                if (! $field) {
+                if (!$field) {
                     return;
                 }
 
                 $parentId = null;
 
-                if (! empty($row['parent_code'])) {
+                if (!empty($row['parent_code'])) {
                     $parent = $fieldsByCode->get($row['parent_code']);
                     if ($parent) {
                         $parentId = $parent->id;

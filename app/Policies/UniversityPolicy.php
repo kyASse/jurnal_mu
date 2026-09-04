@@ -65,7 +65,7 @@ class UniversityPolicy
      */
     public function delete(User $user, University $university): bool
     {
-        if (! $user->isSuperAdmin()) {
+        if (!$user->isSuperAdmin()) {
             return false;
         }
 

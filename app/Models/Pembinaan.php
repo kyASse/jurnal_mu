@@ -232,7 +232,7 @@ class Pembinaan extends Model
      */
     public function isQuotaFull(): bool
     {
-        if (! $this->quota) {
+        if (!$this->quota) {
             return false;
         }
 
@@ -309,7 +309,7 @@ class Pembinaan extends Model
 
         // Auto-fill deleted_by on soft delete
         static::deleting(function ($model) {
-            if (auth()->check() && ! $model->isForceDeleting()) {
+            if (auth()->check() && !$model->isForceDeleting()) {
                 $model->deleted_by = auth()->id();
                 $model->save();
             }

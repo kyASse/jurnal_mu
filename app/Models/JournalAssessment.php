@@ -211,7 +211,7 @@ class JournalAssessment extends Model
      */
     public function scopeByStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 

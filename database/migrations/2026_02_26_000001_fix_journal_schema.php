@@ -33,7 +33,7 @@ return new class extends Migration
                 fn ($col) => Schema::hasColumn('journals', $col)
             );
 
-            if (! empty($columnsToDrop)) {
+            if (!empty($columnsToDrop)) {
                 $table->dropColumn(array_values($columnsToDrop));
             }
         });
@@ -45,13 +45,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('journals', function (Blueprint $table) {
-            if (! Schema::hasColumn('journals', 'dikti_accreditation_number')) {
+            if (!Schema::hasColumn('journals', 'dikti_accreditation_number')) {
                 $table->string('dikti_accreditation_number', 50)->nullable();
             }
-            if (! Schema::hasColumn('journals', 'accreditation_issued_date')) {
+            if (!Schema::hasColumn('journals', 'accreditation_issued_date')) {
                 $table->date('accreditation_issued_date')->nullable();
             }
-            if (! Schema::hasColumn('journals', 'accreditation_expiry_date')) {
+            if (!Schema::hasColumn('journals', 'accreditation_expiry_date')) {
                 $table->date('accreditation_expiry_date')->nullable();
             }
         });

@@ -97,7 +97,7 @@ class JournalController extends Controller
         $user = Auth::user();
 
         // Ensure user has a university assigned
-        if (! $user->university_id) {
+        if (!$user->university_id) {
             return back()->with('error', 'Anda belum terdaftar di kampus manapun. Hubungi Admin Kampus untuk mendaftarkan akun Anda ke universitas.');
         }
 

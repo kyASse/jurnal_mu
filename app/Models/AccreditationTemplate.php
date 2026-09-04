@@ -120,7 +120,7 @@ class AccreditationTemplate extends Model
      */
     public function getIndicatorsAttribute()
     {
-        if (! array_key_exists('indicators', $this->relations)) {
+        if (!array_key_exists('indicators', $this->relations)) {
             $this->setRelation('indicators', $this->indicators()->get());
         }
 
@@ -216,7 +216,7 @@ class AccreditationTemplate extends Model
                 $query->where('status', 'submitted');
             })->exists();
 
-        return ! $indicatorsUsedInAssessments;
+        return !$indicatorsUsedInAssessments;
     }
 
     /**

@@ -57,12 +57,12 @@ class JournalCoverService
         // Use getRawOriginal to bypass the accessor so we always get the raw DB value
         $raw = $journal->getRawOriginal('cover_image');
 
-        if (! $raw) {
+        if (!$raw) {
             return;
         }
 
         // Current format — relative path: journal-covers/cover_1_xxx.jpg
-        if (! str_starts_with($raw, '/') && ! str_starts_with($raw, 'http://') && ! str_starts_with($raw, 'https://')) {
+        if (!str_starts_with($raw, '/') && !str_starts_with($raw, 'http://') && !str_starts_with($raw, 'https://')) {
             Storage::disk(self::DISK)->delete($raw);
 
             return;

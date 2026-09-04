@@ -14,7 +14,7 @@ class UniversityController extends Controller
     {
         $university = $request->user()->university;
 
-        if (! $university) {
+        if (!$university) {
             return redirect()->route('dashboard')->with('error', 'Universitas tidak ditemukan.');
         }
 
@@ -27,7 +27,7 @@ class UniversityController extends Controller
     {
         $university = $request->user()->university;
 
-        if (! $university) {
+        if (!$university) {
             return redirect()->route('dashboard')->with('error', 'Universitas tidak ditemukan.');
         }
 

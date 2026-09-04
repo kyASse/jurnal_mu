@@ -198,11 +198,11 @@ class ReviewerAssignment extends Model
 
         // Auto-set assigned_at on create
         static::creating(function ($model) {
-            if (! $model->assigned_at) {
+            if (!$model->assigned_at) {
                 $model->assigned_at = now();
             }
 
-            if (auth()->check() && ! $model->assigned_by) {
+            if (auth()->check() && !$model->assigned_by) {
                 $model->assigned_by = auth()->id();
             }
         });
@@ -216,7 +216,7 @@ class ReviewerAssignment extends Model
 
         // Auto-fill deleted_by on soft delete
         static::deleting(function ($model) {
-            if (auth()->check() && ! $model->isForceDeleting()) {
+            if (auth()->check() && !$model->isForceDeleting()) {
                 $model->deleted_by = auth()->id();
                 $model->save();
             }
