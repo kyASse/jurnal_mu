@@ -7,10 +7,12 @@ on:
   push:
     branches:
       - develop
+      - development
       - main
   pull_request:
     branches:
       - develop
+      - development
       - main
 
 jobs:
@@ -59,6 +61,9 @@ jobs:
         run: php artisan key:generate
 
       - name: Configure Testing Environment
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
         run: |
           mkdir -p database
           touch database/database.sqlite
@@ -67,6 +72,9 @@ jobs:
           php artisan migrate:fresh --seed --force
 
       - name: Run Tests (Pest)
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
         run: ./vendor/bin/pest
 
       - name: Upgrade Chrome Driver (for Dusk)
