@@ -51,11 +51,11 @@ export default function HeroSection({
     return (
         <div className="relative pt-16">
             {/* Ambient Background Radial Mesh & Academic Vector Geometry */}
-            <div className="absolute inset-0 z-0 overflow-hidden bg-gradient-to-br from-[#121840] via-[#1f2868] to-[#480c1d] pb-32 dark:from-[#090d24] dark:via-[#131942] dark:to-[#380614]">
+            <div className="absolute inset-0 z-0 overflow-hidden bg-hero-gradient pb-32">
                 {/* Chromatic Glow Orbs: Rich Blue & Red Themes */}
-                <div className="absolute -top-40 -left-32 h-[42rem] w-[42rem] rounded-full bg-blue-500/20 blur-[140px] dark:bg-blue-600/25" />
+                <div className="absolute -top-40 -left-32 h-[42rem] w-[42rem] rounded-full bg-primary/25 blur-[140px]" />
                 <div className="absolute top-1/4 -right-32 h-[38rem] w-[38rem] rounded-full bg-secondary/30 blur-[130px] dark:bg-secondary/35" />
-                <div className="absolute -bottom-24 left-1/3 h-[28rem] w-[28rem] rounded-full bg-amber-400/15 blur-[110px] dark:bg-amber-400/10" />
+                <div className="absolute -bottom-24 left-1/3 h-[28rem] w-[28rem] rounded-full bg-accent/15 blur-[110px]" />
 
                 {/* Subtle Geometric Blueprint Dot Grid */}
                 <div
