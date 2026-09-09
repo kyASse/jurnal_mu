@@ -2,9 +2,9 @@
 
 This document outlines the standard procedures for maintaining, monitoring, and troubleshooting the JurnalMu application.
 
-**Last Updated:** February 17, 2026  
-**Applicable Version:** v1.1+ (Current: v1.1 Deployed)  
-**Next Version:** v1.2 (Planned - See [v1.2_IMPLEMENTATION_PLAN.md](/v1.2_IMPLEMENTATION_PLAN.md))
+**Last Updated:** June 30, 2026  
+**Applicable Version:** v1.2+ (Current: v1.2 Deployed)  
+**Next Version:** v1.3 (Planned)
 
 ---
 
@@ -91,11 +91,28 @@ php artisan backup:run
    # Check failed jobs
    php artisan queue:failed
    
-   # Monitor queue worker status
-   php artisan queue:listen --tries=1  # Should be running in production
+   # Monitor queue worker status for default and harvesting queues
+   ps aux | grep "queue:work"
    ```
 
-3. **Log Viewer Options**:
+3. **Monitor Feature-Specific Logs**:
+   - **OAI-PMH Harvesting**:
+     Check the status of background journal syncs:
+     ```bash
+     # View last 10 harvesting runs
+     php artisan oai:logs
+     
+     # Check specific journal harvesting logs
+     php artisan oai:logs [journal_id]
+     ```
+   - **CSV Imports**:
+     Check the status of university or journal Excel/CSV imports:
+     ```sql
+     -- Check failed CSV imports
+     SELECT id, filepath, status, error_message FROM csv_imports WHERE status = 'failed' ORDER BY created_at DESC LIMIT 10;
+     ```
+
+4. **Log Viewer Options**:
    - **Manual**: Direct file access via SSH/FTP
    - **Optional Package**: Install `rap2hpoutre/laravel-log-viewer` for web-based viewing
      ```bash
@@ -114,14 +131,17 @@ php artisan backup:run
 ### 4. Queue Worker Maintenance
 **Frequency:** Check daily, restart on deployment
 
-The application uses queues for:
-- Email notifications (Assessment approvals, Pembinaan assignments)
-- Background processing tasks
+The application uses two distinct queues:
+- **`default`**: For email notifications (Assessment approvals, Pembinaan assignments) and lightweight tasks.
+- **`harvesting`**: For heavy background processing (OAI-PMH metadata sync via `HarvestJournalArticlesJob` and XML imports via `ImportArticlesXmlJob`).
 
 **Management:**
 ```bash
-# Check queue status
-php artisan queue:work --once  # Process one job
+# Check queue status or process one job on default queue
+php artisan queue:work --once
+
+# Process one job on harvesting queue
+php artisan queue:work database --queue=harvesting --once
 
 # Restart workers (required after code deployment)
 php artisan queue:restart
@@ -131,23 +151,51 @@ php artisan queue:failed
 php artisan queue:retry all    # Retry failed jobs
 php artisan queue:flush        # Clear all failed jobs
 
-# Production worker (should run continuously)
-php artisan queue:work --tries=3 --timeout=90
+# Monitor specific queue sizes
+php artisan queue:monitor database:default
+php artisan queue:monitor database:harvesting
 ```
 
 **Production Setup (Supervisor Recommended)**:
+
+To ensure workers run persistently, configure Supervisor profiles for both queues.
+
+##### Option A: Default Queue Worker Configuration
+Create `/etc/supervisor/conf.d/jurnal-mu-worker.conf`:
 ```ini
-# /etc/supervisor/conf.d/jurnal-mu-worker.conf
 [program:jurnal-mu-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /path/to/jurnal_mu/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+command=php /path/to/jurnal_mu/artisan queue:work database --queue=default --sleep=3 --tries=3 --max-time=3600
 autostart=true
 autorestart=true
 user=www-data
 numprocs=2
 redirect_stderr=true
 stdout_logfile=/path/to/jurnal_mu/storage/logs/worker.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
 ```
+
+##### Option B: Harvesting Queue Worker Configuration
+Create `/etc/supervisor/conf.d/jurnal_mu-harvesting.conf`:
+```ini
+[program:jurnal_mu-harvesting]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path/to/jurnal_mu/artisan queue:work database --queue=harvesting --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/path/to/jurnal_mu/storage/logs/worker-harvesting.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stopwaitsecs=180
+```
+
+*Note: For Hostinger Shared Hosting, Supervisor is not available. Refer to the cron-based queue configuration details in [QUEUE_WORKER_PRODUCTION.md](../setup-deployment/QUEUE_WORKER_PRODUCTION.md).*
 
 ### 5. Session & Cache Cleanup
 **Frequency:** Monthly or when experiencing performance issues
@@ -834,13 +882,14 @@ When making changes, update these documents:
 
 ```bash
 # Development
-composer dev           # Start all services (server, queue, vite)
+composer dev           # Start all services concurrently (server, queue worker, Vite)
+composer dev:ssr       # Start all services with SSR support (server, queue worker, Pail, SSR)
 npm run dev           # Frontend dev server only
 php artisan serve     # Backend dev server only
 
 # Testing
 php artisan test      # Run Pest tests
-php artisan dusk      # Run browser tests
+php artisan dusk      # Run Dusk browser tests
 npm run test          # Run Vitest tests
 
 # Code Quality
@@ -859,9 +908,10 @@ php artisan optimize:clear  # Clear all caches
 php artisan optimize        # Cache routes, config, views
 
 # Queue Management
-php artisan queue:work      # Start queue worker
-php artisan queue:failed    # List failed jobs
-php artisan queue:restart   # Restart queue workers
+php artisan queue:work --queue=default                   # Start default queue worker
+php artisan queue:work database --queue=harvesting       # Start harvesting queue worker
+php artisan queue:failed                                 # List failed jobs
+php artisan queue:restart                                # Restart queue workers
 ```
 
 ---
@@ -872,6 +922,7 @@ php artisan queue:restart   # Restart queue workers
 |---------|------|---------|--------|
 | 1.0 | Feb 12, 2026 | Initial version | JurnalMU Team |
 | 1.1 | Feb 17, 2026 | Major update: Added comprehensive sections for monitoring, performance, security, troubleshooting. Corrected backup information (spatie package not installed). Added emergency contacts and escalation matrix. | AI Assistant |
+| 1.2 | June 30, 2026 | Updated for v1.2+ Deployed state: Documented multi-queue worker setup (`default` and `harvesting`), integrated custom OAI-PMH harvesting commands/logs, added CSV imports monitoring, updated tech stack to Laravel 12.x, React 19.x, and Tailwind v4, added SSR development commands, and implemented `/health` endpoint. | AI Assistant |
 
 ---
 

@@ -94,7 +94,7 @@ class PembinaanReview extends Model
      */
     public function getScoreLabelAttribute(): ?string
     {
-        if (! $this->score) {
+        if (!$this->score) {
             return null;
         }
 
@@ -116,7 +116,7 @@ class PembinaanReview extends Model
      */
     public function hasFeedback(): bool
     {
-        return ! empty($this->feedback);
+        return !empty($this->feedback);
     }
 
     /**
@@ -124,7 +124,7 @@ class PembinaanReview extends Model
      */
     public function hasRecommendation(): bool
     {
-        return ! empty($this->recommendation);
+        return !empty($this->recommendation);
     }
 
     /**
@@ -136,7 +136,7 @@ class PembinaanReview extends Model
 
         // Auto-set reviewed_at on create
         static::creating(function ($model) {
-            if (! $model->reviewed_at) {
+            if (!$model->reviewed_at) {
                 $model->reviewed_at = now();
             }
         });
@@ -150,7 +150,7 @@ class PembinaanReview extends Model
 
         // Auto-fill deleted_by on soft delete
         static::deleting(function ($model) {
-            if (auth()->check() && ! $model->isForceDeleting()) {
+            if (auth()->check() && !$model->isForceDeleting()) {
                 $model->deleted_by = auth()->id();
                 $model->save();
             }

@@ -16,13 +16,13 @@ class CheckRole
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         // Check if user us authenticated
-        if (! $request->user()) {
+        if (!$request->user()) {
             return redirect()->route('login')
                 ->with('error', 'You must be logged in to access this page.');
         }
 
         // Check if user is active
-        if (! $request->user()->is_active) {
+        if (!$request->user()->is_active) {
             auth()->logout();
 
             return redirect()->route('login')
@@ -30,7 +30,7 @@ class CheckRole
         }
 
         // Check if user has any of the required roles (supports multi-role)
-        if (! $request->user()->hasAnyRole($roles)) {
+        if (!$request->user()->hasAnyRole($roles)) {
             abort(403, 'You do not have permission to access this page.');
         }
 

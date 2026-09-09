@@ -73,7 +73,7 @@ class PembinaanRegistrationAttachment extends Model
      */
     public function getFileSizeHumanAttribute(): string
     {
-        if (! $this->file_size) {
+        if (!$this->file_size) {
             return 'Unknown';
         }
 
@@ -134,14 +134,14 @@ class PembinaanRegistrationAttachment extends Model
 
         // Auto-fill uploaded_by on create
         static::creating(function ($model) {
-            if (auth()->check() && ! $model->uploaded_by) {
+            if (auth()->check() && !$model->uploaded_by) {
                 $model->uploaded_by = auth()->id();
             }
         });
 
         // Auto-fill deleted_by on soft delete
         static::deleting(function ($model) {
-            if (auth()->check() && ! $model->isForceDeleting()) {
+            if (auth()->check() && !$model->isForceDeleting()) {
                 $model->deleted_by = auth()->id();
                 $model->save();
             }

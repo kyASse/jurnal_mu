@@ -25,7 +25,7 @@ class AssessmentController extends Controller
     {
         // Ensure only Super Admin can access Dikti routes
         $this->middleware(function ($request, $next) {
-            if (! $request->user() || ! $request->user()->isSuperAdmin()) {
+            if (!$request->user() || !$request->user()->isSuperAdmin()) {
                 abort(403, 'Unauthorized access to Dikti assessment management.');
             }
 
@@ -139,7 +139,7 @@ class AssessmentController extends Controller
 
         // Verify the selected user is a reviewer
         $reviewer = User::findOrFail($validated['reviewer_id']);
-        if (! $reviewer->hasRole('Reviewer')) {
+        if (!$reviewer->hasRole('Reviewer')) {
             return back()->withErrors(['reviewer_id' => 'Selected user is not a reviewer.']);
         }
 

@@ -140,7 +140,7 @@ class StoreJournalRequest extends FormRequest
             }
         }
 
-        if (! empty($mergeData)) {
+        if (!empty($mergeData)) {
             $this->merge($mergeData);
         }
     }

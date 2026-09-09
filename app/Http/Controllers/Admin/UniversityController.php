@@ -371,7 +371,7 @@ class UniversityController extends Controller
 
         // Toggle active status
         $university->update([
-            'is_active' => ! $university->is_active,
+            'is_active' => !$university->is_active,
         ]);
 
         $status = $university->is_active ? 'activated' : 'deactivated';

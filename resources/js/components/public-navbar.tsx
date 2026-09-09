@@ -13,6 +13,7 @@ const navLinks = [
     { label: 'Articles', route: 'browse.articles' },
     { label: 'Universities', route: 'browse.universities' },
     { label: 'News', route: 'news.index' },
+    { label: 'Announcements', route: 'announcements.index' },
     { label: 'Events', route: 'events.index' },
 ];
 

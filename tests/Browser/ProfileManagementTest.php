@@ -113,8 +113,8 @@ class ProfileManagementTest extends DuskTestCase
             $testImagePath = __DIR__.'/testfiles/test-avatar.png';
 
             // Create a minimal 1x1 PNG without requiring GD extension
-            if (! file_exists($testImagePath)) {
-                if (! is_dir(dirname($testImagePath))) {
+            if (!file_exists($testImagePath)) {
+                if (!is_dir(dirname($testImagePath))) {
                     mkdir(dirname($testImagePath), 0755, true);
                 }
                 file_put_contents($testImagePath, base64_decode(

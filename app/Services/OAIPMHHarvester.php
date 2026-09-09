@@ -63,12 +63,12 @@ class OAIPMHHarvester
 
                     $response = Http::timeout(60)->get($url);
 
-                    if (! $response->successful()) {
+                    if (!$response->successful()) {
                         throw new \Exception("Failed to harvest from OAI-PMH endpoint ({$oai_url}): HTTP {$response->status()}");
                     }
 
                     $contentType = $response->header('Content-Type');
-                    if ($contentType && ! str_contains($contentType, 'xml')) {
+                    if ($contentType && !str_contains($contentType, 'xml')) {
                         throw new \Exception("Endpoint {$oai_url} did not return an XML response (Content-Type: {$contentType})");
                     }
 
@@ -84,7 +84,7 @@ class OAIPMHHarvester
                         $errors = libxml_get_errors();
                         libxml_clear_errors();
                         $errorMessage = "Failed to parse XML response from {$oai_url}";
-                        if (! empty($errors)) {
+                        if (!empty($errors)) {
                             $errorMessage .= ': '.$errors[0]->message;
                         }
                         throw new \Exception($errorMessage);
@@ -96,7 +96,7 @@ class OAIPMHHarvester
 
                     $records = $xml->xpath('//oai:record');
 
-                    if (! empty($records)) {
+                    if (!empty($records)) {
                         $stats['records_found'] += count($records);
 
                         foreach ($records as $record) {
@@ -112,7 +112,7 @@ class OAIPMHHarvester
                     $resumptionTokenNodes = $xml->xpath('//oai:resumptionToken');
                     $resumptionToken = null;
 
-                    if (! empty($resumptionTokenNodes)) {
+                    if (!empty($resumptionTokenNodes)) {
                         $token = trim((string) $resumptionTokenNodes[0]);
                         if ($token !== '') {
                             $resumptionToken = $token;
@@ -174,7 +174,7 @@ class OAIPMHHarvester
 
         // Extract OAI header information
         $header = $record->xpath('oai:header')[0] ?? null;
-        if (! $header) {
+        if (!$header) {
             throw new \Exception('Missing OAI header in record');
         }
 
@@ -215,7 +215,7 @@ class OAIPMHHarvester
         $articleData = [
             'journal_id' => $journal->id,
             'oai_identifier' => $oaiIdentifier,
-            'oai_datestamp' => ! empty($oaiDatestamp) ? Carbon::parse($oaiDatestamp)->format('Y-m-d H:i:s') : null,
+            'oai_datestamp' => !empty($oaiDatestamp) ? Carbon::parse($oaiDatestamp)->format('Y-m-d H:i:s') : null,
             'oai_set' => $oaiSet,
             'title' => $dcData['title'],
             'abstract' => $dcData['abstract'] ?? null,
@@ -236,7 +236,7 @@ class OAIPMHHarvester
         // (a known quirk of several OJS installations) fall back to matching by DOI within
         // the same journal, so we update rather than create a duplicate.
         $existingByDoi = null;
-        if (! empty($dcData['doi'])) {
+        if (!empty($dcData['doi'])) {
             $existingByDoi = Article::where('journal_id', $journal->id)
                 ->where('doi', $dcData['doi'])
                 ->whereNot('oai_identifier', $oaiIdentifier)
@@ -309,13 +309,13 @@ class OAIPMHHarvester
 
             switch ($name) {
                 case 'title':
-                    if (! $data['title']) { // Take first title only
+                    if (!$data['title']) { // Take first title only
                         $data['title'] = $value;
                     }
                     break;
 
                 case 'description':
-                    if (! $data['abstract']) { // Take first description as abstract
+                    if (!$data['abstract']) { // Take first description as abstract
                         $data['abstract'] = $value;
                     }
                     break;
@@ -329,7 +329,7 @@ class OAIPMHHarvester
                     break;
 
                 case 'date':
-                    if (! $data['date']) {
+                    if (!$data['date']) {
                         // Try to parse date (formats: YYYY-MM-DD, YYYY-MM, YYYY)
                         $data['date'] = $this->parseDate($value);
                     }
@@ -341,11 +341,11 @@ class OAIPMHHarvester
                         $data['doi'] = $this->extractDoi($value);
                     } elseif (filter_var($value, FILTER_VALIDATE_URL)) {
                         // Store first URL as article identifier
-                        if (! $data['identifier']) {
+                        if (!$data['identifier']) {
                             $data['identifier'] = $value;
                         }
                         // Check if URL ends with .pdf
-                        if (! $data['pdf_url'] && strtolower(substr($value, -4)) === '.pdf') {
+                        if (!$data['pdf_url'] && strtolower(substr($value, -4)) === '.pdf') {
                             $data['pdf_url'] = $value;
                         }
                     }
@@ -412,10 +412,10 @@ class OAIPMHHarvester
         // Pattern: "5(1)" or "5 (1)" — only treat the parenthesised number as an issue if it
         // is NOT a 4-digit year (e.g. "Vol. 1 (2026)" must NOT yield issue = 2026)
         if (preg_match('/(\d+)\s*\((\d+)\)/', $source, $matches)) {
-            if (! $data['volume']) {
+            if (!$data['volume']) {
                 $data['volume'] = $matches[1];
             }
-            if (! $data['issue'] && (int) $matches[2] < 1000) {
+            if (!$data['issue'] && (int) $matches[2] < 1000) {
                 $data['issue'] = $matches[2];
             }
         }
@@ -427,7 +427,7 @@ class OAIPMHHarvester
         if (preg_match('/(?:pp?\.?\s*)?(\d+)\s*[-–]\s*(\d+)/i', $source, $matches)) {
             $left = $matches[1];
             $right = $matches[2];
-            if (! (strlen($left) === 4 && strlen($right) === 4)) {
+            if (!(strlen($left) === 4 && strlen($right) === 4)) {
                 $data['pages'] = "{$left}-{$right}";
             }
         }

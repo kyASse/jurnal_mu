@@ -279,7 +279,7 @@ test('user can mark a notification as read', function () {
         ->assertRedirect();
 
     expect($user->fresh()->unreadNotifications()->count())->toBe(0);
-})->skip(fn () => ! class_exists(JournalApprovedNotification::class), 'JournalApprovedNotification does not exist');
+})->skip(fn () => !class_exists(JournalApprovedNotification::class), 'JournalApprovedNotification does not exist');
 
 test('user can mark all notifications as read', function () {
     $user = User::factory()->user()->create();

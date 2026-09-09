@@ -58,7 +58,7 @@ return new class extends Migration
             fn ($col) => Schema::hasColumn('journals', $col)
         );
 
-        if (! empty($columnsToDrop)) {
+        if (!empty($columnsToDrop)) {
             Schema::table('journals', function (Blueprint $table) use ($columnsToDrop) {
                 $table->dropColumn(array_values($columnsToDrop));
             });

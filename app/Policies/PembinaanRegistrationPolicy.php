@@ -33,7 +33,7 @@ class PembinaanRegistrationPolicy
      */
     public function view(User $user, PembinaanRegistration $registration): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -71,7 +71,7 @@ class PembinaanRegistrationPolicy
      */
     public function create(User $user): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -89,24 +89,24 @@ class PembinaanRegistrationPolicy
      */
     public function register(User $user, int $journalId, int $pembinaanId): bool
     {
-        if (! $this->create($user)) {
+        if (!$this->create($user)) {
             return false;
         }
 
         // Check journal ownership
         $journal = Journal::find($journalId);
-        if (! $journal || $journal->user_id !== $user->id) {
+        if (!$journal || $journal->user_id !== $user->id) {
             return false;
         }
 
         // Check pembinaan
         $pembinaan = Pembinaan::find($pembinaanId);
-        if (! $pembinaan) {
+        if (!$pembinaan) {
             return false;
         }
 
         // Check if registration is open
-        if (! $pembinaan->isRegistrationOpen()) {
+        if (!$pembinaan->isRegistrationOpen()) {
             return false;
         }
 
@@ -120,7 +120,7 @@ class PembinaanRegistrationPolicy
             ->where('journal_id', $journalId)
             ->exists();
 
-        return ! $alreadyRegistered;
+        return !$alreadyRegistered;
     }
 
     /**
@@ -131,12 +131,12 @@ class PembinaanRegistrationPolicy
      */
     public function update(User $user, PembinaanRegistration $registration): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
         // Only pending registrations can be updated
-        if (! $registration->isPending()) {
+        if (!$registration->isPending()) {
             return false;
         }
 
@@ -152,12 +152,12 @@ class PembinaanRegistrationPolicy
      */
     public function delete(User $user, PembinaanRegistration $registration): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
         // Only pending registrations can be cancelled
-        if (! $registration->canBeCancelled()) {
+        if (!$registration->canBeCancelled()) {
             return false;
         }
 
@@ -179,12 +179,12 @@ class PembinaanRegistrationPolicy
      */
     public function approve(User $user, PembinaanRegistration $registration): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
         // Only pending registrations can be approved
-        if (! $registration->isPending()) {
+        if (!$registration->isPending()) {
             return false;
         }
 

@@ -245,7 +245,7 @@ class PembinaanRegistration extends Model
      */
     public function hasSupportingDocument(): bool
     {
-        return ! empty($this->supporting_document) && Storage::disk('public')->exists($this->supporting_document);
+        return !empty($this->supporting_document) && Storage::disk('public')->exists($this->supporting_document);
     }
 
     /**
@@ -253,7 +253,7 @@ class PembinaanRegistration extends Model
      */
     public function getSupportingDocumentUrlAttribute(): ?string
     {
-        if (! $this->hasSupportingDocument()) {
+        if (!$this->hasSupportingDocument()) {
             return null;
         }
 
@@ -281,7 +281,7 @@ class PembinaanRegistration extends Model
 
         // Auto-set registered_at on create
         static::creating(function ($model) {
-            if (! $model->registered_at) {
+            if (!$model->registered_at) {
                 $model->registered_at = now();
             }
         });
@@ -295,7 +295,7 @@ class PembinaanRegistration extends Model
 
         // Auto-fill deleted_by on soft delete
         static::deleting(function ($model) {
-            if (auth()->check() && ! $model->isForceDeleting()) {
+            if (auth()->check() && !$model->isForceDeleting()) {
                 $model->deleted_by = auth()->id();
                 $model->save();
             }

@@ -35,6 +35,9 @@ export default function EventsCreate() {
         location_link: '',
         registration_link: '',
         price: '',
+        quota: '',
+        currency: 'IDR',
+        thumbnail: null as File | null,
         contact_person_name: '',
         contact_person_phone: '',
         contact_person_email: '',
@@ -146,18 +149,22 @@ export default function EventsCreate() {
                             </div>
 
                             {/* Location Details */}
+                            {data.location_type !== 'Online' && (
+                                <div className="space-y-2">
+                                    <Label htmlFor="location_venue">Venue Name / Platform</Label>
+                                    <Input
+                                        id="location_venue"
+                                        value={data.location_venue}
+                                        onChange={(e) => setData('location_venue', e.target.value)}
+                                        placeholder="e.g. Zoom, Main Hall"
+                                    />
+                                    {errors.location_venue && <p className="text-sm text-red-500">{errors.location_venue}</p>}
+                                </div>
+                            )}
                             <div className="space-y-2">
-                                <Label htmlFor="location_venue">Venue Name / Platform</Label>
-                                <Input
-                                    id="location_venue"
-                                    value={data.location_venue}
-                                    onChange={(e) => setData('location_venue', e.target.value)}
-                                    placeholder="e.g. Zoom, Main Hall"
-                                />
-                                {errors.location_venue && <p className="text-sm text-red-500">{errors.location_venue}</p>}
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="location_link">Meeting Link</Label>
+                                <Label htmlFor="location_link">
+                                    Meeting Link {data.location_type === 'Online' && <span className="text-red-500">*</span>}
+                                </Label>
                                 <Input
                                     id="location_link"
                                     value={data.location_link}
@@ -177,17 +184,49 @@ export default function EventsCreate() {
                                 />
                                 {errors.registration_link && <p className="text-sm text-red-500">{errors.registration_link}</p>}
                             </div>
+
+                            {/* Price & Currency */}
                             <div className="space-y-2">
-                                <Label htmlFor="price">Price</Label>
-                                <Input
-                                    id="price"
-                                    type="number"
-                                    step="0.01"
-                                    value={data.price}
-                                    onChange={(e) => setData('price', e.target.value)}
-                                    placeholder="0.00"
-                                />
+                                <div className="flex gap-2">
+                                    <div className="w-[100px]">
+                                        <Label htmlFor="currency">Currency</Label>
+                                        <Select value={data.currency} onValueChange={(val) => setData('currency', val)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="IDR" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="IDR">IDR</SelectItem>
+                                                <SelectItem value="USD">USD</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="flex-1">
+                                        <Label htmlFor="price">Price</Label>
+                                        <Input
+                                            id="price"
+                                            type="number"
+                                            step="0.01"
+                                            value={data.price}
+                                            onChange={(e) => setData('price', e.target.value)}
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                </div>
                                 {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
+                                {errors.currency && <p className="text-sm text-red-500">{errors.currency}</p>}
+                            </div>
+
+                            {/* Quota */}
+                            <div className="space-y-2">
+                                <Label htmlFor="quota">Quota / Capacity (Leave empty for unlimited)</Label>
+                                <Input
+                                    id="quota"
+                                    type="number"
+                                    value={data.quota}
+                                    onChange={(e) => setData('quota', e.target.value)}
+                                    placeholder="e.g. 100"
+                                />
+                                {errors.quota && <p className="text-sm text-red-500">{errors.quota}</p>}
                             </div>
 
                             {/* Contact Person Details */}
@@ -226,6 +265,27 @@ export default function EventsCreate() {
                                     <Switch id="is_active" checked={data.is_active} onCheckedChange={(val) => setData('is_active', val)} />
                                     <Label htmlFor="is_active">Active (Visible)</Label>
                                 </div>
+                            </div>
+
+                            {/* Thumbnail */}
+                            <div className="space-y-2 md:col-span-2">
+                                <Label htmlFor="thumbnail">Event Thumbnail Image (Max 2MB)</Label>
+                                <Input
+                                    id="thumbnail"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setData('thumbnail', e.target.files ? e.target.files[0] : null)}
+                                />
+                                {errors.thumbnail && <p className="text-sm text-red-500">{errors.thumbnail}</p>}
+                                {data.thumbnail && (
+                                    <div className="mt-2 h-32 w-32 overflow-hidden rounded-md border">
+                                        <img
+                                            src={URL.createObjectURL(data.thumbnail)}
+                                            alt="Thumbnail Preview"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             {/* Description */}

@@ -115,7 +115,7 @@ class UserPolicy
         // Admin Kampus can update users within their university except Super Admins
         if ($authUser->isAdminKampus()) {
             return $authUser->university_id === $targetUser->university_id
-                && ! $targetUser->isSuperAdmin();
+                && !$targetUser->isSuperAdmin();
         }
 
         return false;
@@ -133,7 +133,7 @@ class UserPolicy
 
         // Super Admin can delete Admin Kampus and User
         if ($authUser->isSuperAdmin()) {
-            return ! $targetUser->isSuperAdmin();
+            return !$targetUser->isSuperAdmin();
         }
 
         // Admin Kampus can delete users within their university except Super Admins
@@ -170,7 +170,7 @@ class UserPolicy
     public function forceDelete(User $authUser, User $targetUser): bool
     {
         // Only Super Admin can force delete
-        return $authUser->isSuperAdmin() && ! $targetUser->isSuperAdmin();
+        return $authUser->isSuperAdmin() && !$targetUser->isSuperAdmin();
     }
 
     /**
@@ -185,7 +185,7 @@ class UserPolicy
 
         // Super Admin can toggle any user except Super Admins
         if ($authUser->isSuperAdmin()) {
-            return ! $targetUser->isSuperAdmin();
+            return !$targetUser->isSuperAdmin();
         }
 
         // Admin Kampus can toggle users within their university except Super Admins
@@ -229,8 +229,8 @@ class UserPolicy
         if ($authUser->isAdminKampus()) {
             return $authUser->university_id === $targetUser->university_id
                 && $targetUser->role_id !== null // Not LPPM (LPPM has null role_id)
-                && ! $targetUser->isSuperAdmin() // Never approve Super Admin
-                && ! $targetUser->isAdminKampus(); // Never approve other Admin Kampus
+                && !$targetUser->isSuperAdmin() // Never approve Super Admin
+                && !$targetUser->isAdminKampus(); // Never approve other Admin Kampus
         }
 
         return false;

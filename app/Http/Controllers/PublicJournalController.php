@@ -131,7 +131,7 @@ class PublicJournalController extends Controller
     public function show(Request $request, Journal $journal): Response
     {
         // Only show active journals to public
-        if (! $journal->is_active) {
+        if (!$journal->is_active) {
             abort(404);
         }
 

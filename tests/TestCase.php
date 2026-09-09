@@ -139,7 +139,7 @@ abstract class TestCase extends BaseTestCase
                     }
 
                     $journal->update([
-                        'indexations' => ! empty($indexations) ? $indexations : null,
+                        'indexations' => !empty($indexations) ? $indexations : null,
                         'sinta_rank' => $sintaRank,
                     ]);
                 }

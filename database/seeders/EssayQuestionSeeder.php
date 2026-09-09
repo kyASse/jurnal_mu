@@ -39,7 +39,7 @@ class EssayQuestionSeeder extends Seeder
             ->where('is_active', false)
             ->first();
 
-        if (! $banptTemplate || ! $scopusTemplate) {
+        if (!$banptTemplate || !$scopusTemplate) {
             $this->command->error('❌ ERROR: Templates not found! Run AccreditationTemplateSeeder first.');
 
             return;

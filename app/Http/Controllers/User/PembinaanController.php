@@ -216,7 +216,7 @@ class PembinaanController extends Controller
     {
         $this->authorize('delete', $registration);
 
-        if (! $registration->canBeCancelled()) {
+        if (!$registration->canBeCancelled()) {
             return back()->with('error', 'Cannot cancel registration that is not pending.');
         }
 
@@ -270,7 +270,7 @@ class PembinaanController extends Controller
     {
         $this->authorize('downloadAttachments', $attachment->registration);
 
-        if (! $attachment->fileExists()) {
+        if (!$attachment->fileExists()) {
             abort(404, 'File not found.');
         }
 

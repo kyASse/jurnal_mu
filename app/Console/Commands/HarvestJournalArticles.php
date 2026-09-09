@@ -49,7 +49,7 @@ class HarvestJournalArticles extends Command
         } elseif ($journalId = $this->argument('journal_id')) {
             $journal = Journal::find($journalId);
 
-            if (! $journal) {
+            if (!$journal) {
                 $this->error("Journal with ID {$journalId} not found.");
 
                 return Command::FAILURE;
@@ -90,7 +90,7 @@ class HarvestJournalArticles extends Command
                 $this->info("   ✓ Imported: {$stats['records_imported']} new articles");
                 $this->info("   ✓ Updated: {$stats['records_updated']} existing articles");
 
-                if (! empty($stats['errors'])) {
+                if (!empty($stats['errors'])) {
                     $this->warn('   ⚠ Errors: '.count($stats['errors']).' records had issues');
                     foreach ($stats['errors'] as $error) {
                         $this->line("      - {$error}");
@@ -112,7 +112,7 @@ class HarvestJournalArticles extends Command
         $this->info("New articles imported: {$totalRecordsImported}");
         $this->info("Existing articles updated: {$totalRecordsUpdated}");
 
-        if (! empty($failedJournals)) {
+        if (!empty($failedJournals)) {
             $this->warn("\nFailed journals (".count($failedJournals).')');
             foreach ($failedJournals as $title) {
                 $this->line("  - {$title}");

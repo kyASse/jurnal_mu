@@ -12,9 +12,11 @@ import {
     Building2,
     CalendarDays,
     ClipboardList,
+    Globe,
     LayoutGrid,
     Library,
     LifeBuoy,
+    Megaphone,
     Newspaper,
     UserCheck,
     Users,
@@ -91,6 +93,11 @@ export function AppSidebar() {
             icon: Library,
         },
         {
+            title: 'Kelola DOI (Diktilitbang)',
+            href: route('admin.doi-management.index'),
+            icon: Globe,
+        },
+        {
             title: 'Pembinaan',
             href: route('admin.pembinaan.index'),
             icon: Award,
@@ -115,6 +122,11 @@ export function AppSidebar() {
             href: route('admin.news.index'),
             icon: Newspaper,
         },
+        {
+            title: 'Announcements',
+            href: route('admin.announcements.index'),
+            icon: Megaphone,
+        },
     ];
 
     // Admin Kampus items
@@ -133,6 +145,11 @@ export function AppSidebar() {
             title: 'Journals',
             href: route('admin-kampus.journals.index'),
             icon: Library,
+        },
+        {
+            title: 'Langganan DOI',
+            href: route('admin-kampus.doi-subscription.index'),
+            icon: Globe,
         },
         {
             title: 'Agendas & Events',
@@ -174,6 +191,11 @@ export function AppSidebar() {
             title: 'Jurnal',
             href: route('user.journals.index'),
             icon: BookOpen,
+        },
+        {
+            title: 'Langganan DOI',
+            href: route('user.doi-subscription.index'),
+            icon: Globe,
         },
         {
             title: 'Pembinaan',

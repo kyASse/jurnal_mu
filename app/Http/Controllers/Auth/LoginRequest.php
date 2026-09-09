@@ -44,7 +44,7 @@ final class LoginRequest extends FormRequest
 
         $credentials = $this->only('email', 'password');
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        if (!Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -53,7 +53,7 @@ final class LoginRequest extends FormRequest
         }
 
         // Check if user is active
-        if (! Auth::user()->is_active) {
+        if (!Auth::user()->is_active) {
             Auth::logout();
             RateLimiter::hit($this->throttleKey());
 
@@ -70,7 +70,7 @@ final class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 

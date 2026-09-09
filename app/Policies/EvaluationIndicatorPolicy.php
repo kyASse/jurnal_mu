@@ -56,7 +56,7 @@ class EvaluationIndicatorPolicy
      */
     public function delete(User $user, EvaluationIndicator $indicator): bool
     {
-        if (! $user->isSuperAdmin()) {
+        if (!$user->isSuperAdmin()) {
             return false;
         }
 
@@ -67,7 +67,7 @@ class EvaluationIndicatorPolicy
             })
             ->exists();
 
-        return ! $usedInSubmittedAssessments;
+        return !$usedInSubmittedAssessments;
     }
 
     /**

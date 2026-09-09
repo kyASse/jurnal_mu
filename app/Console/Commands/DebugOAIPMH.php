@@ -21,7 +21,7 @@ class DebugOAIPMH extends Command
 
         $response = Http::timeout(30)->get($url);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             $this->error("Failed: HTTP {$response->status()}");
 
             return 1;

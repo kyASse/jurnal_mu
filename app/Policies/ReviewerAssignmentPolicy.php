@@ -31,7 +31,7 @@ class ReviewerAssignmentPolicy
      */
     public function view(User $user, ReviewerAssignment $assignment): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -62,7 +62,7 @@ class ReviewerAssignmentPolicy
      */
     public function create(User $user): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -79,18 +79,18 @@ class ReviewerAssignmentPolicy
      */
     public function assign(User $user, int $registrationId, int $reviewerId): bool
     {
-        if (! $this->create($user)) {
+        if (!$this->create($user)) {
             return false;
         }
 
         // Check registration
         $registration = PembinaanRegistration::find($registrationId);
-        if (! $registration) {
+        if (!$registration) {
             return false;
         }
 
         // Can only assign to approved registrations
-        if (! $registration->isApproved()) {
+        if (!$registration->isApproved()) {
             return false;
         }
 
@@ -103,7 +103,7 @@ class ReviewerAssignmentPolicy
 
         // Check if target user is a reviewer
         $reviewer = User::find($reviewerId);
-        if (! $reviewer || ! $reviewer->isReviewer()) {
+        if (!$reviewer || !$reviewer->isReviewer()) {
             return false;
         }
 
@@ -112,7 +112,7 @@ class ReviewerAssignmentPolicy
             ->where('reviewer_id', $reviewerId)
             ->exists();
 
-        return ! $alreadyAssigned;
+        return !$alreadyAssigned;
     }
 
     /**
@@ -123,7 +123,7 @@ class ReviewerAssignmentPolicy
      */
     public function update(User $user, ReviewerAssignment $assignment): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -146,7 +146,7 @@ class ReviewerAssignmentPolicy
      */
     public function delete(User $user, ReviewerAssignment $assignment): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 

@@ -33,6 +33,7 @@ class Agenda extends Model
         'location_link',
         'registration_link',
         'price',
+        'currency',
         'quota',
         'contact_person_name',
         'contact_person_phone',
@@ -59,7 +60,7 @@ class Agenda extends Model
         parent::boot();
 
         static::saving(function ($agenda) {
-            if (! $agenda->slug) {
+            if (!$agenda->slug) {
                 $agenda->slug = static::generateUniqueSlug($agenda->title);
             }
         });

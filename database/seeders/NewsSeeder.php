@@ -21,12 +21,12 @@ class NewsSeeder extends Seeder
             $query->where('name', Role::SUPER_ADMIN);
         })->first();
 
-        if (! $author) {
+        if (!$author) {
             // Fallback to first user
             $author = User::first();
         }
 
-        if (! $author) {
+        if (!$author) {
             $this->command->error('No user found to assign as author for news seeding.');
 
             return;

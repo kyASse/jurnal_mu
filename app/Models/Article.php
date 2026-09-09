@@ -105,7 +105,7 @@ class Article extends Model
      */
     public function getAuthorsListAttribute(): string
     {
-        if (! $this->authors || ! is_array($this->authors)) {
+        if (!$this->authors || !is_array($this->authors)) {
             return 'Unknown';
         }
 
@@ -135,7 +135,7 @@ class Article extends Model
      */
     public function getVolumeIssueAttribute(): ?string
     {
-        if (! $this->volume && ! $this->issue) {
+        if (!$this->volume && !$this->issue) {
             return null;
         }
 

@@ -150,6 +150,7 @@ class PublicHomeService
                     'date_start' => $agenda->date_start?->format('Y-m-d'),
                     'time_start' => $agenda->time_start?->format('H:i'),
                     'location_type' => $agenda->location_type,
+                    'currency' => $agenda->currency,
                     'is_featured' => $agenda->is_featured,
                     'university' => $agenda->university ? [
                         'name' => $agenda->university->name,

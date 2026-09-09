@@ -120,7 +120,7 @@ class EvaluationSubCategory extends Model
             })
             ->exists();
 
-        return ! $indicatorsUsedInAssessments;
+        return !$indicatorsUsedInAssessments;
     }
 
     /**

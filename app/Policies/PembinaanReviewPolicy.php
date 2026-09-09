@@ -32,7 +32,7 @@ class PembinaanReviewPolicy
      */
     public function view(User $user, PembinaanReview $review): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -67,7 +67,7 @@ class PembinaanReviewPolicy
      */
     public function create(User $user): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -84,18 +84,18 @@ class PembinaanReviewPolicy
      */
     public function submitReview(User $user, int $registrationId): bool
     {
-        if (! $this->create($user)) {
+        if (!$this->create($user)) {
             return false;
         }
 
         // Check registration
         $registration = PembinaanRegistration::find($registrationId);
-        if (! $registration) {
+        if (!$registration) {
             return false;
         }
 
         // Can only review approved registrations
-        if (! $registration->isApproved()) {
+        if (!$registration->isApproved()) {
             return false;
         }
 
@@ -104,7 +104,7 @@ class PembinaanReviewPolicy
             ->where('reviewer_id', $user->id)
             ->exists();
 
-        if (! $isAssigned) {
+        if (!$isAssigned) {
             return false;
         }
 
@@ -113,7 +113,7 @@ class PembinaanReviewPolicy
             ->where('reviewer_id', $user->id)
             ->exists();
 
-        return ! $alreadyReviewed;
+        return !$alreadyReviewed;
     }
 
     /**
@@ -125,7 +125,7 @@ class PembinaanReviewPolicy
      */
     public function update(User $user, PembinaanReview $review): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 
@@ -151,7 +151,7 @@ class PembinaanReviewPolicy
      */
     public function delete(User $user, PembinaanReview $review): bool
     {
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             return false;
         }
 

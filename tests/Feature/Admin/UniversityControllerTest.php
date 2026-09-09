@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Journal;
 use App\Models\Role;
 use App\Models\University;
 use App\Models\User;
@@ -183,7 +184,7 @@ it('does not allow non-super admins to access universities index', function () {
 
 it('allows sorting by name_desc, users_desc, and journals_desc', function () {
     // Clean up
-    \App\Models\Journal::query()->delete();
+    Journal::query()->delete();
     User::where('id', '!=', $this->superAdmin->id)->delete();
     University::query()->delete();
 
@@ -200,9 +201,9 @@ it('allows sorting by name_desc, users_desc, and journals_desc', function () {
     $usersC = User::factory()->count(2)->create(['university_id' => $univC->id, 'role_id' => $roleId]);
 
     // Journals: A=1, B=3, C=2
-    \App\Models\Journal::factory()->count(1)->create(['university_id' => $univA->id, 'user_id' => $usersA->first()->id]);
-    \App\Models\Journal::factory()->count(3)->create(['university_id' => $univB->id, 'user_id' => $usersB->first()->id]);
-    \App\Models\Journal::factory()->count(2)->create(['university_id' => $univC->id, 'user_id' => $usersC->first()->id]);
+    Journal::factory()->count(1)->create(['university_id' => $univA->id, 'user_id' => $usersA->first()->id]);
+    Journal::factory()->count(3)->create(['university_id' => $univB->id, 'user_id' => $usersB->first()->id]);
+    Journal::factory()->count(2)->create(['university_id' => $univC->id, 'user_id' => $usersC->first()->id]);
 
     // Force delete side-effect universities and users created by factories
     University::whereNotIn('id', [$univA->id, $univB->id, $univC->id])->forceDelete();
@@ -219,8 +220,6 @@ it('allows sorting by name_desc, users_desc, and journals_desc', function () {
         ->where('universities.data.1.id', $univB->id)
         ->where('universities.data.2.id', $univA->id)
     );
-
-
 
     // Test sort = users_desc (A, C, B)
     $response = $this->actingAs($this->superAdmin)
@@ -242,4 +241,3 @@ it('allows sorting by name_desc, users_desc, and journals_desc', function () {
         ->where('universities.data.2.id', $univA->id)
     );
 });
-

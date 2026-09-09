@@ -151,11 +151,12 @@ interface Props {
 
 export default function UniversitiesIndex({ universities, pendingUniversities = [], filters, can }: Props) {
     const { flash } = usePage<SharedData>().props;
-    const [search, setSearch] = useState(filters.search || '');
-    const [isActiveFilter, setIsActiveFilter] = useState(filters.is_active || '');
-    const [accreditationFilter, setAccreditationFilter] = useState(filters.accreditation_status || '');
-    const [clusterFilter, setClusterFilter] = useState(filters.cluster || '');
-    const [sortFilter, setSortFilter] = useState(filters.sort || 'name_asc');
+    const safeFilters = (filters && !Array.isArray(filters) ? filters : {}) as Partial<Props['filters']>;
+    const [search, setSearch] = useState(safeFilters.search || '');
+    const [isActiveFilter, setIsActiveFilter] = useState(safeFilters.is_active || '');
+    const [accreditationFilter, setAccreditationFilter] = useState(safeFilters.accreditation_status || '');
+    const [clusterFilter, setClusterFilter] = useState(safeFilters.cluster || '');
+    const [sortFilter, setSortFilter] = useState(safeFilters.sort || 'name_asc');
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; universityId?: number; universityName?: string }>({ open: false });
     const [pendingSearch, setPendingSearch] = useState('');
     const [pendingPage, setPendingPage] = useState(1);
@@ -188,11 +189,12 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
     }, [flash]);
 
     useEffect(() => {
-        setSearch(filters.search || '');
-        setIsActiveFilter(filters.is_active || '');
-        setAccreditationFilter(filters.accreditation_status || '');
-        setClusterFilter(filters.cluster || '');
-        setSortFilter(filters.sort || 'name_asc');
+        const currentFilters = (filters && !Array.isArray(filters) ? filters : {}) as Partial<Props['filters']>;
+        setSearch(currentFilters.search || '');
+        setIsActiveFilter(currentFilters.is_active || '');
+        setAccreditationFilter(currentFilters.accreditation_status || '');
+        setClusterFilter(currentFilters.cluster || '');
+        setSortFilter(currentFilters.sort || 'name_asc');
     }, [filters]);
 
     const handleSearch = (e: React.FormEvent) => {
@@ -380,7 +382,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                 </TableCell>
                                                 <TableCell>
                                                     <ul className="space-y-1 text-sm">
-                                                        {'name' in uni.pending_updates && (
+                                                        {uni.pending_updates && 'name' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs font-semibold text-muted-foreground">Name: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.name}</span>
@@ -389,7 +391,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                                 </span>
                                                             </li>
                                                         )}
-                                                        {'code' in uni.pending_updates && (
+                                                        {uni.pending_updates && 'code' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs font-semibold text-muted-foreground">Abbreviation: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.code}</span>
@@ -398,7 +400,7 @@ export default function UniversitiesIndex({ universities, pendingUniversities = 
                                                                 </span>
                                                             </li>
                                                         )}
-                                                        {'ptm_code' in uni.pending_updates && (
+                                                        {uni.pending_updates && 'ptm_code' in uni.pending_updates && (
                                                             <li>
                                                                 <span className="text-xs font-semibold text-muted-foreground">PTM Code: </span>
                                                                 <span className="mr-2 text-red-500 line-through">{uni.ptm_code || '-'}</span>

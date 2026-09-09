@@ -302,7 +302,7 @@ class AdminKampusController extends Controller
         $this->authorize('manage-admin-kampus');
 
         // Verify it's an Admin Kampus
-        if (! $adminKampu->isAdminKampus()) {
+        if (!$adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
@@ -354,7 +354,7 @@ class AdminKampusController extends Controller
         $this->authorize('manage-admin-kampus');
 
         // Verify it's an Admin Kampus
-        if (! $adminKampu->isAdminKampus()) {
+        if (!$adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
@@ -387,7 +387,7 @@ class AdminKampusController extends Controller
         $this->authorize('manage-admin-kampus');
 
         // Verify it's an Admin Kampus
-        if (! $adminKampu->isAdminKampus()) {
+        if (!$adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
@@ -413,7 +413,7 @@ class AdminKampusController extends Controller
         ]);
 
         // Update password if provided
-        if (! empty($validated['password'])) {
+        if (!empty($validated['password'])) {
             $adminKampu->update([
                 'password' => Hash::make($validated['password']),
             ]);
@@ -434,7 +434,7 @@ class AdminKampusController extends Controller
         $adminKampu->load('role');
 
         // Verify it's an Admin Kampus
-        if (! $adminKampu->isAdminKampus()) {
+        if (!$adminKampu->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
@@ -470,13 +470,13 @@ class AdminKampusController extends Controller
         $admin_kampus->load('role');
 
         // Verify it's an Admin Kampus
-        if (! $admin_kampus->isAdminKampus()) {
+        if (!$admin_kampus->isAdminKampus()) {
             abort(404, 'Admin Kampus not found.');
         }
 
         // Toggle active status
         $admin_kampus->update([
-            'is_active' => ! $admin_kampus->is_active,
+            'is_active' => !$admin_kampus->is_active,
         ]);
 
         $status = $admin_kampus->is_active ? 'activated' : 'deactivated';

@@ -60,7 +60,7 @@ class RegisteredUserController extends Controller
             // Regular User registration
             $roleId = DB::table('roles')->where('name', Role::USER)->value('id');
 
-            if (! $roleId) {
+            if (!$roleId) {
                 return back()->withErrors([
                     'role_type' => 'Role configuration error. Please contact administrator.',
                 ]);

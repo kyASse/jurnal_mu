@@ -191,7 +191,7 @@ class PembinaanController extends Controller
     {
         $this->authorize('delete', $pembinaan);
 
-        if (! $pembinaan->canBeDeleted()) {
+        if (!$pembinaan->canBeDeleted()) {
             return back()->with('error', 'Cannot delete pembinaan with approved registrations.');
         }
 

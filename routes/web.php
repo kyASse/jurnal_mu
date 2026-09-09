@@ -3,8 +3,14 @@
 use App\Http\Controllers\Admin\AccreditationTemplateController;
 use App\Http\Controllers\Admin\AdminKampusController;
 use App\Http\Controllers\Admin\AgendaController;
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
 use App\Http\Controllers\Admin\DataMasterController;
+use App\Http\Controllers\Admin\Doi\AdminDoiBankAccountController;
+use App\Http\Controllers\Admin\Doi\AdminDoiManagementController;
+use App\Http\Controllers\Admin\Doi\AdminDoiPackageController;
+use App\Http\Controllers\Admin\Doi\AdminDoiSubscriptionController;
+use App\Http\Controllers\Admin\Doi\AdminDoiVerificationController;
 use App\Http\Controllers\Admin\EssayQuestionController;
 use App\Http\Controllers\Admin\EvaluationCategoryController;
 use App\Http\Controllers\Admin\EvaluationIndicatorController;
@@ -18,6 +24,9 @@ use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\UniversityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminKampus\AssessmentController as AdminKampusAssessmentController;
+use App\Http\Controllers\AdminKampus\DoiInvoiceController as AdminKampusDoiInvoiceController;
+use App\Http\Controllers\AdminKampus\DoiPaymentProofController as AdminKampusDoiPaymentProofController;
+use App\Http\Controllers\AdminKampus\DoiSubscriptionController as AdminKampusDoiSubscriptionController;
 use App\Http\Controllers\AdminKampus\JournalApprovalController;
 use App\Http\Controllers\AdminKampus\JournalController as AdminKampusJournalController;
 use App\Http\Controllers\AdminKampus\PembinaanController as AdminKampusPembinaanController;
@@ -31,6 +40,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Dikti\AssessmentController as DiktiAssessmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PublicAnnouncementController;
 use App\Http\Controllers\PublicArticleController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\PublicJournalController;
@@ -41,10 +51,15 @@ use App\Http\Controllers\ReviewerController as MainReviewerController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\AssessmentIssueController;
+use App\Http\Controllers\User\DoiInvoiceController as UserDoiInvoiceController;
+use App\Http\Controllers\User\DoiPaymentProofController as UserDoiPaymentProofController;
+use App\Http\Controllers\User\DoiSubscriptionController as UserDoiSubscriptionController;
 use App\Http\Controllers\User\JournalController as UserJournalController;
 use App\Http\Controllers\User\PembinaanController as UserPembinaanController;
 use App\Http\Controllers\User\ProfilController;
 use App\Models\Role;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -70,7 +85,7 @@ Route::get('/storage/{path}', function (string $path) {
     }
 
     try {
-        if (! Storage::disk('public')->exists($path)) {
+        if (!Storage::disk('public')->exists($path)) {
             abort(404);
         }
 
@@ -80,6 +95,97 @@ Route::get('/storage/{path}', function (string $path) {
         abort(404);
     }
 })->where('path', '.+')->name('storage.serve');
+
+Route::get('/health', function () {
+    $status = 'healthy';
+    $services = [
+        'database' => 'unknown',
+        'cache' => 'unknown',
+        'storage' => 'unknown',
+        'app_key' => 'unknown',
+    ];
+    $errors = [];
+
+    // 1. Check App Key
+    if (!empty(config('app.key'))) {
+        $services['app_key'] = 'configured';
+    } else {
+        $services['app_key'] = 'missing';
+        $status = 'unhealthy';
+        $errors[] = 'APP_KEY is not configured';
+    }
+
+    // 2. Check Database Connection & Responsiveness
+    try {
+        DB::connection()->getPdo();
+        DB::select('SELECT 1');
+        $services['database'] = 'connected';
+    } catch (Exception $e) {
+        $services['database'] = 'disconnected';
+        $status = 'unhealthy';
+        $errors[] = 'Database error: '.$e->getMessage();
+    }
+
+    // 3. Check Cache Service (Write & Read Test)
+    try {
+        Cache::put('health_check_temp', true, 10);
+        $cacheWorking = Cache::get('health_check_temp') === true;
+        Cache::forget('health_check_temp');
+
+        $services['cache'] = $cacheWorking ? 'working' : 'non-functional';
+        if (!$cacheWorking) {
+            $status = 'unhealthy';
+            $errors[] = 'Cache read/write test failed';
+        }
+    } catch (Exception $e) {
+        $services['cache'] = 'error';
+        $status = 'unhealthy';
+        $errors[] = 'Cache error: '.$e->getMessage();
+    }
+
+    // 4. Check Storage Write Permission
+    try {
+        $tempFile = storage_path('app/health_check_test.txt');
+        if (@file_put_contents($tempFile, 'health') !== false) {
+            @unlink($tempFile);
+            $services['storage'] = 'writable';
+        } else {
+            $services['storage'] = 'read-only';
+            $status = 'unhealthy';
+            $errors[] = 'Storage directory is not writable';
+        }
+    } catch (Exception $e) {
+        $services['storage'] = 'error';
+        $status = 'unhealthy';
+        $errors[] = 'Storage error: '.$e->getMessage();
+    }
+
+    // 5. Check Queue backlog
+    try {
+        if ($services['database'] === 'connected') {
+            $pendingJobs = DB::table('jobs')->count();
+            $failedJobs = DB::table('failed_jobs')->count();
+            $services['queue'] = [
+                'pending_jobs' => $pendingJobs,
+                'failed_jobs' => $failedJobs,
+            ];
+        }
+    } catch (Exception $e) {
+        $services['queue'] = 'error';
+    }
+
+    $response = [
+        'status' => $status,
+        'timestamp' => now()->toIso8601String(),
+        'services' => $services,
+    ];
+
+    if (!empty($errors)) {
+        $response['errors'] = $errors;
+    }
+
+    return response()->json($response, $status === 'healthy' ? 200 : 500);
+});
 
 //  Laman Page
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -113,6 +219,11 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])
 // Public access to view news
 Route::get('/news', [PublicNewsController::class, 'index'])->name('news.index');
 Route::get('/news/{slug}', [PublicNewsController::class, 'show'])->name('news.show');
+
+// Public access to view announcements
+Route::get('/announcements', [PublicAnnouncementController::class, 'index'])->name('announcements.index');
+Route::get('/announcements/{slug}', [PublicAnnouncementController::class, 'show'])->name('announcements.show');
+Route::get('/announcements/{announcement}/download', [PublicAnnouncementController::class, 'downloadAttachment'])->name('announcements.download');
 
 /*
 |--------------------------------------------------------------------------
@@ -345,6 +456,37 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('news', NewsController::class);
         Route::post('news/{news}/toggle-active', [NewsController::class, 'toggleActive'])->name('news.toggle-active');
 
+        // Announcement Management
+        Route::resource('announcements', AnnouncementController::class);
+        Route::post('announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
+        Route::post('announcements/{announcement}/toggle-pinned', [AnnouncementController::class, 'togglePinned'])->name('announcements.toggle-pinned');
+
+        // DOI Management
+        Route::prefix('doi-management')->name('doi-management.')->group(function () {
+            Route::get('/', [AdminDoiManagementController::class, 'index'])->name('index');
+
+            // Payment Proof Verification & File Stream
+            Route::post('payment-proofs/{paymentProof}/approve', [AdminDoiVerificationController::class, 'approve'])->name('payment-proofs.approve');
+            Route::post('payment-proofs/{paymentProof}/reject', [AdminDoiVerificationController::class, 'reject'])->name('payment-proofs.reject');
+            Route::get('payment-proofs/{paymentProof}/stream', [AdminDoiVerificationController::class, 'stream'])->name('payment-proofs.stream');
+
+            // Quota Adjustment
+            Route::post('subscriptions/{subscription}/adjust-quota', [AdminDoiSubscriptionController::class, 'adjustQuota'])->name('subscriptions.adjust-quota');
+
+            // Package Management
+            Route::post('packages', [AdminDoiPackageController::class, 'store'])->name('packages.store');
+            Route::put('packages/{package}', [AdminDoiPackageController::class, 'update'])->name('packages.update');
+            Route::delete('packages/{package}', [AdminDoiPackageController::class, 'destroy'])->name('packages.destroy');
+
+            // Bank Account Management
+            Route::post('bank-accounts', [AdminDoiBankAccountController::class, 'store'])->name('bank-accounts.store');
+            Route::put('bank-accounts/{bankAccount}', [AdminDoiBankAccountController::class, 'update'])->name('bank-accounts.update');
+            Route::delete('bank-accounts/{bankAccount}', [AdminDoiBankAccountController::class, 'destroy'])->name('bank-accounts.destroy');
+
+            // DOI Helpdesk Settings
+            Route::post('settings', [AdminDoiManagementController::class, 'updateSettings'])->name('settings.update');
+        });
+
     });
 
     /*
@@ -502,6 +644,20 @@ Route::middleware(['auth'])->group(function () {
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\AdminKampus\TicketController::class, 'reply'])->name('tickets.reply');
         Route::patch('tickets/{ticket}/status', [App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
 
+        // DOI Subscription Dashboard & Invoices
+        Route::get('doi-subscription', [AdminKampusDoiSubscriptionController::class, 'index'])
+            ->name('doi-subscription.index');
+
+        Route::prefix('doi')->name('doi.')->group(function () {
+            Route::post('subscribe', [AdminKampusDoiSubscriptionController::class, 'subscribe'])->name('subscribe');
+            Route::get('invoices', [AdminKampusDoiInvoiceController::class, 'index'])->name('invoices.index');
+            Route::get('invoices/{invoice}', [AdminKampusDoiInvoiceController::class, 'show'])->name('invoices.show');
+            Route::post('invoices/{invoice}/payment-proof', [AdminKampusDoiPaymentProofController::class, 'store'])->name('invoices.payment-proof.store');
+            Route::get('payment-proofs/{paymentProof}', [AdminKampusDoiPaymentProofController::class, 'show'])->name('payment-proofs.show');
+        });
+        Route::get('doi-subscription/invoices', fn () => redirect()->route('admin-kampus.doi.invoices.index'));
+        Route::get('doi-subscription/invoices/{invoice}', fn ($invoice) => redirect()->route('admin-kampus.doi.invoices.show', $invoice));
+
         // API Location lookup
         Route::get('locations/provinces', [LocationController::class, 'provinces'])
             ->name('locations.provinces');
@@ -625,6 +781,19 @@ Route::middleware(['auth'])->group(function () {
         ]);
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\User\TicketController::class, 'reply'])
             ->name('tickets.reply');
+
+        // DOI Subscription Dashboard & Invoices
+        Route::get('doi-subscription', [UserDoiSubscriptionController::class, 'index'])
+            ->name('doi-subscription.index');
+
+        Route::prefix('doi')->name('doi.')->group(function () {
+            Route::get('invoices', [UserDoiInvoiceController::class, 'index'])->name('invoices.index');
+            Route::get('invoices/{invoice}', [UserDoiInvoiceController::class, 'show'])->name('invoices.show');
+            Route::post('invoices/{invoice}/payment-proof', [UserDoiPaymentProofController::class, 'store'])->name('invoices.payment-proof.store');
+            Route::get('payment-proofs/{paymentProof}', [UserDoiPaymentProofController::class, 'show'])->name('payment-proofs.show');
+        });
+        Route::get('doi-subscription/invoices', fn () => redirect()->route('user.doi.invoices.index'));
+        Route::get('doi-subscription/invoices/{invoice}', fn ($invoice) => redirect()->route('user.doi.invoices.show', $invoice));
     });
 
     /*

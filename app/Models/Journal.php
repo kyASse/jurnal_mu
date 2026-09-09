@@ -220,6 +220,22 @@ class Journal extends Model
         return $this->articles()->recent()->limit($limit);
     }
 
+    /**
+     * Get the latest DOI subscription for this journal
+     */
+    public function doiSubscription()
+    {
+        return $this->hasOne(DoiSubscription::class, 'journal_id')->latestOfMany();
+    }
+
+    /**
+     * Get all DOI subscriptions for this journal
+     */
+    public function doiSubscriptions()
+    {
+        return $this->hasMany(DoiSubscription::class, 'journal_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
@@ -265,7 +281,7 @@ class Journal extends Model
      */
     public function scopeByApprovalStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -299,7 +315,7 @@ class Journal extends Model
      */
     public function scopeBySintaRank($query, $rank)
     {
-        if (! $rank) {
+        if (!$rank) {
             return $query;
         }
 
@@ -311,7 +327,7 @@ class Journal extends Model
      */
     public function scopeSearch($query, ?string $search)
     {
-        if (! $search) {
+        if (!$search) {
             return $query;
         }
 
@@ -327,7 +343,7 @@ class Journal extends Model
      */
     public function scopeByAssessmentStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -341,7 +357,7 @@ class Journal extends Model
      */
     public function scopeByIndexation($query, ?string $platform)
     {
-        if (! $platform) {
+        if (!$platform) {
             return $query;
         }
 
@@ -373,7 +389,7 @@ class Journal extends Model
      */
     public function scopeByAccreditationGrade($query, ?string $grade)
     {
-        if (! $grade) {
+        if (!$grade) {
             return $query;
         }
 
@@ -387,7 +403,7 @@ class Journal extends Model
      */
     public function scopeByPembinaanPeriod($query, ?string $period)
     {
-        if (! $period) {
+        if (!$period) {
             return $query;
         }
 
@@ -403,7 +419,7 @@ class Journal extends Model
      */
     public function scopeByPembinaanYear($query, ?string $year)
     {
-        if (! $year) {
+        if (!$year) {
             return $query;
         }
 
@@ -418,7 +434,7 @@ class Journal extends Model
      */
     public function scopeByParticipation($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -438,7 +454,7 @@ class Journal extends Model
      */
     public function scopeByAssessmentApprovalStatus($query, ?string $status)
     {
-        if (! $status) {
+        if (!$status) {
             return $query;
         }
 
@@ -491,7 +507,7 @@ class Journal extends Model
      */
     public function getAccreditationLabelAttribute(): string
     {
-        if (! $this->sinta_rank || $this->sinta_rank === 'non_sinta') {
+        if (!$this->sinta_rank || $this->sinta_rank === 'non_sinta') {
             return 'Non Sinta';
         }
 
@@ -525,7 +541,7 @@ class Journal extends Model
      */
     public function getIsAccreditationExpiredAttribute(): bool
     {
-        if (! $this->accreditation_end_year) {
+        if (!$this->accreditation_end_year) {
             return false;
         }
 
@@ -539,7 +555,7 @@ class Journal extends Model
      */
     public function getAccreditationExpiryStatusAttribute(): string
     {
-        if (! $this->accreditation_end_year) {
+        if (!$this->accreditation_end_year) {
             return 'none';
         }
 
@@ -561,7 +577,7 @@ class Journal extends Model
      */
     public function getDiktiAccreditationLabelAttribute(): string
     {
-        if (! $this->accreditation_sk_number) {
+        if (!$this->accreditation_sk_number) {
             return 'Belum Ada SK';
         }
 
@@ -584,12 +600,12 @@ class Journal extends Model
      */
     public function getCoverImageAttribute(?string $value): ?string
     {
-        if (! $value) {
+        if (!$value) {
             return $value;
         }
 
         // Current format — relative path: journal-covers/cover_1_xxx.jpg
-        if (! str_starts_with($value, '/') && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://')) {
+        if (!str_starts_with($value, '/') && !str_starts_with($value, 'http://') && !str_starts_with($value, 'https://')) {
             return Storage::disk('public')->url($value);
         }
 
@@ -611,7 +627,7 @@ class Journal extends Model
      */
     public function getIndexationLabelsAttribute(): array
     {
-        if (! $this->indexations || ! is_array($this->indexations)) {
+        if (!$this->indexations || !is_array($this->indexations)) {
             return [];
         }
 

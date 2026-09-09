@@ -18,7 +18,7 @@ class UniversitySeeder extends Seeder
         // Load universities from JSON file
         $jsonPath = database_path('PTMA.json');
 
-        if (! file_exists($jsonPath)) {
+        if (!file_exists($jsonPath)) {
             $this->command->error('PTMA.json file not found at: '.$jsonPath);
 
             return;
@@ -33,7 +33,7 @@ class UniversitySeeder extends Seeder
             return;
         }
 
-        if (empty($universities) || ! is_array($universities)) {
+        if (empty($universities) || !is_array($universities)) {
             $this->command->error('No valid university data found in PTMA.json');
 
             return;
@@ -75,7 +75,7 @@ class UniversitySeeder extends Seeder
                 }
 
                 // Ensure is_active has a boolean value (fix null values)
-                if (! isset($data['is_active']) || $data['is_active'] === null) {
+                if (!isset($data['is_active']) || $data['is_active'] === null) {
                     $data['is_active'] = true;
                 }
 

@@ -149,7 +149,7 @@ class ReviewerController extends Controller
 
         $attachment = $assignment->registration->attachments()->findOrFail($attachmentId);
 
-        if (! $attachment->fileExists()) {
+        if (!$attachment->fileExists()) {
             abort(404, 'File not found.');
         }
 

@@ -86,7 +86,7 @@ class UserController extends Controller
                 ])->toArray();
 
                 // Add primary role if not already in roles array
-                if ($user->role && ! collect($userRoles)->contains('id', $user->role->id)) {
+                if ($user->role && !collect($userRoles)->contains('id', $user->role->id)) {
                     $userRoles[] = [
                         'id' => $user->role->id,
                         'name' => $user->role->name,
@@ -457,7 +457,7 @@ class UserController extends Controller
         ];
 
         // Include password in update if provided
-        if (! empty($validated['password'])) {
+        if (!empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);
         }
 
@@ -523,7 +523,7 @@ class UserController extends Controller
 
         // Toggle active status
         $user->update([
-            'is_active' => ! $user->is_active,
+            'is_active' => !$user->is_active,
         ]);
 
         $status = $user->is_active ? 'activated' : 'deactivated';
@@ -539,7 +539,7 @@ class UserController extends Controller
     private function ensureUserBelongsToUniversityAndIsUser(User $user, User $authUser): void
     {
         // Load role for isSuperAdmin() check if not already loaded
-        if (! $user->relationLoaded('role')) {
+        if (!$user->relationLoaded('role')) {
             $user->load('role');
         }
 
