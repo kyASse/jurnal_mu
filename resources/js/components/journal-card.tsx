@@ -25,7 +25,7 @@ export default function JournalCard({
     indexation_labels = [],
     university = 'Universitas Muhammadiyah',
     external_url = null,
-    coverColor = 'bg-[#079C4E]', // Default to Official Green
+    coverColor = 'bg-primary', // Default to Official Brand Primary
 }: JournalCardProps) {
     // Display max 3 indexations, prioritizing Scopus, WoS, DOAJ
     const priorityIndexations = ['Scopus', 'WoS', 'DOAJ'];
@@ -64,7 +64,7 @@ export default function JournalCard({
                 </div>
 
                 {/* Title */}
-                <h3 className="font-heading mb-2 line-clamp-2 text-xl leading-tight font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white">
+                <h3 className="font-heading mb-2 line-clamp-2 text-xl leading-tight font-bold text-gray-900 transition-colors group-hover:text-primary dark:text-white">
                     <Link href={route('journals.show', id)}>{title}</Link>
                 </h3>
 
@@ -82,11 +82,11 @@ export default function JournalCard({
 
                 {/* Actions */}
                 <div className="mt-6 flex items-center gap-2">
-                    <Button asChild className="w-full bg-[#079C4E] font-semibold text-white hover:bg-[#068a45]">
+                    <Button asChild className="w-full bg-primary font-semibold text-white hover:bg-primary/90">
                         <Link href={route('journals.show', id)}>View Journal</Link>
                     </Button>
                     {external_url && (
-                        <Button asChild variant="outline" size="icon" className="shrink-0 border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10">
+                        <Button asChild variant="outline" size="icon" className="shrink-0 border-primary/20 text-primary hover:bg-primary/10">
                             <a href={external_url} target="_blank" rel="noopener noreferrer" title="Visit Journal Website">
                                 <BookOpen className="h-4 w-4" />
                             </a>

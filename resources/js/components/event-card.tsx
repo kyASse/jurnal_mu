@@ -98,7 +98,7 @@ export default function EventCard({ agenda }: { agenda: EventCardProps }) {
                 {countdown && (
                     <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-4 pb-2">
                         <div className="flex items-center gap-2 text-sm font-medium text-white">
-                            <Clock className="h-4 w-4 text-emerald-400" />
+                            <Clock className="h-4 w-4 text-accent" />
                             <span>{countdown}</span>
                         </div>
                     </div>
@@ -153,7 +153,7 @@ export default function EventCard({ agenda }: { agenda: EventCardProps }) {
             <CardFooter className="mt-auto flex items-center justify-between border-t bg-muted/30 pt-4">
                 <div className="text-sm font-semibold">
                     {formatPrice(agenda.price, agenda.currency || 'IDR') === 'Free' ? (
-                        <span className="text-emerald-600 dark:text-emerald-400">Free Event</span>
+                        <span className="text-primary font-bold dark:text-indigo-300">Free Event</span>
                     ) : (
                         formatPrice(agenda.price, agenda.currency || 'IDR')
                     )}

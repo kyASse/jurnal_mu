@@ -252,7 +252,7 @@ export default function Show({ agenda }: Props) {
                                             <p className="mb-1 text-sm font-medium tracking-wide text-muted-foreground uppercase">Registration</p>
                                             <span className="text-3xl font-bold tracking-tight">
                                                 {formatPrice(agenda.price, agenda.currency || 'IDR') === 'Free' ? (
-                                                    <span className="text-emerald-600">Free</span>
+                                                    <span className="text-primary font-bold dark:text-indigo-300">Free</span>
                                                 ) : (
                                                     formatPrice(agenda.price, agenda.currency || 'IDR')
                                                 )}
@@ -302,8 +302,8 @@ export default function Show({ agenda }: Props) {
                                         </div>
                                     )}
                                     {eventStarted && (
-                                        <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-center dark:border-green-900/50 dark:bg-green-900/20">
-                                            <p className="font-semibold text-green-700 dark:text-green-400">Event has started!</p>
+                                        <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 p-4 text-center dark:border-primary/30 dark:bg-primary/10">
+                                            <p className="font-semibold text-primary">Event has started!</p>
                                         </div>
                                     )}
                                 </div>
@@ -398,7 +398,7 @@ export default function Show({ agenda }: Props) {
                                         asChild
                                         variant="outline"
                                         size="icon"
-                                        className="rounded-full border-muted-foreground/20 hover:bg-[#25D366] hover:text-white"
+                                        className="rounded-full border-muted-foreground/20 hover:bg-primary hover:text-primary-foreground"
                                     >
                                         <a
                                             href={`https://wa.me/?text=${shareTitle}%20${shareUrl}`}
@@ -413,7 +413,7 @@ export default function Show({ agenda }: Props) {
                                         asChild
                                         variant="outline"
                                         size="icon"
-                                        className="rounded-full border-muted-foreground/20 hover:bg-[#1DA1F2] hover:text-white"
+                                        className="rounded-full border-muted-foreground/20 hover:bg-primary hover:text-primary-foreground"
                                     >
                                         <a
                                             href={`https://twitter.com/intent/tweet?text=${shareTitle}&url=${shareUrl}`}
@@ -430,7 +430,7 @@ export default function Show({ agenda }: Props) {
                                         className="flex-1 rounded-full border-muted-foreground/20 font-medium"
                                     >
                                         {copied ? (
-                                            <span className="flex items-center text-emerald-600">
+                                            <span className="flex items-center text-primary">
                                                 <Copy className="mr-2 h-4 w-4" /> Copied!
                                             </span>
                                         ) : (

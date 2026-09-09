@@ -190,21 +190,21 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                 />
             </Head>
 
-            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-[#079C4E] selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
+            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-primary selection:text-primary-foreground dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
                 <PublicNavbar />
 
                 <main className="pt-16">
                     {/* Hero Section */}
-                    <div className="bg-gradient-to-br from-[#079C4E] to-[#10816F] pt-16 pb-20 text-white">
+                    <div className="bg-hero-gradient pt-16 pb-20 text-white">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div>
                                 <h1
                                     className="font-heading mb-4 text-4xl font-bold tracking-tight sm:text-5xl"
                                     style={{ fontFamily: '"El Messiri", serif' }}
                                 >
-                                    Browse <span className="text-[#FCEE1F]">Articles</span>
+                                    Browse <span className="text-accent">Articles</span>
                                 </h1>
-                                <p className="max-w-2xl text-lg text-emerald-50">Search and filter through all harvested research publications.</p>
+                                <p className="max-w-2xl text-lg text-white/80">Search and filter through all harvested research publications.</p>
                             </div>
                         </div>
                     </div>
@@ -247,7 +247,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                     <div className="flex flex-col gap-2 sm:flex-row">
                                         <Button
                                             type="submit"
-                                            className="h-12 w-full bg-[#079C4E] font-semibold text-white hover:bg-[#068A42] sm:flex-1"
+                                            className="h-12 w-full bg-secondary font-semibold text-white hover:bg-secondary/90 sm:flex-1"
                                         >
                                             Search
                                         </Button>
@@ -276,7 +276,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                 <div className="scrollbar-thin rounded-xl border border-gray-200 bg-white p-5 shadow-sm lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto dark:border-white/10 dark:bg-[#111111]">
                                     <div className="mb-4 flex items-center justify-between border-b pb-3 dark:border-white/10">
                                         <h2 className="flex items-center text-lg font-bold">
-                                            <Filter className="mr-2 h-4 w-4 text-[#079C4E]" />
+                                            <Filter className="mr-2 h-4 w-4 text-primary" />
                                             Refine Search Results
                                         </h2>
                                         {hasActiveFilters && (
@@ -448,7 +448,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                                         })}
                                                     </span>
                                                     {article.volume_issue && (
-                                                        <span className="rounded-full bg-gray-100 px-2.5 py-1 font-medium text-[#079C4E] dark:bg-[#1d1d1d]">
+                                                        <span className="rounded-full bg-gray-100 px-2.5 py-1 font-medium text-primary dark:bg-[#1d1d1d]">
                                                             {article.volume_issue}
                                                         </span>
                                                     )}
@@ -458,14 +458,14 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                                         </span>
                                                     )}
                                                     {article.journal.scientific_field && (
-                                                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                        <span className="rounded-full bg-primary/10 px-2.5 py-1 font-semibold text-primary dark:bg-primary/20 dark:text-indigo-300">
                                                             {article.journal.scientific_field.name}
                                                         </span>
                                                     )}
                                                 </div>
 
                                                 {/* Title */}
-                                                <h3 className="mb-2 text-xl font-bold text-gray-900 transition-colors hover:text-[#079C4E] dark:text-white dark:hover:text-[#079C4E]">
+                                                <h3 className="mb-2 text-xl font-bold text-gray-900 transition-colors hover:text-primary dark:text-white dark:hover:text-indigo-400">
                                                     {article.title}
                                                 </h3>
 
@@ -477,7 +477,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                                     <span>Published in: </span>
                                                     <Link
                                                         href={route('journals.show', article.journal.id)}
-                                                        className="font-semibold text-[#079C4E] hover:underline"
+                                                        className="font-semibold text-primary hover:text-secondary hover:underline"
                                                     >
                                                         {article.journal.title}
                                                     </Link>
@@ -493,7 +493,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => toggleAbstract(article.id)}
-                                                            className="mt-1 h-auto p-0 text-xs font-semibold text-[#079C4E] hover:bg-transparent hover:text-[#068542]"
+                                                            className="mt-1 h-auto p-0 text-xs font-semibold text-primary hover:bg-transparent hover:text-secondary"
                                                         >
                                                             {isExpanded ? (
                                                                 <span className="flex items-center">
@@ -570,7 +570,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                                         size="sm"
                                                         variant="outline"
                                                         onClick={() => downloadRis(article)}
-                                                        className="border-[#079C4E]/20 text-[#079C4E] hover:bg-[#079C4E]/10"
+                                                        className="border-primary/20 text-primary hover:bg-primary/10"
                                                     >
                                                         <Download className="mr-1 h-4 w-4" />
                                                         Export Citation (RIS)
@@ -637,7 +637,7 @@ export default function ArticlesBrowse({ articles, facets, filters }: Props) {
                                                         size="sm"
                                                         disabled={!link.url}
                                                         onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
-                                                        className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068A42]' : ''}
+                                                        className={link.active ? 'bg-primary text-white hover:bg-primary/90' : ''}
                                                     >
                                                         {link.label}
                                                     </Button>

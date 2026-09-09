@@ -230,7 +230,7 @@ export default function PublicFooter() {
             <div className="relative z-10 bg-black/30 py-4 text-center">
                 <div className="container mx-auto px-4">
                     <p className="text-xs text-white/40">
-                        &copy; {new Date().getFullYear()} <span className="font-semibold text-[#FCEE1F]">JournalMU</span> &mdash; Majelis Diktilitbang
+                        &copy; {new Date().getFullYear()} <span className="font-semibold text-accent">JournalMU</span> - Majelis Diktilitbang
                         Muhammadiyah. All rights reserved.
                     </p>
                 </div>
