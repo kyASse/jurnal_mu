@@ -95,7 +95,7 @@ export default function UniversityProfile({ university, stats, journals, article
                 columnWidth: '50%',
             },
         },
-        colors: ['#079C4E', '#3b82f6'],
+        colors: ['var(--primary)', 'var(--secondary)'],
         fill: {
             opacity: [1, 0.85],
         },
@@ -111,12 +111,12 @@ export default function UniversityProfile({ university, stats, journals, article
                 title: {
                     text: 'Jurnal (Kumulatif)',
                     style: {
-                        color: '#079C4E',
+                        color: 'var(--primary)',
                     },
                 },
                 labels: {
                     style: {
-                        colors: '#079C4E',
+                        colors: 'var(--primary)',
                     },
                 },
             },
@@ -125,12 +125,12 @@ export default function UniversityProfile({ university, stats, journals, article
                 title: {
                     text: 'Artikel Terbit',
                     style: {
-                        color: '#3b82f6',
+                        color: 'var(--secondary)',
                     },
                 },
                 labels: {
                     style: {
-                        colors: '#3b82f6',
+                        colors: 'var(--secondary)',
                     },
                 },
             },
@@ -202,7 +202,7 @@ export default function UniversityProfile({ university, stats, journals, article
             <Head title={`${university.name} - JurnalMu`} />
 
             {/* Header Hero Section */}
-            <div className="bg-gradient-to-r from-[#079C4E] to-[#056f37] py-12 text-white">
+            <div className="bg-hero-gradient py-12 text-white">
                 <div className="container mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 md:flex-row">
                     {university.logo_url ? (
                         <img
@@ -221,7 +221,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                 {university.name}
                             </h1>
                             {university.accreditation_status && (
-                                <Badge className="self-center border-none bg-[#FCEE1F] font-extrabold text-black md:self-start">
+                                <Badge className="self-center border-none bg-accent font-extrabold text-black md:self-start">
                                     {university.accreditation_status}
                                 </Badge>
                             )}
@@ -244,7 +244,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                 if (addressParts.length === 0) return null;
                                 return (
                                     <span className="flex items-center gap-1">
-                                        <MapPin className="h-4 w-4 text-[#FCEE1F]" /> {addressParts.join(', ')}
+                                        <MapPin className="h-4 w-4 text-accent" /> {addressParts.join(', ')}
                                     </span>
                                 );
                             })()}
@@ -255,17 +255,17 @@ export default function UniversityProfile({ university, stats, journals, article
                                     rel="noopener noreferrer"
                                     className="flex items-center gap-1 underline hover:text-white"
                                 >
-                                    <Globe className="h-4 w-4 text-[#FCEE1F]" /> {university.website}
+                                    <Globe className="h-4 w-4 text-accent" /> {university.website}
                                 </a>
                             )}
                             {university.email && (
                                 <span className="flex items-center gap-1">
-                                    <Mail className="h-4 w-4 text-[#FCEE1F]" /> {university.email}
+                                    <Mail className="h-4 w-4 text-accent" /> {university.email}
                                 </span>
                             )}
                             {university.phone && (
                                 <span className="flex items-center gap-1">
-                                    <Phone className="h-4 w-4 text-[#FCEE1F]" /> {university.phone}
+                                    <Phone className="h-4 w-4 text-accent" /> {university.phone}
                                 </span>
                             )}
                         </div>
@@ -278,7 +278,7 @@ export default function UniversityProfile({ university, stats, journals, article
                 <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardContent className="flex items-center gap-4 pt-6">
-                            <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
+                            <div className="rounded-lg bg-primary/10 p-3 text-primary">
                                 <BookOpen className="h-6 w-6" />
                             </div>
                             <div>
@@ -289,7 +289,7 @@ export default function UniversityProfile({ university, stats, journals, article
                     </Card>
                     <Card>
                         <CardContent className="flex items-center gap-4 pt-6">
-                            <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
+                            <div className="rounded-lg bg-secondary/10 p-3 text-secondary">
                                 <FileText className="h-6 w-6" />
                             </div>
                             <div>
@@ -300,7 +300,7 @@ export default function UniversityProfile({ university, stats, journals, article
                     </Card>
                     <Card>
                         <CardContent className="flex items-center gap-4 pt-6">
-                            <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
+                            <div className="rounded-lg bg-primary/10 p-3 text-primary">
                                 <Award className="h-6 w-6" />
                             </div>
                             <div>
@@ -311,7 +311,7 @@ export default function UniversityProfile({ university, stats, journals, article
                     </Card>
                     <Card>
                         <CardContent className="flex items-center gap-4 pt-6">
-                            <div className="rounded-lg bg-emerald-50 p-3 text-[#079C4E]">
+                            <div className="rounded-lg bg-secondary/10 p-3 text-secondary">
                                 <ShieldCheck className="h-6 w-6" />
                             </div>
                             <div>
@@ -341,7 +341,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                             <button
                                                 type="button"
                                                 onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                                                className="ml-2 font-bold text-[#079C4E] hover:underline focus:outline-none"
+                                                className="ml-2 font-bold text-primary hover:underline hover:text-secondary focus:outline-none"
                                             >
                                                 {isDescriptionExpanded ? 'Lihat Lebih Sedikit' : 'Baca Selengkapnya'}
                                             </button>
@@ -382,7 +382,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                     options={{
                                         chart: { type: 'donut', fontFamily: 'inherit' },
                                         labels: ['Sinta 1', 'Sinta 2', 'Sinta 3', 'Sinta 4', 'Sinta 5', 'Sinta 6', 'Tidak Terakreditasi'],
-                                        colors: ['#079C4E', '#10b981', '#3b82f6', '#60a5fa', '#f59e0b', '#fca5a5', '#9ca3af'],
+                                        colors: ['var(--primary)', 'var(--secondary)', 'var(--accent)', 'var(--chart-4)', 'var(--chart-5)', '#818cf8', '#94a3b8'],
                                         legend: { position: 'bottom' },
                                         dataLabels: { enabled: false },
                                     }}
@@ -418,7 +418,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                 <div className="grid max-h-[300px] grid-cols-1 gap-4 overflow-y-auto pr-2 sm:grid-cols-2">
                                     {journals.map((journal) => (
                                         <Link key={journal.id} href={route('journals.show', journal.id)}>
-                                            <div className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all hover:border-[#079C4E] hover:bg-emerald-50/20">
+                                            <div className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all hover:border-primary hover:bg-primary/5">
                                                 <div className="flex h-10 w-8 items-center justify-center overflow-hidden rounded border bg-gray-100 text-[8px] font-bold text-gray-400">
                                                     {journal.cover_image_url ? (
                                                         <img
@@ -437,7 +437,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                                     </p>
                                                 </div>
                                                 {journal.sinta_rank_label && (
-                                                    <Badge className="bg-[#079C4E] text-xs text-white">{journal.sinta_rank_label}</Badge>
+                                                    <Badge className="bg-primary text-xs text-white">{journal.sinta_rank_label}</Badge>
                                                 )}
                                             </div>
                                         </Link>
@@ -521,7 +521,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                                             href={article.article_url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="line-clamp-2 font-bold text-gray-900 transition-colors hover:text-[#079C4E] hover:underline dark:text-white dark:hover:text-[#079C4E]"
+                                                            className="line-clamp-2 font-bold text-gray-900 transition-colors hover:text-primary hover:underline dark:text-white dark:hover:text-primary"
                                                         >
                                                             {article.title}
                                                         </a>
@@ -538,7 +538,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                                     {article.journal && (
                                                         <Link
                                                             href={route('journals.show', article.journal.id)}
-                                                            className="block truncate text-xs font-semibold text-[#079C4E] hover:underline"
+                                                            className="block truncate text-xs font-semibold text-primary hover:text-secondary hover:underline"
                                                             title={article.journal.title}
                                                         >
                                                             {article.journal.title}
@@ -556,7 +556,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                                             <a href={article.article_url} target="_blank" rel="noopener noreferrer">
                                                                 <Button
                                                                     size="sm"
-                                                                    className="h-8 bg-[#079C4E] px-3 text-xs text-white hover:bg-[#068442]"
+                                                                    className="h-8 bg-primary px-3 text-xs text-white hover:bg-primary/90"
                                                                 >
                                                                     Buka Artikel
                                                                 </Button>
@@ -566,7 +566,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => downloadRis(article)}
-                                                            className="h-7 px-2 text-xs font-medium text-gray-500 hover:bg-emerald-50/50 hover:text-[#079C4E] dark:text-gray-400 dark:hover:bg-[#079C4E]/10 dark:hover:text-[#079C4E]"
+                                                            className="h-7 px-2 text-xs font-medium text-gray-500 hover:bg-primary/10 hover:text-primary dark:text-gray-400 dark:hover:bg-primary/20 dark:hover:text-primary"
                                                         >
                                                             <Download className="mr-1 h-3.5 w-3.5" />
                                                             Cite
@@ -587,7 +587,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                     <Button
                                         key={idx}
                                         variant={link.active ? 'default' : 'outline'}
-                                        className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068442]' : ''}
+                                        className={link.active ? 'bg-primary text-white hover:bg-primary/90' : ''}
                                         onClick={() => handlePageChange(link.url)}
                                         disabled={!link.url}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
