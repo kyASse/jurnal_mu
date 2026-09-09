@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
 import JournalCard from '../journal-card';
 
 beforeAll(() => {
@@ -26,7 +26,14 @@ describe('JournalCard Theme Consistency', () => {
     });
 
     it('should render journal title and theme buttons', () => {
-        render(<JournalCard id={1} title="Jurnal Tarbiyah" sinta_rank="sinta_2" university="Universitas Ahmad Dahlan" />);
+        render(
+            <JournalCard
+                id={1}
+                title="Jurnal Tarbiyah"
+                sinta_rank="sinta_2"
+                university="Universitas Ahmad Dahlan"
+            />
+        );
         expect(screen.getByText('Jurnal Tarbiyah')).toBeInTheDocument();
         expect(screen.getByText('View Journal')).toBeInTheDocument();
     });

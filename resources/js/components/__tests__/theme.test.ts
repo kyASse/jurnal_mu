@@ -1,6 +1,6 @@
+import { expect, test } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { expect, test } from 'vitest';
 
 test('theme colors are updated to Muhammadiyah brand guideline', () => {
     const cssPath = path.resolve(__dirname, '../../../css/app.css');

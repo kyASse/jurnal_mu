@@ -6,7 +6,20 @@ import PublicNavbar from '@/components/public-navbar';
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowRight, Calendar, Clock, Download, FileText, LayoutDashboard, MapPin, User } from 'lucide-react';
+import {
+    ArrowRight,
+    BookOpen,
+    Calendar,
+    Clock,
+    Download,
+    FileText,
+    GraduationCap,
+    LayoutDashboard,
+    Library,
+    MapPin,
+    Search,
+    User,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface WelcomeProps extends SharedData {
@@ -85,9 +98,19 @@ export default function Welcome() {
         if (!searchQuery.trim() || isSearching) return;
 
         setIsSearching(true);
-        const params = searchType === 'journals' ? { search: searchQuery } : searchType === 'articles' ? { q: searchQuery } : { search: searchQuery };
+        const params =
+            searchType === 'journals'
+                ? { search: searchQuery }
+                : searchType === 'articles'
+                  ? { q: searchQuery }
+                  : { search: searchQuery };
 
-        const routeName = searchType === 'journals' ? 'journals.index' : searchType === 'articles' ? 'browse.articles' : 'browse.universities';
+        const routeName =
+            searchType === 'journals'
+                ? 'journals.index'
+                : searchType === 'articles'
+                  ? 'browse.articles'
+                  : 'browse.universities';
 
         router.get(route(routeName), params, {
             onFinish: () => setIsSearching(false),
@@ -231,30 +254,15 @@ export default function Welcome() {
                                             </div>
 
                                             <div className="flex items-center gap-1.5">
-                                                <Button
-                                                    asChild
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="border-gray-200 text-xs dark:border-zinc-700 dark:text-zinc-300"
-                                                >
+                                                <Button asChild variant="outline" size="sm" className="border-gray-200 text-xs dark:border-zinc-700 dark:text-zinc-300">
                                                     <a href={article.google_scholar_url} target="_blank" rel="noopener noreferrer">
                                                         Scholar
                                                     </a>
                                                 </Button>
 
                                                 {article.doi && (
-                                                    <Button
-                                                        asChild
-                                                        size="sm"
-                                                        variant="outline"
-                                                        className="border-gray-200 text-xs text-gray-700 dark:border-zinc-700 dark:text-zinc-300"
-                                                    >
-                                                        <a
-                                                            href={article.doi_url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            title="View Digital Object Identifier"
-                                                        >
+                                                    <Button asChild size="sm" variant="outline" className="border-gray-200 text-xs text-gray-700 dark:border-zinc-700 dark:text-zinc-300">
+                                                        <a href={article.doi_url} target="_blank" rel="noopener noreferrer" title="View Digital Object Identifier">
                                                             <FileText className="mr-1 h-3.5 w-3.5" />
                                                             DOI
                                                         </a>
@@ -291,7 +299,10 @@ export default function Welcome() {
                                     Discover our curated selection of academic conferences, seminars, and workshops. Join the scholarly community to
                                     expand your knowledge.
                                 </p>
-                                <Button asChild className="group rounded-full bg-secondary px-6 py-6 text-base font-semibold hover:bg-secondary/90">
+                                <Button
+                                    asChild
+                                    className="group rounded-full bg-secondary px-6 py-6 text-base font-semibold hover:bg-secondary/90"
+                                >
                                     <Link href={route('events.index')}>
                                         Explore All Events
                                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -426,7 +437,7 @@ export default function Welcome() {
 
                     {/* JOURNALS BY SUBJECT SECTION */}
                     {scientificFields && scientificFields.length > 0 && (
-                        <div className="mt-28 overflow-hidden rounded-3xl border border-primary/20 bg-primary px-6 py-16 text-white shadow-xl sm:px-12 lg:py-20 dark:border-zinc-800 dark:bg-zinc-900">
+                        <div className="mt-28 overflow-hidden rounded-3xl bg-primary px-6 py-16 text-white sm:px-12 lg:py-20 dark:bg-zinc-900 border border-primary/20 dark:border-zinc-800 shadow-xl">
                             <div className="grid gap-12 lg:grid-cols-[1fr_3fr]">
                                 {/* Header / Title area */}
                                 <div className="space-y-6">
@@ -437,8 +448,8 @@ export default function Welcome() {
                                         Journals by Subject
                                     </h2>
                                     <p className="text-blue-100">
-                                        Explore our extensive collection of journals categorized by scientific fields, showcasing the diverse research
-                                        output from Muhammadiyah Universities across Indonesia.
+                                        Explore our extensive collection of journals categorized by scientific fields, showcasing the diverse
+                                        research output from Muhammadiyah Universities across Indonesia.
                                     </p>
                                     <Button
                                         asChild
@@ -460,7 +471,9 @@ export default function Welcome() {
                                             href={route('journals.index', { scientific_field_id: field.id })}
                                             className="group flex w-full items-center justify-between border-b border-white/10 py-5 transition-colors hover:border-white/40"
                                         >
-                                            <span className="font-medium text-blue-50 transition-colors group-hover:text-white">{field.name}</span>
+                                            <span className="font-medium text-blue-50 transition-colors group-hover:text-white">
+                                                {field.name}
+                                            </span>
                                             <ArrowRight className="h-4 w-4 text-white/0 transition-all group-hover:-translate-x-1 group-hover:text-white/50" />
                                         </Link>
                                     ))}
@@ -470,7 +483,7 @@ export default function Welcome() {
                     )}
 
                     {/* CTA Section */}
-                    <div className="mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary text-white shadow-2xl dark:from-[#151a43] dark:to-[#6b1013]">
+                    <div className="mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary dark:from-[#151a43] dark:to-[#6b1013] text-white shadow-2xl">
                         <div
                             className="relative px-6 py-16 text-center sm:px-12 lg:py-20"
                             style={{
@@ -495,7 +508,9 @@ export default function Welcome() {
                                         size="lg"
                                         className="w-full bg-accent px-8 text-lg font-bold text-primary hover:bg-accent/90 sm:w-auto"
                                     >
-                                        <Link href={route('login')}>Submit Manuscript</Link>
+                                        <Link href={route('login')}>
+                                            Submit Manuscript
+                                        </Link>
                                     </Button>
                                     {/* <Button
                                         size="lg"

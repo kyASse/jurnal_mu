@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
 import PublicFooter from '../public-footer';
 
 beforeAll(() => {

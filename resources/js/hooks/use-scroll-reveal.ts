@@ -36,7 +36,7 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>({
                     setIsVisible(false);
                 }
             },
-            { threshold, rootMargin },
+            { threshold, rootMargin }
         );
 
         observer.observe(element);

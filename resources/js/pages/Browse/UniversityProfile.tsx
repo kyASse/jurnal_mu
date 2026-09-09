@@ -341,7 +341,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                             <button
                                                 type="button"
                                                 onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                                                className="ml-2 font-bold text-primary hover:text-secondary hover:underline focus:outline-none"
+                                                className="ml-2 font-bold text-primary hover:underline hover:text-secondary focus:outline-none"
                                             >
                                                 {isDescriptionExpanded ? 'Lihat Lebih Sedikit' : 'Baca Selengkapnya'}
                                             </button>
@@ -382,15 +382,7 @@ export default function UniversityProfile({ university, stats, journals, article
                                     options={{
                                         chart: { type: 'donut', fontFamily: 'inherit' },
                                         labels: ['Sinta 1', 'Sinta 2', 'Sinta 3', 'Sinta 4', 'Sinta 5', 'Sinta 6', 'Tidak Terakreditasi'],
-                                        colors: [
-                                            'var(--primary)',
-                                            'var(--secondary)',
-                                            'var(--accent)',
-                                            'var(--chart-4)',
-                                            'var(--chart-5)',
-                                            '#818cf8',
-                                            '#94a3b8',
-                                        ],
+                                        colors: ['var(--primary)', 'var(--secondary)', 'var(--accent)', 'var(--chart-4)', 'var(--chart-5)', '#818cf8', '#94a3b8'],
                                         legend: { position: 'bottom' },
                                         dataLabels: { enabled: false },
                                     }}
