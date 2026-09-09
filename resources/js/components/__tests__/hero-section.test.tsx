@@ -27,15 +27,18 @@ describe('HeroSection', () => {
         isSearching: false,
     };
 
-    it('renders headline, eyebrow badge, search form, and 3 metric islands', () => {
+    it('renders headline, search form, and 3 metric stat cards', () => {
         render(<HeroSection {...mockProps} />);
 
-        expect(screen.getByText(/PORTAL REPOSITORI ILMIAH RESMI/i)).toBeInTheDocument();
-        expect(screen.getByText(/Eksplorasi Keunggulan/i)).toBeInTheDocument();
-        expect(screen.getByPlaceholderText(/Cari nama jurnal/i)).toBeInTheDocument();
+        expect(screen.getByText(/Discover Muhammadiyah's/i)).toBeInTheDocument();
+        expect(screen.getByText(/Scientific Excellence/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/Search for journals/i)).toBeInTheDocument();
         expect(screen.getByText('120')).toBeInTheDocument();
         expect(screen.getByText('4.500')).toBeInTheDocument();
         expect(screen.getByText('35')).toBeInTheDocument();
+        expect(screen.getByText(/Total Journals/i)).toBeInTheDocument();
+        expect(screen.getByText(/Total Articles/i)).toBeInTheDocument();
+        expect(screen.getByText(/Total Universities/i)).toBeInTheDocument();
     });
 
     it('submits search form on button click', () => {

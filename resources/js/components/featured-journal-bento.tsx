@@ -1,7 +1,7 @@
 import { IndexationBadge, SintaBadge } from '@/components/badges';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { Link } from '@inertiajs/react';
-import { ArrowRight, ArrowUpRight, Layers } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 
 interface JournalItem {
     id: number;
@@ -39,34 +39,28 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
     return (
         <section
             ref={sectionRef}
-            className={`py-16 md:py-24 transition-all duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            className={`mt-16 mb-12 transition-all duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                 isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
             }`}
         >
             {/* Header Section */}
-            <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div className="mb-8 flex items-end justify-between">
                 <div>
-                    <div className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-primary dark:border-primary/20 dark:bg-primary/10 dark:text-primary-foreground">
-                        <Layers className="h-3 w-3" />
-                        KURASI TERBAIK
-                    </div>
                     <h2
-                        className="font-heading mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl dark:text-white"
+                        className="font-heading text-3xl font-bold text-primary dark:text-white"
                         style={{ fontFamily: '"El Messiri", serif' }}
                     >
-                        Jurnal Terakreditasi Unggulan
+                        Featured Journals
                     </h2>
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                        Publikasi berkala ilmiah terindeks SINTA 1 &amp; 2 dari jaringan perguruan tinggi Muhammadiyah.
-                    </p>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">High-impact research from our network.</p>
                 </div>
 
                 <Link
                     href={route('journals.index')}
-                    className="group inline-flex items-center gap-2 text-sm font-semibold text-secondary transition-colors duration-300 hover:text-primary dark:text-rose-400 dark:hover:text-white"
+                    className="group flex items-center font-semibold text-secondary hover:text-primary dark:text-rose-400 dark:hover:text-white"
                 >
-                    Lihat Semua Jurnal
-                    <ArrowRight className="h-4 w-4 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1.5" />
+                    View All Journals
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
             </div>
 
@@ -116,13 +110,13 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
                                     </div>
                                 </div>
 
-                                {/* Nested CTA Button-in-Button "Telusuri Publikasi" */}
+                                {/* Nested CTA Button-in-Button "Explore Publication" */}
                                 <div className="mt-8 pt-6 border-t border-slate-100 dark:border-zinc-800">
                                     <Link
                                         href={route('journals.show', masterJournal.id)}
                                         className="group/btn flex items-center justify-between rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-md transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-primary/90 hover:shadow-lg active:scale-[0.98] dark:bg-indigo-600 dark:hover:bg-indigo-500"
                                     >
-                                        <span>Telusuri Publikasi</span>
+                                        <span>Explore Publication</span>
                                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-0.5 group-hover/btn:scale-105">
                                             <ArrowUpRight className="h-4 w-4 text-white" />
                                         </div>
@@ -146,7 +140,7 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
                                     <div className="flex items-center justify-between gap-2">
                                         <SintaBadge rank={journal.sinta_rank} />
                                         <span className="truncate text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                                            {journal.university || 'Perguruan Tinggi'}
+                                            {journal.university || 'Universitas Muhammadiyah'}
                                         </span>
                                     </div>
                                     <h4 className="font-heading mt-3 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-300 group-hover:text-primary dark:text-white dark:group-hover:text-indigo-400">
@@ -160,7 +154,7 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
                                         href={route('journals.show', journal.id)}
                                         className="inline-flex items-center gap-1 font-semibold text-primary transition-transform duration-300 hover:translate-x-1 dark:text-indigo-400"
                                     >
-                                        Buka
+                                        View
                                         <ArrowRight className="h-3.5 w-3.5" />
                                     </Link>
                                 </div>

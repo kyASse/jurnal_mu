@@ -58,12 +58,13 @@ describe('FeaturedJournalBento', () => {
         },
     ];
 
-    it('renders master showcase card with nested CTA "Telusuri Publikasi" and satellite cards', () => {
+    it('renders master showcase card with nested CTA "Explore Publication" and satellite cards in English', () => {
         render(<FeaturedJournalBento journals={mockJournals} />);
 
-        expect(screen.getByText(/Jurnal Terakreditasi Unggulan/i)).toBeInTheDocument();
+        expect(screen.getByText(/Featured Journals/i)).toBeInTheDocument();
         expect(screen.getByText('Jurnal Ilmiah Farmasi dan Biomedis')).toBeInTheDocument();
-        expect(screen.getByText('Telusuri Publikasi')).toBeInTheDocument();
+        expect(screen.getByText('Explore Publication')).toBeInTheDocument();
         expect(screen.getByText('Jurnal Teknologi dan Rekayasa Sistem')).toBeInTheDocument();
+        expect(screen.getByText(/View All Journals/i)).toBeInTheDocument();
     });
 });

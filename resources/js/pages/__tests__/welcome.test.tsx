@@ -74,8 +74,9 @@ beforeEach(() => {
 describe('Welcome Page Redesign', () => {
     it('should render welcome page with hero and featured bento without crashing', () => {
         render(<Welcome />);
-        expect(screen.getByText(/Eksplorasi Keunggulan/i)).toBeInTheDocument();
-        expect(screen.getByText(/Jurnal Terakreditasi Unggulan/i)).toBeInTheDocument();
+        expect(screen.getByText(/Discover Muhammadiyah's/i)).toBeInTheDocument();
+        expect(screen.getByText(/Scientific Excellence/i)).toBeInTheDocument();
+        expect(screen.getByText(/Featured Journals/i)).toBeInTheDocument();
         expect(screen.getByText('Jurnal Ilmiah Farmasi')).toBeInTheDocument();
     });
 
@@ -104,13 +105,13 @@ describe('Welcome Page Redesign', () => {
 
     it('should have accessibility labels on search input', () => {
         render(<Welcome />);
-        const searchInput = screen.getByPlaceholderText(/Cari nama jurnal/i);
+        const searchInput = screen.getByPlaceholderText(/Search for journals/i);
         expect(searchInput).toHaveAttribute('aria-label', 'Search academic content');
     });
 
     it('should perform client-side search using Inertia router', async () => {
         render(<Welcome />);
-        const searchInput = screen.getByPlaceholderText(/Cari nama jurnal/i);
+        const searchInput = screen.getByPlaceholderText(/Search for journals/i);
         fireEvent.change(searchInput, { target: { value: 'physics' } });
 
         const searchButton = screen.getByRole('button', { name: /Search/i });
