@@ -124,11 +124,7 @@ export default function Index({ agendas, filters, types = [], universities = [] 
                         <Button
                             type="submit"
                             size="lg"
-<<<<<<< HEAD
-                            className="h-12 w-full rounded-full bg-secondary px-8 font-semibold text-white hover:bg-secondary/90 sm:w-auto"
-=======
-                            className="h-12 w-full rounded-full bg-[#079C4E] px-8 font-semibold hover:bg-[#068A44] sm:col-span-2 lg:col-span-2"
->>>>>>> origin/development
+                            className="h-12 w-full rounded-full bg-secondary px-8 font-semibold text-white hover:bg-secondary/90 sm:col-span-2 lg:col-span-2"
                         >
                             Search
                         </Button>
@@ -140,13 +136,13 @@ export default function Index({ agendas, filters, types = [], universities = [] 
                 <div className="mb-8 flex justify-center border-b">
                     <button
                         onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'upcoming' })}
-                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'upcoming' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'upcoming' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                         Upcoming Events
                     </button>
                     <button
                         onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'past' })}
-                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'past' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'past' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                         Past Events
                     </button>
