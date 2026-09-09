@@ -46,10 +46,7 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
             {/* Header Section */}
             <div className="mb-8 flex items-end justify-between">
                 <div>
-                    <h2
-                        className="font-heading text-3xl font-bold text-primary dark:text-white"
-                        style={{ fontFamily: '"El Messiri", serif' }}
-                    >
+                    <h2 className="font-heading text-3xl font-bold text-primary dark:text-white" style={{ fontFamily: '"El Messiri", serif' }}>
                         Featured Journals
                     </h2>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">High-impact research from our network.</p>
@@ -69,7 +66,7 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
                 {/* MASTER SHOWCASE CARD (7 COLUMNS) */}
                 {masterJournal && (
                     <div className="lg:col-span-7">
-                        <div className="group h-full rounded-[2rem] bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-2 sm:p-2.5 ring-1 ring-black/[0.06] shadow-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-2xl dark:from-white/[0.06] dark:to-white/[0.02] dark:ring-white/[0.08]">
+                        <div className="group h-full rounded-[2rem] bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-2 shadow-xl ring-1 ring-black/[0.06] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-2xl sm:p-2.5 dark:from-white/[0.06] dark:to-white/[0.02] dark:ring-white/[0.08]">
                             <div className="flex h-full flex-col justify-between rounded-[calc(2rem-0.625rem)] border border-black/[0.02] bg-white p-6 sm:p-8 dark:border-white/[0.04] dark:bg-zinc-900">
                                 <div>
                                     {/* Top Metadata & Badges */}
@@ -87,7 +84,7 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
 
                                     {/* Title */}
                                     <h3
-                                        className="font-heading mt-6 text-2xl font-bold leading-tight text-slate-900 transition-colors duration-300 group-hover:text-primary sm:text-3xl dark:text-white dark:group-hover:text-indigo-400"
+                                        className="font-heading mt-6 text-2xl leading-tight font-bold text-slate-900 transition-colors duration-300 group-hover:text-primary sm:text-3xl dark:text-white dark:group-hover:text-indigo-400"
                                         style={{ fontFamily: '"El Messiri", serif' }}
                                     >
                                         <Link href={route('journals.show', masterJournal.id)}>{masterJournal.title}</Link>
@@ -111,7 +108,7 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
                                 </div>
 
                                 {/* Nested CTA Button-in-Button "Explore Publication" */}
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-zinc-800">
+                                <div className="mt-8 border-t border-slate-100 pt-6 dark:border-zinc-800">
                                     <Link
                                         href={route('journals.show', masterJournal.id)}
                                         className="group/btn flex items-center justify-between rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-md transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-primary/90 hover:shadow-lg active:scale-[0.98] dark:bg-indigo-600 dark:hover:bg-indigo-500"
@@ -133,7 +130,7 @@ export default function FeaturedJournalBento({ journals }: FeaturedJournalBentoP
                         <div
                             key={journal.id}
                             style={{ transitionDelay: `${idx * 100}ms` }}
-                            className="group rounded-[1.5rem] bg-black/[0.02] p-1.5 ring-1 ring-black/[0.05] shadow-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-md dark:bg-white/[0.03] dark:ring-white/[0.06]"
+                            className="group rounded-[1.5rem] bg-black/[0.02] p-1.5 shadow-sm ring-1 ring-black/[0.05] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-md dark:bg-white/[0.03] dark:ring-white/[0.06]"
                         >
                             <div className="flex h-full flex-col justify-between rounded-[calc(1.5rem-0.375rem)] border border-black/[0.02] bg-white p-5 dark:border-white/[0.02] dark:bg-zinc-900">
                                 <div>

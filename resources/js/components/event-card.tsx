@@ -153,7 +153,7 @@ export default function EventCard({ agenda }: { agenda: EventCardProps }) {
             <CardFooter className="mt-auto flex items-center justify-between border-t bg-muted/30 pt-4">
                 <div className="text-sm font-semibold">
                     {formatPrice(agenda.price, agenda.currency || 'IDR') === 'Free' ? (
-                        <span className="text-primary font-bold dark:text-indigo-300">Free Event</span>
+                        <span className="font-bold text-primary dark:text-indigo-300">Free Event</span>
                     ) : (
                         formatPrice(agenda.price, agenda.currency || 'IDR')
                     )}

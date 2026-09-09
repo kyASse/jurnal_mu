@@ -252,7 +252,7 @@ export default function Show({ agenda }: Props) {
                                             <p className="mb-1 text-sm font-medium tracking-wide text-muted-foreground uppercase">Registration</p>
                                             <span className="text-3xl font-bold tracking-tight">
                                                 {formatPrice(agenda.price, agenda.currency || 'IDR') === 'Free' ? (
-                                                    <span className="text-primary font-bold dark:text-indigo-300">Free</span>
+                                                    <span className="font-bold text-primary dark:text-indigo-300">Free</span>
                                                 ) : (
                                                     formatPrice(agenda.price, agenda.currency || 'IDR')
                                                 )}

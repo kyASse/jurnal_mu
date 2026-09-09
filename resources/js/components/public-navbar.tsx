@@ -68,7 +68,9 @@ export default function PublicNavbar() {
                                     </Button>
                                 </Link>
                                 <Link href={route('register')}>
-                                    <Button className="border-0 bg-accent-gradient px-3 font-bold text-white hover:bg-accent-gradient/90 sm:px-4">Register</Button>
+                                    <Button className="hover:bg-accent-gradient/90 border-0 bg-accent-gradient px-3 font-bold text-white sm:px-4">
+                                        Register
+                                    </Button>
                                 </Link>
                             </>
                         )}
@@ -122,10 +124,7 @@ export default function PublicNavbar() {
                                 <div className="flex flex-col gap-3">
                                     {auth?.user ? (
                                         <Link href={route('dashboard')} onClick={() => setOpen(false)}>
-                                            <Button
-                                                variant="secondary"
-                                                className="w-full border-0 bg-white font-bold text-primary   hover:bg-gray-100"
-                                            >
+                                            <Button variant="secondary" className="w-full border-0 bg-white font-bold text-primary hover:bg-gray-100">
                                                 <LayoutDashboard className="mr-2 h-4 w-4" />
                                                 Dashboard
                                             </Button>
@@ -133,12 +132,15 @@ export default function PublicNavbar() {
                                     ) : (
                                         <>
                                             <Link href={route('login')} onClick={() => setOpen(false)}>
-                                                <Button variant="ghost" className="w-full border border-white text-white hover:bg-white/20 hover:text-white">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="w-full border border-white text-white hover:bg-white/20 hover:text-white"
+                                                >
                                                     Log in
                                                 </Button>
                                             </Link>
                                             <Link href={route('register')} onClick={() => setOpen(false)}>
-                                                <Button className="w-full border-0 bg-accent-gradient font-bold text-white hover:bg-accent-gradient/90">
+                                                <Button className="hover:bg-accent-gradient/90 w-full border-0 bg-accent-gradient font-bold text-white">
                                                     Register
                                                 </Button>
                                             </Link>

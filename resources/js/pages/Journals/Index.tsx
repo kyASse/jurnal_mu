@@ -313,7 +313,7 @@ export default function JournalsIndex({
                                     </Select>
 
                                     <div className="flex flex-col gap-2 sm:flex-row">
-                                        <Button type="submit" className="h-12 w-full bg-secondary hover:bg-secondary/90 text-white sm:flex-1">
+                                        <Button type="submit" className="h-12 w-full bg-secondary text-white hover:bg-secondary/90 sm:flex-1">
                                             Search
                                         </Button>
                                         {hasActiveFilters && (

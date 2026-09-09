@@ -91,7 +91,10 @@ export default function Show({ news }: Props) {
                     </ol>
                 </nav>
 
-                <a href={route('news.index')} className="mb-8 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-secondary hover:underline">
+                <a
+                    href={route('news.index')}
+                    className="mb-8 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-secondary hover:underline"
+                >
                     <ArrowLeft className="h-4 w-4" /> Back to all news
                 </a>
 
