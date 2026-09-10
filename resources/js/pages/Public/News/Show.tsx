@@ -91,7 +91,7 @@ export default function Show({ news }: Props) {
                     </ol>
                 </nav>
 
-                <a href={route('news.index')} className="mb-8 inline-flex items-center gap-1.5 text-sm font-semibold text-[#079C4E] hover:underline">
+                <a href={route('news.index')} className="mb-8 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-secondary hover:underline">
                     <ArrowLeft className="h-4 w-4" /> Back to all news
                 </a>
 
@@ -108,7 +108,7 @@ export default function Show({ news }: Props) {
 
                         <div className="flex flex-wrap items-center justify-center gap-4 border-y py-4 text-sm text-muted-foreground dark:border-zinc-800">
                             <div className="flex items-center gap-1">
-                                <CalendarDays className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                <CalendarDays className="h-4 w-4 text-primary dark:text-indigo-400" />
                                 <span>
                                     {news.published_at
                                         ? new Date(news.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -122,7 +122,7 @@ export default function Show({ news }: Props) {
                             </div>
                             <span>&bull;</span>
                             <div className="flex items-center gap-1">
-                                <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                <Eye className="h-4 w-4 text-primary dark:text-indigo-400" />
                                 <span>{news.views} views</span>
                             </div>
                         </div>
@@ -139,13 +139,13 @@ export default function Show({ news }: Props) {
                                 className="rounded-full"
                                 title={copied ? 'Copied!' : 'Copy Link'}
                             >
-                                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
+                                {copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />}
                             </Button>
                             <Button
                                 onClick={shareWhatsApp}
                                 size="icon"
                                 variant="outline"
-                                className="rounded-full hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/20"
+                                className="rounded-full hover:bg-primary/10 hover:text-primary"
                                 title="Share WhatsApp"
                             >
                                 <Share2 className="h-4 w-4" />
@@ -175,8 +175,8 @@ export default function Show({ news }: Props) {
                             {news.image ? (
                                 <img src={`/storage/${news.image}`} alt={news.title} className="h-full w-full object-cover" />
                             ) : (
-                                <div className="flex h-full w-full items-center justify-center bg-emerald-50 dark:bg-emerald-950/20">
-                                    <Newspaper className="h-24 w-24 text-emerald-600/20 dark:text-emerald-400/10" />
+                                <div className="flex h-full w-full items-center justify-center bg-primary/5">
+                                    <Newspaper className="h-24 w-24 text-primary/20" />
                                 </div>
                             )}
                         </div>
@@ -185,7 +185,7 @@ export default function Show({ news }: Props) {
                     {/* Body Text */}
                     <div className="mx-auto max-w-2xl px-2 sm:px-6">
                         <div
-                            className="prose prose-lg dark:prose-invert prose-emerald max-w-none text-justify font-sans leading-relaxed text-[#242420] dark:text-[#E8E8E6] [&_p]:mt-0 [&_p]:mb-6 [&_p]:indent-8"
+                            className="prose prose-lg dark:prose-invert max-w-none text-justify font-sans leading-relaxed text-foreground [&_p]:mt-0 [&_p]:mb-6 [&_p]:indent-8"
                             dangerouslySetInnerHTML={{ __html: news.body }}
                             style={{ fontSize: '1.125rem' }}
                         />
@@ -199,7 +199,7 @@ export default function Show({ news }: Props) {
                                         <Badge
                                             key={tag}
                                             variant="secondary"
-                                            className="cursor-pointer px-3 py-1 text-xs transition-colors hover:bg-[#079C4E] hover:text-white"
+                                            className="cursor-pointer px-3 py-1 text-xs transition-colors hover:bg-primary hover:text-primary-foreground"
                                         >
                                             {tag}
                                         </Badge>

@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - development
 
 jobs:
   php-lint:

@@ -136,12 +136,12 @@ export default function BrowseUniversities({ universityStats, universities, sele
                 />
             </Head>
 
-            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-[#079C4E] selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
+            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-primary selection:text-primary-foreground dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
                 <PublicNavbar />
 
                 <main className="pt-16">
                     {/* Hero Section */}
-                    <div className="bg-gradient-to-br from-[#079C4E] to-[#10816F] pt-16 pb-20 text-white">
+                    <div className="bg-hero-gradient pt-16 pb-20 text-white">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             {selectedUniversity ? (
                                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
@@ -155,7 +155,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                 />
                                             ) : (
                                                 <div
-                                                    className="font-heading flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[#079C4E] to-[#10816F] text-xl font-bold text-white"
+                                                    className="font-heading flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-xl font-bold text-white"
                                                     style={{ fontFamily: '"El Messiri", serif' }}
                                                 >
                                                     {getInitials(selectedUniversity.name, selectedUniversity.short_name)}
@@ -164,11 +164,11 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                         </div>
                                         <div>
                                             <div className="flex flex-wrap items-center gap-2">
-                                                <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-bold tracking-wider text-[#FCEE1F] uppercase ring-1 ring-emerald-500/30">
+                                                <span className="inline-flex items-center rounded-full bg-secondary/20 px-2.5 py-0.5 text-xs font-bold tracking-wider text-accent uppercase ring-1 ring-secondary/30">
                                                     {selectedUniversity.code}
                                                 </span>
                                                 {selectedUniversity.short_name && (
-                                                    <span className="text-sm font-semibold text-emerald-100">{selectedUniversity.short_name}</span>
+                                                    <span className="text-sm font-semibold text-white/90">{selectedUniversity.short_name}</span>
                                                 )}
                                             </div>
                                             <h1
@@ -177,7 +177,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                             >
                                                 {selectedUniversity.name}
                                             </h1>
-                                            <p className="mt-1 text-sm font-medium text-emerald-50">
+                                            <p className="mt-1 text-sm font-medium text-white/80">
                                                 Explore {journals?.total || 0} approved {journals?.total === 1 ? 'journal' : 'journals'} from this
                                                 university
                                             </p>
@@ -200,9 +200,9 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                         className="font-heading mb-4 text-4xl font-bold tracking-tight sm:text-5xl"
                                         style={{ fontFamily: '"El Messiri", serif' }}
                                     >
-                                        Browse by <span className="text-[#FCEE1F]">University</span>
+                                        Browse by <span className="text-accent">University</span>
                                     </h1>
-                                    <p className="max-w-2xl text-lg text-emerald-50">
+                                    <p className="max-w-2xl text-lg text-white/80">
                                         Explore academic journals published by Muhammadiyah universities across Indonesia.
                                     </p>
                                 </div>
@@ -261,7 +261,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                     <div className="flex flex-col gap-2 sm:flex-row">
                                         <Button
                                             type="submit"
-                                            className="h-12 w-full bg-[#079C4E] font-semibold text-white hover:bg-[#068A42] sm:flex-1"
+                                            className="h-12 w-full bg-secondary font-semibold text-white hover:bg-secondary/90 sm:flex-1"
                                         >
                                             Search
                                         </Button>
@@ -292,7 +292,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                         <p className="mt-1 text-sm text-gray-500">
                                             This university does not have any active, approved journals at the moment.
                                         </p>
-                                        <Button onClick={handleClearFilters} className="mt-6 bg-[#079C4E] hover:bg-[#068A42]">
+                                        <Button onClick={handleClearFilters} className="mt-6 bg-primary text-white hover:bg-primary/90">
                                             Browse Other Universities
                                         </Button>
                                     </div>
@@ -364,7 +364,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                                 size="sm"
                                                                 disabled={!link.url}
                                                                 onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
-                                                                className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068A42]' : ''}
+                                                                className={link.active ? 'bg-primary text-white hover:bg-primary/90' : ''}
                                                             >
                                                                 {link.label}
                                                             </Button>
@@ -384,7 +384,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                         <div
                                             key={university.id}
                                             onClick={() => handleUniversityCardClick(university.id)}
-                                            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/20 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+                                            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gray-50 p-2 shadow-inner ring-1 ring-gray-100 dark:bg-zinc-800 dark:ring-zinc-700">
@@ -396,7 +396,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                         />
                                                     ) : (
                                                         <div
-                                                            className="font-heading flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[#079C4E] to-[#10816F] text-lg font-bold text-white"
+                                                            className="font-heading flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-lg font-bold text-white"
                                                             style={{ fontFamily: '"El Messiri", serif' }}
                                                         >
                                                             {getInitials(university.name, university.short_name)}
@@ -405,7 +405,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <h3
-                                                        className="font-heading truncate text-lg leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#079C4E] dark:text-white"
+                                                        className="font-heading truncate text-lg leading-snug font-bold text-gray-900 transition-colors group-hover:text-primary dark:text-white"
                                                         style={{ fontFamily: '"El Messiri", serif' }}
                                                     >
                                                         {university.name}
@@ -420,7 +420,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
 
                                             <div className="flex items-center justify-between">
                                                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Approved Journals</span>
-                                                <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-[#079C4E] transition-colors group-hover:bg-[#079C4E] group-hover:text-white dark:bg-emerald-500/10">
+                                                <span className="inline-flex items-center gap-1.5 rounded-lg bg-secondary/10 px-2.5 py-1 text-xs font-bold text-secondary transition-colors group-hover:bg-secondary group-hover:text-white dark:bg-secondary/20 dark:text-rose-300">
                                                     <BookOpen className="h-3.5 w-3.5" />
                                                     {university.journals_count} {university.journals_count === 1 ? 'Journal' : 'Journals'}
                                                 </span>
@@ -479,7 +479,7 @@ export default function BrowseUniversities({ universityStats, universities, sele
                                                         size="sm"
                                                         disabled={!link.url}
                                                         onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
-                                                        className={link.active ? 'bg-[#079C4E] text-white hover:bg-[#068A42]' : ''}
+                                                        className={link.active ? 'bg-primary text-white hover:bg-primary/90' : ''}
                                                     >
                                                         {link.label}
                                                     </Button>

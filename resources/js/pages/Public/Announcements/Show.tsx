@@ -28,7 +28,7 @@ export default function Show({ announcement }: Props) {
                 <div className="mb-6">
                     <Link
                         href={route('announcements.index')}
-                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#079C4E] hover:underline"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-secondary hover:underline"
                     >
                         <ArrowLeft className="h-4 w-4" /> Back to Announcements
                     </Link>
@@ -42,7 +42,7 @@ export default function Show({ announcement }: Props) {
                                 announcement.tags.map((tag) => (
                                     <span
                                         key={tag}
-                                        className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                        className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary dark:bg-primary/20 dark:text-indigo-300"
                                     >
                                         {tag}
                                     </span>
@@ -53,7 +53,7 @@ export default function Show({ announcement }: Props) {
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1.5">
-                                <CalendarDays className="h-4 w-4 text-emerald-600" />
+                                <CalendarDays className="h-4 w-4 text-primary dark:text-indigo-400" />
                                 {new Date(announcement.published_at).toLocaleDateString('id-ID', {
                                     day: 'numeric',
                                     month: 'long',
@@ -61,7 +61,7 @@ export default function Show({ announcement }: Props) {
                                 })}
                             </span>
                             <span className="flex items-center gap-1.5">
-                                <Eye className="h-4 w-4 text-emerald-600" />
+                                <Eye className="h-4 w-4 text-primary dark:text-indigo-400" />
                                 {announcement.views} views
                             </span>
                         </div>
@@ -69,7 +69,7 @@ export default function Show({ announcement }: Props) {
 
                     {/* Rich HTML Body */}
                     <div
-                        className="prose prose-emerald dark:prose-invert max-w-none py-8 leading-relaxed"
+                        className="prose prose-indigo dark:prose-invert max-w-none py-8 leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: announcement.body }}
                     />
 
@@ -78,8 +78,8 @@ export default function Show({ announcement }: Props) {
                         <div className="mt-8 rounded-xl border bg-muted/30 p-5 dark:border-zinc-800">
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-start gap-3">
-                                    <div className="rounded-lg bg-emerald-100 p-2.5 dark:bg-emerald-950/40">
-                                        <Paperclip className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                    <div className="rounded-lg bg-primary/10 p-2.5 dark:bg-primary/20">
+                                        <Paperclip className="h-5 w-5 text-primary dark:text-indigo-300" />
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-foreground">Attached Document</h4>
@@ -87,7 +87,7 @@ export default function Show({ announcement }: Props) {
                                     </div>
                                 </div>
                                 <a href={route('announcements.download', announcement.id)} className="block">
-                                    <Button className="flex w-full items-center justify-center gap-2 bg-[#079C4E] font-semibold hover:bg-[#068A44]">
+                                    <Button className="flex w-full items-center justify-center gap-2 bg-secondary font-semibold text-white hover:bg-secondary/90">
                                         <FileDown className="h-4 w-4" /> Download Document
                                     </Button>
                                 </a>

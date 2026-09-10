@@ -144,21 +144,21 @@ export default function JournalsIndex({
                 />
             </Head>
 
-            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-[#079C4E] selection:text-white dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
+            <div className="min-h-screen bg-gray-50 font-sans text-[#1b1b18] selection:bg-primary selection:text-primary-foreground dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
                 <PublicNavbar />
 
                 {/* MAIN CONTENT */}
                 <main className="pt-16">
                     {/* Header Section */}
-                    <div className="bg-gradient-to-br from-[#079C4E] to-[#10816F] pt-16 pb-20 text-white">
+                    <div className="bg-hero-gradient pt-16 pb-20 text-white">
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <h1
                                 className="font-heading mb-4 text-4xl font-bold tracking-tight sm:text-5xl"
                                 style={{ fontFamily: '"El Messiri", serif' }}
                             >
-                                Browse <span className="text-[#FCEE1F]">All Journals</span>
+                                Browse <span className="text-accent">All Journals</span>
                             </h1>
-                            <p className="max-w-2xl text-lg text-emerald-50">
+                            <p className="max-w-2xl text-lg text-white/80">
                                 Explore {journals.total} academic journals from Muhammadiyah Universities across Indonesia
                             </p>
                         </div>
@@ -186,7 +186,7 @@ export default function JournalsIndex({
                                                 {rankLabel}
                                             </span>
                                             <div className="mt-2 flex items-center gap-1.5 self-start">
-                                                <span className="inline-flex items-center justify-center rounded bg-emerald-50 px-2 py-0.5 text-xs font-black text-[#079C4E] ring-1 ring-emerald-500/20 transition-colors group-hover:bg-[#079C4E] group-hover:text-white dark:bg-emerald-500/10">
+                                                <span className="inline-flex items-center justify-center rounded bg-primary/10 px-2 py-0.5 text-xs font-black text-primary ring-1 ring-primary/20 transition-colors group-hover:bg-primary group-hover:text-white dark:bg-primary/20 dark:text-indigo-300">
                                                     {sintaStats[rankKey] || 0}
                                                 </span>
                                             </div>
@@ -313,7 +313,7 @@ export default function JournalsIndex({
                                     </Select>
 
                                     <div className="flex flex-col gap-2 sm:flex-row">
-                                        <Button type="submit" className="h-12 w-full bg-[#079C4E] hover:bg-[#068A42] sm:flex-1">
+                                        <Button type="submit" className="h-12 w-full bg-secondary hover:bg-secondary/90 text-white sm:flex-1">
                                             Search
                                         </Button>
                                         {hasActiveFilters && (
@@ -410,7 +410,7 @@ export default function JournalsIndex({
                                                 size="sm"
                                                 disabled={!link.url}
                                                 onClick={() => link.url && router.visit(link.url)}
-                                                className={link.active ? 'bg-[#079C4E] hover:bg-[#068A42]' : ''}
+                                                className={link.active ? 'bg-primary text-white hover:bg-primary/90' : ''}
                                             >
                                                 {link.label}
                                             </Button>

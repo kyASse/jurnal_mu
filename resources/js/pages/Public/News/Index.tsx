@@ -102,10 +102,10 @@ export default function Index({ news, filters }: Props) {
             <Head title="News & Press" />
 
             {/* Header Section */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-[#079C4E] to-[#10816F] py-16 text-white">
+            <div className="relative overflow-hidden bg-hero-gradient py-16 text-white">
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-[#FCEE1F] opacity-10 mix-blend-overlay blur-3xl"></div>
-                    <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-[#1A2A75] opacity-20 mix-blend-multiply blur-3xl"></div>
+                    <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-accent opacity-10 mix-blend-overlay blur-3xl"></div>
+                    <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-primary opacity-20 mix-blend-multiply blur-3xl"></div>
                     <div
                         className="absolute inset-0 opacity-5"
                         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}
@@ -114,9 +114,9 @@ export default function Index({ news, filters }: Props) {
 
                 <div className="relative z-10 mx-auto max-w-7xl px-4 pt-8 pb-12 text-center sm:px-6 lg:px-8">
                     <h1 className="font-heading mb-4 text-4xl font-bold tracking-tight sm:text-5xl" style={{ fontFamily: '"El Messiri", serif' }}>
-                        Latest <span className="text-[#FCEE1F]">News & Updates</span>
+                        Latest <span className="text-accent">News & Updates</span>
                     </h1>
-                    <p className="mx-auto max-w-2xl text-lg text-emerald-50">
+                    <p className="mx-auto max-w-2xl text-lg text-white/80">
                         Stay informed about network announcements, publications, achievements, and structural activities.
                     </p>
                 </div>
@@ -151,7 +151,7 @@ export default function Index({ news, filters }: Props) {
                         <Button
                             type="submit"
                             size="lg"
-                            className="h-12 w-full rounded-full bg-[#079C4E] px-8 font-semibold hover:bg-[#068A44] sm:w-auto"
+                            className="h-12 w-full rounded-full bg-secondary px-8 font-semibold text-white hover:bg-secondary/90 sm:w-auto"
                         >
                             Search
                         </Button>
@@ -195,19 +195,19 @@ export default function Index({ news, filters }: Props) {
                                                 className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                                             />
                                         ) : (
-                                            <div className="flex h-full w-full items-center justify-center bg-emerald-50 dark:bg-emerald-950/20">
-                                                <Newspaper className="h-12 w-12 text-emerald-600/30 dark:text-emerald-400/20" />
+                                            <div className="flex h-full w-full items-center justify-center bg-primary/5">
+                                                <Newspaper className="h-12 w-12 text-primary/30" />
                                             </div>
                                         )}
                                         {item.tags && item.tags.length > 0 && (
-                                            <span className="absolute top-4 left-4 rounded-full bg-[#079C4E] px-3 py-1 text-xs font-bold text-white shadow-md">
+                                            <span className="absolute top-4 left-4 rounded-full bg-secondary px-3 py-1 text-xs font-bold text-white shadow-md">
                                                 {item.tags[0]}
                                             </span>
                                         )}
                                     </div>
                                     <div className="flex flex-1 flex-col p-6">
                                         <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-                                            <CalendarDays className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                                            <CalendarDays className="h-3.5 w-3.5 text-primary dark:text-indigo-400" />
                                             <span>
                                                 {item.published_at
                                                     ? new Date(item.published_at).toLocaleDateString('id-ID', {
@@ -224,7 +224,7 @@ export default function Index({ news, filters }: Props) {
                                                 </>
                                             )}
                                         </div>
-                                        <h3 className="font-heading mb-2 line-clamp-2 text-xl leading-snug font-bold text-foreground transition-colors hover:text-[#079C4E] dark:hover:text-[#079C4E]">
+                                        <h3 className="font-heading mb-2 line-clamp-2 text-xl leading-snug font-bold text-foreground transition-colors hover:text-primary dark:hover:text-indigo-400">
                                             <a href={route('news.show', item.slug)}>{item.title}</a>
                                         </h3>
                                         {item.subtitle && (
@@ -234,7 +234,7 @@ export default function Index({ news, filters }: Props) {
                                         <div className="border-t pt-4 dark:border-zinc-800">
                                             <a
                                                 href={route('news.show', item.slug)}
-                                                className="inline-flex items-center gap-1 text-sm font-bold text-[#079C4E] hover:underline"
+                                                className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:text-secondary hover:underline"
                                             >
                                                 Read Full Article &rarr;
                                             </a>
@@ -250,7 +250,7 @@ export default function Index({ news, filters }: Props) {
                                     onClick={loadMore}
                                     disabled={loadingMore}
                                     size="lg"
-                                    className="rounded-full bg-[#079C4E] px-8 font-semibold hover:bg-[#068A44]"
+                                    className="rounded-full bg-secondary px-8 font-semibold text-white hover:bg-secondary/90"
                                 >
                                     {loadingMore ? 'Loading...' : 'Load More News'}
                                 </Button>

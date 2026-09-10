@@ -44,10 +44,10 @@ export default function Index({ agendas, filters, types = [], universities = [] 
             <Head title="Events & Agendas" />
 
             {/* Header Section */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-[#079C4E] to-[#10816F] py-16 text-white">
+            <div className="relative overflow-hidden bg-hero-gradient py-16 text-white">
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-[#FCEE1F] opacity-10 mix-blend-overlay blur-3xl"></div>
-                    <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-[#1A2A75] opacity-20 mix-blend-multiply blur-3xl"></div>
+                    <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-accent opacity-10 mix-blend-overlay blur-3xl"></div>
+                    <div className="absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full bg-primary opacity-20 mix-blend-multiply blur-3xl"></div>
                     <div
                         className="absolute inset-0 opacity-5"
                         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}
@@ -56,9 +56,9 @@ export default function Index({ agendas, filters, types = [], universities = [] 
 
                 <div className="relative z-10 mx-auto max-w-7xl px-4 pt-8 pb-12 text-center sm:px-6 lg:px-8">
                     <h1 className="font-heading mb-4 text-4xl font-bold tracking-tight sm:text-5xl" style={{ fontFamily: '"El Messiri", serif' }}>
-                        {timeFilter === 'past' ? 'Past' : 'Upcoming'} <span className="text-[#FCEE1F]">Events & Agendas</span>
+                        {timeFilter === 'past' ? 'Past' : 'Upcoming'} <span className="text-accent">Events & Agendas</span>
                     </h1>
-                    <p className="mx-auto max-w-2xl text-lg text-emerald-50">
+                    <p className="mx-auto max-w-2xl text-lg text-white/80">
                         Discover conferences, workshops, and calls for papers from universities across the network.
                     </p>
                 </div>
@@ -124,7 +124,7 @@ export default function Index({ agendas, filters, types = [], universities = [] 
                         <Button
                             type="submit"
                             size="lg"
-                            className="h-12 w-full rounded-full bg-[#079C4E] px-8 font-semibold hover:bg-[#068A44] sm:col-span-2 lg:col-span-2"
+                            className="h-12 w-full rounded-full bg-secondary px-8 font-semibold text-white hover:bg-secondary/90 sm:col-span-2 lg:col-span-2"
                         >
                             Search
                         </Button>
@@ -136,13 +136,13 @@ export default function Index({ agendas, filters, types = [], universities = [] 
                 <div className="mb-8 flex justify-center border-b">
                     <button
                         onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'upcoming' })}
-                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'upcoming' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'upcoming' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                         Upcoming Events
                     </button>
                     <button
                         onClick={() => router.get(route('events.index'), { ...filters, time_filter: 'past' })}
-                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'past' ? 'border-[#079C4E] text-[#079C4E]' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        className={`border-b-2 px-6 py-3 text-sm font-semibold transition-all ${timeFilter === 'past' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                         Past Events
                     </button>
