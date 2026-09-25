@@ -46,6 +46,13 @@ class OAIPMHHarvester
                 continue;
             }
 
+            if (!$this->isSafePublicUrl($oai_url)) {
+                $errorMsg = "Blocked SSRF attempt for unsafe OAI-PMH URL: {$oai_url}";
+                Log::warning($errorMsg, ['journal_id' => $journal->id]);
+                $globalStats['errors'][] = $errorMsg;
+                continue;
+            }
+
             $stats = [
                 'records_found' => 0,
                 'records_imported' => 0,
@@ -60,6 +67,10 @@ class OAIPMHHarvester
 
                 while ($url !== null && $pageCount < $maxPages) {
                     $pageCount++;
+
+                    if (!$this->isSafePublicUrl($url)) {
+                        throw new \Exception("Blocked SSRF attempt for unsafe URL: {$url}");
+                    }
 
                     $response = Http::timeout(60)->get($url);
 
@@ -78,7 +89,7 @@ class OAIPMHHarvester
                     // Sanitize XML string: remove null bytes and other invalid control characters (0x00 - 0x1F except 0x09, 0x0A, 0x0D)
                     $cleanXml = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $xmlString);
 
-                    $xml = simplexml_load_string($cleanXml);
+                    $xml = simplexml_load_string($cleanXml, 'SimpleXMLElement', LIBXML_NONET);
 
                     if ($xml === false) {
                         $errors = libxml_get_errors();
@@ -465,5 +476,36 @@ class OAIPMHHarvester
             'verb' => 'ListRecords',
             'resumptionToken' => $resumptionToken,
         ]);
+    }
+
+    /**
+     * Check if a URL is safe to fetch (public IPv4/IPv6, not loopback/private/link-local/metadata).
+     */
+    public function isSafePublicUrl(string $url): bool
+    {
+        $parsed = parse_url($url);
+        if (!isset($parsed['scheme']) || !in_array(strtolower($parsed['scheme']), ['http', 'https'], true)) {
+            return false;
+        }
+
+        $host = trim($parsed['host'] ?? '', '[]');
+        if (empty($host) || strtolower($host) === 'localhost') {
+            return false;
+        }
+
+        // Resolve IP
+        $ip = filter_var($host, FILTER_VALIDATE_IP) ? $host : gethostbyname($host);
+        if (!$ip || !filter_var($ip, FILTER_VALIDATE_IP)) {
+            return false;
+        }
+
+        // Reject private and reserved IP ranges (RFC 1918, Loopback, Link-Local)
+        $isPublic = filter_var(
+            $ip,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+        );
+
+        return $isPublic !== false;
     }
 }
