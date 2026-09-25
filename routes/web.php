@@ -256,7 +256,7 @@ Route::middleware('guest')->group(function () {
 */
 
 // Protected routes (harus login)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     // Logout
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
@@ -270,7 +270,7 @@ Route::middleware(['auth'])->group(function () {
     | Super Admin Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::SUPER_ADMIN])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:'.Role::SUPER_ADMIN, 'active'])->prefix('admin')->name('admin.')->group(function () {
 
         // Data Master (Dashboard)
         Route::get('data-master', [DataMasterController::class, 'index'])
@@ -515,7 +515,7 @@ Route::middleware(['auth'])->group(function () {
     | Admin Kampus Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::ADMIN_KAMPUS])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
+    Route::middleware(['role:'.Role::ADMIN_KAMPUS, 'active'])->prefix('admin-kampus')->name('admin-kampus.')->group(function () {
 
         // User Approval Workflow (Two-Step Approval Phase 1)
         Route::prefix('users')->name('users.')->group(function () {
@@ -670,7 +670,7 @@ Route::middleware(['auth'])->group(function () {
     | User (Pengelola Jurnal) Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::USER])->prefix('user')->name('user.')->group(function () {
+    Route::middleware(['role:'.Role::USER, 'active'])->prefix('user')->name('user.')->group(function () {
 
         // Profil (Dashboard)
         Route::get('profil', [ProfilController::class, 'index'])
@@ -801,7 +801,7 @@ Route::middleware(['auth'])->group(function () {
     | Reviewer Routes (v1.1)
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:'.Role::REVIEWER])->prefix('reviewer')->name('reviewer.')->group(function () {
+    Route::middleware(['role:'.Role::REVIEWER, 'active'])->prefix('reviewer')->name('reviewer.')->group(function () {
 
         // Assignments Management
         Route::prefix('assignments')->name('assignments.')->group(function () {
