@@ -416,13 +416,8 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->name('tickets.reply');
         Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
             ->name('tickets.update-status');
-
-        // Support / Ticketing System for Super Admin
-        Route::resource('tickets', TicketController::class)->except(['create', 'store', 'edit']);
-        Route::post('tickets/{ticket}/reply', [TicketController::class, 'reply'])
-            ->name('tickets.reply');
-        Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
-            ->name('tickets.update-status');
+        Route::get('tickets/{ticket}/attachments/{message}', [TicketController::class, 'downloadAttachment'])
+            ->name('tickets.attachments.download');
 
         // Pembinaan Management (v1.1)
         Route::prefix('pembinaan')->name('pembinaan.')->group(function () {
@@ -643,6 +638,8 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('tickets', App\Http\Controllers\AdminKampus\TicketController::class)->except(['edit', 'update']);
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\AdminKampus\TicketController::class, 'reply'])->name('tickets.reply');
         Route::patch('tickets/{ticket}/status', [App\Http\Controllers\AdminKampus\TicketController::class, 'updateStatus'])->name('tickets.update-status');
+        Route::get('tickets/{ticket}/attachments/{message}', [App\Http\Controllers\AdminKampus\TicketController::class, 'downloadAttachment'])
+            ->name('tickets.attachments.download');
 
         // DOI Subscription Dashboard & Invoices
         Route::get('doi-subscription', [AdminKampusDoiSubscriptionController::class, 'index'])
@@ -781,6 +778,8 @@ Route::middleware(['auth', 'active'])->group(function () {
         ]);
         Route::post('tickets/{ticket}/reply', [App\Http\Controllers\User\TicketController::class, 'reply'])
             ->name('tickets.reply');
+        Route::get('tickets/{ticket}/attachments/{message}', [App\Http\Controllers\User\TicketController::class, 'downloadAttachment'])
+            ->name('tickets.attachments.download');
 
         // DOI Subscription Dashboard & Invoices
         Route::get('doi-subscription', [UserDoiSubscriptionController::class, 'index'])
