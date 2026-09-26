@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -12,7 +13,7 @@ type LoginForm = {
 };
 
 export default function Login() {
-    const { data, setData, post, processing, errors } = useForm<LoginForm>({
+    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
         remember: false,
@@ -20,7 +21,9 @@ export default function Login() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('login'));
+        post(route('login'), {
+            onFinish: () => reset('password'),
+        });
     };
 
     const handleGoogleLogin = () => {
@@ -67,12 +70,13 @@ export default function Login() {
                             {/* Password */}
                             <div>
                                 <Label htmlFor="password">Password</Label>
-                                <Input
+                                <PasswordInput
                                     id="password"
-                                    type="password"
+                                    name="password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     required
+                                    autoComplete="current-password"
                                     className="mt-2"
                                 />
                                 {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>}
