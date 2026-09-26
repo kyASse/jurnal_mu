@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,6 +48,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::useHotFile(base_path('public/hot'));
+
+        // Enforce strong password complexity defaults across registration & resets
+        Password::defaults(function () {
+            $rule = Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers();
+
+            return app()->isProduction()
+                ? $rule->symbols()->uncompromised()
+                : $rule;
+        });
 
         // Register policies
         Gate::policy(User::class, UserPolicy::class);
