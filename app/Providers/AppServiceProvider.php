@@ -26,10 +26,13 @@ use App\Policies\JournalAssessmentPolicy;
 use App\Policies\JournalPolicy;
 use App\Policies\UniversityPolicy;
 use App\Policies\UserPolicy;
+use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,6 +49,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Passport::tokensExpireIn(now()->addHours(1));
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        Passport::authorizationView('vendor.passport.authorize');
+
+        Route::matched(function (RouteMatched $event) {
+            if ($event->route->getName() === 'passport.authorizations.authorize') {
+                $event->route->middleware('auth');
+            }
+        });
+
         Vite::useHotFile(base_path('public/hot'));
 
         // Register policies
