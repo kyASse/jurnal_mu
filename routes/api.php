@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Api\OAuthRevokeController;
+use App\Http\Controllers\Api\SSOUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,3 +51,19 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
     // Route::apiResource('journals', JournalController::class);
     // Route::apiResource('universities', UniversityController::class);
 });
+
+/*
+|--------------------------------------------------------------------------
+| SSO OAuth Routes (Passport Protected)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:api'])->prefix('sso')->group(function () {
+    Route::get('/user', [SSOUserController::class, 'show']);
+});
+
+Route::middleware(['auth:api'])->prefix('oauth')->group(function () {
+    Route::post('/revoke-token', [OAuthRevokeController::class, 'revoke']);
+});
+
+
