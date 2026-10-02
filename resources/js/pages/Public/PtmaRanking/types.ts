@@ -13,6 +13,7 @@ export interface PtmaUniversity {
 export interface PtmaMetric {
     id: number;
     university_id?: number;
+    ptm_code?: string | null;
     ranking_position: number;
     sinta_score_overall: number | string;
     sinta_score_3yr: number | string;

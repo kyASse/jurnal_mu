@@ -3,6 +3,7 @@
 namespace Tests\Feature\Sinta;
 
 use App\Jobs\SyncUniversitySintaMetricJob;
+use App\Models\Role;
 use App\Models\University;
 use App\Models\UniversitySintaMetric;
 use App\Models\User;
@@ -15,10 +16,16 @@ class AdminSintaSyncTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected Role $superAdminRole;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->withoutVite();
+        $this->superAdminRole = Role::firstOrCreate(
+            ['name' => Role::SUPER_ADMIN],
+            ['display_name' => 'Super Administrator']
+        );
     }
 
     public function test_guest_is_redirected_to_login_when_accessing_admin_sinta(): void
@@ -28,10 +35,30 @@ class AdminSintaSyncTest extends TestCase
         $response->assertRedirect('/login');
     }
 
+    public function test_non_super_admin_cannot_access_admin_sinta_dashboard(): void
+    {
+        $userRole = Role::firstOrCreate(
+            ['name' => Role::USER],
+            ['display_name' => 'User']
+        );
+
+        $regularUser = User::factory()->create([
+            'role_id' => $userRole->id,
+            'email_verified_at' => now(),
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($regularUser)->get('/admin/sinta');
+
+        $response->assertStatus(403);
+    }
+
     public function test_authenticated_admin_can_access_admin_sinta_dashboard(): void
     {
         $user = User::factory()->create([
+            'role_id' => $this->superAdminRole->id,
             'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         $university1 = University::factory()->create([
@@ -80,7 +107,9 @@ class AdminSintaSyncTest extends TestCase
         Queue::fake();
 
         $user = User::factory()->create([
+            'role_id' => $this->superAdminRole->id,
             'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         // Active universities with ptm_code (target for sync)

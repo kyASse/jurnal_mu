@@ -55,4 +55,26 @@ class SintaApiClientTest extends TestCase
         $data = $client->getAffiliationMetric('051010');
         $this->assertEquals(125000, $data['sinta_score_overall']);
     }
+
+    public function test_client_throws_exception_on_empty_token_response(): void
+    {
+        config([
+            'sinta.mock_mode' => false,
+            'sinta.base_url' => 'http://apisinta.kemdikbud.go.id',
+            'sinta.username' => 'testuser',
+            'sinta.password' => 'secret123',
+        ]);
+
+        Cache::forget('sinta_bearer_token');
+
+        Http::fake([
+            'http://apisinta.kemdikbud.go.id/consumer/login' => Http::response(['token' => ''], 200),
+        ]);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('API SINTA berhasil dihubungi namun tidak mengembalikan token yang valid.');
+
+        $client = new SintaApiClient();
+        $client->getToken();
+    }
 }

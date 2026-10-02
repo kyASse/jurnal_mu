@@ -3,6 +3,7 @@
 namespace Tests\Feature\Sinta;
 
 use App\Jobs\SyncUniversitySintaMetricJob;
+use App\Models\Role;
 use App\Models\University;
 use App\Models\UniversitySintaMetric;
 use App\Models\User;
@@ -77,10 +78,32 @@ class PtmaRankingControllerTest extends TestCase
         $response->assertRedirect('/login');
     }
 
+    public function test_non_super_admin_cannot_access_admin_sinta(): void
+    {
+        $userRole = Role::firstOrCreate(
+            ['name' => Role::USER],
+            ['display_name' => 'User']
+        );
+        $user = User::factory()->create([
+            'role_id' => $userRole->id,
+            'email_verified_at' => now(),
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($user)->get('/admin/sinta');
+        $response->assertStatus(403);
+    }
+
     public function test_admin_can_view_sinta_index(): void
     {
+        $superAdminRole = Role::firstOrCreate(
+            ['name' => Role::SUPER_ADMIN],
+            ['display_name' => 'Super Administrator']
+        );
         $user = User::factory()->create([
+            'role_id' => $superAdminRole->id,
             'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         $university = University::factory()->create([
@@ -111,8 +134,14 @@ class PtmaRankingControllerTest extends TestCase
     {
         Queue::fake();
 
+        $superAdminRole = Role::firstOrCreate(
+            ['name' => Role::SUPER_ADMIN],
+            ['display_name' => 'Super Administrator']
+        );
         $user = User::factory()->create([
+            'role_id' => $superAdminRole->id,
             'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         University::factory()->create([

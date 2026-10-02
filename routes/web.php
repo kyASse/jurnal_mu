@@ -845,10 +845,13 @@ Route::middleware(['auth'])->group(function () {
     // });
 });
 
-Route::middleware(['auth', 'verified'])->prefix('admin/sinta')->name('admin.sinta.')->group(function () {
-    Route::get('/', [AdminSintaController::class, 'index'])->name('index');
-    Route::post('/sync', [AdminSintaController::class, 'syncAll'])->name('sync');
-});
+Route::middleware(['auth', 'verified', 'role:'.\App\Models\Role::SUPER_ADMIN])
+    ->prefix('admin/sinta')
+    ->name('admin.sinta.')
+    ->group(function () {
+        Route::get('/', [AdminSintaController::class, 'index'])->name('index');
+        Route::post('/sync', [AdminSintaController::class, 'syncAll'])->name('sync');
+    });
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\University;
 use App\Models\UniversitySintaMetric;
+use App\Services\Sinta\PtmaRankingService;
 use App\Services\Sinta\SintaApiClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -48,6 +49,8 @@ class SyncUniversitySintaMetricJob implements ShouldQueue
                     'last_synced_at' => now(),
                 ])
             );
+
+            PtmaRankingService::clearCache();
         } catch (Throwable $e) {
             Log::error("Failed to sync SINTA metric for University ID {$this->university->id} (ptm_code: {$ptmCode}): {$e->getMessage()}");
 

@@ -43,7 +43,13 @@ class SintaApiClient
                 throw new Exception('Gagal melakukan autentikasi ke API SINTA: ' . $response->status());
             }
 
-            return (string) $response->json('token');
+            $token = $response->json('token');
+            if (empty($token) || !is_string($token)) {
+                Log::error('SINTA Login returned empty token payload', ['body' => $response->body()]);
+                throw new Exception('API SINTA berhasil dihubungi namun tidak mengembalikan token yang valid.');
+            }
+
+            return $token;
         });
     }
 

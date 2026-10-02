@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\SyncUniversitySintaMetricJob;
 use App\Models\University;
 use App\Models\UniversitySintaMetric;
+use App\Services\Sinta\PtmaRankingService;
 use Illuminate\Console\Command;
 
 class SyncSintaPtmaCommand extends Command
@@ -75,10 +76,13 @@ class SyncSintaPtmaCommand extends Command
             }
 
             $bar->advance();
+            usleep(150000);
         }
 
         $bar->finish();
         $this->newLine();
+
+        PtmaRankingService::clearCache();
 
         $this->info("SINTA synchronization completed successfully. Synced: {$successCount}, Failed: {$failCount}.");
 

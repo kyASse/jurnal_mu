@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import PublicLayout from '@/layouts/public-layout';
 import { PtmaHeroBento, PtmaHeroStats } from './components/PtmaHeroBento';
@@ -27,6 +27,24 @@ export default function PtmaRankingIndex({
 }: PtmaRankingIndexProps) {
     const [selectedMetric, setSelectedMetric] = useState<PtmaMetric | null>(null);
     const activeSort = filters?.sort || 'sinta_overall';
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const urlParams = new URLSearchParams(window.location.search);
+        const campus = urlParams.get('campus');
+        if (campus && rankings?.data) {
+            const match = rankings.data.find(
+                (m) =>
+                    m.university?.code?.toLowerCase() === campus.toLowerCase() ||
+                    String(m.university?.id) === campus ||
+                    m.university?.ptm_code === campus ||
+                    m.ptm_code === campus
+            );
+            if (match) {
+                setSelectedMetric(match);
+            }
+        }
+    }, [rankings]);
 
     return (
         <PublicLayout>

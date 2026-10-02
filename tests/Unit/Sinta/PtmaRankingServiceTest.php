@@ -134,4 +134,71 @@ class PtmaRankingServiceTest extends TestCase
         $this->assertEquals('Univ B', $stats['top_university_overall']->name);
         $this->assertEquals(3000, $stats['top_university_score']);
     }
+
+    public function test_ranking_uses_deterministic_secondary_tie_breaker_sort(): void
+    {
+        $u1 = University::factory()->create(['name' => 'Univ 1', 'ptm_code' => '001', 'is_active' => true]);
+        $u2 = University::factory()->create(['name' => 'Univ 2', 'ptm_code' => '002', 'is_active' => true]);
+
+        // Both have identical scopus_docs
+        UniversitySintaMetric::create([
+            'university_id' => $u2->id,
+            'ptm_code' => '002',
+            'scopus_docs' => 100,
+            'sinta_score_overall' => 500,
+        ]);
+
+        UniversitySintaMetric::create([
+            'university_id' => $u1->id,
+            'ptm_code' => '001',
+            'scopus_docs' => 100,
+            'sinta_score_overall' => 500,
+        ]);
+
+        $service = new PtmaRankingService();
+        $results = $service->getRankings(['sort' => 'scopus', 'dir' => 'desc']);
+
+        // Tie broken by universities.id ASC: u1 (lower id) comes before u2
+        $this->assertEquals($u1->id, $results->first()->university_id);
+        $this->assertEquals($u2->id, $results->last()->university_id);
+    }
+
+    public function test_summary_stats_are_cached_and_can_be_cleared(): void
+    {
+        \Illuminate\Support\Facades\Cache::forget('ptma_macro_stats');
+
+        $u1 = University::factory()->create(['name' => 'Univ A', 'ptm_code' => '001', 'is_active' => true]);
+        UniversitySintaMetric::create([
+            'university_id' => $u1->id,
+            'ptm_code' => '001',
+            'scopus_docs' => 100,
+            'sinta_score_overall' => 1000,
+        ]);
+
+        $service = new PtmaRankingService();
+        $stats1 = $service->getSummaryStats();
+        $this->assertEquals(1, $stats1['total_ptma_indexed']);
+        $this->assertTrue(\Illuminate\Support\Facades\Cache::has('ptma_macro_stats'));
+
+        // Add another university metric
+        $u2 = University::factory()->create(['name' => 'Univ B', 'ptm_code' => '002', 'is_active' => true]);
+        UniversitySintaMetric::create([
+            'university_id' => $u2->id,
+            'ptm_code' => '002',
+            'scopus_docs' => 200,
+            'sinta_score_overall' => 2000,
+        ]);
+
+        // Still cached, so statsCached equals stats1
+        $statsCached = $service->getSummaryStats();
+        $this->assertEquals(1, $statsCached['total_ptma_indexed']);
+
+        // Clear cache
+        PtmaRankingService::clearCache();
+        $this->assertFalse(\Illuminate\Support\Facades\Cache::has('ptma_macro_stats'));
+
+        // Fresh stats fetch
+        $statsFresh = $service->getSummaryStats();
+        $this->assertEquals(2, $statsFresh['total_ptma_indexed']);
+    }
 }

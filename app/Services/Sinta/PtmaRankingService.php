@@ -5,6 +5,7 @@ namespace App\Services\Sinta;
 use App\Models\University;
 use App\Models\UniversitySintaMetric;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class PtmaRankingService
@@ -65,7 +66,9 @@ class PtmaRankingService
             $query->where('universities.accreditation_status', $accreditation);
         }
 
-        return $query->orderBy($column, $direction)->paginate($perPage);
+        return $query->orderBy($column, $direction)
+            ->orderBy('universities.id', 'asc')
+            ->paginate($perPage);
     }
 
     /**
@@ -75,38 +78,48 @@ class PtmaRankingService
      */
     public function getSummaryStats(): array
     {
-        $totals = UniversitySintaMetric::query()
-            ->join('universities', 'universities.id', '=', 'university_sinta_metrics.university_id')
-            ->where('universities.is_active', true)
-            ->whereNull('universities.deleted_at')
-            ->selectRaw('
-                COUNT(university_sinta_metrics.id) as total_ptma_indexed,
-                COALESCE(SUM(scopus_docs), 0) as collective_scopus_docs,
-                COALESCE(SUM(garuda_docs), 0) as collective_garuda_docs,
-                COALESCE(SUM(ipr_count), 0) as collective_ipr_count,
-                COALESCE(SUM(research_count), 0) as collective_research_count,
-                COALESCE(SUM(authors_count), 0) as collective_authors_count
-            ')
-            ->first();
+        return Cache::remember('ptma_macro_stats', 3600, function () {
+            $totals = UniversitySintaMetric::query()
+                ->join('universities', 'universities.id', '=', 'university_sinta_metrics.university_id')
+                ->where('universities.is_active', true)
+                ->whereNull('universities.deleted_at')
+                ->selectRaw('
+                    COUNT(university_sinta_metrics.id) as total_ptma_indexed,
+                    COALESCE(SUM(scopus_docs), 0) as collective_scopus_docs,
+                    COALESCE(SUM(garuda_docs), 0) as collective_garuda_docs,
+                    COALESCE(SUM(ipr_count), 0) as collective_ipr_count,
+                    COALESCE(SUM(research_count), 0) as collective_research_count,
+                    COALESCE(SUM(authors_count), 0) as collective_authors_count
+                ')
+                ->first();
 
-        $topUnivMetric = UniversitySintaMetric::query()
-            ->select('university_sinta_metrics.*')
-            ->join('universities', 'universities.id', '=', 'university_sinta_metrics.university_id')
-            ->where('universities.is_active', true)
-            ->whereNull('universities.deleted_at')
-            ->orderByDesc('university_sinta_metrics.sinta_score_overall')
-            ->with('university')
-            ->first();
+            $topUnivMetric = UniversitySintaMetric::query()
+                ->select('university_sinta_metrics.*')
+                ->join('universities', 'universities.id', '=', 'university_sinta_metrics.university_id')
+                ->where('universities.is_active', true)
+                ->whereNull('universities.deleted_at')
+                ->orderByDesc('university_sinta_metrics.sinta_score_overall')
+                ->with('university')
+                ->first();
 
-        return [
-            'total_ptma_indexed' => (int) ($totals->total_ptma_indexed ?? 0),
-            'collective_scopus_docs' => (int) ($totals->collective_scopus_docs ?? 0),
-            'collective_garuda_docs' => (int) ($totals->collective_garuda_docs ?? 0),
-            'collective_ipr_count' => (int) ($totals->collective_ipr_count ?? 0),
-            'collective_research_count' => (int) ($totals->collective_research_count ?? 0),
-            'collective_authors_count' => (int) ($totals->collective_authors_count ?? 0),
-            'top_university_overall' => $topUnivMetric?->university,
-            'top_university_score' => $topUnivMetric?->sinta_score_overall ?? 0,
-        ];
+            return [
+                'total_ptma_indexed' => (int) ($totals->total_ptma_indexed ?? 0),
+                'collective_scopus_docs' => (int) ($totals->collective_scopus_docs ?? 0),
+                'collective_garuda_docs' => (int) ($totals->collective_garuda_docs ?? 0),
+                'collective_ipr_count' => (int) ($totals->collective_ipr_count ?? 0),
+                'collective_research_count' => (int) ($totals->collective_research_count ?? 0),
+                'collective_authors_count' => (int) ($totals->collective_authors_count ?? 0),
+                'top_university_overall' => $topUnivMetric?->university,
+                'top_university_score' => $topUnivMetric?->sinta_score_overall ?? 0,
+            ];
+        });
+    }
+
+    /**
+     * Clear the cached PTMA macro statistics.
+     */
+    public static function clearCache(): void
+    {
+        Cache::forget('ptma_macro_stats');
     }
 }

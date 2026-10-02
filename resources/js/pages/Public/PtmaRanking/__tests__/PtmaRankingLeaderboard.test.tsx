@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { LeaderboardRow } from '../components/LeaderboardRow';
 import { LeaderboardTable } from '../components/LeaderboardTable';
@@ -339,6 +339,35 @@ describe('PtmaDetailDrawer Component', () => {
         // ESC keydown
         fireEvent.keyDown(window, { key: 'Escape' });
         expect(onClose).toHaveBeenCalledTimes(2);
+    });
+
+    it('copies link with campus query param when Salin Tautan is clicked', async () => {
+        const writeTextMock = vi.fn().mockResolvedValue(undefined);
+        const originalClipboard = navigator.clipboard;
+        Object.defineProperty(navigator, 'clipboard', {
+            value: {
+                writeText: writeTextMock,
+            },
+            writable: true,
+            configurable: true,
+        });
+
+        render(<PtmaDetailDrawer metric={mockMetric} onClose={vi.fn()} />);
+
+        const copyBtn = screen.getByRole('button', { name: /salin tautan/i });
+        await act(async () => {
+            fireEvent.click(copyBtn);
+        });
+
+        expect(writeTextMock).toHaveBeenCalledTimes(1);
+        const copiedUrl = writeTextMock.mock.calls[0][0];
+        expect(copiedUrl).toContain('campus=UMS');
+
+        Object.defineProperty(navigator, 'clipboard', {
+            value: originalClipboard,
+            writable: true,
+            configurable: true,
+        });
     });
 });
 

@@ -419,10 +419,28 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     {metrics.links.map((link, index) => {
-                                        if (link.url === null) return null;
-
                                         const isFirst = index === 0;
                                         const isLast = index === metrics.links.length - 1;
+
+                                        if (link.url === null) {
+                                            return (
+                                                <Button
+                                                    key={index}
+                                                    variant="outline"
+                                                    size="sm"
+                                                    disabled
+                                                    className="h-8 min-w-8 px-2 text-xs text-muted-foreground opacity-50"
+                                                >
+                                                    {isFirst ? (
+                                                        <ChevronLeft className="h-3.5 w-3.5" />
+                                                    ) : isLast ? (
+                                                        <ChevronRight className="h-3.5 w-3.5" />
+                                                    ) : (
+                                                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                                    )}
+                                                </Button>
+                                            );
+                                        }
 
                                         return (
                                             <Link
@@ -434,7 +452,6 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                                                 <Button
                                                     variant={link.active ? 'default' : 'outline'}
                                                     size="sm"
-                                                    disabled={!link.url}
                                                     className={`h-8 min-w-8 px-2 text-xs ${
                                                         link.active ? '' : 'text-muted-foreground'
                                                     }`}

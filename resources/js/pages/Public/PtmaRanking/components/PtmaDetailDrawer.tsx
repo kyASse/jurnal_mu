@@ -50,7 +50,14 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
     const numberFormatter = new Intl.NumberFormat('id-ID');
 
     const handleCopyLink = () => {
-        const url = window.location.href;
+        const campusKey = encodeURIComponent(univ?.code || univ?.id || '');
+        let url = window.location.href;
+        if (url.includes('campus=')) {
+            url = url.replace(/campus=[^&]*/, `campus=${campusKey}`);
+        } else {
+            const separator = url.includes('?') ? '&' : '?';
+            url = `${url}${separator}campus=${campusKey}`;
+        }
         navigator.clipboard.writeText(url).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
