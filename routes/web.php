@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AccreditationTemplateController;
 use App\Http\Controllers\Admin\AdminKampusController;
+use App\Http\Controllers\Admin\AdminSintaController;
 use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
@@ -48,6 +49,7 @@ use App\Http\Controllers\PublicNewsController;
 use App\Http\Controllers\PublicUniversityController;
 use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\ReviewerController as MainReviewerController;
+use App\Http\Controllers\Sinta\PtmaRankingController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\AssessmentIssueController;
@@ -209,6 +211,9 @@ Route::get('/browse/universities', [PublicUniversityController::class, 'index'])
     ->name('browse.universities');
 Route::get('/browse/universities/{university}', [PublicUniversityController::class, 'show'])
     ->name('browse.universities.show');
+
+// PTMA SINTA Ranking
+Route::get('/ptma/ranking', [PtmaRankingController::class, 'index'])->name('ptma.ranking');
 
 // Public access to view events
 Route::get('/events', [PublicEventController::class, 'index'])
@@ -838,6 +843,11 @@ Route::middleware(['auth'])->group(function () {
     //     Route::patch('/', [ProfileController::class, 'update'])->name('update');
     //     Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     // });
+});
+
+Route::middleware(['auth', 'verified'])->prefix('admin/sinta')->name('admin.sinta.')->group(function () {
+    Route::get('/', [AdminSintaController::class, 'index'])->name('index');
+    Route::post('/sync', [AdminSintaController::class, 'syncAll'])->name('sync');
 });
 
 require __DIR__.'/settings.php';
