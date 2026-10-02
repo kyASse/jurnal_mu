@@ -61,4 +61,16 @@ class UniversitySintaMetricModelTest extends TestCase
         $this->assertInstanceOf(University::class, $metric->university);
         $this->assertEquals($university->id, $metric->university->id);
     }
+
+    public function test_university_sinta_metric_factory_creates_record(): void
+    {
+        $metric = UniversitySintaMetric::factory()->create();
+
+        $this->assertNotNull($metric->id);
+        $this->assertNotNull($metric->university_id);
+        $this->assertNotNull($metric->ptm_code);
+        $this->assertGreaterThan(0, $metric->sinta_score_overall);
+        $this->assertEquals('success', $metric->sync_status);
+        $this->assertInstanceOf(University::class, $metric->university);
+    }
 }
