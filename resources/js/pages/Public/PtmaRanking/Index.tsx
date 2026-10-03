@@ -67,7 +67,7 @@ export default function PtmaRankingIndex({
             </Head>
 
             {/* Hero Header Section */}
-            <div className="bg-hero-gradient pt-14 pb-24 text-white">
+            <div className="bg-hero-gradient pt-14 pb-12 sm:pb-14 text-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 text-accent ring-1 ring-white/20 backdrop-blur-sm mb-4">
                         Benchmark Institusi PTMA
@@ -84,8 +84,8 @@ export default function PtmaRankingIndex({
                 </div>
             </div>
 
-            {/* Content Overlap & Container Structure */}
-            <div className="relative z-20 mx-auto -mt-14 max-w-7xl px-4 sm:px-6 lg:px-8 pb-16">
+            {/* Content Container Structure */}
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-16">
                 {/* Bento Hero */}
                 <PtmaHeroBento stats={stats} />
 

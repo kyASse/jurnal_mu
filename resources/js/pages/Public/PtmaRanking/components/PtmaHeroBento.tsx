@@ -31,7 +31,7 @@ export const PtmaHeroBento: React.FC<PtmaHeroBentoProps> = ({ stats }) => {
     const topUniv = stats.top_university_overall;
 
     return (
-        <section className="relative w-full py-6 md:py-10 font-['Geist',sans-serif]">
+        <section className="relative w-full pt-0 pb-6 md:pb-8 font-['Geist',sans-serif]">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
                 {/* Spotlight #1 Leaderboard (Double-Bezel Architecture) */}
                 <div className="lg:col-span-5 relative group">

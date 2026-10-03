@@ -138,8 +138,8 @@ describe('FilterControlBar Component', () => {
         const input = screen.getByPlaceholderText(/Cari nama atau singkatan/i);
         expect(input).toHaveValue('Yogyakarta');
 
-        const select = screen.getByLabelText(/Filter status akreditasi BAN-PT/i);
-        expect(select).toHaveValue('Unggul');
+        const trigger = screen.getByLabelText(/Filter status akreditasi BAN-PT/i);
+        expect(trigger).toHaveTextContent('Akreditasi: Unggul');
     });
 
     it('triggers debounced search on input change', () => {
@@ -178,10 +178,14 @@ describe('FilterControlBar Component', () => {
     });
 
     it('triggers navigation when accreditation dropdown option is selected', () => {
+        vi.useRealTimers();
         render(<FilterControlBar filters={{ sort: 'sinta_overall' }} />);
 
-        const select = screen.getByLabelText(/Filter status akreditasi BAN-PT/i);
-        fireEvent.change(select, { target: { value: 'Baik Sekali' } });
+        const trigger = screen.getByLabelText(/Filter status akreditasi BAN-PT/i);
+        fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerType: 'mouse' });
+
+        const option = screen.getByText('Baik Sekali');
+        fireEvent.click(option);
 
         expect(mockRouterGet).toHaveBeenCalledWith(
             '/ptma/ranking',

@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react';
-import { Filter, RotateCcw, Search, X } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown, Filter, RotateCcw, Search, X } from 'lucide-react';
 import { useDebouncedCallback } from 'use-debounce';
 
 export interface FilterControlBarProps {
@@ -107,14 +116,14 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
 
     return (
         <div className="w-full mb-6 font-['Geist',sans-serif]">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2 md:p-3 rounded-2xl bg-zinc-50/70 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2 md:p-3 rounded-2xl bg-card border border-border shadow-xs">
                 {/* Search Input */}
                 <form
                     onSubmit={handleSearchSubmit}
                     className="relative flex-1 max-w-lg"
                     role="search"
                 >
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
                         <Search className="w-4 h-4" />
                     </div>
                     <input
@@ -123,13 +132,13 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
                         onChange={handleSearchChange}
                         placeholder="Cari nama atau singkatan PTMA (contoh: UMY, UAD, UMS)..."
                         aria-label="Cari PTMA"
-                        className="w-full pl-10 pr-10 py-2.5 text-xs md:text-sm rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all shadow-xs"
+                        className="w-full pl-10 pr-10 py-2.5 text-xs md:text-sm rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-primary transition-all shadow-xs"
                     />
                     {search && (
                         <button
                             type="button"
                             onClick={handleClearSearch}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
                             aria-label="Bersihkan pencarian"
                         >
                             <X className="w-4 h-4" />
@@ -139,34 +148,40 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
 
                 {/* Filter Controls */}
                 <div className="flex items-center gap-2">
-                    <div className="relative flex items-center">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                            <Filter className="w-3.5 h-3.5" />
-                        </div>
-                        <select
-                            value={accreditation}
-                            onChange={(e) => handleAccreditationChange(e.target.value)}
-                            aria-label="Filter status akreditasi BAN-PT"
-                            className="pl-9 pr-8 py-2.5 text-xs md:text-sm rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all shadow-xs cursor-pointer appearance-none"
-                        >
-                            {ACCREDITATION_OPTIONS.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-zinc-400">
-                            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                            </svg>
-                        </div>
-                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                type="button"
+                                aria-label="Filter status akreditasi BAN-PT"
+                                className={`inline-flex items-center gap-2 px-3.5 py-2.5 text-xs md:text-sm rounded-xl border transition-all shadow-xs cursor-pointer ${
+                                    accreditation
+                                        ? 'border-primary text-primary bg-primary/5 font-medium'
+                                        : 'bg-card text-foreground border-border hover:bg-muted'
+                                }`}
+                            >
+                                <Filter className="w-4 h-4 text-muted-foreground" />
+                                <span>{accreditation ? `Akreditasi: ${accreditation}` : 'Semua Akreditasi'}</span>
+                                <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-1.5" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 bg-popover text-popover-foreground border-border shadow-lg">
+                            <DropdownMenuLabel>Filter Akreditasi BAN-PT</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={accreditation} onValueChange={handleAccreditationChange}>
+                                {ACCREDITATION_OPTIONS.map((opt) => (
+                                    <DropdownMenuRadioItem key={opt.value} value={opt.value} className="cursor-pointer">
+                                        {opt.label}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     {hasActiveFilters && (
                         <button
                             type="button"
                             onClick={handleResetAll}
-                            className="inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/60 transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors shadow-xs"
                             title="Reset filter pencarian"
                         >
                             <RotateCcw className="w-3.5 h-3.5" />
