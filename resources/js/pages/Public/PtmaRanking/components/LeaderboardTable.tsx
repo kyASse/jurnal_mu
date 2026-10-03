@@ -30,14 +30,14 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     // Empty state
     if (!metrics || metrics.length === 0) {
         return (
-            <div className="w-full py-16 px-4 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-center font-['Geist',sans-serif]">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
+            <div className="w-full py-16 px-4 rounded-3xl border border-dashed border-border bg-muted/40 text-center font-['Geist',sans-serif]">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
                     <SearchX className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                <h3 className="text-base font-semibold text-card-foreground">
                     Tidak ada kampus yang cocok dengan kriteria pencarian
                 </h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-md mx-auto">
+                <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
                     Silakan ubah kata kunci pencarian atau sesuaikan filter akreditasi BAN-PT untuk melihat kampus PTMA lainnya.
                 </p>
             </div>
@@ -84,9 +84,9 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     return (
         <div className="w-full space-y-4 font-['Geist',sans-serif]">
             {/* Table Meta Header */}
-            <div className="flex items-center justify-between px-2 py-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <div className="flex items-center justify-between px-2 py-1 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5 font-medium">
-                    <School className="w-3.5 h-3.5 text-emerald-600" />
+                    <School className="w-3.5 h-3.5 text-primary" />
                     Menampilkan {metrics.length} Perguruan Tinggi
                     {pagination?.total && pagination.total > metrics.length && (
                         <span> dari {pagination.total} terindeks</span>
@@ -112,10 +112,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 
             {/* Pagination Controls */}
             {pagination && pagination.links && pagination.links.length > 3 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 border-t border-zinc-200/80 dark:border-zinc-800">
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
-                        Halaman <span className="font-semibold text-zinc-800 dark:text-zinc-200">{pagination.current_page}</span> dari{' '}
-                        <span className="font-semibold text-zinc-800 dark:text-zinc-200">{pagination.last_page}</span>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 border-t border-border">
+                    <div className="text-xs text-muted-foreground font-mono">
+                        Halaman <span className="font-semibold text-foreground">{pagination.current_page}</span> dari{' '}
+                        <span className="font-semibold text-foreground">{pagination.last_page}</span>
                         {pagination.total && (
                             <span className="ml-1">({pagination.total} total kampus)</span>
                         )}
@@ -136,8 +136,8 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                                         onClick={() => handlePageClick(link.url)}
                                         className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                             isDisabled
-                                                ? 'text-zinc-300 dark:text-zinc-700 cursor-not-allowed'
-                                                : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                                                ? 'text-muted-foreground/40 cursor-not-allowed'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                                         }`}
                                         aria-label="Halaman sebelumnya"
                                     >
@@ -156,8 +156,8 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                                         onClick={() => handlePageClick(link.url)}
                                         className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                             isDisabled
-                                                ? 'text-zinc-300 dark:text-zinc-700 cursor-not-allowed'
-                                                : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                                                ? 'text-muted-foreground/40 cursor-not-allowed'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                                         }`}
                                         aria-label="Halaman berikutnya"
                                     >
@@ -175,10 +175,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                                     onClick={() => handlePageClick(link.url)}
                                     className={`w-8 h-8 rounded-lg text-xs font-mono font-medium transition-colors flex items-center justify-center ${
                                         link.active
-                                            ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                                            ? 'bg-primary text-primary-foreground font-bold shadow-xs'
                                             : isDisabled
-                                            ? 'text-zinc-300 dark:text-zinc-700 cursor-default'
-                                            : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                                            ? 'text-muted-foreground/40 cursor-default'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                                     }`}
                                 >
                                     {link.label}

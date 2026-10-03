@@ -36,16 +36,16 @@ export const PtmaHeroBento: React.FC<PtmaHeroBentoProps> = ({ stats }) => {
                 {/* Spotlight #1 Leaderboard (Double-Bezel Architecture) */}
                 <div className="lg:col-span-5 relative group">
                     {/* Outer Shell: Doppelrand Container */}
-                    <div className="h-full rounded-[2rem] p-2 bg-gradient-to-br from-emerald-500/20 via-zinc-200/60 to-zinc-100/40 dark:from-emerald-900/30 dark:via-zinc-800/50 dark:to-zinc-900/40 ring-1 ring-emerald-500/30 dark:ring-emerald-500/20 shadow-sm transition-all duration-300">
+                    <div className="h-full rounded-[2rem] p-2 bg-gradient-to-br from-primary/15 via-muted/60 to-muted/30 ring-1 ring-primary/25 shadow-sm transition-all duration-300">
                         {/* Inner Core: Backdrop blur & content canvas */}
-                        <div className="h-full rounded-[calc(2rem-0.5rem)] p-6 md:p-8 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/60 dark:border-zinc-800/80 shadow-xs flex flex-col justify-between min-h-[300px]">
+                        <div className="h-full rounded-[calc(2rem-0.5rem)] p-6 md:p-8 bg-card/95 backdrop-blur-xl border border-border shadow-xs flex flex-col justify-between min-h-[300px]">
                             {/* Header Badges */}
                             <div className="flex items-center justify-between gap-2">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-500/25">
-                                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold uppercase tracking-wider bg-primary/10 text-primary ring-1 ring-primary/25">
+                                    <Sparkles className="w-3.5 h-3.5 text-primary" />
                                     Top PTMA Nasional
                                 </span>
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-bold tracking-tight text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-bold tracking-tight text-muted-foreground bg-muted">
                                     Peringkat #1
                                 </span>
                             </div>
@@ -57,29 +57,29 @@ export const PtmaHeroBento: React.FC<PtmaHeroBentoProps> = ({ stats }) => {
                                         <img
                                             src={topUniv.logo_url}
                                             alt={topUniv.name}
-                                            className="w-12 h-12 rounded-xl object-contain bg-zinc-50 dark:bg-zinc-800 p-1 ring-1 ring-zinc-200 dark:ring-zinc-700"
+                                            className="w-12 h-12 rounded-xl object-contain bg-muted p-1 ring-1 ring-border"
                                         />
                                     ) : (
-                                        <div className="w-12 h-12 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 ring-1 ring-emerald-500/30 flex items-center justify-center font-bold text-emerald-700 dark:text-emerald-400 text-sm">
+                                        <div className="w-12 h-12 rounded-xl bg-primary/10 ring-1 ring-primary/25 flex items-center justify-center font-bold text-primary text-sm">
                                             {topUniv?.short_name || topUniv?.name?.substring(0, 3).toUpperCase() || 'PTM'}
                                         </div>
                                     )}
                                     <div>
                                         {topUniv?.accreditation_status && (
-                                            <span className="text-[10px] uppercase font-mono font-semibold tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 rounded-md">
+                                            <span className="text-[10px] uppercase font-mono font-semibold tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md ring-1 ring-primary/20">
                                                 Akreditasi {topUniv.accreditation_status}
                                             </span>
                                         )}
                                     </div>
                                 </div>
-                                <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 leading-snug line-clamp-2">
+                                <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-card-foreground leading-snug line-clamp-2">
                                     {topUniv?.name ?? 'Universitas Muhammadiyah'}
                                 </h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 flex items-center gap-1.5">
+                                <p className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1.5">
                                     <span>{topUniv?.city ?? 'Indonesia'}</span>
                                     {topUniv?.province && (
                                         <>
-                                            <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                                            <span className="text-muted-foreground/40">•</span>
                                             <span>{topUniv.province}</span>
                                         </>
                                     )}
@@ -87,16 +87,16 @@ export const PtmaHeroBento: React.FC<PtmaHeroBentoProps> = ({ stats }) => {
                             </div>
 
                             {/* Footer Metric */}
-                            <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-baseline justify-between">
+                            <div className="pt-4 border-t border-border flex items-baseline justify-between">
                                 <div>
-                                    <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-emerald-600 dark:text-emerald-400 tracking-tight">
+                                    <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-primary tracking-tight">
                                         {numberFormatter.format(Math.round(stats.top_university_score))}
                                     </span>
-                                    <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mt-0.5">
+                                    <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block mt-0.5">
                                         Skor SINTA Overall
                                     </span>
                                 </div>
-                                <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+                                <span className="text-xs font-mono text-muted-foreground">
                                     Kemdikbudristek
                                 </span>
                             </div>
@@ -107,94 +107,94 @@ export const PtmaHeroBento: React.FC<PtmaHeroBentoProps> = ({ stats }) => {
                 {/* Macro Power Grid (2x2) */}
                 <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Card 1: Total PTMA Terindeks */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between hover:border-emerald-500/30 transition-colors shadow-xs">
+                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-primary/30 transition-colors shadow-xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Total PTMA Terindeks
                             </span>
-                            <div className="w-8 h-8 rounded-lg bg-zinc-200/60 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300">
+                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                                 <Layers className="w-4 h-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-zinc-900 dark:text-zinc-50">
+                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
                                 {numberFormatter.format(stats.total_ptma_indexed)}
                             </span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-1">
+                            <span className="text-xs text-muted-foreground block mt-1">
                                 Perguruan Tinggi Muhammadiyah & 'Aisyiyah
                             </span>
                         </div>
-                        <div className="h-1 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-zinc-500 rounded-full w-full" />
+                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary/60 rounded-full w-full" />
                         </div>
                     </div>
 
                     {/* Card 2: Publikasi Scopus Kolektif */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between hover:border-emerald-500/30 transition-colors shadow-xs">
+                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-primary/30 transition-colors shadow-xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
                                 Publikasi Scopus Kolektif
                             </span>
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                 <BookOpen className="w-4 h-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-zinc-900 dark:text-zinc-50">
+                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
                                 {numberFormatter.format(stats.collective_scopus_docs)}
                             </span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-1">
+                            <span className="text-xs text-muted-foreground block mt-1">
                                 Dokumen Internasional Bereputasi
                             </span>
                         </div>
-                        <div className="h-1 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-emerald-600 rounded-full w-full" />
+                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary rounded-full w-full" />
                         </div>
                     </div>
 
                     {/* Card 3: Publikasi Garuda Kolektif */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between hover:border-emerald-500/30 transition-colors shadow-xs">
+                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-secondary/30 transition-colors shadow-xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                            <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
                                 Publikasi Garuda Kolektif
                             </span>
-                            <div className="w-8 h-8 rounded-lg bg-zinc-200/60 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                            <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
                                 <FileCheck className="w-4 h-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-zinc-900 dark:text-zinc-50">
+                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
                                 {numberFormatter.format(stats.collective_garuda_docs)}
                             </span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-1">
+                            <span className="text-xs text-muted-foreground block mt-1">
                                 Publikasi Terakreditasi Nasional
                             </span>
                         </div>
-                        <div className="h-1 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-zinc-700 dark:bg-zinc-400 rounded-full w-full" />
+                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-secondary rounded-full w-full" />
                         </div>
                     </div>
 
                     {/* Card 4: Paten / HKI Kolektif */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between hover:border-emerald-500/30 transition-colors shadow-xs">
+                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-accent/40 transition-colors shadow-xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Paten & HKI Kolektif
                             </span>
-                            <div className="w-8 h-8 rounded-lg bg-zinc-200/60 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                            <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-foreground">
                                 <Award className="w-4 h-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-zinc-900 dark:text-zinc-50">
+                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
                                 {numberFormatter.format(stats.collective_ipr_count)}
                             </span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-1">
+                            <span className="text-xs text-muted-foreground block mt-1">
                                 Hak Kekayaan Intelektual Terdaftar
                             </span>
                         </div>
-                        <div className="h-1 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-zinc-700 dark:bg-zinc-400 rounded-full w-full" />
+                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-muted-foreground rounded-full w-full" />
                         </div>
                     </div>
                 </div>

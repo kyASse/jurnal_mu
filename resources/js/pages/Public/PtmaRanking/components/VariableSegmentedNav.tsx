@@ -47,7 +47,7 @@ export const VariableSegmentedNav: React.FC<VariableSegmentedNavProps> = ({
             className="w-full my-6 sticky top-2 z-20 font-['Geist',sans-serif]"
         >
             <div className="w-full overflow-x-auto pb-1 scrollbar-none flex items-center justify-start md:justify-center">
-                <div className="inline-flex items-center gap-1 p-1.5 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm shadow-zinc-950/5">
+                <div className="inline-flex items-center gap-1 p-1.5 rounded-full bg-card/90 dark:bg-card/90 backdrop-blur-xl border border-border shadow-xs">
                     {VARIABLES.map((item) => {
                         const isActive = safeSort === item.key;
 
@@ -56,17 +56,17 @@ export const VariableSegmentedNav: React.FC<VariableSegmentedNavProps> = ({
                                 key={item.key}
                                 type="button"
                                 onClick={() => handleSwitch(item.key)}
-                                className={`relative px-3.5 py-1.5 text-xs font-medium rounded-full transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
+                                className={`relative px-3.5 py-1.5 text-xs font-medium rounded-full transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                                     isActive
-                                        ? 'text-emerald-950 dark:text-emerald-50 font-semibold'
-                                        : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60'
+                                        ? 'text-primary font-semibold'
+                                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                                 }`}
                             >
                                 {isActive && (
                                     <motion.div
                                         layoutId="activePillIndicator"
                                         transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                                        className="absolute inset-0 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/30 dark:border-emerald-500/40 rounded-full shadow-xs"
+                                        className="absolute inset-0 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-full shadow-xs"
                                     />
                                 )}
                                 <span className="relative z-10">{item.label}</span>
