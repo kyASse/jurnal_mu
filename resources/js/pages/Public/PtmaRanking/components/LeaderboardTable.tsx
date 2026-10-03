@@ -25,6 +25,8 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     onSelectDetail,
     pagination,
 }) => {
+    const safeSort = typeof currentSort === 'string' && currentSort ? currentSort : 'sinta_overall';
+
     // Empty state
     if (!metrics || metrics.length === 0) {
         return (
@@ -69,7 +71,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
         }
     };
 
-    const topValue = metrics[0] ? getMetricNumber(metrics[0], currentSort) : 1;
+    const topValue = metrics[0] ? getMetricNumber(metrics[0], safeSort) : 1;
 
     const handlePageClick = (url: string | null) => {
         if (!url) return;
@@ -91,7 +93,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                     )}
                 </span>
                 <span className="font-mono text-[11px] uppercase tracking-wider">
-                    Urutan: {currentSort.replace('_', ' ')}
+                    Urutan: {safeSort.replace(/_/g, ' ')}
                 </span>
             </div>
 
@@ -101,7 +103,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                     <LeaderboardRow
                         key={item.id}
                         metric={item}
-                        currentSort={currentSort}
+                        currentSort={safeSort}
                         topValue={topValue}
                         onSelectDetail={onSelectDetail}
                     />

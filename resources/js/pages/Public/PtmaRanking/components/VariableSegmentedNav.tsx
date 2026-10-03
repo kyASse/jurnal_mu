@@ -28,12 +28,15 @@ export const VariableSegmentedNav: React.FC<VariableSegmentedNavProps> = ({
     currentSort = 'sinta_overall',
     filters = {},
 }) => {
+    const safeSort = typeof currentSort === 'string' && currentSort ? currentSort : 'sinta_overall';
+    const safeFilters = filters && !Array.isArray(filters) && typeof filters === 'object' ? filters : {};
+
     const handleSwitch = (key: string) => {
-        if (currentSort === key) return;
+        if (safeSort === key) return;
 
         router.get(
             '/ptma/ranking',
-            { ...filters, sort: key, page: 1 },
+            { ...safeFilters, sort: key, page: 1 },
             { preserveState: true, preserveScroll: true, replace: true }
         );
     };
@@ -46,7 +49,7 @@ export const VariableSegmentedNav: React.FC<VariableSegmentedNavProps> = ({
             <div className="w-full overflow-x-auto pb-1 scrollbar-none flex items-center justify-start md:justify-center">
                 <div className="inline-flex items-center gap-1 p-1.5 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm shadow-zinc-950/5">
                     {VARIABLES.map((item) => {
-                        const isActive = currentSort === item.key;
+                        const isActive = safeSort === item.key;
 
                         return (
                             <button

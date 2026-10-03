@@ -23,26 +23,27 @@ const ACCREDITATION_OPTIONS = [
 ];
 
 export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {} }) => {
-    const initialQuery = filters.q ?? '';
-    const initialAccreditation = filters.accreditation ?? '';
+    const safeFilters = filters && !Array.isArray(filters) && typeof filters === 'object' ? filters : {};
+    const initialQuery = safeFilters.q ?? '';
+    const initialAccreditation = safeFilters.accreditation ?? '';
 
     const [search, setSearch] = useState(initialQuery);
     const [accreditation, setAccreditation] = useState(initialAccreditation);
 
     // Synchronize internal state when server props change (e.g., browser back/forward)
     useEffect(() => {
-        setSearch(filters.q ?? '');
-    }, [filters.q]);
+        setSearch(safeFilters.q ?? '');
+    }, [safeFilters.q]);
 
     useEffect(() => {
-        setAccreditation(filters.accreditation ?? '');
-    }, [filters.accreditation]);
+        setAccreditation(safeFilters.accreditation ?? '');
+    }, [safeFilters.accreditation]);
 
     const performSearch = (query: string, acc: string = accreditation) => {
         router.get(
             '/ptma/ranking',
             {
-                ...filters,
+                ...safeFilters,
                 q: query.trim() ? query.trim() : undefined,
                 accreditation: acc ? acc : undefined,
                 page: 1,
@@ -90,8 +91,8 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
         router.get(
             '/ptma/ranking',
             {
-                sort: filters.sort ?? 'sinta_overall',
-                dir: filters.dir ?? 'desc',
+                sort: typeof safeFilters.sort === 'string' ? safeFilters.sort : 'sinta_overall',
+                dir: typeof safeFilters.dir === 'string' ? safeFilters.dir : 'desc',
                 page: 1,
             },
             {

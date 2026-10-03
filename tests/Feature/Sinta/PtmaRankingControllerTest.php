@@ -45,6 +45,8 @@ class PtmaRankingControllerTest extends TestCase
             ->has('rankings')
             ->has('stats')
             ->has('filters')
+            ->where('filters.sort', 'sinta_overall')
+            ->where('filters.dir', 'desc')
         );
     }
 

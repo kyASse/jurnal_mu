@@ -15,11 +15,12 @@ export const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
     topValue,
     onSelectDetail,
 }) => {
+    const safeSort = typeof currentSort === 'string' && currentSort ? currentSort : 'sinta_overall';
     const rank = metric.ranking_position;
     const univ: PtmaUniversity = metric.university;
 
     const getMetricDisplay = () => {
-        switch (currentSort) {
+        switch (safeSort) {
             case 'sinta_3yr':
                 return {
                     value: Number(metric.sinta_score_3yr) || 0,

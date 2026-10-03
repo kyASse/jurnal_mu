@@ -443,4 +443,19 @@ describe('PtmaRanking Index Page Component', () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument();
         expect(screen.getByText('Scorecard Kampus')).toBeInTheDocument();
     });
+
+    it('safely handles empty array filters from Laravel without throwing currentSort.replace TypeError', () => {
+        expect(() => {
+            render(
+                <PtmaRankingIndex
+                    rankings={mockRankings}
+                    stats={mockStats}
+                    filters={[] as any}
+                />
+            );
+        }).not.toThrow();
+
+        expect(screen.getByText(/Urutan: sinta overall/i)).toBeInTheDocument();
+    });
 });
+

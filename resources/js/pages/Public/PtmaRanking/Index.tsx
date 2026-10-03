@@ -26,7 +26,11 @@ export default function PtmaRankingIndex({
     filters = {},
 }: PtmaRankingIndexProps) {
     const [selectedMetric, setSelectedMetric] = useState<PtmaMetric | null>(null);
-    const activeSort = filters?.sort || 'sinta_overall';
+    const safeFilters = filters && !Array.isArray(filters) && typeof filters === 'object' ? filters : {};
+    const activeSort =
+        typeof safeFilters.sort === 'string' && safeFilters.sort.trim() !== ''
+            ? safeFilters.sort
+            : 'sinta_overall';
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -75,10 +79,10 @@ export default function PtmaRankingIndex({
                     <PtmaHeroBento stats={stats} />
 
                     {/* Variable Segmented Nav */}
-                    <VariableSegmentedNav currentSort={activeSort} filters={filters} />
+                    <VariableSegmentedNav currentSort={activeSort} filters={safeFilters} />
 
                     {/* Search & Filter Bar */}
-                    <FilterControlBar filters={filters} />
+                    <FilterControlBar filters={safeFilters} />
 
                     {/* Leaderboard Table */}
                     <LeaderboardTable

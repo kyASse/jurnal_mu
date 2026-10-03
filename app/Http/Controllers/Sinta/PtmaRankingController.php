@@ -19,7 +19,12 @@ class PtmaRankingController extends Controller
      */
     public function index(Request $request): Response
     {
-        $filters = $request->only(['sort', 'dir', 'q', 'accreditation']);
+        $filters = [
+            'sort' => (string) ($request->input('sort') ?: 'sinta_overall'),
+            'dir' => (string) ($request->input('dir') ?: 'desc'),
+            'q' => (string) ($request->input('q') ?: ''),
+            'accreditation' => (string) ($request->input('accreditation') ?: ''),
+        ];
         $perPage = (int) $request->input('per_page', 25);
 
         $rankings = $this->rankingService->getRankings($filters, $perPage);
