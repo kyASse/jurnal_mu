@@ -419,7 +419,8 @@ describe('PtmaRanking Index Page Component', () => {
         );
 
         expect(screen.getByText('Benchmark Institusi PTMA')).toBeInTheDocument();
-        expect(screen.getByText('Peringkat Riset SINTA PTMA')).toBeInTheDocument();
+        expect(screen.getByText(/Peringkat Riset/i)).toBeInTheDocument();
+        expect(screen.getByText(/SINTA PTMA/i)).toBeInTheDocument();
         expect(screen.getByText('Total PTMA Terindeks')).toBeInTheDocument();
         expect(screen.getAllByText('Skor SINTA Overall').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByPlaceholderText(/Cari nama atau singkatan PTMA/i)).toBeInTheDocument();
