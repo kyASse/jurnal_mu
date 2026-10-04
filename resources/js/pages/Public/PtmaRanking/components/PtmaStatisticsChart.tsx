@@ -146,7 +146,7 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                     top3[2]?.university?.code ||
                     top3[2]?.university?.name ||
                     'Peringkat 3',
-                color: 'var(--chart-5)',
+                color: 'var(--chart-3)',
             },
         };
     }, [top3]);
@@ -255,13 +255,13 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                         <span className="inline-flex items-center gap-1.5">
                                             <span
                                                 className="h-2.5 w-2.5 rounded-[2px]"
-                                                style={{ backgroundColor: 'var(--chart-1)' }}
+                                                style={{ backgroundColor: 'var(--chart-3)' }}
                                             />
                                             <span>#1 Unggulan</span>
                                         </span>
                                         <span className="inline-flex items-center gap-1.5">
                                             <span
-                                                className="h-2.5 w-2.5 rounded-[2px] opacity-60"
+                                                className="h-2.5 w-2.5 rounded-[2px]"
                                                 style={{ backgroundColor: 'var(--chart-1)' }}
                                             />
                                             <span>#2-#10</span>
@@ -317,8 +317,11 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                             {barData.map((_, index) => (
                                                 <Cell
                                                     key={`cell-${index}`}
-                                                    fill="var(--chart-1)"
-                                                    opacity={index === 0 ? 1 : 0.65}
+                                                    fill={
+                                                        index === 0
+                                                            ? 'var(--chart-3)'
+                                                            : 'var(--chart-1)'
+                                                    }
                                                 />
                                             ))}
                                         </Bar>
