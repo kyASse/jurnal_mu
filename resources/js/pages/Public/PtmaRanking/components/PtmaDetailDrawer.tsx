@@ -138,10 +138,15 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
         const campusKey = encodeURIComponent(String(univ?.code || univ?.id || ''));
         const url = new URL(window.location.href);
         url.searchParams.set('campus', campusKey);
-        navigator.clipboard.writeText(url.toString()).then(() => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        });
+        navigator.clipboard
+            .writeText(url.toString())
+            .then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            })
+            .catch(() => {
+                // Ignore clipboard denial in restricted/non-secure contexts
+            });
     };
 
     return (
@@ -159,7 +164,7 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
             />
 
             {/* Slide-over panel container */}
-            <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
+            <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-6 md:pl-10">
                 <div className="w-screen max-w-lg bg-card text-card-foreground border-l border-border shadow-2xl flex flex-col h-full justify-between overflow-hidden">
                     {/* Sticky Glassmorphism Header */}
                     <div className="p-5 sm:p-6 border-b border-border bg-card/95 backdrop-blur-md shrink-0 z-10">
