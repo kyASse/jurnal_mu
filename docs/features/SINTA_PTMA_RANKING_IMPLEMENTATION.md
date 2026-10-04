@@ -1,18 +1,22 @@
 # Dokumentasi Fitur: Papan Peringkat SINTA PTMA (Interactive Multi-Variable Ranking)
 
-Dokumentasi arsitektur, integrasi API, perankingan multi-dimensi, antarmuka frontend, dan panduan operasional subsistem Papan Peringkat SINTA PTMA pada platform **JurnalMu**.
+Dokumentasi komprehensif arsitektur sistem, integrasi API SINTA v3.0, kalkulasi perankingan multi-dimensi, antarmuka visual frontend, visualisasi chart data, dan panduan operasional subsistem Papan Peringkat SINTA PTMA pada platform **JurnalMu**.
 
 ---
 
 ## 1. Ringkasan & Tujuan Fitur
 
-Fitur ini menyediakan tolok ukur (benchmarking) kinerja riset, publikasi internasional/nasional, pengabdian, dan luaran kekayaan intelektual (HKI) seluruh Perguruan Tinggi Muhammadiyah & 'Aisyiyah (PTMA) di Indonesia secara komparatif dan transparan berdasarkan data **SINTA API Version 3.0**.
+Fitur ini menyediakan tolok ukur (*benchmarking*) komparatif kinerja riset, publikasi internasional/nasional, pengabdian kepada masyarakat (PkM), serta luaran kekayaan intelektual (HKI) seluruh Perguruan Tinggi Muhammadiyah & 'Aisyiyah (PTMA) di Indonesia secara transparan, berbasis data resmi **SINTA API Version 3.0 (Kemendikbudristek)**.
 
 ### Kemampuan Utama:
-1. **Perankingan Multi-Dimensi**: Pengurutan peringkat PTMA tidak hanya berdasarkan total skor SINTA, melainkan dapat dipilah per-variabel (Scopus, WoS, Garuda, Paten/HKI, Penelitian, Pengabdian, Buku, Dosen).
-2. **Integrasi Rate-Safe & Offline-First**: Mendukung kuota ketat 500 request/hari dengan caching token 12 jam, throttle loop 150ms, dan *Deterministic Mock Driver* yang memungkinkan pengujian dan pengembangan lokal tanpa koneksi luar ke server Kemendikbud.
-3. **High-End UI/UX Design**: Tampilan publik papan peringkat bertaraf *Awwwards-Tier* dengan *Double-Bezel Card Stream*, *Asymmetric Hero Bento*, *Floating Segmented Island Nav*, *Relative Sparkbars*, dan *Slide-Over Sheet Detail Drawer*.
-4. **Panel Manajemen Super Admin**: Monitoring status sinkronisasi, indikator kuota, dan pemantik batch sinkronisasi massal dengan proteksi otorisasi ganda.
+1. **Perankingan Multi-Dimensi Dinamis**: Pengurutan peringkat PTMA fleksibel pada 11 variabel luaran (Skor SINTA Overall, SINTA 3 Tahun, Scopus, Web of Science, Garuda, Google Scholar, Penelitian, Pengabdian/PkM, Paten/HKI, Buku, dan Dosen).
+2. **Visualisasi Data Interaktif (shadcn/ui Charts + Recharts)**:
+   - **Top 10 Benchmark Bar Chart**: Menampilkan perbandingan dinamis 10 kampus teratas yang reaktif mengikuti variabel pengurutan yang aktif.
+   - **Top 3 Research Profile Radar Chart**: Komparasi multi-series 6 sumbu riset untuk tiga kampus teratas dengan garis kontur tegas dan arsiran transparan.
+   - **Sidik Jari Riset Kampus (Radar Chart - Dots)**: Diagram radar individual pada slide-over drawer yang memvisualisasikan spesialisasi luaran internal perguruan tinggi.
+3. **Integrasi API Rate-Safe & Offline-First**: Dirancang aman terhadap kuota ketat 500 request/hari dengan caching token Bearer 12 jam, throttle interval 150ms antar-request, penanganan anti-poisoning cache, serta *Deterministic Mock Driver* untuk pengujian lokal tanpa koneksi ke server eksternal.
+4. **Desain Visual Konsisten & Design Tokens**: Menggunakan sistem desain token terpadu dari `resources/css/app.css` (`var(--primary)`, `var(--secondary)`, `var(--chart-1)` s/d `var(--chart-5)`), tipografi *El Messiri* & *Geist*, serta kompatibilitas mode gelap otomatis.
+5. **Panel Manajemen Super Admin**: Monitoring status sinkronisasi, indikator kuota harian, serta pemicu sinkronisasi batch massal yang dilindungi otorisasi ganda.
 
 ---
 
@@ -21,34 +25,34 @@ Fitur ini menyediakan tolok ukur (benchmarking) kinerja riset, publikasi interna
 Data metrik SINTA disimpan secara terisolasi pada tabel `university_sinta_metrics` dengan relasi 1-to-1 terhadap tabel `universities`.
 
 ### Skema Tabel `university_sinta_metrics`:
-| Kolom | Tipe Data | Deskripsi |
+| Kolom | Tipe Data | Keterangan & Indeks |
 | :--- | :--- | :--- |
 | `id` | `BIGINT UNSIGNED (PK)` | Identifier unik record metrik |
 | `university_id` | `BIGINT UNSIGNED (FK, UNIQUE)` | Relasi ke `universities.id` (Cascade on delete) |
-| `sinta_id` | `VARCHAR(50), NULL` | ID resmi afiliasi di SINTA (Indexed) |
+| `sinta_id` | `VARCHAR(50), NULL` | ID resmi afiliasi di portal SINTA (Indexed) |
 | `ptm_code` | `VARCHAR(20)` | Kode PDDIKTI kampus (Indexed) |
-| `sinta_score_overall` | `DECIMAL(12,2)` | Skor SINTA V3 Overall (Indexed) |
+| `sinta_score_overall` | `DECIMAL(12,2)` | Skor SINTA V3 Keseluruhan (Indexed) |
 | `sinta_score_3yr` | `DECIMAL(12,2)` | Skor SINTA V3 3 Tahun Terakhir (Indexed) |
 | `national_rank_overall` | `INT, NULL` | Peringkat nasional SINTA Overall |
 | `national_rank_3yr` | `INT, NULL` | Peringkat nasional SINTA 3 Tahun |
 | `scopus_docs` | `INT` | Total publikasi terindeks Scopus (Indexed) |
-| `scopus_citations` | `INT` | Total sitasi Scopus |
+| `scopus_citations` | `INT` | Total sitasi dokumen Scopus |
 | `wos_docs` | `INT` | Total publikasi Web of Science (Indexed) |
-| `wos_citations` | `INT` | Total sitasi Web of Science |
+| `wos_citations` | `INT` | Total sitasi dokumen Web of Science |
 | `garuda_docs` | `INT` | Total publikasi terindeks Garuda (Indexed) |
-| `garuda_citations` | `INT` | Total sitasi Garuda |
+| `garuda_citations` | `INT` | Total sitasi dokumen Garuda |
 | `google_docs` | `INT` | Total dokumen Google Scholar (Indexed) |
 | `google_citations` | `INT` | Total sitasi Google Scholar |
 | `research_count` | `INT` | Total kegiatan penelitian/hibah (Indexed) |
-| `service_count` | `INT` | Total pengabdian masyarakat / PkM (Indexed) |
+| `service_count` | `INT` | Total kegiatan pengabdian masyarakat / PkM (Indexed) |
 | `ipr_count` | `INT` | Total HKI / Paten terdaftar (Indexed) |
-| `book_count` | `INT` | Total buku terdaftar (Indexed) |
-| `authors_count` | `INT` | Jumlah dosen terdaftar di SINTA |
-| `departments_count` | `INT` | Jumlah program studi |
-| `journals_count` | `INT` | Jumlah jurnal yang diterbitkan kampus |
-| `raw_payload` | `JSON, NULL` | Snapshot payload asli dari API SINTA |
-| `sync_status` | `ENUM('pending','success','failed')` | Status sinkronisasi terakhir |
-| `sync_error` | `TEXT, NULL` | Pesan error jika sinkronisasi gagal |
+| `book_count` | `INT` | Total buku ber-ISBN terdaftar (Indexed) |
+| `authors_count` | `INT` | Jumlah dosen/peneliti terdaftar di SINTA |
+| `departments_count` | `INT` | Jumlah program studi terdata |
+| `journals_count` | `INT` | Jumlah jurnal terakreditasi kampus |
+| `raw_payload` | `JSON, NULL` | Snapshot payload mentah JSON dari API SINTA |
+| `sync_status` | `ENUM('pending','success','failed')` | Status proses sinkronisasi terakhir |
+| `sync_error` | `TEXT, NULL` | Pesan galat bila proses sinkronisasi gagal |
 | `last_synced_at` | `TIMESTAMP, NULL` | Waktu terakhir penarikan data (Indexed) |
 
 ### Relasi Model Eloquent:
@@ -61,17 +65,17 @@ Data metrik SINTA disimpan secara terisolasi pada tabel `university_sinta_metric
 
 File: `app/Services/Sinta/SintaApiClient.php`
 
-### Alur Kerja:
-1. **Autentikasi Token**:
-   * Memanggil endpoint `POST /consumer/login` dengan `username` dan `password`.
-   * Token disimpan dalam cache Laravel (`sinta_bearer_token`) dengan masa aktif 12 jam (43.200 detik).
-   * Dilengkapi validasi pencegah *token cache poisoning* (melempar `\Exception` jika token kosong sebelum masuk cache).
+### Alur Kerja & Mekanisme Proteksi:
+1. **Autentikasi Token Bearer**:
+   * Memanggil endpoint `POST /consumer/login` dengan kredensial `username` dan `password`.
+   * Token disimpan dalam cache Laravel (`sinta_bearer_token`) selama 12 jam (43.200 detik).
+   * **Anti-Poisoning Guard**: Memvalidasi token sebelum disimpan ke cache. Jika response login kosong/tidak valid, sistem langsung melempar exception dan tidak meng-cache token kosong.
 2. **Pengambilan Metrik Afiliasi**:
-   * URL endpoint: `POST /v3/{env}/{uniq}/affiliation/metric/kodept/{ptmCode}`.
-   * Parameter `:type = kodept` dipetakan otomatis menggunakan `ptm_code` dari tabel `universities`.
-3. **Deterministic Mock Driver (Offline/Dev Safety)**:
-   * Jika `config('sinta.mock_mode') == true`, klien menggunakan generator data berbasis seed `crc32($ptmCode)`.
-   * Menghasilkan data pengujian yang realistis dan konsisten antar-eksekusi tanpa membuat koneksi HTTP ke server SINTA Kemendikbud.
+   * Endpoint: `POST /v3/{env}/{uniq}/affiliation/metric/kodept/{ptmCode}`.
+   * Parameter `:type = kodept` diinjeksi menggunakan nilai `ptm_code` kampus dari basis data.
+3. **Deterministic Mock Driver (Offline & Safety Guard)**:
+   * Jika `config('sinta.mock_mode') == true`, klien menggunakan generator berbasis seed deterministik `crc32($ptmCode)`.
+   * Menghasilkan data simulasi yang realistis, proporsional, dan identik antar-eksekusi tanpa melakukan request jaringan keluar.
 
 ---
 
@@ -79,28 +83,21 @@ File: `app/Services/Sinta/SintaApiClient.php`
 
 File: `app/Services/Sinta/PtmaRankingService.php`
 
-### Fitur Kalkulasi:
+### Algoritma & Fitur Kalkulasi:
 * **Dynamic SQL Window Function**:
-  Menggunakan `DENSE_RANK() OVER (ORDER BY {$column} {$direction}) as ranking_position` langsung di query database. Kampus dengan nilai sama memperoleh ranking sama secara akurat tanpa terpotong paginasi.
-* **Secondary Tie-Breaker Sort**:
-  Setiap query pengurutan dilengkapi `->orderBy($column, $direction)->orderBy('universities.id', 'asc')` untuk menjamin stabilitas paginasi.
-* **Daftar Sort Key yang Didukung**:
-  * `sinta_overall` ➔ Skor SINTA Overall
-  * `sinta_3yr` ➔ Skor SINTA 3 Tahun
-  * `scopus` ➔ Dokumen Scopus
-  * `wos` ➔ Dokumen Web of Science
-  * `garuda` ➔ Dokumen Garuda
-  * `google` ➔ Dokumen Google Scholar
-  * `research` ➔ Jumlah Penelitian
-  * `service` ➔ Jumlah Pengabdian (PkM)
-  * `ipr` ➔ Jumlah Paten / HKI
-  * `book` ➔ Jumlah Buku
-  * `authors` ➔ Jumlah Dosen
+  Menggunakan `DENSE_RANK() OVER (ORDER BY {$column} {$direction}) as ranking_position` secara langsung pada level query SQL. Kampus dengan nilai seri mendapat posisi ranking yang sama secara adil tanpa terpengaruh paginasi.
+* **Secondary Tie-Breaker Sorting**:
+  Setiap pengurutan dijamin stabil antar-halaman paginasi menggunakan penentu seri sekunder:
+  ```php
+  $query->orderBy($column, $direction)->orderBy('universities.id', 'asc');
+  ```
+* **11 Variabel Pengurutan yang Didukung**:
+  `sinta_overall`, `sinta_3yr`, `scopus`, `wos`, `garuda`, `google`, `research`, `service`, `ipr`, `book`, `authors`.
 * **Filter Tambahan**:
-  * Pencarian teks bebas `q` (mencari nama kampus, singkatan, atau kode PT).
+  * Pencarian teks bebas `q` (mencocokkan nama universitas, kode singkatan, atau kode PT).
   * Filter akreditasi BAN-PT (`Unggul`, `Baik Sekali`, `Baik`, `A`, `B`).
-* **Cache Statistik Makro**:
-  Output `getSummaryStats()` dibungkus dalam `Cache::remember('ptma_macro_stats', 3600, ...)` dan di-flush otomatis via `PtmaRankingService::clearCache()` setiap kali sinkronisasi selesai.
+* **Caching Statistik Makro**:
+  Hasil agregasi nasional `getSummaryStats()` dibungkus dalam `Cache::remember('ptma_macro_stats', 3600, ...)` dan di-flush otomatis via `PtmaRankingService::clearCache()` setiap kali batch sinkronisasi selesai.
 
 ---
 
@@ -108,103 +105,194 @@ File: `app/Services/Sinta/PtmaRankingService.php`
 
 ### Background Job:
 File: `app/Jobs/SyncUniversitySintaMetricJob.php`
-* Mengimplementasikan `ShouldQueue`.
-* Mengambil metrik untuk 1 universitas dan memperbarui record `UniversitySintaMetric` secara idempoten via `updateOrCreate`.
-* Menangani error per kampus secara terisolasi tanpa membatalkan antrean kampus lainnya.
+* Mengimplementasikan interface `ShouldQueue`.
+* Memproses sinkronisasi untuk 1 universitas dan memperbarui tabel secara idempoten via `updateOrCreate`.
+* Isolasi galat: kegagalan penarikan data pada satu kampus tidak membatalkan eksekusi antrean kampus lainnya.
 
 ### Artisan CLI Command:
 File: `app/Console/Commands/SyncSintaPtmaCommand.php`
 ```bash
-# Sinkronisasi seluruh PTMA (dengan mock mode)
+# Sinkronisasi seluruh kampus PTMA (mode mock dev)
 docker exec -i jurnal-mu-app php artisan sinta:sync-ptma --mock
 
-# Sinkronisasi 1 kampus spesifik berdasarkan ID universitas
+# Sinkronisasi kampus spesifik berdasarkan ID universitas
 docker exec -i jurnal-mu-app php artisan sinta:sync-ptma --university_id=1
 ```
-* Dilengkapi progress bar interaktif di terminal.
-* Menerapkan throttle delay `150ms` (`usleep(150000)`) antar-iterasi untuk melindungi batas laju request API.
+* Menampilkan *progress bar* interaktif di terminal console.
+* Menerapkan throttle delay `150ms` (`usleep(150000)`) antar-panggilan API untuk mematuhi rate limit server.
 
 ---
 
-## 6. Antarmuka Pengguna (Frontend React + Inertia.js)
+## 6. Arsitektur Antarmuka Pengguna (Frontend React + Inertia.js)
 
 Komponen publik terletak pada direktori `resources/js/pages/Public/PtmaRanking/`.
 
-### Struktur Komponen:
-1. **`Index.tsx`**:
-   Halaman root leaderboard publik (`/ptma/ranking`) dengan `<Head>` SEO metadata dan dukungan deep-linking parameter URL `?campus=...`.
-2. **`PtmaHeroBento.tsx`**:
-   Bento grid 12-kolom asimetris:
-   * Kolom Kiri (`col-span-5`): Kartu *Spotlight #1 PTMA* dengan arsitektur *Double-Bezel* (`rounded-[2rem]` outer shell, `rounded-[calc(2rem-0.5rem)]` inner core) dan aksen emas.
-   * Kolom Kanan (`col-span-7`): Grid 2x2 statistik makro nasional (Total PTMA, Scopus Kolektif, Garuda Kolektif, Paten Kolektif).
-3. **`VariableSegmentedNav.tsx`**:
-   Pill navigasi mengambang (floating island) dengan animasi pegas (spring physics) menggunakan Motion (`motion/react`) via `layoutId="activePillIndicator"`.
+### Struktur Komponen Halaman:
+
+```
+resources/js/pages/Public/PtmaRanking/
+├── Index.tsx                       # Root Leaderboard Page & SEO Metadata
+├── components/
+│   ├── PtmaHeroBento.tsx           # Header Hero Gradient + Spotlight #1 + Macro Stats Bento
+│   ├── VariableSegmentedNav.tsx    # Floating Island Navigation dengan 11 Variabel
+│   ├── PtmaStatisticsChart.tsx     # Visualisasi Data Statistik: Top 10 Bar & Top 3 Radar
+│   ├── FilterControlBar.tsx        # Search Input & shadcn DropdownMenu Akreditasi
+│   ├── LeaderboardTable.tsx        # Tabel Kontainer Papan Peringkat
+│   ├── LeaderboardRow.tsx          # Baris Peringkat, Sparkbar Relatif, Button Rincian
+│   └── PtmaDetailDrawer.tsx        # Slide-Over Detail Drawer & Radar Sidik Jari Riset
+└── types.ts                        # Deklarasi Tipe TypeScript
+```
+
+### Rincian Komponen:
+
+1. **`PtmaHeroBento.tsx`**:
+   * Visual header seragam dengan halaman publik `Browse/Universities.tsx` menggunakan `bg-hero-gradient` dan tipografi *El Messiri*.
+   * Mengeliminasi tabrakan tata letak negatif margin, menghasilkan transisi bersih ke area kartu.
+   * Spotlight PTMA #1 beraksen emas dipadukan grid 2x2 statistik makro nasional (Total PTMA, Scopus, Garuda, Paten).
+
+2. **`VariableSegmentedNav.tsx`**:
+   * Komponen navigasi pulau mengambang (*floating island pill*) berisi 11 pilihan variabel perankingan.
+   * Transisi indikator menggunakan Motion physics (`layoutId="activePillIndicator"`).
+
+3. **`PtmaStatisticsChart.tsx` (Visualisasi Data Statistik)**:
+   * Terletak tepat di bawah navigasi variabel dan di atas bar filter.
+   * Dilengkapi tombol toggle lipat (*Collapsible*): "Tampilkan Grafik" / "Sembunyikan Grafik".
+   * Menggunakan komponen resmi `@/components/ui/tabs` dengan dua mode tab:
+     * **Tab 1: Top 10 Benchmark (Horizontal Bar Chart)**:
+       - Menampilkan perbandingan 10 kampus teratas secara horizontal.
+       - Skema warna hierarkis: Kampus #1 Unggulan menggunakan token `var(--chart-3)` (Sun Yellow), kampus peringkat 2–10 menggunakan token `var(--chart-1)` (Navy).
+       - Label sumbu dan tooltip interaktif terformat dalam lokal angka Indonesia (`id-ID`).
+     * **Tab 2: Profil Riset Top 3 (Multi-Series Radar Chart)**:
+       - Implementasi pola resmi shadcn multi-radar.
+       - Menampilkan 6 sumbu luaran riset: Scopus, Garuda, WoS, HKI, Riset, Pengabdian.
+       - Grid latar belakang polygon (`<PolarGrid />`) dengan kontur garis tegas (`strokeWidth={2}`) dan arsiran transparan (`fillOpacity={0.25}`, `0.2`, `0.15`) tanpa bulatan dot berlebih agar komparasi tumpang tindih mudah dibaca.
+       - Skema warna seri: Peringkat 1 (`var(--chart-1)` Navy), Peringkat 2 (`var(--chart-2)` Maroon), Peringkat 3 (`var(--chart-3)` Sun Yellow).
+       - Dilengkapi komponen `<ChartLegend />` dan tooltip dengan indikator garis.
+
 4. **`FilterControlBar.tsx`**:
-   Bar pencarian nama kampus dengan debounce 350ms dan dropdown filter akreditasi BAN-PT.
+   * Input pencarian teks instan dengan debounce 350ms.
+   * Dropdown filter akreditasi BAN-PT mengadopsi standar resmi shadcn `DropdownMenu` (`DropdownMenuRadioGroup`, `DropdownMenuRadioItem`).
+
 5. **`LeaderboardTable.tsx` & `LeaderboardRow.tsx`**:
-   Penyajian baris data berarsitektur *Double-Bezel*:
-   * Badge peringkat bergradasi logam: Emas (#1), Perak (#2), Perunggu (#3).
-   * Kolom angka utama dinamis (`font-mono tabular-nums`) sesuai variabel aktif.
-   * Batang visual persentase relatif (*Relative Sparkbar*) terhadap kampus pemuncak.
-   * Tombol aksi bergaya *Button-in-Button* ("Rincian ↗").
-6. **`PtmaDetailDrawer.tsx`**:
-   Drawer geser dari sisi kanan (Slide-Over Sheet) dengan scorecard lengkap 14 variabel kampus, kunci scroll body saat terbuka, aksi salin tautan kampus, dan dukungan penutupan via tombol ESC / klik latar belakang.
+   * Badge medali peringkat bergradasi: Emas (#1), Perak (#2), Perunggu (#3).
+   * Nilai metrik utama disorot dengan `font-mono tabular-nums`.
+   * Batang visual relatif (*Relative Sparkbar*) yang memperlihatkan proporsi perolehan terhadap kampus pemuncak.
+   * Tombol aksi "Rincian ↗" untuk membuka panel drawer detail kampus.
+
+6. **`PtmaDetailDrawer.tsx` (Slide-Over Card)**:
+   * Header sticky bergaya *glassmorphism* dengan avatar doppelrand, badge akreditasi BAN-PT, peringkat nasional, dan peringkat PTMA.
+   * Scorecard sorotan skor SINTA Overall & 3 Tahun.
+   * **Radar Chart "Sidik Jari Riset & Luaran"**:
+     - Mengadopsi pola resmi shadcn **Radar Chart - Dots** (`chart-radar-dots.tsx`).
+     - Menggunakan `<PolarGrid />` bergaris poligon, poligon arsiran tunggal `fill="var(--color-score)"` beropasitas `0.6`, dan penanda titik pada tiap sudut vertex (`dot={{ r: 4, fillOpacity: 1 }}`).
+     - Memberikan representasi visual yang jelas mengenai spesialisasi luaran kampus bersangkutan.
+   * 3 Modul Bento Tematik:
+     1. *Publikasi & Sitasi Global*: Dokumen Scopus, Sitasi Scopus, Dokumen WoS, Sitasi WoS.
+     2. *Publikasi Nasional & HKI*: Dokumen Garuda, Sitasi Garuda, Paten/HKI, Buku Terbit.
+     3. *Produktivitas Riset & Akademik*: Penelitian, Pengabdian (PkM), Dosen Terdaftar, Jurnal Kampus.
+   * Tombol interaktif "Salin Tautan" dengan integrasi deep-link URL parameter `?campus={code}`.
 
 ---
 
-## 7. Panel Manajemen Super Admin
+## 7. Perbedaan Basis Normalisasi Radar Chart
 
-File: `resources/js/pages/Admin/Sinta/Index.tsx`
+Sistem memiliki dua implementasi diagram radar dengan tujuan analisis yang berbeda secara fundamental:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                   PERBANDINGAN FORMULA RADAR CHART                     │
+├───────────────────────────────────┬────────────────────────────────────┤
+│   RADAR DRAWER DETAIL KAMPUS      │      RADAR TAB KOMPARASI TOP 3     │
+│   (Sidik Jari Riset Internal)     │      (Benchmark Antar-Kampus)      │
+├───────────────────────────────────┼────────────────────────────────────┤
+│ Sifat: INTRA-KAMPUS (Internal)    │ Sifat: INTER-KAMPUS (Antar-Kampus) │
+│ Basis 100%: Nilai volume tertinggi│ Basis 100%: Nilai tertinggi di     │
+│ milik kampus itu sendiri di antara│ antara 3 kampus pada sumbu dimensi │
+│ 6 dimensi luaran.                 │ yang bersangkutan.                 │
+│                                   │                                    │
+│ Rumus:                            │ Rumus:                             │
+│ score = (val / max(internal)) * 100│ score = (val / max(top3_axis)) * 100│
+│                                   │                                    │
+│ Tujuan Analisis:                  │ Tujuan Analisis:                   │
+│ Mengidentifikasi spesialisasi dan │ Mengetahui kampus mana yang unggul │
+│ portofolio riset kampus tersebut  │ secara absolut pada masing-masing  │
+│ (apakah kuat di Scopus, Garuda,   │ bidang di kelompok pemuncak.       │
+│ atau Pengabdian).                 │                                    │
+└───────────────────────────────────┴────────────────────────────────────┘
+```
+
+---
+
+## 8. Pemetaan Design Tokens & Dark Mode
+
+Seluruh elemen visual menggunakan variabel tema dari `resources/css/app.css`:
+
+| Token CSS | Mode Terang (Light) | Mode Gelap (Dark) | Penggunaan Utama |
+| :--- | :--- | :--- | :--- |
+| `--primary` | `#2C368A` (Navy) | `#5C6BC0` | Warna aksen utama, tombol, teks sorotan |
+| `--secondary` | `#E8242A` (Maroon) | `#EF5350` | Warna aksen sekunder |
+| `--chart-1` | `#2C368A` | `#5C6BC0` | Bar #2-#10, Radar Drawer, Radar Rank 1 Top 3 |
+| `--chart-2` | `#E8242A` | `#EF5350` | Radar Rank 2 Top 3 |
+| `--chart-3` | `#fcee1f` (Sun Yellow) | `#fcee1f` | Bar #1 Unggulan, Radar Rank 3 Top 3 |
+| `--chart-4` | `#0f172a` | `#f8fafc` | Elemen visual kontras gelap/terang |
+| `--chart-5` | `#64748b` | `#94a3b8` | Aksen netral / teks pendukung |
+| `--border` | `#e2e8f0` | `#1e293b` | Garis batas komponen & grid polar chart |
+
+---
+
+## 9. Panel Manajemen Super Admin
+
+File: `resources/js/pages/Admin/Sinta/Index.tsx`  
 Rute: `GET /admin/sinta` (Khusus Super Admin)
 
-### Fitur:
-* Proteksi middleware ketat: `['auth', 'verified', 'role:'.Role::SUPER_ADMIN]`. Pengguna non-admin otomatis ditolak dengan `403 Forbidden`.
-* 4 Kartu Status: Total Kampus Target, Berhasil Sinkron, Gagal Sinkron, Status Mode Sistem (Mock / Live).
-* Tabel riwayat sinkronisasi per kampus beserta status dan pesan error.
-* Dialog konfirmasi proteksi (`AlertDialog`) sebelum mengeksekusi pemantik sinkronisasi massal (`POST /admin/sinta/sync`).
+### Fitur Pengelolaan:
+* **Proteksi Akses**: Dilindungi middleware ganda `['auth', 'verified', 'role:'.Role::SUPER_ADMIN]`. Akses non-admin secara otomatis ditolak dengan kode respon `403 Forbidden`.
+* **Statistik Cepat**: Kartu monitoring total kampus target, jumlah berhasil sinkron, jumlah gagal, serta status sistem (Mock / Live).
+* **Riwayat Sinkronisasi**: Tabel pantauan waktu sinkronisasi terakhir per kampus beserta detail galat sinkronisasi jika terjadi kendala.
+* **Sinkronisasi Massal Terproteksi**: Tombol pemantik sinkronisasi massal (`POST /admin/sinta/sync`) dilengkapi dialog konfirmasi `AlertDialog` untuk mencegah pemicuan tanpa sengaja.
 
 ---
 
-## 8. Panduan Konfigurasi Lingkungan (`.env`)
+## 10. Panduan Konfigurasi Lingkungan (`.env`)
 
-Tambahkan konfigurasi berikut ke file `.env` sistem:
+Konfigurasi berikut wajib didefinisikan pada file `.env` aplikasi:
 
 ```dotenv
-# Konfigurasi Integrasi SINTA API v3.0
+# Konfigurasi Integrasi SINTA API v3.0 Kemendikbudristek
 SINTA_API_URL=http://apisinta.kemdikbud.go.id
-SINTA_ENV=prod               # 'dev' untuk pengujian atau 'prod' untuk live
+SINTA_ENV=prod               # 'dev' untuk pengujian sandbox atau 'prod' untuk production
 SINTA_USERNAME=your_username
 SINTA_PASSWORD=your_password
 SINTA_UNIQ_ID=your_uniq_id
 SINTA_DAILY_LIMIT=500
-SINTA_MOCK_MODE=true         # Set true untuk lokal dev/testing (nol request keluar)
+SINTA_MOCK_MODE=true         # Set true untuk pengujian lokal / offline tanpa request keluar
 ```
 
 ---
 
-## 9. Verifikasi & Pengujian
+## 11. Panduan Verifikasi & Pengujian
 
-### 1. Menjalankan Migrasi & Seeder Lokal:
+### 1. Menjalankan Migrasi & Database Seeder:
 ```bash
 docker exec -i jurnal-mu-app php artisan migrate
 docker exec -i jurnal-mu-app php artisan db:seed --class=SintaPtmaSeeder
 ```
 
-### 2. Menjalankan Backend Test Suite (PHPUnit / Pest):
+### 2. Menjalankan Backend Test Suite (PHPUnit):
 ```bash
 docker exec -i jurnal-mu-app php artisan test tests/Feature/Sinta tests/Unit/Sinta
 ```
-*Hasil: 24 test cases, 136 assertions passing (100% green).*
+*Hasil Verifikasi: 24 test cases lulus (140 assertions passing, 100% green).*
 
 ### 3. Menjalankan Frontend Test Suite (Vitest):
 ```bash
-npm test
+npx vitest run resources/js/pages/Public/PtmaRanking/
 ```
-*Hasil: 19 file pengujian, 123 unit/component tests passing (100% green).*
+*Hasil Verifikasi: 4 file test suite, 47 unit/component tests lulus (100% green).*
 
-### 4. Pengecekan Type & Build Frontend:
+### 4. Pengecekan Type & Build Produksi:
 ```bash
 npm run types
 npm run build
 ```
-*Hasil: 0 type errors, build Vite selesai tanpa error.*
+*Hasil Verifikasi: 0 type error (`tsc --noEmit`), bundel produksi Vite terkompilasi bersih tanpa peringatan fatal.*
