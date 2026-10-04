@@ -5,7 +5,6 @@ import {
     Cell,
     PolarAngleAxis,
     PolarGrid,
-    PolarRadiusAxis,
     Radar,
     RadarChart,
     XAxis,
@@ -131,7 +130,7 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                     top3[0]?.university?.code ||
                     top3[0]?.university?.name ||
                     'Peringkat 1',
-                color: 'var(--chart-3)',
+                color: 'var(--chart-1)',
             },
             univ_1: {
                 label:
@@ -139,7 +138,7 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                     top3[1]?.university?.code ||
                     top3[1]?.university?.name ||
                     'Peringkat 2',
-                color: 'var(--chart-1)',
+                color: 'var(--chart-2)',
             },
             univ_2: {
                 label:
@@ -147,7 +146,7 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                     top3[2]?.university?.code ||
                     top3[2]?.university?.name ||
                     'Peringkat 3',
-                color: 'var(--chart-2)',
+                color: 'var(--chart-5)',
             },
         };
     }, [top3]);
@@ -252,17 +251,17 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                     <span>
                                         10 Kampus Teratas &bull; {activeMetricConfig.label}
                                     </span>
-                                    <span className="flex items-center gap-2">
-                                        <span className="inline-flex items-center gap-1">
+                                    <span className="flex items-center gap-3">
+                                        <span className="inline-flex items-center gap-1.5">
                                             <span
                                                 className="h-2.5 w-2.5 rounded-[2px]"
-                                                style={{ backgroundColor: 'var(--chart-3)' }}
+                                                style={{ backgroundColor: 'var(--chart-1)' }}
                                             />
                                             <span>#1 Unggulan</span>
                                         </span>
-                                        <span className="inline-flex items-center gap-1">
+                                        <span className="inline-flex items-center gap-1.5">
                                             <span
-                                                className="h-2.5 w-2.5 rounded-[2px]"
+                                                className="h-2.5 w-2.5 rounded-[2px] opacity-60"
                                                 style={{ backgroundColor: 'var(--chart-1)' }}
                                             />
                                             <span>#2-#10</span>
@@ -318,11 +317,8 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                             {barData.map((_, index) => (
                                                 <Cell
                                                     key={`cell-${index}`}
-                                                    fill={
-                                                        index === 0
-                                                            ? 'var(--chart-3)'
-                                                            : 'var(--chart-1)'
-                                                    }
+                                                    fill="var(--chart-1)"
+                                                    opacity={index === 0 ? 1 : 0.65}
                                                 />
                                             ))}
                                         </Bar>
@@ -341,70 +337,14 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                 </div>
                                 <ChartContainer
                                     config={radarChartConfig}
-                                    className="h-[360px] w-full aspect-auto"
+                                    className="mx-auto aspect-square max-h-[360px] w-full"
                                 >
-                                    <RadarChart data={radarData} outerRadius="75%">
-                                        <PolarGrid
-                                            gridType="polygon"
-                                            fill="none"
-                                            fillOpacity={0}
-                                            stroke="var(--border)"
-                                            strokeOpacity={0.7}
-                                            className="stroke-border/70 fill-none"
-                                        />
-                                        <PolarAngleAxis
-                                            dataKey="subject"
-                                            tick={{ fill: 'var(--muted-foreground)', fontSize: 11, fontWeight: 600 }}
-                                            className="text-[11px] font-semibold fill-muted-foreground"
-                                        />
-                                        <PolarRadiusAxis
-                                            angle={30}
-                                            domain={[0, 100]}
-                                            stroke="transparent"
-                                            tick={false}
-                                        />
-                                        {top3[0] && (
-                                            <Radar
-                                                name={String(
-                                                    radarChartConfig.univ_0?.label || 'Rank 1'
-                                                )}
-                                                dataKey="univ_0"
-                                                stroke="var(--chart-3)"
-                                                strokeWidth={2.5}
-                                                fill="var(--chart-3)"
-                                                fillOpacity={0.35}
-                                                dot={{ r: 3, fill: 'var(--chart-3)' }}
-                                            />
-                                        )}
-                                        {top3[1] && (
-                                            <Radar
-                                                name={String(
-                                                    radarChartConfig.univ_1?.label || 'Rank 2'
-                                                )}
-                                                dataKey="univ_1"
-                                                stroke="var(--chart-1)"
-                                                strokeWidth={2}
-                                                fill="var(--chart-1)"
-                                                fillOpacity={0.25}
-                                                dot={{ r: 3, fill: 'var(--chart-1)' }}
-                                            />
-                                        )}
-                                        {top3[2] && (
-                                            <Radar
-                                                name={String(
-                                                    radarChartConfig.univ_2?.label || 'Rank 3'
-                                                )}
-                                                dataKey="univ_2"
-                                                stroke="var(--chart-2)"
-                                                strokeWidth={2}
-                                                fill="var(--chart-2)"
-                                                fillOpacity={0.2}
-                                                dot={{ r: 3, fill: 'var(--chart-2)' }}
-                                            />
-                                        )}
+                                    <RadarChart data={radarData}>
                                         <ChartTooltip
+                                            cursor={false}
                                             content={
                                                 <ChartTooltipContent
+                                                    indicator="line"
                                                     formatter={(value, name, item) => {
                                                         const dataKey = item?.dataKey || '';
                                                         const key = String(name || '');
@@ -444,6 +384,44 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                                 />
                                             }
                                         />
+                                        <PolarAngleAxis dataKey="subject" />
+                                        <PolarGrid />
+                                        {top3[0] && (
+                                            <Radar
+                                                name={String(
+                                                    radarChartConfig.univ_0?.label || 'Rank 1'
+                                                )}
+                                                dataKey="univ_0"
+                                                stroke="var(--color-univ_0)"
+                                                strokeWidth={2}
+                                                fill="var(--color-univ_0)"
+                                                fillOpacity={0.25}
+                                            />
+                                        )}
+                                        {top3[1] && (
+                                            <Radar
+                                                name={String(
+                                                    radarChartConfig.univ_1?.label || 'Rank 2'
+                                                )}
+                                                dataKey="univ_1"
+                                                stroke="var(--color-univ_1)"
+                                                strokeWidth={2}
+                                                fill="var(--color-univ_1)"
+                                                fillOpacity={0.2}
+                                            />
+                                        )}
+                                        {top3[2] && (
+                                            <Radar
+                                                name={String(
+                                                    radarChartConfig.univ_2?.label || 'Rank 3'
+                                                )}
+                                                dataKey="univ_2"
+                                                stroke="var(--color-univ_2)"
+                                                strokeWidth={2}
+                                                fill="var(--color-univ_2)"
+                                                fillOpacity={0.15}
+                                            />
+                                        )}
                                         <ChartLegend content={<ChartLegendContent />} />
                                     </RadarChart>
                                 </ChartContainer>

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
     PolarAngleAxis,
     PolarGrid,
-    PolarRadiusAxis,
     Radar,
     RadarChart,
 } from 'recharts';
@@ -82,11 +81,10 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
             metric.service_count || 0,
         ];
         const maxVal = Math.max(...rawValues, 1);
-        const logMax = Math.log10(maxVal + 1);
 
         const calcScore = (val: number) => {
-            if (!val || val <= 0 || logMax <= 0) return 0;
-            return Math.min(100, Math.max(0, Math.round((Math.log10(val + 1) / logMax) * 100)));
+            if (!val || val <= 0 || maxVal <= 0) return 0;
+            return Math.min(100, Math.max(0, Math.round((val / maxVal) * 100)));
         };
 
         return [
@@ -295,52 +293,9 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
 
                             <ChartContainer
                                 config={chartConfig}
-                                className="h-[270px] w-full aspect-auto"
+                                className="mx-auto aspect-square max-h-[260px] w-full"
                             >
-                                <RadarChart data={radarData} outerRadius="75%">
-                                    <defs>
-                                        <linearGradient id="ptmaRadarGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.55} />
-                                            <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0.15} />
-                                        </linearGradient>
-                                    </defs>
-                                    <PolarGrid
-                                        gridType="polygon"
-                                        fill="none"
-                                        fillOpacity={0}
-                                        stroke="var(--border)"
-                                        strokeOpacity={0.7}
-                                        className="stroke-border/70 fill-none"
-                                    />
-                                    <PolarAngleAxis
-                                        dataKey="subject"
-                                        tick={{ fill: 'var(--muted-foreground)', fontSize: 11, fontWeight: 600 }}
-                                        className="text-[11px] font-semibold fill-muted-foreground"
-                                    />
-                                    <PolarRadiusAxis
-                                        domain={[0, 100]}
-                                        stroke="transparent"
-                                        tick={false}
-                                    />
-                                    <Radar
-                                        name="Capaian"
-                                        dataKey="score"
-                                        stroke="var(--chart-1)"
-                                        strokeWidth={2.5}
-                                        fill="url(#ptmaRadarGradient)"
-                                        dot={{
-                                            r: 3.5,
-                                            fill: 'var(--chart-1)',
-                                            stroke: 'var(--card)',
-                                            strokeWidth: 1.5,
-                                        }}
-                                        activeDot={{
-                                            r: 6,
-                                            fill: 'var(--chart-3)',
-                                            stroke: 'var(--chart-1)',
-                                            strokeWidth: 2,
-                                        }}
-                                    />
+                                <RadarChart data={radarData}>
                                     <ChartTooltip
                                         cursor={false}
                                         content={
@@ -350,7 +305,7 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
                                                     const raw = item?.payload?.raw;
                                                     return (
                                                         <div className="flex items-center justify-between gap-3 w-full">
-                                                            <span className="text-muted-foreground">Volume Luaran:</span>
+                                                            <span className="text-muted-foreground">{item?.payload?.subject}:</span>
                                                             <div className="flex items-baseline gap-1.5">
                                                                 <span className="font-mono font-bold tabular-nums text-foreground">
                                                                     {Number(raw ?? value).toLocaleString('id-ID')}
@@ -364,6 +319,17 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
                                                 }}
                                             />
                                         }
+                                    />
+                                    <PolarAngleAxis dataKey="subject" />
+                                    <PolarGrid />
+                                    <Radar
+                                        dataKey="score"
+                                        fill="var(--color-score)"
+                                        fillOpacity={0.6}
+                                        dot={{
+                                            r: 4,
+                                            fillOpacity: 1,
+                                        }}
                                     />
                                 </RadarChart>
                             </ChartContainer>
