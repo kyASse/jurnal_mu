@@ -462,8 +462,8 @@ describe('PtmaRanking Index Page Component', () => {
         expect(screen.getByText(/Urutan: sinta overall/i)).toBeInTheDocument();
     });
 
-    it('renders PtmaStatisticsChart component with tabs and benchmark section', () => {
-        render(
+    it('renders PtmaStatisticsChart component with tabs on page 1 and omits it on subsequent pages', () => {
+        const { rerender } = render(
             <PtmaRankingIndex
                 rankings={mockRankings}
                 stats={mockStats}
@@ -474,6 +474,17 @@ describe('PtmaRanking Index Page Component', () => {
         expect(screen.getByText('Statistik & Komparasi PTMA')).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: /Top 10 Benchmark/i })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: /Profil Riset Top 3/i })).toBeInTheDocument();
+
+        // Rerender on page 2
+        rerender(
+            <PtmaRankingIndex
+                rankings={{ ...mockRankings, current_page: 2 }}
+                stats={mockStats}
+                filters={{ sort: 'sinta_overall' }}
+            />
+        );
+
+        expect(screen.queryByText('Statistik & Komparasi PTMA')).not.toBeInTheDocument();
     });
 });
 

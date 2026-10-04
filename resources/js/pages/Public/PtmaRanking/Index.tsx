@@ -93,11 +93,13 @@ export default function PtmaRankingIndex({
                 {/* Variable Segmented Nav */}
                 <VariableSegmentedNav currentSort={activeSort} filters={safeFilters} />
 
-                {/* Statistics Chart */}
-                <PtmaStatisticsChart
-                    metrics={rankings?.data ?? []}
-                    currentSort={activeSort}
-                />
+                {/* Statistics Chart (Rendered on primary page 1) */}
+                {(rankings?.current_page ?? 1) === 1 && (
+                    <PtmaStatisticsChart
+                        metrics={rankings?.data ?? []}
+                        currentSort={activeSort}
+                    />
+                )}
 
                 {/* Search & Filter Bar */}
                 <FilterControlBar filters={safeFilters} />

@@ -392,14 +392,15 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                             content={
                                                 <ChartTooltipContent
                                                     formatter={(value, name, item) => {
+                                                        const dataKey = item?.dataKey || '';
                                                         const key = String(name || '');
                                                         const idx =
+                                                            dataKey === 'univ_0' ||
                                                             key === radarChartConfig.univ_0?.label ||
                                                             key === 'univ_0'
                                                                 ? 0
-                                                                : key ===
-                                                                      radarChartConfig.univ_1
-                                                                          ?.label ||
+                                                                : dataKey === 'univ_1' ||
+                                                                  key === radarChartConfig.univ_1?.label ||
                                                                   key === 'univ_1'
                                                                 ? 1
                                                                 : 2;
