@@ -423,6 +423,9 @@ describe('PtmaRanking Index Page Component', () => {
         expect(screen.getByText(/SINTA PTMA/i)).toBeInTheDocument();
         expect(screen.getByText('Total PTMA Terindeks')).toBeInTheDocument();
         expect(screen.getAllByText('Skor SINTA Overall').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Statistik & Komparasi PTMA')).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: /Top 10 Benchmark/i })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: /Profil Riset Top 3/i })).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/Cari nama atau singkatan PTMA/i)).toBeInTheDocument();
         expect(screen.getByText('Universitas Muhammadiyah Surakarta')).toBeInTheDocument();
     });
@@ -457,6 +460,20 @@ describe('PtmaRanking Index Page Component', () => {
         }).not.toThrow();
 
         expect(screen.getByText(/Urutan: sinta overall/i)).toBeInTheDocument();
+    });
+
+    it('renders PtmaStatisticsChart component with tabs and benchmark section', () => {
+        render(
+            <PtmaRankingIndex
+                rankings={mockRankings}
+                stats={mockStats}
+                filters={{ sort: 'sinta_overall' }}
+            />
+        );
+
+        expect(screen.getByText('Statistik & Komparasi PTMA')).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: /Top 10 Benchmark/i })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: /Profil Riset Top 3/i })).toBeInTheDocument();
     });
 });
 

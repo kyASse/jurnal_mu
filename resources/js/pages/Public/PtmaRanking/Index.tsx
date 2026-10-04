@@ -6,6 +6,7 @@ import { VariableSegmentedNav } from './components/VariableSegmentedNav';
 import { FilterControlBar } from './components/FilterControlBar';
 import { LeaderboardTable } from './components/LeaderboardTable';
 import { PtmaDetailDrawer } from './components/PtmaDetailDrawer';
+import { PtmaStatisticsChart } from './components/PtmaStatisticsChart';
 import { PaginatedMetrics, PtmaMetric } from './types';
 
 export interface PtmaRankingIndexProps {
@@ -91,6 +92,12 @@ export default function PtmaRankingIndex({
 
                 {/* Variable Segmented Nav */}
                 <VariableSegmentedNav currentSort={activeSort} filters={safeFilters} />
+
+                {/* Statistics Chart */}
+                <PtmaStatisticsChart
+                    metrics={rankings?.data ?? []}
+                    currentSort={activeSort}
+                />
 
                 {/* Search & Filter Bar */}
                 <FilterControlBar filters={safeFilters} />
