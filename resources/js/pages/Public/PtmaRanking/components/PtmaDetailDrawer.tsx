@@ -295,13 +295,27 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
 
                             <ChartContainer
                                 config={chartConfig}
-                                className="h-[260px] w-full aspect-auto"
+                                className="h-[270px] w-full aspect-auto"
                             >
-                                <RadarChart data={radarData}>
-                                    <PolarGrid className="stroke-border/40" />
+                                <RadarChart data={radarData} outerRadius="75%">
+                                    <defs>
+                                        <linearGradient id="ptmaRadarGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.55} />
+                                            <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0.15} />
+                                        </linearGradient>
+                                    </defs>
+                                    <PolarGrid
+                                        gridType="polygon"
+                                        fill="none"
+                                        fillOpacity={0}
+                                        stroke="var(--border)"
+                                        strokeOpacity={0.7}
+                                        className="stroke-border/70 fill-none"
+                                    />
                                     <PolarAngleAxis
                                         dataKey="subject"
-                                        className="text-xs font-medium fill-muted-foreground"
+                                        tick={{ fill: 'var(--muted-foreground)', fontSize: 11, fontWeight: 600 }}
+                                        className="text-[11px] font-semibold fill-muted-foreground"
                                     />
                                     <PolarRadiusAxis
                                         domain={[0, 100]}
@@ -312,8 +326,20 @@ export const PtmaDetailDrawer: React.FC<PtmaDetailDrawerProps> = ({ metric, onCl
                                         name="Capaian"
                                         dataKey="score"
                                         stroke="var(--chart-1)"
-                                        fill="var(--chart-1)"
-                                        fillOpacity={0.25}
+                                        strokeWidth={2.5}
+                                        fill="url(#ptmaRadarGradient)"
+                                        dot={{
+                                            r: 3.5,
+                                            fill: 'var(--chart-1)',
+                                            stroke: 'var(--card)',
+                                            strokeWidth: 1.5,
+                                        }}
+                                        activeDot={{
+                                            r: 6,
+                                            fill: 'var(--chart-3)',
+                                            stroke: 'var(--chart-1)',
+                                            strokeWidth: 2,
+                                        }}
                                     />
                                     <ChartTooltip
                                         cursor={false}

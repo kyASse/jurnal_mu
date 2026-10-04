@@ -343,11 +343,19 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                     config={radarChartConfig}
                                     className="h-[360px] w-full aspect-auto"
                                 >
-                                    <RadarChart data={radarData}>
-                                        <PolarGrid className="stroke-border/40" />
+                                    <RadarChart data={radarData} outerRadius="75%">
+                                        <PolarGrid
+                                            gridType="polygon"
+                                            fill="none"
+                                            fillOpacity={0}
+                                            stroke="var(--border)"
+                                            strokeOpacity={0.7}
+                                            className="stroke-border/70 fill-none"
+                                        />
                                         <PolarAngleAxis
                                             dataKey="subject"
-                                            className="text-xs font-medium"
+                                            tick={{ fill: 'var(--muted-foreground)', fontSize: 11, fontWeight: 600 }}
+                                            className="text-[11px] font-semibold fill-muted-foreground"
                                         />
                                         <PolarRadiusAxis
                                             angle={30}
@@ -362,8 +370,10 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                                 )}
                                                 dataKey="univ_0"
                                                 stroke="var(--chart-3)"
+                                                strokeWidth={2.5}
                                                 fill="var(--chart-3)"
-                                                fillOpacity={0.25}
+                                                fillOpacity={0.35}
+                                                dot={{ r: 3, fill: 'var(--chart-3)' }}
                                             />
                                         )}
                                         {top3[1] && (
@@ -373,8 +383,10 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                                 )}
                                                 dataKey="univ_1"
                                                 stroke="var(--chart-1)"
+                                                strokeWidth={2}
                                                 fill="var(--chart-1)"
-                                                fillOpacity={0.2}
+                                                fillOpacity={0.25}
+                                                dot={{ r: 3, fill: 'var(--chart-1)' }}
                                             />
                                         )}
                                         {top3[2] && (
@@ -384,8 +396,10 @@ export const PtmaStatisticsChart: React.FC<PtmaStatisticsChartProps> = ({
                                                 )}
                                                 dataKey="univ_2"
                                                 stroke="var(--chart-2)"
+                                                strokeWidth={2}
                                                 fill="var(--chart-2)"
-                                                fillOpacity={0.15}
+                                                fillOpacity={0.2}
+                                                dot={{ r: 3, fill: 'var(--chart-2)' }}
                                             />
                                         )}
                                         <ChartTooltip
