@@ -108,19 +108,19 @@
     --popover-foreground: #0f172a;
 
     /* Muhammadiyah Navy */
-    --primary: #2C368A;
+    --primary: #2c368a;
     --primary-foreground: #ffffff;
 
     /* Muhammadiyah Maroon */
-    --secondary: #E8242A;
+    --secondary: #e8242a;
     --secondary-foreground: #ffffff;
 
     --muted: #f1f5f9; /* Slate-100 */
     --muted-foreground: #64748b; /* Slate-500 */
 
     /* Accent Gradient (Yellow to Maroon) */
-    --accent-gradient: linear-gradient(135deg, #FCEE1F 0%, #E8242A 100%);
-    --accent: #FCEE1F;
+    --accent-gradient: linear-gradient(135deg, #fcee1f 0%, #e8242a 100%);
+    --accent: #fcee1f;
     --accent-foreground: #0f172a;
 
     /* Hero Gradient (Deep Twilight Navy to Maroon) */
@@ -138,10 +138,10 @@
 
     --border: #e2e8f0; /* Slate-200 */
     --input: #e2e8f0;
-    --ring: #2C368A;
+    --ring: #2c368a;
 
-    --chart-1: #2C368A;
-    --chart-2: #E8242A;
+    --chart-1: #2c368a;
+    --chart-2: #e8242a;
     --chart-3: #fcee1f;
     --chart-4: #0f172a;
     --chart-5: #64748b;
@@ -151,12 +151,12 @@
     /* Sidebar */
     --sidebar: #ffffff;
     --sidebar-foreground: #0f172a;
-    --sidebar-primary: #2C368A;
+    --sidebar-primary: #2c368a;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: #f0f2ff; /* Very light navy */
-    --sidebar-accent-foreground: #2C368A;
+    --sidebar-accent-foreground: #2c368a;
     --sidebar-border: #e2e8f0;
-    --sidebar-ring: #2C368A;
+    --sidebar-ring: #2c368a;
 }
 
 .dark {
@@ -169,17 +169,17 @@
     --popover: #0f172a;
     --popover-foreground: #f8fafc;
 
-    --primary: #5C6BC0;
+    --primary: #5c6bc0;
     --primary-foreground: #ffffff;
 
-    --secondary: #EF5350;
+    --secondary: #ef5350;
     --secondary-foreground: #ffffff;
 
     --muted: #1e293b;
     --muted-foreground: #94a3b8;
 
-    --accent-gradient: linear-gradient(135deg, #FCEE1F 0%, #EF5350 100%);
-    --accent: #FCEE1F;
+    --accent-gradient: linear-gradient(135deg, #fcee1f 0%, #ef5350 100%);
+    --accent: #fcee1f;
     --accent-foreground: #020617;
 
     /* Hero Gradient (Deep Twilight Navy to Maroon Dark) */
@@ -196,22 +196,22 @@
 
     --border: #1e293b;
     --input: #1e293b;
-    --ring: #5C6BC0;
+    --ring: #5c6bc0;
 
-    --chart-1: #5C6BC0;
-    --chart-2: #EF5350;
+    --chart-1: #5c6bc0;
+    --chart-2: #ef5350;
     --chart-3: #fcee1f;
     --chart-4: #f8fafc;
     --chart-5: #94a3b8;
 
     --sidebar: #020617;
     --sidebar-foreground: #f8fafc;
-    --sidebar-primary: #5C6BC0;
+    --sidebar-primary: #5c6bc0;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: #1e293b;
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: #1e293b;
-    --sidebar-ring: #5C6BC0;
+    --sidebar-ring: #5c6bc0;
 }
 
 @layer base {

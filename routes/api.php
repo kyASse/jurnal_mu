@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\OAuthRevokeController;
+use App\Http\Controllers\Api\SSOUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
-use App\Http\Controllers\Api\OAuthRevokeController;
-use App\Http\Controllers\Api\SSOUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -65,5 +65,3 @@ Route::middleware(['auth:api'])->prefix('sso')->group(function () {
 Route::middleware(['auth:api'])->prefix('oauth')->group(function () {
     Route::post('/revoke-token', [OAuthRevokeController::class, 'revoke']);
 });
-
-

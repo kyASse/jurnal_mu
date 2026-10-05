@@ -15,7 +15,7 @@ test('authenticated user sees custom consent screen with client info', function 
     $codeVerifier = bin2hex(random_bytes(32));
     $codeChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
 
-    $response = $this->actingAs($user, 'web')->get('/oauth/authorize?' . http_build_query([
+    $response = $this->actingAs($user, 'web')->get('/oauth/authorize?'.http_build_query([
         'client_id' => $client->id,
         'redirect_uri' => 'https://askui.test/auth/callback',
         'response_type' => 'code',

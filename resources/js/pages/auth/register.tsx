@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { UniversityCombobox } from '@/components/ui/university-combobox';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -29,7 +30,7 @@ interface Props {
 }
 
 export default function Register({ universities }: Props) {
-    const { data, setData, post, processing, errors } = useForm<RegisterForm>({
+    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
         name: '',
         email: '',
         password: '',
@@ -44,7 +45,9 @@ export default function Register({ universities }: Props) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('register'));
+        post(route('register'), {
+            onFinish: () => reset('password', 'password_confirmation'),
+        });
     };
 
     return (
@@ -187,12 +190,13 @@ export default function Register({ universities }: Props) {
                             {/* Password */}
                             <div>
                                 <Label htmlFor="password">Password *</Label>
-                                <Input
+                                <PasswordInput
                                     id="password"
-                                    type="password"
+                                    name="password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     required
+                                    autoComplete="new-password"
                                     className="mt-2"
                                 />
                                 {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>}
@@ -201,12 +205,13 @@ export default function Register({ universities }: Props) {
                             {/* Password Confirmation */}
                             <div>
                                 <Label htmlFor="password_confirmation">Konfirmasi Password *</Label>
-                                <Input
+                                <PasswordInput
                                     id="password_confirmation"
-                                    type="password"
+                                    name="password_confirmation"
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
                                     required
+                                    autoComplete="new-password"
                                     className="mt-2"
                                 />
                                 {errors.password_confirmation && (

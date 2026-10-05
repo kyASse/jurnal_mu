@@ -20,7 +20,7 @@ test('full oauth pkce flow from authorization to token exchange and user fetch',
     $redirectUri = $client->redirect_uris[0];
 
     // 2. Request authorization (Consent screen) to set up authorization request session
-    $consentResponse = $this->actingAs($user, 'web')->get('/oauth/authorize?' . http_build_query([
+    $consentResponse = $this->actingAs($user, 'web')->get('/oauth/authorize?'.http_build_query([
         'client_id' => $client->id,
         'redirect_uri' => $redirectUri,
         'response_type' => 'code',
@@ -63,7 +63,7 @@ test('full oauth pkce flow from authorization to token exchange and user fetch',
     $accessToken = $tokenResponse->json('access_token');
 
     // 5. Fetch user profile with the token
-    $userResponse = $this->withHeader('Authorization', 'Bearer ' . $accessToken)
+    $userResponse = $this->withHeader('Authorization', 'Bearer '.$accessToken)
         ->getJson('/api/sso/user');
 
     $userResponse->assertStatus(200)
