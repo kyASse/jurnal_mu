@@ -56,16 +56,38 @@ BACKUP_SIZE="$(ls -lh "${BACKUP_FILE}" | awk '{print $5}')"
 echo "[+] Backup created successfully: ${BACKUP_FILE} (${BACKUP_SIZE})"
 echo "$(date): Automated backup created: backup_${TIMESTAMP}.sql.gz (${BACKUP_SIZE}) by $(whoami)" >> storage/logs/backup.log
 
-# 4. Load NVM & Node environment
+# 4. Load NVM & Node environment safely (nvm.sh is incompatible with set -e / set -u)
 echo "[*] Sourcing Node.js via NVM..."
+set +eu
 export NVM_DIR="$HOME/.nvm"
 if [ -s "$NVM_DIR/nvm.sh" ]; then
   # shellcheck source=/dev/null
-  . "$NVM_DIR/nvm.sh"
-  nvm use 20 || nvm use --lts || true
-else
-  echo "[!] Warning: NVM not found in $HOME/.nvm. Using system node if available."
+  . "$NVM_DIR/nvm.sh" --no-use
+  nvm use 20 2>/dev/null || nvm use --lts 2>/dev/null || nvm use default 2>/dev/null || true
 fi
+
+# If node still not on PATH, attempt to install Node 20 or locate existing NVM binaries
+if ! command -v node >/dev/null 2>&1; then
+  if command -v nvm >/dev/null 2>&1; then
+    echo "[*] Node not detected, attempting nvm install 20..."
+    nvm install 20 2>/dev/null || true
+  fi
+  if [ -d "$HOME/.nvm/versions/node" ]; then
+    LATEST_NODE_DIR="$(find "$HOME/.nvm/versions/node" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | sort -V | tail -n 1)"
+    if [ -n "$LATEST_NODE_DIR" ] && [ -d "$LATEST_NODE_DIR/bin" ]; then
+      export PATH="$LATEST_NODE_DIR/bin:$PATH"
+    fi
+  fi
+fi
+
+# Fallback to system node locations
+for node_path in "$HOME/bin" "$HOME/.local/bin" "/usr/local/bin" "/usr/bin"; do
+  if [ -x "$node_path/node" ]; then
+    export PATH="$node_path:$PATH"
+    break
+  fi
+done
+set -eu
 
 echo "Node version: $(node -v 2>/dev/null || echo 'not found')"
 echo "NPM version: $(npm -v 2>/dev/null || echo 'not found')"

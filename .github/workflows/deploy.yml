@@ -93,12 +93,8 @@ jobs:
             echo "[*] Navigating to ${TARGET_DIR}..."
             cd "${TARGET_DIR}"
             
-            if [ ! -f "scripts/deploy.sh" ]; then
-              echo "[*] Initializing or pulling deploy script from git..."
-              git fetch origin main
-              git checkout origin/main -- scripts/deploy.sh
-              chmod +x scripts/deploy.sh
-            fi
-            
+            echo "[*] Ensuring latest deploy script from origin main..."
+            git fetch origin main
+            git checkout origin/main -- scripts/deploy.sh
             chmod +x scripts/deploy.sh
             bash scripts/deploy.sh
