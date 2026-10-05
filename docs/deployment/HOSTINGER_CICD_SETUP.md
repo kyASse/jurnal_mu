@@ -156,7 +156,7 @@ chmod -R 775 storage/app/backups
 Hostinger Cloud/VPS and cPanel environments often provide NVM. Confirm availability:
 ```bash
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 node -v
 npm -v
@@ -174,7 +174,14 @@ Confirm `mariadb-dump` or `mysqldump` is available in PATH:
 ```bash
 mariadb-dump --version 2>/dev/null || mysqldump --version
 ```
-*(If only `mysqldump` is installed, create a symlink in `~/bin` or verify that `mariadb-dump` alias exists: `mkdir -p ~/bin && ln -s $(which mysqldump) ~/bin/mariadb-dump && export PATH="$HOME/bin:$PATH"`)*
+`scripts/deploy.sh` dynamically detects the available binary:
+```bash
+DUMP_BIN="$(command -v mariadb-dump || command -v mysqldump || echo 'mariadb-dump')"
+```
+> **Privilege Notice**: Shared hosting database users typically lack global `EVENT` and `PROCESS` privileges. `scripts/deploy.sh` executes backups with `--no-tablespaces` and omits `--events` to prevent privilege errors during automated backups:
+> ```bash
+> "$DUMP_BIN" -u "${DB_USER}" -p"${DB_PASS}" --single-transaction --routines --triggers --no-tablespaces "${DB_NAME}" | gzip > "${BACKUP_FILE}"
+> ```
 
 ---
 
@@ -285,9 +292,9 @@ Every deployment run automatically creates a timestamped compressed backup in `s
 
 2. Extract credentials from `.env`:
    ```bash
-   DB_USER=$(grep -E '^DB_USERNAME=' .env | cut -d '=' -f2- | tr -d '\"'\'')
-   DB_PASS=$(grep -E '^DB_PASSWORD=' .env | cut -d '=' -f2- | tr -d '\"'\'')
-   DB_NAME=$(grep -E '^DB_DATABASE=' .env | cut -d '=' -f2- | tr -d '\"'\'')
+   DB_USER=$(grep -E '^DB_USERNAME=' .env | cut -d '=' -f2- | tr -d '\"\r\'')
+   DB_PASS=$(grep -E '^DB_PASSWORD=' .env | cut -d '=' -f2- | tr -d '\"\r\'')
+   DB_NAME=$(grep -E '^DB_DATABASE=' .env | cut -d '=' -f2- | tr -d '\"\r\'')
    ```
 
 3. Restore database from compressed dump:

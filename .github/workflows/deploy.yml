@@ -78,15 +78,18 @@ jobs:
     steps:
       - name: Trigger Remote Deployment
         uses: appleboy/ssh-action@v1.2.1
+        env:
+          HOSTINGER_APP_DIR: ${{ secrets.HOSTINGER_APP_DIR }}
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
+          envs: HOSTINGER_APP_DIR
           script_stop: true
           command_timeout: 15m
           script: |
-            TARGET_DIR="${{ secrets.HOSTINGER_APP_DIR || 'domains/journalmu.org/public_html' }}"
+            TARGET_DIR="${HOSTINGER_APP_DIR:-domains/journalmu.org/public_html}"
             echo "[*] Navigating to ${TARGET_DIR}..."
             cd "${TARGET_DIR}"
             

@@ -16,9 +16,9 @@ mkdir -p "storage/logs"
 # 2. Extract Database Credentials from .env
 if [ -f .env ]; then
   # Parse .env ignoring comments and empty lines
-  DB_NAME="${DB_NAME:-$(grep -E '^DB_DATABASE=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"'\''')}"
-  DB_USER="${DB_USER:-$(grep -E '^DB_USERNAME=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"'\''')}"
-  DB_PASS="${DB_PASS:-$(grep -E '^DB_PASSWORD=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"'\''')}"
+  DB_NAME="${DB_NAME:-$(grep -E '^DB_DATABASE=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"\r'\''')}"
+  DB_USER="${DB_USER:-$(grep -E '^DB_USERNAME=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"\r'\''')}"
+  DB_PASS="${DB_PASS:-$(grep -E '^DB_PASSWORD=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"\r'\''')}"
 fi
 
 if [ -z "${DB_NAME:-}" ] || [ -z "${DB_USER:-}" ]; then
@@ -30,19 +30,21 @@ fi
 echo "[*] Creating database backup for ${DB_NAME}..."
 BACKUP_FILE="${BACKUP_DIR}/backup_${TIMESTAMP}.sql.gz"
 
+DUMP_BIN="$(command -v mariadb-dump || command -v mysqldump || echo 'mariadb-dump')"
+
 if [ -n "${DB_PASS:-}" ]; then
-  mariadb-dump -u "${DB_USER}" -p"${DB_PASS}" \
+  "$DUMP_BIN" -u "${DB_USER}" -p"${DB_PASS}" \
     --single-transaction \
     --routines \
     --triggers \
-    --events \
+    --no-tablespaces \
     "${DB_NAME}" | gzip > "${BACKUP_FILE}"
 else
-  mariadb-dump -u "${DB_USER}" \
+  "$DUMP_BIN" -u "${DB_USER}" \
     --single-transaction \
     --routines \
     --triggers \
-    --events \
+    --no-tablespaces \
     "${DB_NAME}" | gzip > "${BACKUP_FILE}"
 fi
 
@@ -59,7 +61,7 @@ echo "[*] Sourcing Node.js via NVM..."
 export NVM_DIR="$HOME/.nvm"
 if [ -s "$NVM_DIR/nvm.sh" ]; then
   # shellcheck source=/dev/null
-  \. "$NVM_DIR/nvm.sh"
+  . "$NVM_DIR/nvm.sh"
   nvm use 20 || nvm use --lts || true
 else
   echo "[!] Warning: NVM not found in $HOME/.nvm. Using system node if available."
@@ -79,7 +81,7 @@ composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
 # 7. Frontend Build
 echo "[*] Installing NPM dependencies & building assets..."
-npm install
+npm install --no-audit --no-fund
 npm run build
 
 # 8. Laravel Migrations & Storage Link
