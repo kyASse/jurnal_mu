@@ -109,7 +109,25 @@ File: `app/Jobs/SyncUniversitySintaMetricJob.php`
 * Memproses sinkronisasi untuk 1 universitas dan memperbarui tabel secara idempoten via `updateOrCreate`.
 * Isolasi galat: kegagalan penarikan data pada satu kampus tidak membatalkan eksekusi antrean kampus lainnya.
 
-### Artisan CLI Command:
+### Artisan CLI Commands:
+
+#### 1. Health-Check & Diagnostic Ping (`sinta:ping`):
+File: `app/Console/Commands/PingSintaCommand.php`
+```bash
+# Cek konfigurasi dan uji autentikasi / ambil Bearer token (tanpa sentuh database)
+docker exec -i jurnal-mu-app php artisan sinta:ping
+
+# Cek dengan paksa mode mock
+docker exec -i jurnal-mu-app php artisan sinta:ping --mock
+
+# Cek autentikasi dan uji coba ambil sampel metrik 1 kode PT secara read-only
+docker exec -i jurnal-mu-app php artisan sinta:ping --kodept=051010
+```
+* Menampilkan ringkasan konfigurasi `.env` (kredensial disamarkan `***`).
+* Mengukur latensi koneksi (ms) ke endpoint `/consumer/login`.
+* Dapat menguji penarikan metrik kampus sampel tanpa menyimpan/mengubah data database.
+
+#### 2. Sinkronisasi Metrik PTMA (`sinta:sync-ptma`):
 File: `app/Console/Commands/SyncSintaPtmaCommand.php`
 ```bash
 # Sinkronisasi seluruh kampus PTMA (mode mock dev)
