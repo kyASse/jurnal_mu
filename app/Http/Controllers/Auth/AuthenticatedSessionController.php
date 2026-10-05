@@ -9,7 +9,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -37,28 +39,45 @@ class AuthenticatedSessionController extends Controller
             'password' => 'required|string',
         ]);
 
+        $throttleKey = Str::transliterate(Str::lower($request->email).'|'.$request->ip());
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            throw ValidationException::withMessages([
+                'email' => trans('auth.throttle', [
+                    'seconds' => $seconds,
+                    'minutes' => ceil($seconds / 60),
+                ]),
+            ]);
+        }
+
         $user = User::where('email', $request->email)->first();
 
         // check if user exists
         if (!$user) {
+            RateLimiter::hit($throttleKey, 60);
             throw ValidationException::withMessages([
-                'email' => 'The provided credentials do not match our records.',
-            ]);
-        }
-
-        // check if user is active
-        if (!$user->is_active) {
-            throw ValidationException::withMessages([
-                'email' => 'Your account is inactive. Please contact the administrator.',
+                'email' => __('auth.failed'),
             ]);
         }
 
         // check password
         if (!Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($throttleKey, 60);
             throw ValidationException::withMessages([
-                'email' => 'The provided credentials do not match our records.',
+                'email' => __('auth.failed'),
             ]);
         }
+
+        // check if user is active
+        if (!$user->is_active) {
+            RateLimiter::hit($throttleKey, 60);
+            throw ValidationException::withMessages([
+                'email' => 'Your account is inactive. Please contact the administrator.',
+            ]);
+        }
+
+        RateLimiter::clear($throttleKey);
 
         // Login
         Auth::login($user, $request->boolean('remember'));

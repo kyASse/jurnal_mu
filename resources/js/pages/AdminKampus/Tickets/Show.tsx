@@ -100,7 +100,7 @@ export default function Show({ ticket }: any) {
                                                     {msg.attachment_path && (
                                                         <div className="mt-3 border-t border-primary-foreground/20 pt-3">
                                                             <a
-                                                                href={`/storage/${msg.attachment_path}`}
+                                                                href={route('admin-kampus.tickets.attachments.download', [ticket.id, msg.id])}
                                                                 target="_blank"
                                                                 className="flex items-center gap-2 text-xs font-medium hover:underline"
                                                             >
