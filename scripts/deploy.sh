@@ -99,7 +99,8 @@ git reset --hard origin/main
 
 # 6. PHP Dependencies
 echo "[*] Installing Composer dependencies..."
-composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
+composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs --no-scripts
+php artisan package:discover --ansi || true
 
 # 7. Frontend Build
 echo "[*] Installing NPM dependencies & building assets..."
