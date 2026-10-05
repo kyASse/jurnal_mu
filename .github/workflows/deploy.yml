@@ -1,0 +1,104 @@
+name: CI/CD Deploy Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  ci-tests:
+    name: Run CI Tests & Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Frontend Assets Check
+        run: npm run build
+
+      - name: Install PHP Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare Environment File
+        run: cp .env.example .env
+
+      - name: Generate App Key
+        run: php artisan key:generate
+
+      - name: Setup SQLite Database for Tests
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+          sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env
+          sed -i 's/DB_DATABASE=jurnal_mu/DB_DATABASE=database\/database.sqlite/' .env
+          php artisan migrate:fresh --seed --force
+
+      - name: Run Pest Tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: ./vendor/bin/pest
+
+  deploy-hostinger:
+    name: Deploy to Hostinger via SSH
+    needs: [ci-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Remote Deployment
+        uses: appleboy/ssh-action@v1.2.1
+        env:
+          HOSTINGER_APP_DIR: ${{ secrets.HOSTINGER_APP_DIR }}
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT != '' && secrets.HOSTINGER_SSH_PORT || 65002 }}
+          envs: HOSTINGER_APP_DIR
+          script_stop: true
+          command_timeout: 15m
+          script: |
+            TARGET_DIR="${HOSTINGER_APP_DIR:-domains/journalmu.org/public_html}"
+            echo "[*] Navigating to ${TARGET_DIR}..."
+            cd "${TARGET_DIR}"
+            
+            if [ ! -f "scripts/deploy.sh" ]; then
+              echo "[*] Initializing or pulling deploy script from git..."
+              git fetch origin main
+              git checkout origin/main -- scripts/deploy.sh
+              chmod +x scripts/deploy.sh
+            fi
+            
+            chmod +x scripts/deploy.sh
+            bash scripts/deploy.sh
