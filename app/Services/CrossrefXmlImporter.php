@@ -18,7 +18,7 @@ class CrossrefXmlImporter
         $xmlContent = file_get_contents($filePath);
         $cleanXml = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $xmlContent);
 
-        $xml = simplexml_load_string($cleanXml);
+        $xml = simplexml_load_string($cleanXml, 'SimpleXMLElement', LIBXML_NONET);
         if ($xml === false) {
             throw new \Exception('Gagal memproses file XML. Format tidak valid.');
         }

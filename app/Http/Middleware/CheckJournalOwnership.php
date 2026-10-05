@@ -33,22 +33,37 @@ class CheckJournalOwnership
             return $next($request);
         }
 
-        // Get journal from route parameter
-        $journal = $request->route('journal');
+        // Resolve journal route parameter safely whether model or raw ID
+        try {
+            $routeParam = $request->route('journal');
+        } catch (\Throwable) {
+            $routeParam = null;
+        }
 
         // If no journal in route, continue (will be handled by controller)
-        if (!$journal) {
+        if (!$routeParam) {
             return $next($request);
         }
 
-        // Ensure journal is Journal model instance
-        if (!$journal instanceof Journal) {
-            $journal = Journal::findOrFail($journal);
+        if ($routeParam instanceof Journal) {
+            $journal = $routeParam;
+        } elseif (is_numeric($routeParam) || is_string($routeParam)) {
+            $journal = Journal::find($routeParam);
+            if (!$journal) {
+                abort(404, 'Journal not found.');
+            }
+        } elseif (is_object($routeParam) && isset($routeParam->id)) {
+            $journal = Journal::find($routeParam->id);
+            if (!$journal) {
+                abort(404, 'Journal not found.');
+            }
+        } else {
+            abort(403, 'Invalid journal parameter.');
         }
 
         // Admin Kampus: check if journal belongs to their university
         if ($user->isAdminKampus()) {
-            if ($journal->university_id !== $user->university_id) {
+            if (!$user->university_id || (int) $journal->university_id !== (int) $user->university_id) {
                 abort(403, 'You do not have permission to access this journal.');
             }
 
@@ -57,7 +72,7 @@ class CheckJournalOwnership
 
         // User: check if they own this journal
         if ($user->isUser()) {
-            if ($journal->user_id !== $user->id) {
+            if (!$journal->user_id || (int) $journal->user_id !== (int) $user->id) {
                 abort(403, 'You do not have permission to access this journal.');
             }
 

@@ -296,7 +296,7 @@ class UniversityController extends Controller
             'email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'logo_url' => 'nullable|url|max:500',
-            'logo_file' => 'nullable|image|max:2048',
+            'logo_file' => 'nullable|file|mimes:jpeg,png,jpg,webp|max:2048',
             'accreditation_status' => 'nullable|string|max:50',
             'cluster' => 'nullable|string|max:50',
             'profile_description' => [

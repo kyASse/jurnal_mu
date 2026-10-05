@@ -36,13 +36,15 @@ class CheckUniversity
             abort(403, 'Your account is not associated with any university. Please contact administrator.');
         }
 
-        // Get university_id from route parameter (if exists)
-        $routeUniversityId = $request->route('university')
-            ? $request->route('university')->id
-            : null;
+        // Resolve university ID safely whether model or raw ID
+        try {
+            $routeParam = $request->route('university');
+        } catch (\Throwable) {
+            $routeParam = null;
+        }
+        $routeUniversityId = is_object($routeParam) ? $routeParam->id : (is_numeric($routeParam) ? (int) $routeParam : null);
 
-        // If route has university parameter, check if it matches user's university
-        if ($routeUniversityId && $routeUniversityId != $user->university_id) {
+        if ($routeUniversityId && (int) $routeUniversityId !== (int) $user->university_id) {
             abort(403, 'You do not have permission to access this university data.');
         }
 
@@ -50,7 +52,7 @@ class CheckUniversity
         $requestUniversityId = $request->input('university_id');
 
         // If request has university_id, check if it matches user's university
-        if ($requestUniversityId && $requestUniversityId != $user->university_id) {
+        if ($requestUniversityId && (int) $requestUniversityId !== (int) $user->university_id) {
             abort(403, 'You cannot create/update data for another university.');
         }
 

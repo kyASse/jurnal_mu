@@ -4,8 +4,10 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\TicketMessage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class TicketController extends Controller
@@ -55,7 +57,7 @@ class TicketController extends Controller
 
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('ticket_attachments', 'public');
+            $attachmentPath = $request->file('attachment')->store("tickets/{$ticket->id}", 'local');
         }
 
         $ticket->messages()->create([
@@ -90,7 +92,7 @@ class TicketController extends Controller
 
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('ticket_attachments', 'public');
+            $attachmentPath = $request->file('attachment')->store("tickets/{$ticket->id}", 'local');
         }
 
         $ticket->messages()->create([
@@ -105,6 +107,24 @@ class TicketController extends Controller
         }
 
         return redirect()->back()->with('success', 'Reply sent successfully.');
+    }
+
+    public function downloadAttachment(Ticket $ticket, TicketMessage $message)
+    {
+        $this->authorize('view', $ticket);
+
+        if ($message->ticket_id !== $ticket->id) {
+            abort(404);
+        }
+
+        if (!$message->attachment_path || !Storage::disk('local')->exists($message->attachment_path)) {
+            abort(404, 'File lampiran tidak ditemukan.');
+        }
+
+        return Storage::disk('local')->download(
+            $message->attachment_path,
+            basename($message->attachment_path)
+        );
     }
 
     public function destroy(Ticket $ticket)
