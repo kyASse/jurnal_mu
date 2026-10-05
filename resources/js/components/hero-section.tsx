@@ -173,8 +173,7 @@ export default function HeroSection({
 
                 {/* Subtitle */}
                 <p className="mx-auto mb-10 max-w-2xl text-lg text-white/90 sm:text-xl">
-                    The central portal for academic journals, research papers, and scholarly works from Muhammadiyah Universities across
-                    Indonesia.
+                    The central portal for academic journals, research papers, and scholarly works from Muhammadiyah Universities across Indonesia.
                 </p>
 
                 {/* Floating Capsule Search Bar with Double-Bezel */}
@@ -199,7 +198,7 @@ export default function HeroSection({
                                           ? 'Search for article title, author, or abstract...'
                                           : 'Search for university name or code...'
                                 }
-                                className="h-11 w-full border-0 bg-transparent px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0 sm:text-base dark:text-white"
+                                className="h-11 w-full border-0 bg-transparent px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-0 focus:outline-none sm:text-base dark:text-white"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -217,7 +216,9 @@ export default function HeroSection({
                                     >
                                         {searchType === 'journals' && <Library className="h-3.5 w-3.5 text-primary" />}
                                         {searchType === 'articles' && <BookOpen className="h-3.5 w-3.5 text-secondary" />}
-                                        {searchType === 'universities' && <GraduationCap className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-400" />}
+                                        {searchType === 'universities' && (
+                                            <GraduationCap className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-400" />
+                                        )}
                                         <span className="capitalize">{searchType}</span>
                                         <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
                                     </button>
@@ -314,9 +315,7 @@ export default function HeroSection({
                         <div className="absolute -top-4 -right-4 rounded-full bg-accent/10 p-6 opacity-50 mix-blend-multiply transition-transform group-hover:scale-110 dark:bg-accent/20"></div>
                         <div className="relative flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                                    Total Universities
-                                </p>
+                                <p className="text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">Total Universities</p>
                                 <p className="mt-2 text-4xl font-black text-gray-900 dark:text-white">
                                     {new Intl.NumberFormat('id-ID').format(totalUniversities || 0)}
                                 </p>

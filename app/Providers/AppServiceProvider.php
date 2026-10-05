@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
@@ -61,6 +62,18 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Vite::useHotFile(base_path('public/hot'));
+
+        // Enforce strong password complexity defaults across registration & resets
+        Password::defaults(function () {
+            $rule = Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers();
+
+            return app()->isProduction()
+                ? $rule->symbols()->uncompromised()
+                : $rule;
+        });
 
         // Register policies
         Gate::policy(User::class, UserPolicy::class);
