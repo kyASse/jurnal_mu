@@ -292,9 +292,9 @@ Every deployment run automatically creates a timestamped compressed backup in `s
 
 2. Extract credentials from `.env`:
    ```bash
-   DB_USER=$(grep -E '^DB_USERNAME=' .env | cut -d '=' -f2- | tr -d '\"\r\'')
-   DB_PASS=$(grep -E '^DB_PASSWORD=' .env | cut -d '=' -f2- | tr -d '\"\r\'')
-   DB_NAME=$(grep -E '^DB_DATABASE=' .env | cut -d '=' -f2- | tr -d '\"\r\'')
+   DB_USER=$(grep -E '^DB_USERNAME=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"\r\'''')
+   DB_PASS=$(grep -E '^DB_PASSWORD=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"\r\'''')
+   DB_NAME=$(grep -E '^DB_DATABASE=' .env | head -n 1 | cut -d '=' -f2- | tr -d '\"\r\'''')
    ```
 
 3. Restore database from compressed dump:

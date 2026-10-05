@@ -84,7 +84,7 @@ jobs:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT != '' && secrets.HOSTINGER_SSH_PORT || 65002 }}
           envs: HOSTINGER_APP_DIR
           script_stop: true
           command_timeout: 15m
