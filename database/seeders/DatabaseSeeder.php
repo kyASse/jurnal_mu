@@ -39,6 +39,9 @@ class DatabaseSeeder extends Seeder
             DoiPackageSeeder::class,        // 14. DOI Packages (no dependencies)
             DoiBankAccountSeeder::class,    // 15. DOI Bank Accounts (no dependencies)
             DoiSettingSeeder::class,        // 16. DOI Settings (no dependencies)
+
+            // === SINTA PTMA Ranking Subsystem ===
+            SintaPtmaSeeder::class,         // 17. SINTA PTMA Metrics (depends on: universities)
         ]);
 
         $this->command->info('');

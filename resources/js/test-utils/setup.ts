@@ -35,11 +35,50 @@ global.IntersectionObserver = class IntersectionObserver {
 
 // Mock ResizeObserver for responsive charts
 global.ResizeObserver = class ResizeObserver {
-    constructor() {}
+    callback?: (entries: any[]) => void;
+    constructor(callback?: (entries: any[]) => void) {
+        this.callback = callback;
+    }
     disconnect() {}
-    observe() {}
+    observe(target: any) {
+        if (typeof this.callback === 'function') {
+            this.callback([
+                {
+                    target,
+                    contentRect: {
+                        width: 800,
+                        height: 400,
+                        top: 0,
+                        left: 0,
+                        bottom: 400,
+                        right: 800,
+                    },
+                },
+            ]);
+        }
+    }
     unobserve() {}
 } as any;
+
+// Mock getBoundingClientRect for responsive charts in happy-dom
+const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+Element.prototype.getBoundingClientRect = function () {
+    const rect = originalGetBoundingClientRect ? originalGetBoundingClientRect.call(this) : null;
+    if (!rect || (rect.width === 0 && rect.height === 0)) {
+        return {
+            width: 800,
+            height: 400,
+            top: 0,
+            left: 0,
+            bottom: 400,
+            right: 800,
+            x: 0,
+            y: 0,
+            toJSON: () => {},
+        };
+    }
+    return rect;
+};
 
 // Suppress console errors in tests (optional - remove if you want to see them)
 const originalError = console.error;
