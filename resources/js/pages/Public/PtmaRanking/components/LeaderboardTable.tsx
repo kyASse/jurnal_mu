@@ -1,8 +1,8 @@
-import React from 'react';
 import { router } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, School, SearchX } from 'lucide-react';
-import { LeaderboardRow } from './LeaderboardRow';
+import React from 'react';
 import { PaginationLink, PtmaMetric } from '../types';
+import { LeaderboardRow } from './LeaderboardRow';
 
 export interface LeaderboardTableProps {
     metrics: PtmaMetric[];
@@ -19,25 +19,18 @@ export interface LeaderboardTableProps {
     };
 }
 
-export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
-    metrics,
-    currentSort = 'sinta_overall',
-    onSelectDetail,
-    pagination,
-}) => {
+export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ metrics, currentSort = 'sinta_overall', onSelectDetail, pagination }) => {
     const safeSort = typeof currentSort === 'string' && currentSort ? currentSort : 'sinta_overall';
 
     // Empty state
     if (!metrics || metrics.length === 0) {
         return (
-            <div className="w-full py-16 px-4 rounded-3xl border border-dashed border-border bg-muted/40 text-center font-['Geist',sans-serif]">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
-                    <SearchX className="w-6 h-6" />
+            <div className="w-full rounded-3xl border border-dashed border-border bg-muted/40 px-4 py-16 text-center font-['Geist',sans-serif]">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                    <SearchX className="h-6 w-6" />
                 </div>
-                <h3 className="text-base font-semibold text-card-foreground">
-                    Tidak ada kampus yang cocok dengan kriteria pencarian
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                <h3 className="text-base font-semibold text-card-foreground">Tidak ada kampus yang cocok dengan kriteria pencarian</h3>
+                <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
                     Silakan ubah kata kunci pencarian atau sesuaikan filter akreditasi BAN-PT untuk melihat kampus PTMA lainnya.
                 </p>
             </div>
@@ -86,42 +79,30 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
             {/* Table Meta Header */}
             <div className="flex items-center justify-between px-2 py-1 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5 font-medium">
-                    <School className="w-3.5 h-3.5 text-primary" />
+                    <School className="h-3.5 w-3.5 text-primary" />
                     Menampilkan {metrics.length} Perguruan Tinggi
-                    {pagination?.total && pagination.total > metrics.length && (
-                        <span> dari {pagination.total} terindeks</span>
-                    )}
+                    {pagination?.total && pagination.total > metrics.length && <span> dari {pagination.total} terindeks</span>}
                 </span>
-                <span className="font-mono text-[11px] uppercase tracking-wider">
-                    Urutan: {safeSort.replace(/_/g, ' ')}
-                </span>
+                <span className="font-mono text-[11px] tracking-wider uppercase">Urutan: {safeSort.replace(/_/g, ' ')}</span>
             </div>
 
             {/* Rows List */}
             <div className="space-y-3">
                 {metrics.map((item) => (
-                    <LeaderboardRow
-                        key={item.id}
-                        metric={item}
-                        currentSort={safeSort}
-                        topValue={topValue}
-                        onSelectDetail={onSelectDetail}
-                    />
+                    <LeaderboardRow key={item.id} metric={item} currentSort={safeSort} topValue={topValue} onSelectDetail={onSelectDetail} />
                 ))}
             </div>
 
             {/* Pagination Controls */}
             {pagination && pagination.links && pagination.links.length > 3 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 border-t border-border">
-                    <div className="text-xs text-muted-foreground font-mono">
+                <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-6 pb-2 sm:flex-row">
+                    <div className="font-mono text-xs text-muted-foreground">
                         Halaman <span className="font-semibold text-foreground">{pagination.current_page}</span> dari{' '}
                         <span className="font-semibold text-foreground">{pagination.last_page}</span>
-                        {pagination.total && (
-                            <span className="ml-1">({pagination.total} total kampus)</span>
-                        )}
+                        {pagination.total && <span className="ml-1">({pagination.total} total kampus)</span>}
                     </div>
 
-                    <div className="flex items-center gap-1 flex-wrap justify-center">
+                    <div className="flex flex-wrap items-center justify-center gap-1">
                         {pagination.links.map((link, idx) => {
                             const isPrev = link.label.includes('Previous') || link.label.includes('&laquo;');
                             const isNext = link.label.includes('Next') || link.label.includes('&raquo;');
@@ -134,14 +115,14 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                                         type="button"
                                         disabled={isDisabled}
                                         onClick={() => handlePageClick(link.url)}
-                                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                        className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                                             isDisabled
-                                                ? 'text-muted-foreground/40 cursor-not-allowed'
-                                                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                                ? 'cursor-not-allowed text-muted-foreground/40'
+                                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                         }`}
                                         aria-label="Halaman sebelumnya"
                                     >
-                                        <ChevronLeft className="w-3.5 h-3.5" />
+                                        <ChevronLeft className="h-3.5 w-3.5" />
                                         <span>Sebelumnya</span>
                                     </button>
                                 );
@@ -154,15 +135,15 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                                         type="button"
                                         disabled={isDisabled}
                                         onClick={() => handlePageClick(link.url)}
-                                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                        className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                                             isDisabled
-                                                ? 'text-muted-foreground/40 cursor-not-allowed'
-                                                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                                ? 'cursor-not-allowed text-muted-foreground/40'
+                                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                         }`}
                                         aria-label="Halaman berikutnya"
                                     >
                                         <span>Berikutnya</span>
-                                        <ChevronRight className="w-3.5 h-3.5" />
+                                        <ChevronRight className="h-3.5 w-3.5" />
                                     </button>
                                 );
                             }
@@ -173,12 +154,12 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                                     type="button"
                                     disabled={isDisabled}
                                     onClick={() => handlePageClick(link.url)}
-                                    className={`w-8 h-8 rounded-lg text-xs font-mono font-medium transition-colors flex items-center justify-center ${
+                                    className={`flex h-8 w-8 items-center justify-center rounded-lg font-mono text-xs font-medium transition-colors ${
                                         link.active
-                                            ? 'bg-primary text-primary-foreground font-bold shadow-xs'
+                                            ? 'bg-primary font-bold text-primary-foreground shadow-xs'
                                             : isDisabled
-                                            ? 'text-muted-foreground/40 cursor-default'
-                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                              ? 'cursor-default text-muted-foreground/40'
+                                              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                     }`}
                                 >
                                     {link.label}

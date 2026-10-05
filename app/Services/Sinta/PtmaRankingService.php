@@ -6,7 +6,6 @@ use App\Models\University;
 use App\Models\UniversitySintaMetric;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class PtmaRankingService
 {
@@ -29,10 +28,6 @@ class PtmaRankingService
 
     /**
      * Get paginated PTMA university rankings with dense rank calculation and filters.
-     *
-     * @param array $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator
      */
     public function getRankings(array $filters = [], int $perPage = 25): LengthAwarePaginator
     {
@@ -73,8 +68,6 @@ class PtmaRankingService
 
     /**
      * Get aggregated macro totals and top ranked university overall.
-     *
-     * @return array
      */
     public function getSummaryStats(): array
     {

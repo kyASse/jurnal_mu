@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import { router } from '@inertiajs/react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,7 +7,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { router } from '@inertiajs/react';
 import { ChevronDown, Filter, RotateCcw, Search, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 export interface FilterControlBarProps {
@@ -61,7 +61,7 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
-            }
+            },
         );
     };
 
@@ -108,23 +108,19 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
-            }
+            },
         );
     };
 
     const hasActiveFilters = Boolean(search || accreditation);
 
     return (
-        <div className="w-full mb-6 font-['Geist',sans-serif]">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2 md:p-3 rounded-2xl bg-card border border-border shadow-xs">
+        <div className="mb-6 w-full font-['Geist',sans-serif]">
+            <div className="flex flex-col items-stretch justify-between gap-3 rounded-2xl border border-border bg-card p-2 shadow-xs sm:flex-row sm:items-center md:p-3">
                 {/* Search Input */}
-                <form
-                    onSubmit={handleSearchSubmit}
-                    className="relative flex-1 max-w-lg"
-                    role="search"
-                >
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
-                        <Search className="w-4 h-4" />
+                <form onSubmit={handleSearchSubmit} className="relative max-w-lg flex-1" role="search">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground">
+                        <Search className="h-4 w-4" />
                     </div>
                     <input
                         type="text"
@@ -132,16 +128,16 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
                         onChange={handleSearchChange}
                         placeholder="Cari nama atau singkatan PTMA (contoh: UMY, UAD, UMS)..."
                         aria-label="Cari PTMA"
-                        className="w-full pl-10 pr-10 py-2.5 text-xs md:text-sm rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-primary transition-all shadow-xs"
+                        className="w-full rounded-xl border border-border bg-background py-2.5 pr-10 pl-10 text-xs text-foreground shadow-xs transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/20 focus:outline-none md:text-sm"
                     />
                     {search && (
                         <button
                             type="button"
                             onClick={handleClearSearch}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
                             aria-label="Bersihkan pencarian"
                         >
-                            <X className="w-4 h-4" />
+                            <X className="h-4 w-4" />
                         </button>
                     )}
                 </form>
@@ -153,18 +149,18 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
                             <button
                                 type="button"
                                 aria-label="Filter status akreditasi BAN-PT"
-                                className={`inline-flex items-center gap-2 px-3.5 py-2.5 text-xs md:text-sm rounded-xl border transition-all shadow-xs cursor-pointer ${
+                                className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3.5 py-2.5 text-xs shadow-xs transition-all md:text-sm ${
                                     accreditation
-                                        ? 'border-primary text-primary bg-primary/5 font-medium'
-                                        : 'bg-card text-foreground border-border hover:bg-muted'
+                                        ? 'border-primary bg-primary/5 font-medium text-primary'
+                                        : 'border-border bg-card text-foreground hover:bg-muted'
                                 }`}
                             >
-                                <Filter className="w-4 h-4 text-muted-foreground" />
+                                <Filter className="h-4 w-4 text-muted-foreground" />
                                 <span>{accreditation ? `Akreditasi: ${accreditation}` : 'Semua Akreditasi'}</span>
-                                <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-1.5" />
+                                <ChevronDown className="ml-1.5 h-3.5 w-3.5 opacity-60" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 bg-popover text-popover-foreground border-border shadow-lg">
+                        <DropdownMenuContent align="end" className="w-56 border-border bg-popover text-popover-foreground shadow-lg">
                             <DropdownMenuLabel>Filter Akreditasi BAN-PT</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuRadioGroup value={accreditation} onValueChange={handleAccreditationChange}>
@@ -181,10 +177,10 @@ export const FilterControlBar: React.FC<FilterControlBarProps> = ({ filters = {}
                         <button
                             type="button"
                             onClick={handleResetAll}
-                            className="inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-colors shadow-xs"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2.5 text-xs font-medium text-muted-foreground shadow-xs transition-colors hover:bg-muted hover:text-foreground"
                             title="Reset filter pencarian"
                         >
-                            <RotateCcw className="w-3.5 h-3.5" />
+                            <RotateCcw className="h-3.5 w-3.5" />
                             <span className="hidden sm:inline">Reset</span>
                         </button>
                     )}

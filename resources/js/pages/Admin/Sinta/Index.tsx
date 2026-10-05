@@ -16,18 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    Activity,
-    AlertCircle,
-    Building2,
-    CheckCircle2,
-    ChevronLeft,
-    ChevronRight,
-    Loader2,
-    RefreshCw,
-    Server,
-    ShieldAlert,
-} from 'lucide-react';
+import { Activity, AlertCircle, Building2, CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Server, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -153,7 +142,10 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
         switch (status) {
             case 'success':
                 return (
-                    <Badge variant="outline" className="border-emerald-500/30 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+                    <Badge
+                        variant="outline"
+                        className="border-emerald-500/30 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
+                    >
                         <CheckCircle2 className="mr-1 h-3 w-3" />
                         Sukses
                     </Badge>
@@ -183,9 +175,7 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                            Manajemen Integrasi SINTA
-                        </h1>
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">Manajemen Integrasi SINTA</h1>
                         <p className="mt-1 text-sm text-muted-foreground">
                             Pusat sinkronisasi dan monitoring metrik SINTA untuk seluruh Perguruan Tinggi Muhammadiyah &amp; &apos;Aisyiyah.
                         </p>
@@ -195,11 +185,7 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                         <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <AlertDialogTrigger asChild>
                                 <Button disabled={isSyncing} className="shadow-sm">
-                                    {isSyncing ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <RefreshCw className="mr-2 h-4 w-4" />
-                                    )}
+                                    {isSyncing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
                                     Sync Data Sekarang
                                 </Button>
                             </AlertDialogTrigger>
@@ -208,15 +194,13 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                                     <AlertDialogTitle>Konfirmasi Sinkronisasi SINTA</AlertDialogTitle>
                                     <AlertDialogDescription>
                                         Tindakan ini akan menjadwalkan pembaruan metrik SINTA untuk seluruh{' '}
-                                        <span className="font-semibold text-foreground">{summary.total_ptma} kampus PTMA aktif</span> ke
-                                        dalam sistem antrean (background queue). Proses sinkronisasi akan berjalan di latar belakang. Lanjutkan?
+                                        <span className="font-semibold text-foreground">{summary.total_ptma} kampus PTMA aktif</span> ke dalam sistem
+                                        antrean (background queue). Proses sinkronisasi akan berjalan di latar belakang. Lanjutkan?
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Batal</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleSync}>
-                                        Mulai Sinkronisasi
-                                    </AlertDialogAction>
+                                    <AlertDialogAction onClick={handleSync}>Mulai Sinkronisasi</AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
@@ -228,81 +212,61 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                     {/* Total Kampus Target */}
                     <Card className="border-border/60 shadow-xs">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Total Kampus Target
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Kampus Target</CardTitle>
                             <div className="rounded-lg bg-primary/10 p-2 text-primary">
                                 <Building2 className="h-4 w-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight text-foreground">
-                                {summary.total_ptma}
-                            </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Kampus PTMA aktif terdaftar
-                            </p>
+                            <div className="text-2xl font-bold tracking-tight text-foreground">{summary.total_ptma}</div>
+                            <p className="mt-1 text-xs text-muted-foreground">Kampus PTMA aktif terdaftar</p>
                         </CardContent>
                     </Card>
 
                     {/* Berhasil Sinkron */}
                     <Card className="border-border/60 shadow-xs">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Berhasil Sinkron
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Berhasil Sinkron</CardTitle>
                             <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
-                                {summary.synced_success}
-                            </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Metrik terverifikasi &amp; tersimpan
-                            </p>
+                            <div className="text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">{summary.synced_success}</div>
+                            <p className="mt-1 text-xs text-muted-foreground">Metrik terverifikasi &amp; tersimpan</p>
                         </CardContent>
                     </Card>
 
                     {/* Gagal Sinkron */}
                     <Card className="border-border/60 shadow-xs">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Gagal Sinkron
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Gagal Sinkron</CardTitle>
                             <div className="rounded-lg bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400">
                                 <ShieldAlert className="h-4 w-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight text-rose-600 dark:text-rose-400">
-                                {summary.synced_failed}
-                            </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Membutuhkan sinkronisasi ulang
-                            </p>
+                            <div className="text-2xl font-bold tracking-tight text-rose-600 dark:text-rose-400">{summary.synced_failed}</div>
+                            <p className="mt-1 text-xs text-muted-foreground">Membutuhkan sinkronisasi ulang</p>
                         </CardContent>
                     </Card>
 
                     {/* Mode Sistem */}
                     <Card className="border-border/60 shadow-xs">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Mode Sistem
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Mode Sistem</CardTitle>
                             <div className="rounded-lg bg-blue-500/10 p-2 text-blue-600 dark:text-blue-400">
                                 <Server className="h-4 w-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-base font-bold tracking-tight text-foreground truncate">
+                            <div className="truncate text-base font-bold tracking-tight text-foreground">
                                 {summary.mock_mode ? 'Mock Mode (Dev)' : 'Live API (Production)'}
                             </div>
                             <div className="mt-1">
                                 <Badge
                                     variant="outline"
-                                    className={`text-[10px] uppercase tracking-wider ${
+                                    className={`text-[10px] tracking-wider uppercase ${
                                         summary.mock_mode
                                             ? 'border-amber-500/30 bg-amber-50/50 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400'
                                             : 'border-blue-500/30 bg-blue-50/50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400'
@@ -365,28 +329,20 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                                                             {item.university?.name || `PTMA ${item.ptm_code}`}
                                                         </span>
                                                         {item.university?.short_name && (
-                                                            <span className="text-xs text-muted-foreground">
-                                                                {item.university.short_name}
-                                                            </span>
+                                                            <span className="text-xs text-muted-foreground">{item.university.short_name}</span>
                                                         )}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="font-mono text-xs font-semibold text-muted-foreground">
-                                                        {item.ptm_code}
-                                                    </span>
+                                                    <span className="font-mono text-xs font-semibold text-muted-foreground">{item.ptm_code}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="font-mono text-sm font-semibold tabular-nums text-foreground">
+                                                    <span className="font-mono text-sm font-semibold text-foreground tabular-nums">
                                                         {formatScore(item.sinta_score_overall)}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell>
-                                                    {renderStatusBadge(item.sync_status)}
-                                                </TableCell>
-                                                <TableCell className="text-xs text-muted-foreground">
-                                                    {formatDate(item.last_synced_at)}
-                                                </TableCell>
+                                                <TableCell>{renderStatusBadge(item.sync_status)}</TableCell>
+                                                <TableCell className="text-xs text-muted-foreground">{formatDate(item.last_synced_at)}</TableCell>
                                                 <TableCell className="max-w-[260px] text-xs">
                                                     {item.sync_error ? (
                                                         <span className="line-clamp-2 text-rose-600 dark:text-rose-400" title={item.sync_error}>
@@ -408,10 +364,7 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                             <div className="flex flex-col items-center justify-between gap-4 border-t border-border/60 px-6 py-4 sm:flex-row">
                                 <div className="text-xs text-muted-foreground">
                                     Menampilkan{' '}
-                                    <span className="font-medium text-foreground">
-                                        {(metrics.current_page - 1) * metrics.per_page + 1}
-                                    </span>{' '}
-                                    sampai{' '}
+                                    <span className="font-medium text-foreground">{(metrics.current_page - 1) * metrics.per_page + 1}</span> sampai{' '}
                                     <span className="font-medium text-foreground">
                                         {Math.min(metrics.current_page * metrics.per_page, metrics.total)}
                                     </span>{' '}
@@ -443,18 +396,11 @@ export default function AdminSintaIndex({ metrics, summary }: AdminSintaIndexPro
                                         }
 
                                         return (
-                                            <Link
-                                                key={index}
-                                                href={link.url}
-                                                preserveState
-                                                preserveScroll
-                                            >
+                                            <Link key={index} href={link.url} preserveState preserveScroll>
                                                 <Button
                                                     variant={link.active ? 'default' : 'outline'}
                                                     size="sm"
-                                                    className={`h-8 min-w-8 px-2 text-xs ${
-                                                        link.active ? '' : 'text-muted-foreground'
-                                                    }`}
+                                                    className={`h-8 min-w-8 px-2 text-xs ${link.active ? '' : 'text-muted-foreground'}`}
                                                 >
                                                     {isFirst ? (
                                                         <ChevronLeft className="h-3.5 w-3.5" />

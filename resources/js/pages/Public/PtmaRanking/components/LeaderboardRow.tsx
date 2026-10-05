@@ -1,5 +1,5 @@
-import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import React from 'react';
 import { PtmaMetric, PtmaUniversity } from '../types';
 
 export interface LeaderboardRowProps {
@@ -9,12 +9,7 @@ export interface LeaderboardRowProps {
     onSelectDetail: (metric: PtmaMetric) => void;
 }
 
-export const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
-    metric,
-    currentSort = 'sinta_overall',
-    topValue,
-    onSelectDetail,
-}) => {
+export const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ metric, currentSort = 'sinta_overall', topValue, onSelectDetail }) => {
     const safeSort = typeof currentSort === 'string' && currentSort ? currentSort : 'sinta_overall';
     const rank = metric.ranking_position;
     const univ: PtmaUniversity = metric.university;
@@ -98,14 +93,14 @@ export const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
     };
 
     return (
-        <div className="group relative rounded-2xl p-1 bg-muted/40 ring-1 ring-border hover:ring-primary/40 transition-all shadow-xs font-['Geist',sans-serif]">
+        <div className="group relative rounded-2xl bg-muted/40 p-1 font-['Geist',sans-serif] shadow-xs ring-1 ring-border transition-all hover:ring-primary/40">
             {/* Inner Core: Double-Bezel Architecture */}
-            <div className="rounded-[calc(1rem-0.125rem)] p-4 md:px-6 md:py-4 bg-card text-card-foreground flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors">
+            <div className="flex flex-col items-start justify-between gap-4 rounded-[calc(1rem-0.125rem)] bg-card p-4 text-card-foreground transition-colors md:flex-row md:items-center md:px-6 md:py-4">
                 {/* Left: Rank & University Identity */}
-                <div className="flex items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
+                <div className="flex min-w-0 flex-1 items-center gap-3.5 sm:gap-4">
                     {/* Metallic Rank Badge */}
                     <div
-                        className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-['Geist_Mono',monospace] tabular-nums text-sm ${getRankBadgeClasses()}`}
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-['Geist_Mono',monospace] text-sm tabular-nums ${getRankBadgeClasses()}`}
                         title={`Peringkat #${rank}`}
                     >
                         #{rank}
@@ -116,34 +111,30 @@ export const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
                         <img
                             src={univ.logo_url}
                             alt={univ.name}
-                            className="w-10 h-10 shrink-0 rounded-xl object-contain bg-muted p-1 ring-1 ring-border"
+                            className="h-10 w-10 shrink-0 rounded-xl bg-muted object-contain p-1 ring-1 ring-border"
                         />
                     ) : (
-                        <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/10 ring-1 ring-primary/25 flex items-center justify-center font-bold text-primary text-xs">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xs font-bold text-primary ring-1 ring-primary/25">
                             {univ.short_name || univ.code || (univ.name ? univ.name.substring(0, 3).toUpperCase() : 'PTM')}
                         </div>
                     )}
 
                     {/* University Details */}
                     <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-sm md:text-base font-semibold text-card-foreground group-hover:text-primary transition-colors truncate">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="truncate text-sm font-semibold text-card-foreground transition-colors group-hover:text-primary md:text-base">
                                 {univ.name}
                             </h4>
-                            {univ.short_name && (
-                                <span className="text-xs text-muted-foreground font-normal">
-                                    ({univ.short_name})
-                                </span>
-                            )}
+                            {univ.short_name && <span className="text-xs font-normal text-muted-foreground">({univ.short_name})</span>}
                         </div>
 
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
                             {univ.accreditation_status && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] uppercase font-mono font-medium tracking-wider bg-primary/10 text-primary ring-1 ring-primary/20">
+                                <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-medium tracking-wider text-primary uppercase ring-1 ring-primary/20">
                                     Akreditasi {univ.accreditation_status}
                                 </span>
                             )}
-                            <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                 <span>{univ.city ?? 'Indonesia'}</span>
                                 {univ.province && (
                                     <>
@@ -157,24 +148,24 @@ export const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
                 </div>
 
                 {/* Right: Primary Metric & Relative Sparkbar & Button-in-Button */}
-                <div className="flex items-center gap-4 sm:gap-6 w-full md:w-auto justify-between md:justify-end shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-border">
+                <div className="flex w-full shrink-0 items-center justify-between gap-4 border-t border-border pt-3 sm:gap-6 md:w-auto md:justify-end md:border-t-0 md:pt-0">
                     {/* Primary Metric & Sparkbar */}
                     <div className="flex flex-col items-start md:items-end">
                         <div className="flex items-baseline gap-1.5">
-                            <span className="text-lg md:text-xl font-bold font-['Geist_Mono',monospace] tabular-nums text-card-foreground tracking-tight">
+                            <span className="font-['Geist_Mono',monospace] text-lg font-bold tracking-tight text-card-foreground tabular-nums md:text-xl">
                                 {numberFormatter.format(Math.round(metricInfo.value))}
                             </span>
-                            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider hidden sm:inline">
+                            <span className="hidden text-[11px] font-medium tracking-wider text-muted-foreground uppercase sm:inline">
                                 {metricInfo.label}
                             </span>
                         </div>
                         {/* Relative Sparkbar against Top 1 */}
                         <div
-                            className="w-28 sm:w-36 md:w-44 h-1.5 bg-muted rounded-full overflow-hidden mt-1.5 ring-1 ring-border/40"
+                            className="mt-1.5 h-1.5 w-28 overflow-hidden rounded-full bg-muted ring-1 ring-border/40 sm:w-36 md:w-44"
                             title={`${sparkWidth.toFixed(1)}% relatif terhadap peringkat #1`}
                         >
                             <div
-                                className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500 ease-out"
+                                className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 ease-out"
                                 style={{ width: `${sparkWidth}%` }}
                             />
                         </div>
@@ -184,11 +175,11 @@ export const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
                     <button
                         type="button"
                         onClick={() => onSelectDetail(metric)}
-                        className="inline-flex items-center gap-2 pl-3.5 pr-1.5 py-1.5 rounded-full text-xs font-medium bg-muted hover:bg-primary/10 text-foreground hover:text-primary border border-border hover:border-primary/30 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
+                        className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-muted py-1.5 pr-1.5 pl-3.5 text-xs font-medium text-foreground transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                         <span>Rincian</span>
-                        <span className="w-5 h-5 rounded-full bg-card flex items-center justify-center text-muted-foreground border border-border shadow-xs">
-                            <ArrowUpRight className="w-3 h-3 text-current" />
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-xs">
+                            <ArrowUpRight className="h-3 w-3 text-current" />
                         </span>
                     </button>
                 </div>

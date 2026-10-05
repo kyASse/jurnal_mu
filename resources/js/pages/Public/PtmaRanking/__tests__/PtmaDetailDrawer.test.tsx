@@ -93,9 +93,7 @@ describe('PtmaDetailDrawer Component', () => {
             render(<PtmaDetailDrawer metric={mockMetric} onClose={vi.fn()} />);
 
             expect(screen.getByText('Sidik Jari Riset & Luaran')).toBeInTheDocument();
-            expect(
-                screen.getByText(/Profil kekuatan luaran riset dan publikasi kampus pada 6 dimensi utama/i)
-            ).toBeInTheDocument();
+            expect(screen.getByText(/Profil kekuatan luaran riset dan publikasi kampus pada 6 dimensi utama/i)).toBeInTheDocument();
             expect(screen.getByText('6 Sumbu')).toBeInTheDocument();
 
             // Radar axes labels
@@ -273,9 +271,7 @@ describe('PtmaDetailDrawer Component', () => {
                 },
             };
 
-            const { container } = render(
-                <PtmaDetailDrawer metric={minimalMetric} onClose={vi.fn()} />
-            );
+            const { container } = render(<PtmaDetailDrawer metric={minimalMetric} onClose={vi.fn()} />);
 
             expect(container.firstChild).not.toBeNull();
             expect(screen.getByText('Universitas Tanpa Profil Lengkap')).toBeInTheDocument();

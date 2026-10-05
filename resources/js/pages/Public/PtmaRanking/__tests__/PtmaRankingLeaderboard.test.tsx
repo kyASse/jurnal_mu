@@ -62,14 +62,7 @@ describe('LeaderboardRow Component', () => {
     it('renders rank #1 badge, university info, and formatted score in id-ID locale', () => {
         const onSelectDetail = vi.fn();
 
-        render(
-            <LeaderboardRow
-                metric={mockMetric}
-                currentSort="sinta_overall"
-                topValue={345678}
-                onSelectDetail={onSelectDetail}
-            />
-        );
+        render(<LeaderboardRow metric={mockMetric} currentSort="sinta_overall" topValue={345678} onSelectDetail={onSelectDetail} />);
 
         expect(screen.getByText('#1')).toBeInTheDocument();
         expect(screen.getByText('Universitas Muhammadiyah Surakarta')).toBeInTheDocument();
@@ -82,14 +75,7 @@ describe('LeaderboardRow Component', () => {
     it('dynamically adapts metric and label when sort is changed to scopus', () => {
         const onSelectDetail = vi.fn();
 
-        render(
-            <LeaderboardRow
-                metric={mockMetric}
-                currentSort="scopus"
-                topValue={2000}
-                onSelectDetail={onSelectDetail}
-            />
-        );
+        render(<LeaderboardRow metric={mockMetric} currentSort="scopus" topValue={2000} onSelectDetail={onSelectDetail} />);
 
         expect(screen.getByText('1.450')).toBeInTheDocument();
         expect(screen.getByText('Dokumen Scopus')).toBeInTheDocument();
@@ -98,14 +84,7 @@ describe('LeaderboardRow Component', () => {
     it('invokes onSelectDetail callback when clicking the Rincian button', () => {
         const onSelectDetail = vi.fn();
 
-        render(
-            <LeaderboardRow
-                metric={mockMetric}
-                currentSort="sinta_overall"
-                topValue={345678}
-                onSelectDetail={onSelectDetail}
-            />
-        );
+        render(<LeaderboardRow metric={mockMetric} currentSort="sinta_overall" topValue={345678} onSelectDetail={onSelectDetail} />);
 
         const detailBtn = screen.getByRole('button', { name: /rincian/i });
         fireEvent.click(detailBtn);
@@ -119,34 +98,13 @@ describe('LeaderboardRow Component', () => {
         const rank3 = { ...mockMetric, id: 3, ranking_position: 3 };
         const rank4 = { ...mockMetric, id: 4, ranking_position: 4 };
 
-        const { rerender } = render(
-            <LeaderboardRow
-                metric={rank2}
-                currentSort="sinta_overall"
-                topValue={345678}
-                onSelectDetail={vi.fn()}
-            />
-        );
+        const { rerender } = render(<LeaderboardRow metric={rank2} currentSort="sinta_overall" topValue={345678} onSelectDetail={vi.fn()} />);
         expect(screen.getByText('#2')).toBeInTheDocument();
 
-        rerender(
-            <LeaderboardRow
-                metric={rank3}
-                currentSort="sinta_overall"
-                topValue={345678}
-                onSelectDetail={vi.fn()}
-            />
-        );
+        rerender(<LeaderboardRow metric={rank3} currentSort="sinta_overall" topValue={345678} onSelectDetail={vi.fn()} />);
         expect(screen.getByText('#3')).toBeInTheDocument();
 
-        rerender(
-            <LeaderboardRow
-                metric={rank4}
-                currentSort="sinta_overall"
-                topValue={345678}
-                onSelectDetail={vi.fn()}
-            />
-        );
+        rerender(<LeaderboardRow metric={rank4} currentSort="sinta_overall" topValue={345678} onSelectDetail={vi.fn()} />);
         expect(screen.getByText('#4')).toBeInTheDocument();
     });
 });
@@ -194,27 +152,13 @@ describe('LeaderboardTable Component', () => {
     ];
 
     it('renders empty state when no metrics match filter', () => {
-        render(
-            <LeaderboardTable
-                metrics={[]}
-                currentSort="sinta_overall"
-                onSelectDetail={vi.fn()}
-            />
-        );
+        render(<LeaderboardTable metrics={[]} currentSort="sinta_overall" onSelectDetail={vi.fn()} />);
 
-        expect(
-            screen.getByText('Tidak ada kampus yang cocok dengan kriteria pencarian')
-        ).toBeInTheDocument();
+        expect(screen.getByText('Tidak ada kampus yang cocok dengan kriteria pencarian')).toBeInTheDocument();
     });
 
     it('renders all rows and displays total metrics count header', () => {
-        render(
-            <LeaderboardTable
-                metrics={mockMetrics}
-                currentSort="sinta_overall"
-                onSelectDetail={vi.fn()}
-            />
-        );
+        render(<LeaderboardTable metrics={mockMetrics} currentSort="sinta_overall" onSelectDetail={vi.fn()} />);
 
         expect(screen.getByText('Universitas Muhammadiyah Yogyakarta')).toBeInTheDocument();
         expect(screen.getByText('Universitas Ahmad Dahlan')).toBeInTheDocument();
@@ -240,14 +184,7 @@ describe('LeaderboardTable Component', () => {
             ],
         };
 
-        render(
-            <LeaderboardTable
-                metrics={mockMetrics}
-                currentSort="sinta_overall"
-                onSelectDetail={vi.fn()}
-                pagination={pagination}
-            />
-        );
+        render(<LeaderboardTable metrics={mockMetrics} currentSort="sinta_overall" onSelectDetail={vi.fn()} pagination={pagination} />);
 
         expect(screen.getByText(/50 total kampus/i)).toBeInTheDocument();
         const page2Button = screen.getByRole('button', { name: '2' });
@@ -410,13 +347,7 @@ describe('PtmaRanking Index Page Component', () => {
     };
 
     it('assembles SEO head, hero bento, nav, filter bar, and leaderboard table', () => {
-        render(
-            <PtmaRankingIndex
-                rankings={mockRankings}
-                stats={mockStats}
-                filters={{ sort: 'sinta_overall' }}
-            />
-        );
+        render(<PtmaRankingIndex rankings={mockRankings} stats={mockStats} filters={{ sort: 'sinta_overall' }} />);
 
         expect(screen.getByText('Benchmark Institusi PTMA')).toBeInTheDocument();
         expect(screen.getByText(/Peringkat Riset/i)).toBeInTheDocument();
@@ -431,13 +362,7 @@ describe('PtmaRanking Index Page Component', () => {
     });
 
     it('opens PtmaDetailDrawer when detail action is clicked on row', () => {
-        render(
-            <PtmaRankingIndex
-                rankings={mockRankings}
-                stats={mockStats}
-                filters={{ sort: 'sinta_overall' }}
-            />
-        );
+        render(<PtmaRankingIndex rankings={mockRankings} stats={mockStats} filters={{ sort: 'sinta_overall' }} />);
 
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
@@ -450,41 +375,22 @@ describe('PtmaRanking Index Page Component', () => {
 
     it('safely handles empty array filters from Laravel without throwing currentSort.replace TypeError', () => {
         expect(() => {
-            render(
-                <PtmaRankingIndex
-                    rankings={mockRankings}
-                    stats={mockStats}
-                    filters={[] as any}
-                />
-            );
+            render(<PtmaRankingIndex rankings={mockRankings} stats={mockStats} filters={[] as any} />);
         }).not.toThrow();
 
         expect(screen.getByText(/Urutan: sinta overall/i)).toBeInTheDocument();
     });
 
     it('renders PtmaStatisticsChart component with tabs on page 1 and omits it on subsequent pages', () => {
-        const { rerender } = render(
-            <PtmaRankingIndex
-                rankings={mockRankings}
-                stats={mockStats}
-                filters={{ sort: 'sinta_overall' }}
-            />
-        );
+        const { rerender } = render(<PtmaRankingIndex rankings={mockRankings} stats={mockStats} filters={{ sort: 'sinta_overall' }} />);
 
         expect(screen.getByText('Statistik & Komparasi PTMA')).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: /Top 10 Benchmark/i })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: /Profil Riset Top 3/i })).toBeInTheDocument();
 
         // Rerender on page 2
-        rerender(
-            <PtmaRankingIndex
-                rankings={{ ...mockRankings, current_page: 2 }}
-                stats={mockStats}
-                filters={{ sort: 'sinta_overall' }}
-            />
-        );
+        rerender(<PtmaRankingIndex rankings={{ ...mockRankings, current_page: 2 }} stats={mockStats} filters={{ sort: 'sinta_overall' }} />);
 
         expect(screen.queryByText('Statistik & Komparasi PTMA')).not.toBeInTheDocument();
     });
 });
-

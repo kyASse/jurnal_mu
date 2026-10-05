@@ -844,7 +844,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     // });
 });
 
-Route::middleware(['auth', 'verified', 'role:'.\App\Models\Role::SUPER_ADMIN])
+Route::middleware(['auth', 'verified', 'role:'.Role::SUPER_ADMIN])
     ->prefix('admin/sinta')
     ->name('admin.sinta.')
     ->group(function () {

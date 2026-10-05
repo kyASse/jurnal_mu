@@ -83,9 +83,7 @@ describe('PtmaStatisticsChart Component', () => {
         const { container: emptyContainer } = render(<PtmaStatisticsChart metrics={[]} />);
         expect(emptyContainer.firstChild).toBeNull();
 
-        const { container: undefContainer } = render(
-            <PtmaStatisticsChart metrics={undefined as any} />
-        );
+        const { container: undefContainer } = render(<PtmaStatisticsChart metrics={undefined as any} />);
         expect(undefContainer.firstChild).toBeNull();
     });
 
@@ -93,9 +91,7 @@ describe('PtmaStatisticsChart Component', () => {
         render(<PtmaStatisticsChart metrics={mockMetrics} currentSort="sinta_overall" />);
 
         expect(screen.getByText('Statistik & Komparasi PTMA')).toBeInTheDocument();
-        expect(
-            screen.getByText(/Benchmark 10 besar berdasarkan metrik terpilih/i)
-        ).toBeInTheDocument();
+        expect(screen.getByText(/Benchmark 10 besar berdasarkan metrik terpilih/i)).toBeInTheDocument();
 
         expect(screen.getByRole('tab', { name: /Top 10 Benchmark/i })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: /Profil Riset Top 3/i })).toBeInTheDocument();
@@ -151,9 +147,7 @@ describe('PtmaStatisticsChart Component', () => {
     });
 
     it('handles custom currentSort smoothly', () => {
-        const { rerender } = render(
-            <PtmaStatisticsChart metrics={mockMetrics} currentSort="scopus" />
-        );
+        const { rerender } = render(<PtmaStatisticsChart metrics={mockMetrics} currentSort="scopus" />);
         expect(screen.getAllByText(/Scopus/i).length).toBeGreaterThanOrEqual(1);
 
         rerender(<PtmaStatisticsChart metrics={mockMetrics} currentSort="garuda" />);

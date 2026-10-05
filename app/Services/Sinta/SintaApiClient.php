@@ -10,10 +10,15 @@ use Illuminate\Support\Facades\Log;
 class SintaApiClient
 {
     protected string $baseUrl;
+
     protected string $env;
+
     protected string $username;
+
     protected string $password;
+
     protected string $uniq;
+
     protected bool $mockMode;
 
     public function __construct()
@@ -40,7 +45,7 @@ class SintaApiClient
 
             if (!$response->successful()) {
                 Log::error('SINTA Login Failed', ['body' => $response->body()]);
-                throw new Exception('Gagal melakukan autentikasi ke API SINTA: ' . $response->status());
+                throw new Exception('Gagal melakukan autentikasi ke API SINTA: '.$response->status());
             }
 
             $token = $response->json('token');
@@ -75,6 +80,7 @@ class SintaApiClient
         }
 
         $payload = (array) $response->json();
+
         return $this->normalizeMetricPayload($ptmCode, $payload);
     }
 
@@ -125,7 +131,7 @@ class SintaApiClient
 
         return [
             'ptm_code' => $ptmCode,
-            'sinta_id' => 'SINTA-' . substr((string) abs($seed), 0, 5),
+            'sinta_id' => 'SINTA-'.substr((string) abs($seed), 0, 5),
             'sinta_score_overall' => round($scoreOverall, 2),
             'sinta_score_3yr' => round($score3Yr, 2),
             'national_rank_overall' => mt_rand(1, 450),

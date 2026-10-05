@@ -4,7 +4,6 @@ namespace Tests\Feature\Sinta;
 
 use App\Jobs\SyncUniversitySintaMetricJob;
 use App\Models\University;
-use App\Models\UniversitySintaMetric;
 use App\Services\Sinta\SintaApiClient;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -94,7 +93,7 @@ class SyncSintaPtmaCommandTest extends TestCase
             'is_active' => true,
         ]);
 
-        $client = new SintaApiClient();
+        $client = new SintaApiClient;
         $job = new SyncUniversitySintaMetricJob($uni);
         $job->handle($client);
 

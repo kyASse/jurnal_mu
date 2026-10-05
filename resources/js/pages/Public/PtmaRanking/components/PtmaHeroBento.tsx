@@ -1,5 +1,5 @@
-import React from 'react';
 import { Award, BookOpen, FileCheck, Layers, Sparkles } from 'lucide-react';
+import React from 'react';
 
 export interface PtmaHeroStats {
     total_ptma_indexed: number;
@@ -31,51 +31,51 @@ export const PtmaHeroBento: React.FC<PtmaHeroBentoProps> = ({ stats }) => {
     const topUniv = stats.top_university_overall;
 
     return (
-        <section className="relative w-full pt-0 pb-6 md:pb-8 font-['Geist',sans-serif]">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <section className="relative w-full pt-0 pb-6 font-['Geist',sans-serif] md:pb-8">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
                 {/* Spotlight #1 Leaderboard (Double-Bezel Architecture) */}
-                <div className="lg:col-span-5 relative group">
+                <div className="group relative lg:col-span-5">
                     {/* Outer Shell: Doppelrand Container */}
-                    <div className="h-full rounded-[2rem] p-2 bg-gradient-to-br from-primary/15 via-muted/60 to-muted/30 ring-1 ring-primary/25 shadow-sm transition-all duration-300">
+                    <div className="h-full rounded-[2rem] bg-gradient-to-br from-primary/15 via-muted/60 to-muted/30 p-2 shadow-sm ring-1 ring-primary/25 transition-all duration-300">
                         {/* Inner Core: Backdrop blur & content canvas */}
-                        <div className="h-full rounded-[calc(2rem-0.5rem)] p-6 md:p-8 bg-card/95 backdrop-blur-xl border border-border shadow-xs flex flex-col justify-between min-h-[300px]">
+                        <div className="flex h-full min-h-[300px] flex-col justify-between rounded-[calc(2rem-0.5rem)] border border-border bg-card/95 p-6 shadow-xs backdrop-blur-xl md:p-8">
                             {/* Header Badges */}
                             <div className="flex items-center justify-between gap-2">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold uppercase tracking-wider bg-primary/10 text-primary ring-1 ring-primary/25">
-                                    <Sparkles className="w-3.5 h-3.5 text-primary" />
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 font-mono text-[11px] font-semibold tracking-wider text-primary uppercase ring-1 ring-primary/25">
+                                    <Sparkles className="h-3.5 w-3.5 text-primary" />
                                     Top PTMA Nasional
                                 </span>
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-bold tracking-tight text-muted-foreground bg-muted">
+                                <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 font-mono text-xs font-bold tracking-tight text-muted-foreground">
                                     Peringkat #1
                                 </span>
                             </div>
 
                             {/* Center Identity */}
                             <div className="my-6">
-                                <div className="flex items-center gap-3 mb-3">
+                                <div className="mb-3 flex items-center gap-3">
                                     {topUniv?.logo_url ? (
                                         <img
                                             src={topUniv.logo_url}
                                             alt={topUniv.name}
-                                            className="w-12 h-12 rounded-xl object-contain bg-muted p-1 ring-1 ring-border"
+                                            className="h-12 w-12 rounded-xl bg-muted object-contain p-1 ring-1 ring-border"
                                         />
                                     ) : (
-                                        <div className="w-12 h-12 rounded-xl bg-primary/10 ring-1 ring-primary/25 flex items-center justify-center font-bold text-primary text-sm">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-sm font-bold text-primary ring-1 ring-primary/25">
                                             {topUniv?.short_name || topUniv?.name?.substring(0, 3).toUpperCase() || 'PTM'}
                                         </div>
                                     )}
                                     <div>
                                         {topUniv?.accreditation_status && (
-                                            <span className="text-[10px] uppercase font-mono font-semibold tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md ring-1 ring-primary/20">
+                                            <span className="rounded-md bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-primary uppercase ring-1 ring-primary/20">
                                                 Akreditasi {topUniv.accreditation_status}
                                             </span>
                                         )}
                                     </div>
                                 </div>
-                                <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-card-foreground leading-snug line-clamp-2">
+                                <h3 className="line-clamp-2 text-2xl leading-snug font-bold tracking-tight text-card-foreground md:text-3xl">
                                     {topUniv?.name ?? 'Universitas Muhammadiyah'}
                                 </h3>
-                                <p className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1.5">
+                                <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
                                     <span>{topUniv?.city ?? 'Indonesia'}</span>
                                     {topUniv?.province && (
                                         <>
@@ -87,114 +87,96 @@ export const PtmaHeroBento: React.FC<PtmaHeroBentoProps> = ({ stats }) => {
                             </div>
 
                             {/* Footer Metric */}
-                            <div className="pt-4 border-t border-border flex items-baseline justify-between">
+                            <div className="flex items-baseline justify-between border-t border-border pt-4">
                                 <div>
-                                    <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-primary tracking-tight">
+                                    <span className="font-['Geist_Mono',monospace] font-mono text-3xl font-extrabold tracking-tight text-primary tabular-nums md:text-4xl">
                                         {numberFormatter.format(Math.round(stats.top_university_score))}
                                     </span>
-                                    <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block mt-0.5">
+                                    <span className="mt-0.5 block text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
                                         Skor SINTA Overall
                                     </span>
                                 </div>
-                                <span className="text-xs font-mono text-muted-foreground">
-                                    Kemdikbudristek
-                                </span>
+                                <span className="font-mono text-xs text-muted-foreground">Kemdikbudristek</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Macro Power Grid (2x2) */}
-                <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-7">
                     {/* Card 1: Total PTMA Terindeks */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-primary/30 transition-colors shadow-xs">
+                    <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-colors hover:border-primary/30 md:p-6">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                Total PTMA Terindeks
-                            </span>
-                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                                <Layers className="w-4 h-4" />
+                            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Total PTMA Terindeks</span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                                <Layers className="h-4 w-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
+                            <span className="font-['Geist_Mono',monospace] font-mono text-3xl font-extrabold text-card-foreground tabular-nums md:text-4xl">
                                 {numberFormatter.format(stats.total_ptma_indexed)}
                             </span>
-                            <span className="text-xs text-muted-foreground block mt-1">
-                                Perguruan Tinggi Muhammadiyah & 'Aisyiyah
-                            </span>
+                            <span className="mt-1 block text-xs text-muted-foreground">Perguruan Tinggi Muhammadiyah & 'Aisyiyah</span>
                         </div>
-                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-primary/60 rounded-full w-full" />
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                            <div className="h-full w-full rounded-full bg-primary/60" />
                         </div>
                     </div>
 
                     {/* Card 2: Publikasi Scopus Kolektif */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-primary/30 transition-colors shadow-xs">
+                    <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-colors hover:border-primary/30 md:p-6">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                                Publikasi Scopus Kolektif
-                            </span>
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                <BookOpen className="w-4 h-4" />
+                            <span className="text-xs font-semibold tracking-wider text-primary uppercase">Publikasi Scopus Kolektif</span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <BookOpen className="h-4 w-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
+                            <span className="font-['Geist_Mono',monospace] font-mono text-3xl font-extrabold text-card-foreground tabular-nums md:text-4xl">
                                 {numberFormatter.format(stats.collective_scopus_docs)}
                             </span>
-                            <span className="text-xs text-muted-foreground block mt-1">
-                                Dokumen Internasional Bereputasi
-                            </span>
+                            <span className="mt-1 block text-xs text-muted-foreground">Dokumen Internasional Bereputasi</span>
                         </div>
-                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-primary rounded-full w-full" />
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                            <div className="h-full w-full rounded-full bg-primary" />
                         </div>
                     </div>
 
                     {/* Card 3: Publikasi Garuda Kolektif */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-secondary/30 transition-colors shadow-xs">
+                    <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-colors hover:border-secondary/30 md:p-6">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
-                                Publikasi Garuda Kolektif
-                            </span>
-                            <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
-                                <FileCheck className="w-4 h-4" />
+                            <span className="text-xs font-semibold tracking-wider text-secondary uppercase">Publikasi Garuda Kolektif</span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+                                <FileCheck className="h-4 w-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
+                            <span className="font-['Geist_Mono',monospace] font-mono text-3xl font-extrabold text-card-foreground tabular-nums md:text-4xl">
                                 {numberFormatter.format(stats.collective_garuda_docs)}
                             </span>
-                            <span className="text-xs text-muted-foreground block mt-1">
-                                Publikasi Terakreditasi Nasional
-                            </span>
+                            <span className="mt-1 block text-xs text-muted-foreground">Publikasi Terakreditasi Nasional</span>
                         </div>
-                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-secondary rounded-full w-full" />
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                            <div className="h-full w-full rounded-full bg-secondary" />
                         </div>
                     </div>
 
                     {/* Card 4: Paten / HKI Kolektif */}
-                    <div className="rounded-2xl p-5 md:p-6 bg-card border border-border flex flex-col justify-between hover:border-accent/40 transition-colors shadow-xs">
+                    <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-colors hover:border-accent/40 md:p-6">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                Paten & HKI Kolektif
-                            </span>
-                            <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-foreground">
-                                <Award className="w-4 h-4" />
+                            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Paten & HKI Kolektif</span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/20 text-foreground">
+                                <Award className="h-4 w-4" />
                             </div>
                         </div>
                         <div className="my-3">
-                            <span className="text-3xl md:text-4xl font-extrabold font-mono tabular-nums font-['Geist_Mono',monospace] text-card-foreground">
+                            <span className="font-['Geist_Mono',monospace] font-mono text-3xl font-extrabold text-card-foreground tabular-nums md:text-4xl">
                                 {numberFormatter.format(stats.collective_ipr_count)}
                             </span>
-                            <span className="text-xs text-muted-foreground block mt-1">
-                                Hak Kekayaan Intelektual Terdaftar
-                            </span>
+                            <span className="mt-1 block text-xs text-muted-foreground">Hak Kekayaan Intelektual Terdaftar</span>
                         </div>
-                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-muted-foreground rounded-full w-full" />
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                            <div className="h-full w-full rounded-full bg-muted-foreground" />
                         </div>
                     </div>
                 </div>

@@ -34,6 +34,7 @@ class SyncUniversitySintaMetricJob implements ShouldQueue
 
         if (empty($ptmCode)) {
             Log::warning("Skipping SINTA sync: University ID {$this->university->id} ({$this->university->name}) has no ptm_code.");
+
             return;
         }
 

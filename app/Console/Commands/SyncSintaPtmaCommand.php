@@ -40,6 +40,7 @@ class SyncSintaPtmaCommand extends Command
 
             if ($universities->isEmpty()) {
                 $this->error("University with ID {$universityId} not found.");
+
                 return Command::FAILURE;
             }
         } else {
@@ -50,6 +51,7 @@ class SyncSintaPtmaCommand extends Command
 
         if ($universities->isEmpty()) {
             $this->warn('No active universities with ptm_code found to sync.');
+
             return Command::SUCCESS;
         }
 

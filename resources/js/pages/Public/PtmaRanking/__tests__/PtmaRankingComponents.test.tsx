@@ -114,7 +114,7 @@ describe('VariableSegmentedNav Component', () => {
         expect(mockRouterGet).toHaveBeenCalledWith(
             '/ptma/ranking',
             { q: 'muhammadiyah', sort: 'scopus', page: 1 },
-            { preserveState: true, preserveScroll: true, replace: true }
+            { preserveState: true, preserveScroll: true, replace: true },
         );
     });
 
@@ -157,7 +157,7 @@ describe('FilterControlBar Component', () => {
         expect(mockRouterGet).toHaveBeenCalledWith(
             '/ptma/ranking',
             { sort: 'sinta_overall', q: 'Surakarta', page: 1 },
-            { preserveState: true, preserveScroll: true, replace: true }
+            { preserveState: true, preserveScroll: true, replace: true },
         );
     });
 
@@ -173,7 +173,7 @@ describe('FilterControlBar Component', () => {
         expect(mockRouterGet).toHaveBeenCalledWith(
             '/ptma/ranking',
             { sort: 'scopus', q: 'Malang', page: 1 },
-            { preserveState: true, preserveScroll: true, replace: true }
+            { preserveState: true, preserveScroll: true, replace: true },
         );
     });
 
@@ -190,7 +190,7 @@ describe('FilterControlBar Component', () => {
         expect(mockRouterGet).toHaveBeenCalledWith(
             '/ptma/ranking',
             { sort: 'sinta_overall', accreditation: 'Baik Sekali', page: 1 },
-            { preserveState: true, preserveScroll: true, replace: true }
+            { preserveState: true, preserveScroll: true, replace: true },
         );
     });
 
@@ -203,7 +203,7 @@ describe('FilterControlBar Component', () => {
         expect(mockRouterGet).toHaveBeenCalledWith(
             '/ptma/ranking',
             { sort: 'sinta_overall', page: 1 },
-            { preserveState: true, preserveScroll: true, replace: true }
+            { preserveState: true, preserveScroll: true, replace: true },
         );
     });
 });

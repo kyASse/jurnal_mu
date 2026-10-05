@@ -39,7 +39,7 @@ class UniversitySintaMetricFactory extends Factory
 
         return [
             'university_id' => University::factory(),
-            'sinta_id' => 'SINTA-' . $this->faker->numerify('#####'),
+            'sinta_id' => 'SINTA-'.$this->faker->numerify('#####'),
             'ptm_code' => $this->faker->numerify('051###'),
             'sinta_score_overall' => round($scoreOverall, 2),
             'sinta_score_3yr' => round($score3Yr, 2),

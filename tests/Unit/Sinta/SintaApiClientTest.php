@@ -14,7 +14,7 @@ class SintaApiClientTest extends TestCase
         config(['sinta.mock_mode' => true]);
         Http::preventStrayRequests();
 
-        $client = new SintaApiClient();
+        $client = new SintaApiClient;
         $result = $client->getAffiliationMetric('051010');
 
         $this->assertIsArray($result);
@@ -46,7 +46,7 @@ class SintaApiClientTest extends TestCase
             ], 200),
         ]);
 
-        $client = new SintaApiClient();
+        $client = new SintaApiClient;
         $token = $client->getToken();
 
         $this->assertEquals('dummy-jwt-token-12345', $token);
@@ -74,7 +74,7 @@ class SintaApiClientTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('API SINTA berhasil dihubungi namun tidak mengembalikan token yang valid.');
 
-        $client = new SintaApiClient();
+        $client = new SintaApiClient;
         $client->getToken();
     }
 }

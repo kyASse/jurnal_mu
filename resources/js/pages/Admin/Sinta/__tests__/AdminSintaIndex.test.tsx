@@ -62,9 +62,7 @@ describe('AdminSintaIndex Pagination', () => {
         render(<AdminSintaIndex metrics={mockMetrics as any} summary={mockSummary} />);
 
         // The first link (Previous) has url: null, so it should render as a disabled button
-        const disabledButtons = screen.getAllByRole('button').filter(
-            (btn) => btn.hasAttribute('disabled')
-        );
+        const disabledButtons = screen.getAllByRole('button').filter((btn) => btn.hasAttribute('disabled'));
 
         expect(disabledButtons.length).toBeGreaterThan(0);
     });
