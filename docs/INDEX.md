@@ -54,6 +54,9 @@ Dokumentasi fitur-fitur dan implementasinya
   - `doi-subscription/UI_DESIGN.md` - UI/UX Design System & Wireframes
   - `doi-subscription/TESTING_LOGS.md` - QA & Test Execution Matrix
 
+- **Papan Peringkat SINTA PTMA** ✨ **NEW**
+  - `SINTA_PTMA_RANKING_IMPLEMENTATION.md` - Integrasi SINTA API v3.0, ranking multi-dimensi, visualisasi chart data (Top 10 Bar & Top 3 Radar), dan panel Super Admin
+
 - **Lainnya**
   - `BROWSE_UNIVERSITIES_IMPLEMENTATION.md` - Fitur browse universitas
   - `CACHE_IMPLEMENTATION_SUMMARY.md` - Implementasi cache

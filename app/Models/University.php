@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Doi\SubscriptionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class University extends Model
@@ -106,6 +107,14 @@ class University extends Model
     {
         return $this->hasOne(DoiSubscription::class, 'university_id')
             ->where('status', SubscriptionStatus::ACTIVE);
+    }
+
+    /**
+     * Get SINTA metrics for this university
+     */
+    public function sintaMetric(): HasOne
+    {
+        return $this->hasOne(UniversitySintaMetric::class);
     }
 
     /*
