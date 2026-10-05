@@ -73,7 +73,7 @@ class AuthSecurityTest extends TestCase
         foreach ($weakPasswords as $weakPassword) {
             $response = $this->post(route('register'), [
                 'name' => 'Test User',
-                'email' => 'test_' . uniqid() . '@domain.edu',
+                'email' => 'test_'.uniqid().'@domain.edu',
                 'password' => $weakPassword,
                 'password_confirmation' => $weakPassword,
                 'university_id' => $university->id,
@@ -141,7 +141,7 @@ class AuthSecurityTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $this->post(route('register'), [
                 'name' => 'Spam User',
-                'email' => "spam_{$i}_" . uniqid() . '@domain.edu',
+                'email' => "spam_{$i}_".uniqid().'@domain.edu',
                 'password' => 'SpamP@ssw0rd123',
                 'password_confirmation' => 'SpamP@ssw0rd123',
                 'university_id' => $university->id,
@@ -152,7 +152,7 @@ class AuthSecurityTest extends TestCase
         // 11th attempt must be throttled with HTTP 429
         $response = $this->post(route('register'), [
             'name' => 'Spam User 11',
-            'email' => 'spam_11_' . uniqid() . '@domain.edu',
+            'email' => 'spam_11_'.uniqid().'@domain.edu',
             'password' => 'SpamP@ssw0rd123',
             'password_confirmation' => 'SpamP@ssw0rd123',
             'university_id' => $university->id,

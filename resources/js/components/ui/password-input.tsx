@@ -2,8 +2,7 @@ import * as React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export interface PasswordInputProps
-  extends React.ComponentProps<'input'> {}
+export type PasswordInputProps = React.ComponentProps<'input'>;
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ className, autoComplete = 'current-password', ...props }, ref) => {

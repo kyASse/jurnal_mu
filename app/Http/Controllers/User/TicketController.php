@@ -117,7 +117,7 @@ class TicketController extends Controller
             abort(404);
         }
 
-        if (! $message->attachment_path || ! Storage::disk('local')->exists($message->attachment_path)) {
+        if (!$message->attachment_path || !Storage::disk('local')->exists($message->attachment_path)) {
             abort(404, 'File lampiran tidak ditemukan.');
         }
 

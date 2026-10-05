@@ -11,5 +11,7 @@
         <testsuite name="Browser Test Suite">
             <directory suffix="Test.php">./tests/Browser</directory>
         </testsuite>
-    </testsuites>
+    <php>
+        <env name="APP_URL" value="http://127.0.0.1:8000"/>
+    </php>
 </phpunit>

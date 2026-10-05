@@ -10,6 +10,7 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
@@ -119,7 +120,7 @@ class AccessControlSecurityTest extends TestCase
 
     public function test_check_university_middleware_blocks_different_university_with_model_or_raw_id(): void
     {
-        $middleware = new CheckUniversity();
+        $middleware = new CheckUniversity;
         $userRole = Role::where('name', Role::ADMIN_KAMPUS)->first();
 
         $uni1 = University::factory()->create();
@@ -135,8 +136,9 @@ class AccessControlSecurityTest extends TestCase
         $request1 = Request::create('/test', 'GET');
         $request1->setUserResolver(fn () => $user);
         $request1->setRouteResolver(function () use ($uni2) {
-            $route = new \Illuminate\Routing\Route('GET', '/test/{university}', []);
+            $route = new Route('GET', '/test/{university}', []);
             $route->parameters = ['university' => $uni2];
+
             return $route;
         });
 
@@ -151,8 +153,9 @@ class AccessControlSecurityTest extends TestCase
         $request2 = Request::create('/test', 'GET');
         $request2->setUserResolver(fn () => $user);
         $request2->setRouteResolver(function () use ($uni2) {
-            $route = new \Illuminate\Routing\Route('GET', '/test/{university}', []);
+            $route = new Route('GET', '/test/{university}', []);
             $route->parameters = ['university' => (string) $uni2->id];
+
             return $route;
         });
 
@@ -167,8 +170,9 @@ class AccessControlSecurityTest extends TestCase
         $request3 = Request::create('/test', 'POST', ['university_id' => $uni2->id]);
         $request3->setUserResolver(fn () => $user);
         $request3->setRouteResolver(function () {
-            $route = new \Illuminate\Routing\Route('POST', '/test', []);
+            $route = new Route('POST', '/test', []);
             $route->parameters = [];
+
             return $route;
         });
 
@@ -183,8 +187,9 @@ class AccessControlSecurityTest extends TestCase
         $request4 = Request::create('/test', 'GET');
         $request4->setUserResolver(fn () => $user);
         $request4->setRouteResolver(function () use ($uni1) {
-            $route = new \Illuminate\Routing\Route('GET', '/test/{university}', []);
+            $route = new Route('GET', '/test/{university}', []);
             $route->parameters = ['university' => $uni1];
+
             return $route;
         });
 
@@ -194,7 +199,7 @@ class AccessControlSecurityTest extends TestCase
 
     public function test_check_journal_ownership_middleware_blocks_unauthorized_access(): void
     {
-        $middleware = new CheckJournalOwnership();
+        $middleware = new CheckJournalOwnership;
         $userRole = Role::where('name', Role::USER)->first();
 
         $uni = University::factory()->create();
@@ -218,8 +223,9 @@ class AccessControlSecurityTest extends TestCase
         $request1 = Request::create('/test', 'GET');
         $request1->setUserResolver(fn () => $otherUser);
         $request1->setRouteResolver(function () use ($journal) {
-            $route = new \Illuminate\Routing\Route('GET', '/test/{journal}', []);
+            $route = new Route('GET', '/test/{journal}', []);
             $route->parameters = ['journal' => $journal];
+
             return $route;
         });
 
@@ -234,8 +240,9 @@ class AccessControlSecurityTest extends TestCase
         $request2 = Request::create('/test', 'GET');
         $request2->setUserResolver(fn () => $otherUser);
         $request2->setRouteResolver(function () use ($journal) {
-            $route = new \Illuminate\Routing\Route('GET', '/test/{journal}', []);
+            $route = new Route('GET', '/test/{journal}', []);
             $route->parameters = ['journal' => $journal->id];
+
             return $route;
         });
 
@@ -250,8 +257,9 @@ class AccessControlSecurityTest extends TestCase
         $request3 = Request::create('/test', 'GET');
         $request3->setUserResolver(fn () => $owner);
         $request3->setRouteResolver(function () use ($journal) {
-            $route = new \Illuminate\Routing\Route('GET', '/test/{journal}', []);
+            $route = new Route('GET', '/test/{journal}', []);
             $route->parameters = ['journal' => $journal];
+
             return $route;
         });
 

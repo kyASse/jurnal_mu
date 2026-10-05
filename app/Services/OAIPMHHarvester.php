@@ -50,6 +50,7 @@ class OAIPMHHarvester
                 $errorMsg = "Blocked SSRF attempt for unsafe OAI-PMH URL: {$oai_url}";
                 Log::warning($errorMsg, ['journal_id' => $journal->id]);
                 $globalStats['errors'][] = $errorMsg;
+
                 continue;
             }
 
