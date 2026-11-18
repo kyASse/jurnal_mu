@@ -48,7 +48,26 @@ vi.mock('@inertiajs/react', () => {
                 scientificFields: [],
                 upcomingEvents: [],
                 featuredArticles: [],
-                topUniversities: [],
+                topUniversities: [
+                    {
+                        id: 1,
+                        name: 'Universitas Ahmad Dahlan',
+                        short_name: 'UAD',
+                        city: 'Yogyakarta',
+                        province: 'Daerah Istimewa Yogyakarta',
+                        logo_url: null,
+                        journals_count: 66,
+                    },
+                    {
+                        id: 2,
+                        name: 'Universitas Muhammadiyah Malang',
+                        short_name: 'UMM',
+                        city: 'Malang',
+                        province: 'Jawa Timur',
+                        logo_url: null,
+                        journals_count: 63,
+                    },
+                ],
             },
         }),
     };
@@ -118,5 +137,25 @@ describe('Welcome Page Redesign', () => {
         fireEvent.click(searchButton);
 
         expect(mockGet).toHaveBeenCalled();
+    });
+
+    it('should render top universities cards with links and badges', () => {
+        render(<Welcome />);
+        expect(screen.getByText('Top Universities')).toBeInTheDocument();
+        expect(screen.getByText('Universitas Ahmad Dahlan')).toBeInTheDocument();
+        expect(screen.getByText('66 Journals')).toBeInTheDocument();
+        expect(screen.getByText('Universitas Muhammadiyah Malang')).toBeInTheDocument();
+        expect(screen.getByText('63 Journals')).toBeInTheDocument();
+        expect(screen.getByText('Browse All Universities')).toBeInTheDocument();
+    });
+
+    it('should configure top universities section with grid-cols-1 and responsive flex header for mobile', () => {
+        const welcomePath = path.resolve(__dirname, '../welcome.tsx');
+        const content = fs.readFileSync(welcomePath, 'utf8');
+
+        // Verify grid has grid-cols-1 for base mobile breakpoint to prevent card overflow
+        expect(content).toMatch(/grid\s+grid-cols-1\s+gap-4\s+sm:gap-6\s+sm:grid-cols-2\s+lg:grid-cols-3/);
+        // Verify header uses responsive flex stacking (flex-col sm:flex-row)
+        expect(content).toMatch(/flex\s+flex-col\s+gap-4\s+sm:mb-12\s+sm:flex-row\s+sm:items-end\s+sm:justify-between/);
     });
 });
