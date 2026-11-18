@@ -154,7 +154,7 @@ describe('Welcome Page Redesign', () => {
         const content = fs.readFileSync(welcomePath, 'utf8');
 
         // Verify grid has grid-cols-1 for base mobile breakpoint to prevent card overflow
-        expect(content).toMatch(/grid\s+grid-cols-1\s+gap-4\s+sm:gap-6\s+sm:grid-cols-2\s+lg:grid-cols-3/);
+        expect(content).toMatch(/grid\s+grid-cols-1\s+gap-4\s+sm:grid-cols-2\s+sm:gap-6\s+lg:grid-cols-3/);
         // Verify header uses responsive flex stacking (flex-col sm:flex-row)
         expect(content).toMatch(/flex\s+flex-col\s+gap-4\s+sm:mb-12\s+sm:flex-row\s+sm:items-end\s+sm:justify-between/);
     });
