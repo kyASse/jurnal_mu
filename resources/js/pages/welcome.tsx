@@ -368,7 +368,7 @@ export default function Welcome() {
                     {/* TOP UNIVERSITIES SECTION */}
                     {topUniversities && topUniversities.length > 0 && (
                         <div className="mt-24 mb-16">
-                            <div className="mb-12 flex items-end justify-between">
+                            <div className="mb-8 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
                                     <h2 className="font-heading text-3xl font-bold text-primary" style={{ fontFamily: '"El Messiri", serif' }}>
                                         Top Universities
@@ -386,15 +386,15 @@ export default function Welcome() {
                                 </Link>
                             </div>
 
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                                 {topUniversities.map((uni) => (
                                     <Link
                                         key={uni.id}
                                         href={route('browse.universities.show', uni.id)}
-                                        className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+                                        className="group flex w-full min-w-0 items-center gap-3.5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:gap-4 sm:p-5 dark:border-zinc-800 dark:bg-zinc-900"
                                     >
                                         {/* Logo or Initials placeholder */}
-                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2 group-hover:border-primary/20 dark:border-zinc-800 dark:bg-zinc-800">
+                                        <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2 group-hover:border-primary/20 sm:h-16 sm:w-16 dark:border-zinc-800 dark:bg-zinc-800">
                                             {uni.logo_url ? (
                                                 <img src={uni.logo_url} alt={uni.name} className="h-full w-full object-contain" />
                                             ) : (
@@ -405,7 +405,7 @@ export default function Welcome() {
                                         </div>
 
                                         {/* Details */}
-                                        <div className="min-w-0 flex-grow space-y-1">
+                                        <div className="min-w-0 flex-1 space-y-1">
                                             <h3 className="truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-primary dark:text-white">
                                                 {uni.name}
                                             </h3>
